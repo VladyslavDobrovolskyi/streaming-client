@@ -18,9 +18,9 @@ jobs:
                   port: ${{ secrets.PORT }}
                   script: |
                       cd /home/ubuntu/
-                      echo "🔄 Скачиваем код с GitHub"
+                      echo "🔄 Cтягиваем код с github"
+                      echo "🗑 Очищаем следы прошлых запусков, если имеются"
                       if [ -d "streaming-client" ]; then
-                          echo "🗑 Удаляем старую папку streaming-client"
                           rm -rf streaming-client
                       fi
                       git clone git@github.com:VladyslavDobrovolskyi/streaming-client.git
@@ -29,29 +29,50 @@ jobs:
                       git pull
                       rm -rf .git
 
-                      echo "🔄 Проверяем и управляем контейнером streaming-client"
+                      echo "🔄 Остановка и пересборка контейнера"
+                      echo "🛑 Проверка наличия контейнера streaming-client"
                       if [ $(docker ps -q -f name=streaming-client) ]; then
-                          echo "🛑 Останавливаем контейнер streaming-client"
+                          echo "🛑 Остановка контейнера streaming-client"
                           docker stop streaming-client || true
                           docker rm streaming-client || true
-                      fi
 
-                      echo "🛠 Пересобираем контейнер streaming-client"
-                      docker-compose build streaming-client --no-cache
+                          echo "🛠 Пересборка контейнера streaming-client без кэша"
+                          docker build -t streaming-client .
 
-                      echo "🚀 Запускаем контейнер streaming-client"
-                      docker-compose up -d streaming-client
+                          echo "🚀 Запуск контейнера streaming-client"
+                          docker run -d --name streaming-client \
+                            --network app-network \
+                            -p 7777:7777 \
+                            streaming-client
 
-                      echo "🔍 Проверяем статус контейнера streaming-client"
-                      if [ $(docker ps -q -f name=streaming-client) ]; then
-                          echo "✅ Контейнер streaming-client успешно запущен"
+                          echo "🔍 Проверка, что контейнер streaming-client поднялся"
+                          if [ $(docker ps -q -f name=streaming-client) ]; then
+                              echo "✅ Контейнер streaming-client успешно запущен"
+                          else
+                              echo "❌ Контейнер streaming-client не запущен"
+                              exit 1
+                          fi
                       else
-                          echo "❌ Не удалось запустить контейнер streaming-client"
-                          exit 1
+                          echo "🛠 Контейнер streaming-client не найден, пересборка и запуск"
+                          docker build -t streaming-client .
+                          docker run -d --name streaming-client \
+                            --network app-network \
+                            -p 7777:7777 \
+                            streaming-client
+
+                          echo "🔍 Проверка, что контейнер streaming-client поднялся"
+                          if [ $(docker ps -q -f name=streaming-client) ]; then
+                              echo "✅ Контейнер streaming-client успешно запущен"
+                          else
+                              echo "❌ Контейнер streaming-client не запущен"
+                              exit 1
+                          fi
+                      fi
+                       cd /home/ubuntu/
+
+                       echo "🗑 Очищаем пространство"
+                      if [ -d "streaming-client" ]; then
+                          rm -rf streaming-client
                       fi
 
-                      echo "🗑 Удаляем локальную копию streaming-client"
-                      cd ..
-                      rm -rf streaming-client
-
-                      echo "✅ Деплой завершён!"
+                      echo "✅ Деплой завершен успешно!"
