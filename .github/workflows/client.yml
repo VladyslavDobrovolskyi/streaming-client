@@ -40,7 +40,7 @@ jobs:
                           docker-compose build --no-cache streaming-client
 
                           echo "🚀 Запуск контейнера streaming-client"
-                          docker-compose start -d --no-deps --force-recreate streaming-client
+                          docker-compose up -d --no-deps --force-recreate streaming-client
 
                           echo "🔍 Проверка, что контейнер streaming-client поднялся"
                           if [ $(docker ps -q -f name=streaming-client) ]; then
