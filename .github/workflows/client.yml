@@ -39,9 +39,15 @@ jobs:
                           echo "🛠 Пересборка контейнера streaming-client без кэша"
                           docker build -t streaming-client .
 
+                          echo "🔍 Проверка наличия сети streaming-network"
+                          if [ ! $(docker network ls -q -f name=streaming-network) ]; then
+                              echo "🌐 Сеть streaming-network не найдена, создаем сеть"
+                              docker network create streaming-network
+                          fi
+
                           echo "🚀 Запуск контейнера streaming-client"
                           docker run -d --name streaming-client \
-                            --network app-network \
+                            --network streaming-network \
                             -p 7777:7777 \
                             streaming-client
 
@@ -55,8 +61,16 @@ jobs:
                       else
                           echo "🛠 Контейнер streaming-client не найден, пересборка и запуск"
                           docker build -t streaming-client .
+
+                          echo "🔍 Проверка наличия сети streaming-network"
+                          if [ ! $(docker network ls -q -f name=streaming-network) ]; then
+                              echo "🌐 Сеть streaming-network не найдена, создаем сеть"
+                              docker network create streaming-network
+                          fi
+
+                          echo "🚀 Запуск контейнера streaming-client"
                           docker run -d --name streaming-client \
-                            --network app-network \
+                            --network streaming-network \
                             -p 7777:7777 \
                             streaming-client
 
@@ -68,9 +82,9 @@ jobs:
                               exit 1
                           fi
                       fi
-                       cd /home/ubuntu/
+                      cd /home/ubuntu/
 
-                       echo "🗑 Очищаем пространство"
+                      echo "🗑 Очищаем пространство"
                       if [ -d "streaming-client" ]; then
                           rm -rf streaming-client
                       fi
