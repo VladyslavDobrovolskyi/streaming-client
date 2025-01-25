@@ -35,52 +35,34 @@ jobs:
                           echo "🛑 Остановка контейнера streaming-client"
                           docker stop streaming-client || true
                           docker rm streaming-client || true
+                      fi
 
-                          echo "🛠 Пересборка контейнера streaming-client без кэша"
-                          docker build -t streaming-client .
+                      echo "🗑 Удаление предыдущего образа streaming-client, если он существует"
+                      if [ $(docker images -q streaming-client) ]; then
+                          docker rmi streaming-client || true
+                      fi
 
-                          echo "🔍 Проверка наличия сети streaming-network"
-                          if [ ! $(docker network ls -q -f name=streaming-network) ]; then
-                              echo "🌐 Сеть streaming-network не найдена, создаем сеть"
-                              docker network create streaming-network
-                          fi
+                      echo "🛠 Пересборка контейнера streaming-client без кэша"
+                      docker build -t streaming-client .
 
-                          echo "🚀 Запуск контейнера streaming-client"
-                          docker run -d --name streaming-client \
-                            --network streaming-network \
-                            -p 7777:7777 \
-                            streaming-client
+                      echo "🔍 Проверка наличия сети app-network"
+                      if [ ! $(docker network ls -q -f name=app-network) ]; then
+                          echo "🌐 Сеть app-network не найдена, создаем сеть"
+                          docker network create app-network
+                      fi
 
-                          echo "🔍 Проверка, что контейнер streaming-client поднялся"
-                          if [ $(docker ps -q -f name=streaming-client) ]; then
-                              echo "✅ Контейнер streaming-client успешно запущен"
-                          else
-                              echo "❌ Контейнер streaming-client не запущен"
-                              exit 1
-                          fi
+                      echo "🚀 Запуск контейнера streaming-client"
+                      docker run -d --name streaming-client \
+                        --network app-network \
+                        -p 7777:7777 \
+                        streaming-client
+
+                      echo "🔍 Проверка, что контейнер streaming-client поднялся"
+                      if [ $(docker ps -q -f name=streaming-client) ]; then
+                          echo "✅ Контейнер streaming-client успешно запущен"
                       else
-                          echo "🛠 Контейнер streaming-client не найден, пересборка и запуск"
-                          docker build -t streaming-client .
-
-                          echo "🔍 Проверка наличия сети streaming-network"
-                          if [ ! $(docker network ls -q -f name=streaming-network) ]; then
-                              echo "🌐 Сеть streaming-network не найдена, создаем сеть"
-                              docker network create streaming-network
-                          fi
-
-                          echo "🚀 Запуск контейнера streaming-client"
-                          docker run -d --name streaming-client \
-                            --network streaming-network \
-                            -p 7777:7777 \
-                            streaming-client
-
-                          echo "🔍 Проверка, что контейнер streaming-client поднялся"
-                          if [ $(docker ps -q -f name=streaming-client) ]; then
-                              echo "✅ Контейнер streaming-client успешно запущен"
-                          else
-                              echo "❌ Контейнер streaming-client не запущен"
-                              exit 1
-                          fi
+                          echo "❌ Контейнер streaming-client не запущен"
+                          exit 1
                       fi
                       cd /home/ubuntu/
 
