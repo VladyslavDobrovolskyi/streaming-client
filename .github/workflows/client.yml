@@ -18,9 +18,9 @@ jobs:
                   port: ${{ secrets.PORT }}
                   script: |
                       cd /home/ubuntu/
-                      echo "🔄 Cтягиваем код с github"
-                      echo "🗑 Очищаем следы прошлых запусков, если имеются"
+                      echo "🔄 Скачиваем код с GitHub"
                       if [ -d "streaming-client" ]; then
+                          echo "🗑 Удаляем старую папку streaming-client"
                           rm -rf streaming-client
                       fi
                       git clone git@github.com:VladyslavDobrovolskyi/streaming-client.git
@@ -29,41 +29,29 @@ jobs:
                       git pull
                       rm -rf .git
 
-                      echo "🔄 Остановка и пересборка контейнера"
-                      echo "🛑 Проверка наличия контейнера streaming-client"
+                      echo "🔄 Проверяем и управляем контейнером streaming-client"
                       if [ $(docker ps -q -f name=streaming-client) ]; then
-                          echo "🛑 Остановка контейнера streaming-client"
+                          echo "🛑 Останавливаем контейнер streaming-client"
                           docker stop streaming-client || true
                           docker rm streaming-client || true
-
-                          echo "🛠 Пересборка контейнера streaming-client без кэша"
-                          docker-compose build --no-cache streaming-client
-
-                          echo "🚀 Запуск контейнера streaming-client"
-                          docker-compose up -d --no-deps --force-recreate streaming-client
-
-                          echo "🔍 Проверка, что контейнер streaming-client поднялся"
-                          if [ $(docker ps -q -f name=streaming-client) ]; then
-                              echo "✅ Контейнер streaming-client успешно запущен"
-                          else
-                              echo "❌ Контейнер streaming-client не запущен"
-                              exit 1
-                          fi
-                      else
-                          echo "🛠 Контейнер streaming-client не найден, пересборка и запуск"
-                          docker-compose --build --no-cache streaming-client
-                          docker-compose up -d --no-deps --force-recreate streaming-client
-
-                          echo "🔍 Проверка, что контейнер streaming-client поднялся"
-                          if [ $(docker ps -q -f name=streaming-client) ]; then
-                              echo "✅ Контейнер streaming-client успешно запущен"
-                          else
-                              echo "❌ Контейнер streaming-client не запущен"
-                              exit 1
-                          fi
                       fi
 
-                      echo "🗑 Удаление папки streaming-client"
-                      rm -rf /home/ubuntu/streaming-client
+                      echo "🛠 Пересобираем контейнер streaming-client"
+                      docker-compose build streaming-client --no-cache
 
-                      echo "✅ Деплой завершен успешно!"
+                      echo "🚀 Запускаем контейнер streaming-client"
+                      docker-compose up -d streaming-client
+
+                      echo "🔍 Проверяем статус контейнера streaming-client"
+                      if [ $(docker ps -q -f name=streaming-client) ]; then
+                          echo "✅ Контейнер streaming-client успешно запущен"
+                      else
+                          echo "❌ Не удалось запустить контейнер streaming-client"
+                          exit 1
+                      fi
+
+                      echo "🗑 Удаляем локальную копию streaming-client"
+                      cd ..
+                      rm -rf streaming-client
+
+                      echo "✅ Деплой завершён!"
