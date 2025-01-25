@@ -33,8 +33,8 @@ jobs:
                       echo "🛑 Проверка наличия контейнера streaming-client"
                       if [ $(docker ps -q -f name=streaming-client) ]; then
                           echo "🛑 Остановка контейнера streaming-client"
-                          docker stop streaming-client 
-                          docker rm streaming-client 
+                          docker stop streaming-client || true
+                          docker rm streaming-client || true
 
                           echo "🛠 Пересборка контейнера streaming-client без кэша"
                           docker-compose build --no-cache streaming-client
