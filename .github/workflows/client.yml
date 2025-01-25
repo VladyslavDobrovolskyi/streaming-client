@@ -45,7 +45,10 @@ jobs:
                           echo "🔍 Проверка, что контейнер streaming-client поднялся"
                           if [ $(docker ps -q -f name=streaming-client) ]; then
                               echo "✅ Контейнер streaming-client успешно запущен"
-
+                          else
+                              echo "❌ Контейнер streaming-client не запущен"
+                              exit 1
+                          fi
                       else
                           echo "🛠 Контейнер streaming-client не найден, пересборка и запуск"
                           docker-compose build --no-cache streaming-client
