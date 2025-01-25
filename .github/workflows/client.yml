@@ -54,6 +54,7 @@ jobs:
                       echo "🚀 Запуск контейнера streaming-client"
                       docker run -d --name streaming-client \
                         --network streaming-network \
+                        --restart always \
                         -p 7777:7777 \
                         streaming-client
 
