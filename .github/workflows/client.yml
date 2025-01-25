@@ -68,7 +68,7 @@ jobs:
                       fi
 
 
-                      cd /home/ubuntu/
+                       cd /home/ubuntu/
 
                       echo "🔍 Проверка наличия контейнеров postgres и nginx"
                       if [ ! $(docker ps -q -f name=postgres) ]; then
@@ -79,9 +79,6 @@ jobs:
                           echo "❌ Контейнер nginx не найден, запускаем docker-compose up"
                           docker-compose up -d nginx
                       fi
-
-
-                      cd /home/ubuntu/
 
                       echo "🗑 Очищаем пространство"
                       if [ -d "streaming-client" ]; then
