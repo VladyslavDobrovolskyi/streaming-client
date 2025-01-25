@@ -30,7 +30,7 @@ const Login: React.FC = () => {
 
 	return (
 		<div>
-			<h2>Login (CI-CD-TEST)</h2>
+			<h2>Login (CI-CD-TEST-2)</h2>
 			{error && <p style={{ color: 'red' }}>{error}</p>}
 			<input type='text' placeholder='Username' value={username} onChange={e => setUsername(e.target.value)} />
 			<input
