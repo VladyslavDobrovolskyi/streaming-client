@@ -21,14 +21,12 @@ jobs:
 
                       echo "🔄 Cтягиваем код с github"
                       git clone git@github.com:VladyslavDobrovolskyi/streaming-client.git
-                      cd streaming-deploy
+                      cd streaming-client
                       git checkout dev
                       git pull
                       rm -rf .git
 
                       echo "🔄 Остановка и пересборка контейнера"
-                      cd /home/ubuntu/
-
                       echo "🛑 Остановка контейнера streaming-client"
                       docker stop streaming-client || true
                       docker rm streaming-client || true
