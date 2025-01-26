@@ -1,6 +1,7 @@
 import axios from 'axios'
-import store from '../redux/store'
-import { refreshToken, logoutAsync } from '../features/auth/authSlice'
+import store, { RootState } from '../redux/store'
+import { refreshToken } from '../features/auth/authSlice'
+import { clearAuthState } from '../features/auth/authSlice'
 
 const api = axios.create({
 	baseURL: 'https://streaming.vladyslavdobrovolskyi.tech/api/',
@@ -12,8 +13,8 @@ const api = axios.create({
 
 api.interceptors.request.use(
 	config => {
-		const state = store.getState()
-		const token = state.auth.accessToken
+		const state = store.getState() as RootState
+		const token = (state.auth as { accessToken: string }).accessToken
 		if (token) {
 			config.headers.Authorization = `Bearer ${token}`
 		}
@@ -34,7 +35,7 @@ api.interceptors.response.use(
 				originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`
 				return api(originalRequest)
 			} catch (refreshError) {
-				store.dispatch(logoutAsync())
+				store.dispatch(clearAuthState())
 				return Promise.reject(refreshError)
 			}
 		}
