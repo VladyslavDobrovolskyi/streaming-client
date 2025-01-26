@@ -5,12 +5,14 @@ import { validatePasswordLength } from '../utils/validation'
 import { login } from '../features/auth/authSlice'
 import { Link } from 'react-router-dom'
 import styles from './AuthForm.module.css'
-import { navigate } from '@reach/router'
+import { useNavigate } from 'react-router-dom'
 
 const LoginForm = () => {
 	useEffect(() => {
 		document.title = 'Sign In'
 	}, [])
+
+	const navigate = useNavigate()
 
 	const [formData, setFormData] = useState({
 		username: '',
