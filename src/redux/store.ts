@@ -1,14 +1,17 @@
-import { configureStore } from '@reduxjs/toolkit'
-import authReducer from '../features/auth/authSlice'
+// store.ts
+import { configureStore } from '@reduxjs/toolkit';
+import authReducer from '../features/auth/authSlice';
+import authMiddleware from '../middleware/authMiddleware'; // импортируем наш middleware
 
 const store = configureStore({
-	reducer: {
-		auth: authReducer,
-	},
-})
+  reducer: {
+    auth: authReducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(authMiddleware), // добавляем middleware
+});
 
-// Типы для RootState и AppDispatch
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
 
-export default store
+export default store;

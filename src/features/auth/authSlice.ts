@@ -112,10 +112,18 @@ const authSlice = createSlice({
 				state.isLoading = false
 				state.error = action.payload as string
 			})
-			.addCase(refreshToken.fulfilled, (state, action: PayloadAction<string>) => {
+			.addCase(refreshToken.fulfilled, (state, action: PayloadAction<string | undefined>) => {
 				console.log('Refresh token fulfilled:', action.payload)
-				state.accessToken = action.payload
-				localStorage.setItem('accessToken', action.payload)
+				if (action.payload) {
+					state.accessToken = action.payload
+					localStorage.setItem('accessToken', action.payload)
+				} else {
+					state.isAuthenticated = false
+					state.accessToken = null
+					state.refreshToken = null
+					localStorage.removeItem('accessToken')
+					localStorage.removeItem('refreshToken')
+				}
 			})
 			.addCase(refreshToken.rejected, state => {
 				console.error('Refresh token rejected')
