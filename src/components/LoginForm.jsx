@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux'
 import DOMPurify from 'dompurify'
 import { validatePasswordLength } from '../utils/validation'
 import { login } from '../features/auth/authSlice'
+import { Link } from 'react-router-dom'
 import styles from './AuthForm.module.css'
 
 const LoginForm = () => {
