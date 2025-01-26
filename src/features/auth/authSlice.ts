@@ -32,32 +32,44 @@ const initialState: AuthState = {
 export const register = createAsyncThunk(
 	'auth/register',
 	async (userData: { email: string; password: string }, { rejectWithValue }) => {
-	  try {
-		const { id, email, token } = await registerUser(userData);
-		return { id, email, token };
-	  } catch (error) {
-		return rejectWithValue(error instanceof Error ? error.message : 'An unknown error occurred');
-	  }
+		try {
+			const { id, email, token } = await registerUser(userData)
+			console.log('Register successful:', { id, email, token })
+			return { id, email, token }
+		} catch (error) {
+			console.error('Register failed:', error)
+			if (error instanceof Error) {
+				return rejectWithValue(error.message)
+			}
+			return rejectWithValue('An unknown error occurred')
+		}
 	}
-  );
-  
-  export const login = createAsyncThunk(
+)
+
+export const login = createAsyncThunk(
 	'auth/login',
 	async (credentials: { email: string; password: string }, { rejectWithValue }) => {
-	  try {
-		const { id, email, accessToken, refreshToken } = await authLoginUser(credentials);
-		return { id, email, accessToken, refreshToken };
-	  } catch (error) {
-		return rejectWithValue(error instanceof Error ? error.message : 'An unknown error occurred');
-	  }
+		try {
+			const { id, email, accessToken, refreshToken } = await authLoginUser(credentials)
+			console.log('Login successful:', { id, email, accessToken, refreshToken })
+			return { id, email, accessToken, refreshToken }
+		} catch (error) {
+			console.error('Login failed:', error)
+			if (error instanceof Error) {
+				return rejectWithValue(error.message)
+			}
+			return rejectWithValue('An unknown error occurred')
+		}
 	}
-  );
+)
 
 export const refreshToken = createAsyncThunk('auth/refreshToken', async (_, { rejectWithValue }) => {
 	try {
 		const accessToken = await refreshAccessToken()
+		console.log('Refresh token successful:', accessToken)
 		return accessToken
 	} catch (error: unknown) {
+		console.error('Refresh token failed:', error)
 		if (error instanceof Error) {
 			return rejectWithValue(error.message)
 		}
@@ -69,6 +81,7 @@ const authSlice = createSlice({
 	initialState,
 	reducers: {
 		clearAuthState: state => {
+			console.log('Clearing auth state')
 			state.accessToken = null
 			state.refreshToken = null
 			state.profileData = null
@@ -81,9 +94,11 @@ const authSlice = createSlice({
 	extraReducers: builder => {
 		builder
 			.addCase(login.pending, state => {
+				console.log('Login pending')
 				state.isLoading = true
 			})
 			.addCase(login.fulfilled, (state, action: PayloadAction<LoginPayload>) => {
+				console.log('Login fulfilled:', action.payload)
 				state.isLoading = false
 				state.accessToken = action.payload.accessToken
 				state.refreshToken = action.payload.refreshToken
@@ -93,16 +108,17 @@ const authSlice = createSlice({
 				state.isAuthenticated = true
 			})
 			.addCase(login.rejected, (state, action) => {
+				console.error('Login rejected:', action.payload)
 				state.isLoading = false
 				state.error = action.payload as string
 			})
-			.addCase(refreshToken.fulfilled, (state, action: PayloadAction<string | undefined>) => {
-				if (action.payload) {
-					state.accessToken = action.payload
-					localStorage.setItem('accessToken', action.payload)
-				}
+			.addCase(refreshToken.fulfilled, (state, action: PayloadAction<string>) => {
+				console.log('Refresh token fulfilled:', action.payload)
+				state.accessToken = action.payload
+				localStorage.setItem('accessToken', action.payload)
 			})
 			.addCase(refreshToken.rejected, state => {
+				console.error('Refresh token rejected')
 				state.isAuthenticated = false
 				state.accessToken = null
 				state.refreshToken = null
