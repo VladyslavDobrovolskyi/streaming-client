@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import socket from '../socket'
 import ReactPlayer from 'react-player'
 import Hls from 'hls.js'
-import Login from './Login'
+import LoginForm from '../components/LoginForm'
 import { v4 } from 'uuid'
 import ACTIONS from '../socket/actions'
 
@@ -140,7 +140,7 @@ const Main: React.FC = () => {
 	}
 
 	if (!isAuthenticated) {
-		return <Login />
+		return <LoginForm />
 	}
 
 	if (error) {

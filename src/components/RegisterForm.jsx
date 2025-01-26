@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import DOMPurify from 'dompurify'
-import { registerUser } from '../../features/auth/AuthService'
+import { registerUser } from '../features/auth/AuthService'
 import { validateEmail, validatePasswordLength } from '../../../utils/validation'
 import styles from './AuthForm.module.css'
 
