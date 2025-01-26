@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import DOMPurify from 'dompurify'
-import { validatePasswordLength } from '../../../utils/validation'
+import { validatePasswordLength } from '../utils/validation'
 import { login } from '../authSlice'
 import styles from './AuthForm.module.css'
 
