@@ -5,6 +5,7 @@ import { validatePasswordLength } from '../utils/validation'
 import { login } from '../features/auth/authSlice'
 import { Link } from 'react-router-dom'
 import styles from './AuthForm.module.css'
+import { navigate } from '@reach/router'
 
 const LoginForm = () => {
 	useEffect(() => {
@@ -53,6 +54,7 @@ const LoginForm = () => {
 
 		try {
 			const resultAction = await dispatch(login({ username, password })).unwrap()
+			navigate('/')
 			console.log('Login success:', resultAction)
 		} catch (err) {
 			setErrors({ username: err.message, password: '' })

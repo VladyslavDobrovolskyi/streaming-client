@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import socket from '../socket'
 import ReactPlayer from 'react-player'
 import Hls from 'hls.js'
-import LoginForm from '../components/LoginForm.jsx'
 import { v4 } from 'uuid'
 import ACTIONS from '../socket/actions'
 
@@ -19,7 +18,7 @@ const Main: React.FC = () => {
 	const rootNode = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
-		const token = localStorage.getItem('accessToken') //proverka
+		const token = localStorage.getItem('accessToken')
 		if (token) {
 			setIsAuthenticated(true)
 		}
@@ -140,7 +139,7 @@ const Main: React.FC = () => {
 	}
 
 	if (!isAuthenticated) {
-		return <LoginForm />
+		navigate(`/login`)
 	}
 
 	if (error) {
