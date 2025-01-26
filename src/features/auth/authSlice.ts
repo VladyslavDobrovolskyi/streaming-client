@@ -87,7 +87,6 @@ const authSlice = createSlice({
 			state.profileData = null
 			state.isAuthenticated = false
 			localStorage.removeItem('accessToken')
-			localStorage.removeItem('refreshToken')
 			localStorage.removeItem('profileData')
 		},
 	},
@@ -104,7 +103,6 @@ const authSlice = createSlice({
 				state.refreshToken = action.payload.refreshToken
 				state.profileData = { id: action.payload.id, email: action.payload.email }
 				localStorage.setItem('accessToken', action.payload.accessToken)
-				localStorage.setItem('refreshToken', action.payload.refreshToken)
 				state.isAuthenticated = true
 			})
 			.addCase(login.rejected, (state, action) => {
@@ -122,7 +120,6 @@ const authSlice = createSlice({
 					state.accessToken = null
 					state.refreshToken = null
 					localStorage.removeItem('accessToken')
-					localStorage.removeItem('refreshToken')
 				}
 			})
 			.addCase(refreshToken.rejected, state => {
@@ -131,7 +128,6 @@ const authSlice = createSlice({
 				state.accessToken = null
 				state.refreshToken = null
 				localStorage.removeItem('accessToken')
-				localStorage.removeItem('refreshToken')
 			})
 	},
 })
