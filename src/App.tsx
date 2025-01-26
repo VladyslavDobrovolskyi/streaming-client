@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Room from './pages/Room'
 import Main from './pages/Main'
 import { Provider } from 'react-redux'
-import { store } from './redux/store.js'
+import store from './redux/store.js'
 
 function App() {
 	return (
