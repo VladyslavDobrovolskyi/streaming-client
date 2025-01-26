@@ -117,7 +117,4 @@ const authSlice = createSlice({
 })
 
 export const { clearAuthState } = authSlice.actions
-
-// Инициализация состояния перед экспортом
-
-export default authSlice.reducer(initialState, { type: 'init' })
+export default authSlice.reducer
