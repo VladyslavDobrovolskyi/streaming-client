@@ -6,14 +6,14 @@ import store from './redux/store'
 
 function App() {
 	return (
-		<Provider store={store}>
-			<BrowserRouter>
+		<BrowserRouter>
+			<Provider store={store}>
 				<Routes>
 					<Route path='/room/:id' element={<Room />} />
 					<Route path='/' element={<Main />} />
 				</Routes>
-			</BrowserRouter>
-		</Provider>
+			</Provider>
+		</BrowserRouter>
 	)
 }
 
