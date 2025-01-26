@@ -1,3 +1,5 @@
+//ts
+
 import path from 'path'
 import { io } from 'socket.io-client'
 
