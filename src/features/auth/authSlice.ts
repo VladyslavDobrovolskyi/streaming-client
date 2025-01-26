@@ -32,32 +32,26 @@ const initialState: AuthState = {
 export const register = createAsyncThunk(
 	'auth/register',
 	async (userData: { email: string; password: string }, { rejectWithValue }) => {
-		try {
-			const { id, email, token } = await registerUser(userData)
-			return { id, email, token }
-		} catch (error) {
-			if (error instanceof Error) {
-				return rejectWithValue(error.message)
-			}
-			return rejectWithValue('An unknown error occurred')
-		}
+	  try {
+		const { id, email, token } = await registerUser(userData);
+		return { id, email, token };
+	  } catch (error) {
+		return rejectWithValue(error instanceof Error ? error.message : 'An unknown error occurred');
+	  }
 	}
-)
-
-export const login = createAsyncThunk(
+  );
+  
+  export const login = createAsyncThunk(
 	'auth/login',
 	async (credentials: { email: string; password: string }, { rejectWithValue }) => {
-		try {
-			const { id, email, accessToken, refreshToken } = await authLoginUser(credentials)
-			return { id, email, accessToken, refreshToken }
-		} catch (error) {
-			if (error instanceof Error) {
-				return rejectWithValue(error.message)
-			}
-			return rejectWithValue('An unknown error occurred')
-		}
+	  try {
+		const { id, email, accessToken, refreshToken } = await authLoginUser(credentials);
+		return { id, email, accessToken, refreshToken };
+	  } catch (error) {
+		return rejectWithValue(error instanceof Error ? error.message : 'An unknown error occurred');
+	  }
 	}
-)
+  );
 
 export const refreshToken = createAsyncThunk('auth/refreshToken', async (_, { rejectWithValue }) => {
 	try {
@@ -102,9 +96,11 @@ const authSlice = createSlice({
 				state.isLoading = false
 				state.error = action.payload as string
 			})
-			.addCase(refreshToken.fulfilled, (state, action: PayloadAction<string>) => {
-				state.accessToken = action.payload
-				localStorage.setItem('accessToken', action.payload)
+			.addCase(refreshToken.fulfilled, (state, action: PayloadAction<string | undefined>) => {
+				if (action.payload) {
+					state.accessToken = action.payload
+					localStorage.setItem('accessToken', action.payload)
+				}
 			})
 			.addCase(refreshToken.rejected, state => {
 				state.isAuthenticated = false
