@@ -19,7 +19,7 @@ const Main: React.FC = () => {
 	const rootNode = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
-		const token = localStorage.getItem('token')
+		const token = localStorage.getItem('accessToken') //proverka
 		if (token) {
 			setIsAuthenticated(true)
 		}
