@@ -1,7 +1,5 @@
 import axios from 'axios'
-import store, { RootState } from '../redux/store'
-import { refreshToken } from '../features/auth/authSlice'
-import { clearAuthState } from '../features/auth/authSlice'
+import { refreshToken, clearAuthState } from '../features/auth/authSlice'
 
 const api = axios.create({
 	baseURL: 'https://streaming.vladyslavdobrovolskyi.tech/api/',
@@ -12,9 +10,10 @@ const api = axios.create({
 })
 
 api.interceptors.request.use(
-	config => {
-		const state = store.getState() as RootState
-		const token = (state.auth as unknown as { accessToken: string }).accessToken
+	async config => {
+		const { default: store } = await import('../redux/store')
+		const state = store.getState()
+		const token = state.auth.accessToken
 		if (token) {
 			config.headers.Authorization = `Bearer ${token}`
 		}
@@ -31,10 +30,12 @@ api.interceptors.response.use(
 			originalRequest._retry = true
 
 			try {
+				const { default: store } = await import('../redux/store')
 				const newAccessToken = await store.dispatch(refreshToken()).unwrap()
 				originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`
 				return api(originalRequest)
 			} catch (refreshError) {
+				const { default: store } = await import('../redux/store')
 				store.dispatch(clearAuthState())
 				return Promise.reject(refreshError)
 			}
