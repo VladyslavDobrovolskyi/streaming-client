@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import socket from '../socket'
 import ReactPlayer from 'react-player'
 import Hls from 'hls.js'
-import LoginForm from '../components/LoginForm'
+import LoginForm from '../components/LoginForm.jsx'
 import { v4 } from 'uuid'
 import ACTIONS from '../socket/actions'
 
