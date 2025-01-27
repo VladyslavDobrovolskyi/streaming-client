@@ -1,13 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import socket from '../socket'
-import ReactPlayer from 'react-player'
 import Hls from 'hls.js'
 import { v4 } from 'uuid'
 import ACTIONS from '../socket/actions'
 
 const Main: React.FC = () => {
-	const playerRef = useRef<ReactPlayer>(null)
+	const videoRef = useRef<HTMLVideoElement>(null)
 	const [isPlaying, setIsPlaying] = useState(true)
 	const [isMuted, setIsMuted] = useState(true)
 	const [error, setError] = useState<string | null>(null)
@@ -44,7 +43,7 @@ const Main: React.FC = () => {
 				return
 			}
 
-			if (Hls.isSupported() && playerRef.current) {
+			if (Hls.isSupported() && videoRef.current) {
 				const hls = new Hls({
 					liveSyncDurationCount: 1,
 					lowLatencyMode: true,
@@ -54,7 +53,7 @@ const Main: React.FC = () => {
 				})
 				hlsRef.current = hls
 
-				const mediaElement = playerRef.current.getInternalPlayer() as HTMLMediaElement
+				const mediaElement = videoRef.current
 
 				if (mediaElement) {
 					hls.loadSource('https://streaming.vladyslavdobrovolskyi.tech/stream/playlist.m3u8')
@@ -82,8 +81,8 @@ const Main: React.FC = () => {
 	}, [])
 
 	const handlePlayPause = () => {
-		if (playerRef.current) {
-			const mediaElement = playerRef.current.getInternalPlayer() as HTMLMediaElement
+		if (videoRef.current) {
+			const mediaElement = videoRef.current
 			if (mediaElement.paused) {
 				if (hlsRef.current) {
 					hlsRef.current.startLoad(-1) // Загрузить последний сегмент
@@ -101,8 +100,8 @@ const Main: React.FC = () => {
 	}
 
 	const handleMuteUnmute = () => {
-		if (playerRef.current) {
-			const mediaElement = playerRef.current.getInternalPlayer() as HTMLMediaElement
+		if (videoRef.current) {
+			const mediaElement = videoRef.current
 			mediaElement.muted = !mediaElement.muted
 			setIsMuted(mediaElement.muted)
 		}
@@ -153,30 +152,15 @@ const Main: React.FC = () => {
 	return (
 		<div className='Main'>
 			<h1>Live Stream!!!</h1>
-			<ReactPlayer
-				ref={playerRef}
-				url='https://streaming.vladyslavdobrovolskyi.tech/stream/playlist.m3u8'
-				playing={isPlaying}
-				controls={false}
-				muted={isMuted}
-				loop={true}
+			<video
+				ref={videoRef}
 				width='100%'
 				height='auto'
-				config={{
-					file: {
-						attributes: {
-							crossOrigin: 'anonymous',
-						},
-						hlsOptions: {
-							liveSyncDurationCount: 1,
-							lowLatencyMode: true,
-							maxLiveSyncPlaybackRate: 1,
-							enableWorker: true,
-							liveBackBufferLength: 0,
-							startPosition: -1,
-						},
-					},
-				}}
+				controls={false}
+				muted={isMuted}
+				autoPlay
+				playsInline
+				crossOrigin='anonymous'
 			/>
 			<div style={{ marginTop: '10px' }}>
 				<button onClick={handlePlayPause} style={{ padding: '10px 20px', fontSize: '16px' }}>
