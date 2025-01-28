@@ -183,10 +183,9 @@ export default function useWebRTC(roomID: string) {
 	}, [roomID, addNewClient])
 
 	// Handle VIDEO_PLAY, VIDEO_PAUSE, VIDEO_SEEK
-	const handleVideoAction = useCallback((action: string, payload: { peerID: string; time?: number }) => {
+	const handleVideoAction = useStateWithCallback((action: string, payload: { peerID: string; time?: number }) => {
 		socket.emit(action, payload)
 	}, [])
-
 	// Listen for video play, pause, and seek events from peers
 	useEffect(() => {
 		socket.on(ACTIONS.VIDEO_PLAY, ({ peerID }) => {
