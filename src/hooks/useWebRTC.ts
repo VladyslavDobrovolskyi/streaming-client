@@ -1,5 +1,4 @@
 import { useEffect, useRef, useCallback } from 'react'
-import freeice from 'freeice'
 import useStateWithCallback from './useStateWithCallback'
 import socket from '../socket'
 import ACTIONS from '../socket/actions'
@@ -31,7 +30,7 @@ export default function useWebRTC(roomID: string) {
 
 	const createPeerConnection = (peerID: string) => {
 		const connection = new RTCPeerConnection({
-			iceServers: freeice(),
+			iceServers: [{ urls: 'stun:stun2.1.google.com:19302' }],
 		})
 
 		connection.onicecandidate = event => {
@@ -78,6 +77,7 @@ export default function useWebRTC(roomID: string) {
 
 		// Set ICE connection timeout and retry mechanism
 		const iceConnectionTimer = setTimeout(() => {
+			console.log('Current state is:', connection.iceConnectionState)
 			if (connection.iceConnectionState !== 'connected' && connection.iceConnectionState !== 'completed') {
 				console.warn(`Retrying connection to peer ${peerID} with new ICE servers`)
 				connection.close()
