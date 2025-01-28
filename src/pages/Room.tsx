@@ -46,7 +46,7 @@ export default function Room() {
 
 	const checkStreamAvailability = async () => {
 		try {
-			const response = await fetch('/movie/movie/movie.mkv')
+			const response = await fetch('/movie/movie.mkv')
 			if (!response.ok) {
 				setError('Movie is currently unavailable')
 				return
