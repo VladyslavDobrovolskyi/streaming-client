@@ -29,94 +29,78 @@ export default function useWebRTC(roomID: string) {
 
 	const iceRetryTimeout = 5000 // 2 seconds timeout
 
-	const createPeerConnection = useCallback(
-		(peerID: string) => {
-			const connection = new RTCPeerConnection({
-				iceServers: freeice(),
-			})
+	const createPeerConnection = (peerID: string) => {
+		const connection = new RTCPeerConnection({
+			iceServers: freeice(),
+		})
 
-			connection.onicecandidate = event => {
-				if (event.candidate) {
-					socket.emit(ACTIONS.RELAY_ICE, {
-						peerID,
-						iceCandidate: event.candidate,
-					})
-				}
-			}
-
-			let tracksNumber = 0
-			connection.ontrack = ({ streams: [remoteStream] }) => {
-				tracksNumber++
-
-				if (tracksNumber === 2) {
-					tracksNumber = 0
-					addNewClient(peerID, () => {
-						const element = peerMediaElements.current[peerID]
-						if (element) {
-							element.srcObject = remoteStream
-						} else {
-							const interval = setInterval(() => {
-								const settledElement = peerMediaElements.current[peerID]
-								if (settledElement) {
-									settledElement.srcObject = remoteStream
-									clearInterval(interval)
-								}
-							}, 500)
-						}
-					})
-				}
-			}
-
-			localMediaStream.current?.getTracks().forEach(track => {
-				connection.addTrack(track, localMediaStream.current!)
-			})
-
-			return connection
-		},
-		[addNewClient]
-	)
-
-	// Handle new peer connection
-	useEffect(() => {
-		async function handleNewPeer({ peerID, createOffer }: { peerID: string; createOffer: boolean }) {
-			if (peerID in peerConnections.current) {
-				return console.warn(`Already connected to peer ${peerID}`)
-			}
-
-			const connection = createPeerConnection(peerID)
-			peerConnections.current[peerID] = connection
-
-			// Set ICE connection timeout and retry mechanism
-			const iceConnectionTimer = setTimeout(() => {
-				if (connection.iceConnectionState !== 'connected' && connection.iceConnectionState !== 'completed') {
-					console.warn(`Retrying connection to peer ${peerID} with new ICE servers`)
-					connection.close()
-					delete peerConnections.current[peerID]
-					peerConnections.current[peerID] = createPeerConnection(peerID)
-				}
-			}, iceRetryTimeout)
-
-			connection.oniceconnectionstatechange = () => {
-				if (connection.iceConnectionState === 'connected' || connection.iceConnectionState === 'completed') {
-					clearTimeout(iceConnectionTimer)
-				}
-			}
-
-			if (createOffer) {
-				const offer = await connection.createOffer()
-				await connection.setLocalDescription(offer)
-				socket.emit(ACTIONS.RELAY_SDP, {
+		connection.onicecandidate = event => {
+			if (event.candidate) {
+				socket.emit(ACTIONS.RELAY_ICE, {
 					peerID,
-					sessionDescription: offer,
+					iceCandidate: event.candidate,
 				})
 			}
 		}
 
-		socket.on(ACTIONS.ADD_PEER, handleNewPeer)
-		return () => {
-			socket.off(ACTIONS.ADD_PEER)
+		connection.ontrack = ({ streams: [remoteStream] }) => {
+			addNewClient(peerID, () => {
+				const element = peerMediaElements.current[peerID]
+				if (element) {
+					element.srcObject = remoteStream
+				} else {
+					const interval = setInterval(() => {
+						const settledElement = peerMediaElements.current[peerID]
+						if (settledElement) {
+							settledElement.srcObject = remoteStream
+							clearInterval(interval)
+						}
+					}, 500)
+				}
+			})
 		}
-	}, [createPeerConnection])
+
+		localMediaStream.current?.getTracks().forEach(track => {
+			connection.addTrack(track, localMediaStream.current!)
+		})
+
+		return connection
+	}
+
+	// Handle new peer connection
+	socket.on(ACTIONS.ADD_PEER, async ({ peerID, createOffer }: { peerID: string; createOffer: boolean }) => {
+		if (peerID in peerConnections.current) {
+			return console.warn(`Already connected to peer ${peerID}`)
+		}
+
+		const connection = createPeerConnection(peerID)
+		peerConnections.current[peerID] = connection
+
+		// Set ICE connection timeout and retry mechanism
+		const iceConnectionTimer = setTimeout(() => {
+			if (connection.iceConnectionState !== 'connected' && connection.iceConnectionState !== 'completed') {
+				console.warn(`Retrying connection to peer ${peerID} with new ICE servers`)
+				connection.close()
+				delete peerConnections.current[peerID]
+				peerConnections.current[peerID] = createPeerConnection(peerID)
+			}
+		}, iceRetryTimeout)
+
+		connection.oniceconnectionstatechange = () => {
+			if (connection.iceConnectionState === 'connected' || connection.iceConnectionState === 'completed') {
+				clearTimeout(iceConnectionTimer)
+			}
+		}
+
+		if (createOffer) {
+			const offer = await connection.createOffer()
+			await connection.setLocalDescription(offer)
+			socket.emit(ACTIONS.RELAY_SDP, {
+				peerID,
+				sessionDescription: offer,
+			})
+		}
+	})
 
 	// Handle remote session description
 	useEffect(() => {
