@@ -46,22 +46,18 @@ export default function Room() {
 				height: '100vh',
 			}}
 		>
-			{clients.map((clientID, index) => {
-				return (
-					<div key={clientID} style={videoLayout[index]} id={clientID}>
-						<video
-							width='100%'
-							height='100%'
-							ref={instance => {
-								provideMediaRef(clientID, instance)
-							}}
-							autoPlay
-							playsInline
-							muted={clientID === LOCAL_VIDEO}
-						/>
-					</div>
-				)
-			})}
+			{clients.map((clientID, index) => (
+				<div key={clientID} style={videoLayout[index]} id={clientID}>
+					<video
+						width='100%'
+						height='100%'
+						ref={instance => provideMediaRef(clientID, instance)}
+						autoPlay
+						playsInline
+						muted={clientID === LOCAL_VIDEO}
+					/>
+				</div>
+			))}
 		</div>
 	)
 }
