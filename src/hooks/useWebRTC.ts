@@ -27,7 +27,7 @@ export default function useWebRTC(roomID: string) {
 		[LOCAL_VIDEO]: null,
 	})
 
-	const iceRetryTimeout = 2000 // 2 seconds timeout
+	const iceRetryTimeout = 5000 // 2 seconds timeout
 
 	const createPeerConnection = useCallback(
 		(peerID: string) => {
