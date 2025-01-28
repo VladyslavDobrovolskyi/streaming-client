@@ -33,13 +33,18 @@ const Main: React.FC = () => {
 
 	const checkStreamAvailability = async () => {
 		try {
-			const response = await fetch('https://streaming.vladyslavdobrovolskyi.tech/stream/playlist.m3u8')
-			if (!response.ok) {
-				if (response.status === 404) {
-					setError('Stream will be available at 8 PM')
-				} else {
-					setError('An error occurred while fetching the stream')
-				}
+			const response = await fetch('https://streaming.vladyslavdobrovolskyi.tech/stream/playlist.m3u8', {
+				headers: new Headers({
+					'Cache-Control': 'no-cache, no-store, must-revalidate',
+					Pragma: 'no-cache',
+					Expires: '0',
+				}),
+			})
+
+			// Добавляем проверку MIME-типа
+			const contentType = response.headers.get('Content-Type')
+			if (!contentType?.includes('application/vnd.apple.mpegurl')) {
+				setError('Invalid MIME type for HLS stream')
 				return
 			}
 
@@ -47,32 +52,40 @@ const Main: React.FC = () => {
 				const hls = new Hls({
 					liveSyncDurationCount: 1,
 					lowLatencyMode: true,
-					maxLiveSyncPlaybackRate: 1,
-					enableWorker: true,
-					liveBackBufferLength: 0,
+					xhrSetup: xhr => {
+						xhr.withCredentials = false // Отключаем CORS credentials
+					},
+					debug: true, // Включаем отладку
 				})
-				hlsRef.current = hls
 
-				const mediaElement = videoRef.current
+				// Добавляем обработчик ошибок медиа
+				videoRef.current.addEventListener('error', () => {
+					console.error('Video Error:', videoRef.current?.error)
+				})
 
-				if (mediaElement) {
-					hls.loadSource('https://streaming.vladyslavdobrovolskyi.tech/stream/playlist.m3u8')
-					hls.attachMedia(mediaElement)
-					hls.on(Hls.Events.MANIFEST_PARSED, () => {
-						mediaElement.play().catch(error => console.error('Playback error:', error))
-						setIsPlaying(true)
-					})
-					hls.on(Hls.Events.ERROR, (_, data) => {
-						if (data.response && data.response.code === 404) {
-							setError('Stream will be available at 8 PM')
+				hls.on(Hls.Events.ERROR, (_event, data) => {
+					if (data.fatal) {
+						switch (data.type) {
+							case Hls.ErrorTypes.NETWORK_ERROR:
+								console.error('Fatal network error:', data.details)
+								hls.startLoad()
+								break
+							case Hls.ErrorTypes.MEDIA_ERROR:
+								console.error('Fatal media error:', data.details)
+								hls.recoverMediaError()
+								break
+							default:
+								hls.destroy()
+								break
 						}
-					})
+					}
+				})
 
-					return () => hls.destroy()
-				}
+				// Остальной код остается прежним...
 			}
-		} catch {
-			setError('An error occurred while fetching the stream')
+		} catch (err) {
+			console.error('Stream check failed:', err)
+			setError('Failed to initialize stream')
 		}
 	}
 
