@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import socket from '../socket'
 import Hls from 'hls.js'
@@ -7,157 +7,190 @@ import ACTIONS from '../socket/actions'
 
 const Main: React.FC = () => {
 	const videoRef = useRef<HTMLVideoElement>(null)
-	const [isPlaying, setIsPlaying] = useState(true)
+	const [isPlaying, setIsPlaying] = useState(false)
 	const [isMuted, setIsMuted] = useState(true)
 	const [error, setError] = useState<string | null>(null)
+	const [isLoading, setIsLoading] = useState(false)
 	const hlsRef = useRef<Hls | null>(null)
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
 	const navigate = useNavigate()
-	const [rooms, updateRooms] = useState([])
+	const [rooms, setRooms] = useState<string[]>([])
 	const rootNode = useRef<HTMLDivElement>(null)
 
+	// Authentication check
 	useEffect(() => {
 		const token = localStorage.getItem('accessToken')
-		if (token) {
-			setIsAuthenticated(true)
+		setIsAuthenticated(!!token)
+		if (!token) navigate('/login')
+	}, [navigate])
+
+	// Rooms management
+	useEffect(() => {
+		const handleShareRooms = ({ rooms = [] }: { rooms: string[] }) => {
+			if (rootNode.current) setRooms(rooms)
+		}
+
+		socket.on(ACTIONS.SHARE_ROOMS, handleShareRooms)
+		return () => {
+			socket.off(ACTIONS.SHARE_ROOMS, handleShareRooms)
 		}
 	}, [])
 
-	useEffect(() => {
-		socket.on(ACTIONS.SHARE_ROOMS, ({ rooms = [] } = {}) => {
-			if (rootNode.current) {
-				updateRooms(rooms)
-			}
-		})
-	}, [])
-
-	const checkStreamAvailability = async () => {
+	// HLS Player initialization
+	const initializePlayer = useCallback(async () => {
 		try {
+			setIsLoading(true)
 			const response = await fetch('https://streaming.vladyslavdobrovolskyi.tech/stream/playlist.m3u8', {
-				headers: new Headers({
-					'Cache-Control': 'no-cache, no-store, must-revalidate',
+				cache: 'no-cache',
+				headers: {
 					Pragma: 'no-cache',
 					Expires: '0',
-				}),
+				},
 			})
 
-			// Добавляем проверку MIME-типа
-			const contentType = response.headers.get('Content-Type')
-			if (!contentType?.includes('application/vnd.apple.mpegurl')) {
-				setError('Invalid MIME type for HLS stream')
-				return
+			if (!response.ok) throw new Error(`HTTP ${response.status}`)
+			if (!response.headers.get('Content-Type')?.includes('application/vnd.apple.mpegurl')) {
+				throw new Error('Invalid MIME type')
 			}
 
 			if (Hls.isSupported() && videoRef.current) {
 				const hls = new Hls({
+					autoStartLoad: false,
 					liveSyncDurationCount: 1,
 					lowLatencyMode: true,
 					xhrSetup: xhr => {
-						xhr.withCredentials = false // Отключаем CORS credentials
+						xhr.withCredentials = false
 					},
-					debug: true, // Включаем отладку
+					debug: false,
 				})
 
-				// Добавляем обработчик ошибок медиа
-				videoRef.current.addEventListener('error', () => {
-					console.error('Video Error:', videoRef.current?.error)
+				hlsRef.current = hls
+				const media = videoRef.current
+
+				hls.loadSource(response.url)
+				hls.attachMedia(media)
+
+				hls.on(Hls.Events.MANIFEST_PARSED, () => {
+					console.log('Manifest parsed, ready to play')
 				})
 
-				hls.on(Hls.Events.ERROR, (_event, data) => {
+				hls.on(Hls.Events.ERROR, (_, data) => {
 					if (data.fatal) {
 						switch (data.type) {
 							case Hls.ErrorTypes.NETWORK_ERROR:
-								console.error('Fatal network error:', data.details)
 								hls.startLoad()
 								break
 							case Hls.ErrorTypes.MEDIA_ERROR:
-								console.error('Fatal media error:', data.details)
 								hls.recoverMediaError()
 								break
 							default:
 								hls.destroy()
-								break
+								setError('Fatal playback error')
 						}
 					}
 				})
-
-				// Остальной код остается прежним...
 			}
 		} catch (err) {
-			console.error('Stream check failed:', err)
-			setError('Failed to initialize stream')
+			console.error('Stream initialization failed:', err)
+			setError('Stream is currently unavailable')
+		} finally {
+			setIsLoading(false)
 		}
-	}
-
-	useEffect(() => {
-		checkStreamAvailability()
 	}, [])
 
-	const handlePlayPause = () => {
-		if (videoRef.current) {
-			const mediaElement = videoRef.current
-			if (mediaElement.paused) {
-				if (hlsRef.current) {
-					hlsRef.current.startLoad(-1) // Загрузить последний сегмент
-				}
-				mediaElement.play().catch(error => console.error('Play error:', error))
-				setIsPlaying(true)
-			} else {
-				if (hlsRef.current) {
-					hlsRef.current.stopLoad() // Остановить загрузку сегментов
-				}
-				mediaElement.pause()
-				setIsPlaying(false)
+	// Initial setup effect
+	useEffect(() => {
+		if (!isAuthenticated) return
+
+		initializePlayer()
+
+		return () => {
+			if (hlsRef.current) {
+				hlsRef.current.destroy()
+				hlsRef.current = null
 			}
 		}
-	}
+	}, [isAuthenticated, initializePlayer])
 
-	const handleMuteUnmute = () => {
-		if (videoRef.current) {
-			const mediaElement = videoRef.current
-			mediaElement.muted = !mediaElement.muted
-			setIsMuted(mediaElement.muted)
+	// Play/pause handler
+	const handlePlayPause = useCallback(async () => {
+		if (!videoRef.current || !hlsRef.current) return
+
+		const media = videoRef.current
+		try {
+			if (media.paused) {
+				setIsLoading(true)
+				hlsRef.current.startLoad(-1)
+				await media.play()
+				setIsPlaying(true)
+			} else {
+				media.pause()
+				hlsRef.current.stopLoad()
+				setIsPlaying(false)
+			}
+		} catch (err) {
+			console.error('Playback control error:', err)
+			if (err instanceof Error) {
+				setError(
+					err.name === 'NotAllowedError' ? 'Please click the page first to start playback' : 'Playback error'
+				)
+			}
+		} finally {
+			setIsLoading(false)
 		}
-	}
+	}, [])
 
-	const testGetUsers = async () => {
+	// Mute handler
+	const handleMute = useCallback(() => {
+		if (videoRef.current) {
+			videoRef.current.muted = !videoRef.current.muted
+			setIsMuted(videoRef.current.muted)
+		}
+	}, [])
+
+	// User interaction handler
+	useEffect(() => {
+		const handleFirstInteraction = () => {
+			if (videoRef.current?.paused) handlePlayPause()
+			document.removeEventListener('click', handleFirstInteraction)
+		}
+
+		document.addEventListener('click', handleFirstInteraction)
+		return () => document.removeEventListener('click', handleFirstInteraction)
+	}, [handlePlayPause])
+
+	// API test handlers
+	const testGetUsers = useCallback(async () => {
 		try {
 			const token = localStorage.getItem('token')
 			const response = await fetch('https://streaming.vladyslavdobrovolskyi.tech/api/users', {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
+				headers: { Authorization: `Bearer ${token}` },
 			})
-			const data = await response.json()
-			console.log('Users:', data)
-		} catch (error) {
-			console.error('Error fetching users:', error)
+			console.log('Users:', await response.json())
+		} catch (err) {
+			console.error('Users fetch error:', err)
 		}
-	}
+	}, [])
 
-	const testGetRooms = async () => {
+	const testGetRooms = useCallback(async () => {
 		try {
 			const token = localStorage.getItem('token')
 			const response = await fetch('https://streaming.vladyslavdobrovolskyi.tech/api/room_reservations', {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
+				headers: { Authorization: `Bearer ${token}` },
 			})
-			const data = await response.json()
-			console.log('Room Reservations:', data)
-		} catch (error) {
-			console.error('Error fetching room reservations:', error)
+			console.log('Rooms:', await response.json())
+		} catch (err) {
+			console.error('Rooms fetch error:', err)
 		}
-	}
+	}, [])
 
-	if (!isAuthenticated) {
-		navigate(`/login`)
-	}
+	if (!isAuthenticated) return null
 
 	if (error) {
 		return (
 			<div className='Main'>
 				<h1>{error}</h1>
+				<button onClick={() => window.location.reload()}>Retry</button>
 			</div>
 		)
 	}
@@ -171,52 +204,49 @@ const Main: React.FC = () => {
 				height='auto'
 				controls={false}
 				muted={isMuted}
-				autoPlay
 				playsInline
-				crossOrigin='anonymous'
+				onPlay={() => setIsPlaying(true)}
+				onPause={() => setIsPlaying(false)}
+				style={{ cursor: 'pointer', backgroundColor: '#000' }}
+				onClick={handlePlayPause}
 			/>
-			<div style={{ marginTop: '10px' }}>
-				<button onClick={handlePlayPause} style={{ padding: '10px 20px', fontSize: '16px' }}>
-					{isPlaying ? 'Pause' : 'Play'}
+
+			<div style={{ marginTop: 10 }}>
+				<button onClick={handlePlayPause} disabled={isLoading} style={{ padding: '10px 20px', fontSize: 16 }}>
+					{isLoading ? 'Loading...' : isPlaying ? 'Pause' : 'Play'}
 				</button>
-				<button
-					onClick={handleMuteUnmute}
-					style={{ padding: '10px 20px', fontSize: '16px', marginLeft: '10px' }}
-				>
+				<button onClick={handleMute} style={{ padding: '10px 20px', fontSize: 16, marginLeft: 10 }}>
 					{isMuted ? 'Unmute' : 'Mute'}
 				</button>
 			</div>
-			<div style={{ marginTop: '20px' }}>
-				<button onClick={testGetUsers} style={{ padding: '10px 20px', fontSize: '16px' }}>
+
+			<div style={{ marginTop: 20 }}>
+				<button onClick={testGetUsers} style={{ padding: '10px 20px', fontSize: 16 }}>
 					Test Get Users
 				</button>
-				<button onClick={testGetRooms} style={{ padding: '10px 20px', fontSize: '16px', marginLeft: '10px' }}>
-					Test Get Room Reservations
+				<button onClick={testGetRooms} style={{ padding: '10px 20px', fontSize: 16, marginLeft: 10 }}>
+					Test Get Rooms
 				</button>
 			</div>
-			<div ref={rootNode}>
-				<h1>Available Rooms</h1>
 
-				<ul>
-					{rooms.map(roomID => (
-						<li key={roomID}>
-							{roomID}
-							<button
-								onClick={() => {
-									navigate(`/room/${roomID}`)
-								}}
-							>
-								JOIN ROOM
-							</button>
-						</li>
-					))}
-				</ul>
+			<div ref={rootNode} style={{ marginTop: 30 }}>
+				<h2>Available Rooms</h2>
+				{rooms.length > 0 ? (
+					<ul style={{ listStyle: 'none', padding: 0 }}>
+						{rooms.map(roomID => (
+							<li key={roomID} style={{ margin: '10px 0' }}>
+								<span style={{ marginRight: 10 }}>{roomID}</span>
+								<button onClick={() => navigate(`/room/${roomID}`)} style={{ padding: '5px 15px' }}>
+									Join
+								</button>
+							</li>
+						))}
+					</ul>
+				) : (
+					<p>No rooms available</p>
+				)}
 
-				<button
-					onClick={() => {
-						navigate(`/room/${v4()}`)
-					}}
-				>
+				<button onClick={() => navigate(`/room/${v4()}`)} style={{ marginTop: 10, padding: '10px 20px' }}>
 					Create New Room
 				</button>
 			</div>
