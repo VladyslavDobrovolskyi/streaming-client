@@ -51,7 +51,7 @@ export default function Room() {
 
 			if (videoRef.current) {
 				const mediaElement = videoRef.current
-				mediaElement.src = '/movie'
+				mediaElement.src = '/movie/movie.mkv'
 				mediaElement.load()
 				mediaElement.play().catch(error => console.error('Playback error:', error))
 				setIsPlaying(true)
