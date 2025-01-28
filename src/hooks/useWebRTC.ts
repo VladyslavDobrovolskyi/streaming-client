@@ -27,18 +27,15 @@ export default function useWebRTC(roomID: string) {
 		[LOCAL_VIDEO]: null,
 	})
 
-	// Handle new peer connection
-	useEffect(() => {
-		async function handleNewPeer({ peerID, createOffer }: { peerID: string; createOffer: boolean }) {
-			if (peerID in peerConnections.current) {
-				return console.warn(`Already connected to peer ${peerID}`)
-			}
+	const iceRetryTimeout = 2000 // 2 seconds timeout
 
-			peerConnections.current[peerID] = new RTCPeerConnection({
+	const createPeerConnection = useCallback(
+		(peerID: string) => {
+			const connection = new RTCPeerConnection({
 				iceServers: freeice(),
 			})
 
-			peerConnections.current[peerID].onicecandidate = event => {
+			connection.onicecandidate = event => {
 				if (event.candidate) {
 					socket.emit(ACTIONS.RELAY_ICE, {
 						peerID,
@@ -48,7 +45,7 @@ export default function useWebRTC(roomID: string) {
 			}
 
 			let tracksNumber = 0
-			peerConnections.current[peerID].ontrack = ({ streams: [remoteStream] }) => {
+			connection.ontrack = ({ streams: [remoteStream] }) => {
 				tracksNumber++
 
 				if (tracksNumber === 2) {
@@ -71,12 +68,43 @@ export default function useWebRTC(roomID: string) {
 			}
 
 			localMediaStream.current?.getTracks().forEach(track => {
-				peerConnections.current[peerID].addTrack(track, localMediaStream.current!)
+				connection.addTrack(track, localMediaStream.current!)
 			})
 
+			return connection
+		},
+		[addNewClient]
+	)
+
+	// Handle new peer connection
+	useEffect(() => {
+		async function handleNewPeer({ peerID, createOffer }: { peerID: string; createOffer: boolean }) {
+			if (peerID in peerConnections.current) {
+				return console.warn(`Already connected to peer ${peerID}`)
+			}
+
+			const connection = createPeerConnection(peerID)
+			peerConnections.current[peerID] = connection
+
+			// Set ICE connection timeout and retry mechanism
+			const iceConnectionTimer = setTimeout(() => {
+				if (connection.iceConnectionState !== 'connected' && connection.iceConnectionState !== 'completed') {
+					console.warn(`Retrying connection to peer ${peerID} with new ICE servers`)
+					connection.close()
+					delete peerConnections.current[peerID]
+					peerConnections.current[peerID] = createPeerConnection(peerID)
+				}
+			}, iceRetryTimeout)
+
+			connection.oniceconnectionstatechange = () => {
+				if (connection.iceConnectionState === 'connected' || connection.iceConnectionState === 'completed') {
+					clearTimeout(iceConnectionTimer)
+				}
+			}
+
 			if (createOffer) {
-				const offer = await peerConnections.current[peerID].createOffer()
-				await peerConnections.current[peerID].setLocalDescription(offer)
+				const offer = await connection.createOffer()
+				await connection.setLocalDescription(offer)
 				socket.emit(ACTIONS.RELAY_SDP, {
 					peerID,
 					sessionDescription: offer,
@@ -88,7 +116,7 @@ export default function useWebRTC(roomID: string) {
 		return () => {
 			socket.off(ACTIONS.ADD_PEER)
 		}
-	}, [addNewClient])
+	}, [createPeerConnection])
 
 	// Handle remote session description
 	useEffect(() => {

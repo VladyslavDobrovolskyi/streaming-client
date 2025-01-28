@@ -36,7 +36,7 @@ function layout(clientsNumber = 1) {
 
 export default function Room() {
 	const { id: roomID } = useParams()
-	const { clients, provideMediaRef } = useWebRTC(roomID)
+	const { clients, provideMediaRef } = useWebRTC(roomID!)
 	const videoLayout = layout(clients.length)
 	const videoRef = useRef<HTMLVideoElement>(null)
 	const [isPlaying, setIsPlaying] = useState(false)
