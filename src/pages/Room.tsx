@@ -121,7 +121,7 @@ export default function Room() {
 					ref={videoRef}
 					width='100%'
 					height='auto'
-					controls={false}
+					controls={true}
 					muted={isMuted}
 					playsInline
 					onPlay={() => setIsPlaying(true)}
