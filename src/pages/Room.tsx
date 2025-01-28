@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router'
 import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
-
+import ACTIONS from '../socket/actions'
 function layout(clientsNumber = 1) {
 	const pairs = Array.from({ length: clientsNumber }).reduce((acc: [number, number?][], _next, index, arr) => {
 		if (index % 2 === 0) {
@@ -34,7 +34,7 @@ function layout(clientsNumber = 1) {
 
 export default function Room() {
 	const { id: roomID } = useParams()
-	const { clients, provideMediaRef } = useWebRTC(roomID)
+	const { clients, provideMediaRef, handleVideoAction } = useWebRTC(roomID)
 	const videoLayout = layout(clients.length)
 	const videoRef = useRef<HTMLVideoElement>(null)
 	const [isPlaying, setIsPlaying] = useState(false)
@@ -71,9 +71,11 @@ export default function Room() {
 			if (mediaElement.paused) {
 				mediaElement.play().catch(error => console.error('Play error:', error))
 				setIsPlaying(true)
+				handleVideoAction(ACTIONS.VIDEO_PLAY, { peerID: LOCAL_VIDEO })
 			} else {
 				mediaElement.pause()
 				setIsPlaying(false)
+				handleVideoAction(ACTIONS.VIDEO_PAUSE, { peerID: LOCAL_VIDEO })
 			}
 		}
 	}
@@ -83,6 +85,7 @@ export default function Room() {
 			const mediaElement = videoRef.current
 			mediaElement.muted = !mediaElement.muted
 			setIsMuted(mediaElement.muted)
+			handleVideoAction(ACTIONS.VIDEO_SEEK, { peerID: LOCAL_VIDEO, time: mediaElement.currentTime })
 		}
 	}
 

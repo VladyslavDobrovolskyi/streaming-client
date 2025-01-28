@@ -182,6 +182,35 @@ export default function useWebRTC(roomID: string) {
 		}
 	}, [roomID, addNewClient])
 
+	// Handle VIDEO_PLAY, VIDEO_PAUSE, VIDEO_SEEK
+	const handleVideoAction = useCallback((action: string, payload: { peerID: string; time?: number }) => {
+		socket.emit(action, payload)
+	}, [])
+
+	// Listen for video play, pause, and seek events from peers
+	useEffect(() => {
+		socket.on(ACTIONS.VIDEO_PLAY, ({ peerID }) => {
+			const peerVideo = peerMediaElements.current[peerID]
+			if (peerVideo) peerVideo.play()
+		})
+
+		socket.on(ACTIONS.VIDEO_PAUSE, ({ peerID }) => {
+			const peerVideo = peerMediaElements.current[peerID]
+			if (peerVideo) peerVideo.pause()
+		})
+
+		socket.on(ACTIONS.VIDEO_SEEK, ({ peerID, time }) => {
+			const peerVideo = peerMediaElements.current[peerID]
+			if (peerVideo) peerVideo.currentTime = time
+		})
+
+		return () => {
+			socket.off(ACTIONS.VIDEO_PLAY)
+			socket.off(ACTIONS.VIDEO_PAUSE)
+			socket.off(ACTIONS.VIDEO_SEEK)
+		}
+	}, [])
+
 	const provideMediaRef = useCallback((id: string, node: HTMLVideoElement | null) => {
 		peerMediaElements.current[id] = node
 	}, [])
@@ -189,5 +218,6 @@ export default function useWebRTC(roomID: string) {
 	return {
 		clients,
 		provideMediaRef,
+		handleVideoAction, // Expose the video action handler
 	}
 }
