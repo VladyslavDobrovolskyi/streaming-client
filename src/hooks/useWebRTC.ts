@@ -78,7 +78,7 @@ export default function useWebRTC(roomID: string) {
 	// Handle new peer connection
 	socket.on(ACTIONS.ADD_PEER, async ({ peerID, createOffer }: { peerID: string; createOffer: boolean }) => {
 		if (peerID in peerConnections.current) {
-			return console.warn(`Already connected to peer ${peerID}`)
+			return null
 		}
 
 		const connection = createPeerConnection(peerID)
