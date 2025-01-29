@@ -26,7 +26,7 @@ export default function useWebRTC(roomID: string) {
 		[LOCAL_VIDEO]: null,
 	})
 
-	const iceRetryTimeout = 5000 // 2 seconds timeout
+	const iceRetryTimeout = 500 // 2 seconds timeout
 
 	const configuration = {
 		sdpSemantics: 'unified-plan', // Новый стандарт WebRTC
