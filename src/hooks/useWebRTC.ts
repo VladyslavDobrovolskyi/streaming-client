@@ -33,7 +33,6 @@ export default function useWebRTC(roomID: string) {
 			{
 				urls: [
 					'turn:92.112.180.234:3478', // TURN сервер по UDP (порт 3478)
-					'turns:92.112.180.234:3478', // Использование протокола TURN с UDP
 				],
 				credential: '9S2T4U0N5', // Пароль для аутентификации
 			},
