@@ -32,9 +32,11 @@ export default function useWebRTC(roomID: string) {
 		iceServers: [
 			{
 				urls: [
-					'turn:92.112.180.234:3478', // TURN сервер по UDP (порт 3478)
+					'turn:92.112.180.234:3478', // URL for TURN server (UDP)
+					'turns:92.112.180.234:3478', // URL for TURN server (TLS)
 				],
-				credential: '9S2T4U0N5', // Пароль для аутентификации
+				username: roomID, // Use roomID as the username
+				credential: '9S2T4U0N5', // Specify the password
 			},
 		],
 	}
