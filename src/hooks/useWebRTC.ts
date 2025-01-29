@@ -32,7 +32,7 @@ export default function useWebRTC(roomID: string) {
 		sdpSemantics: 'unified-plan', // Новый стандарт WebRTC
 		iceServers: [
 			{
-				urls: 'stun:92.112.180.234:3478', // Адрес TURN сервера
+				urls: 'stun:92.112.580.234:3478', // Адрес TURN сервера
 				credential: '9S2T4U0N5', // Ваш цифровой ключ, использованный в конфиге
 			},
 		],
