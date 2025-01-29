@@ -29,14 +29,15 @@ export default function useWebRTC(roomID: string) {
 	const iceRetryTimeout = 10000 // 2 seconds timeout
 
 	const configuration = {
-		sdpSemantics: 'unified-plan', // Новый стандарт WebRTC
 		iceServers: [
 			{
-				urls: 'stun:92.112.180.234:3478', // Адрес TURN сервера
-				credential: '9S2T4U0N5', // Ваш цифровой ключ, использованный в конфиге
+				urls: [
+					'turn:92.112.180.234:3478', // TURN сервер по UDP (порт 3478)
+					'turns:92.112.180.234:3478', // Использование протокола TURN с UDP
+				],
+				credential: '9S2T4U0N5', // Пароль для аутентификации
 			},
 		],
-		iceCandidatePoolSize: 2,
 	}
 
 	const createPeerConnection = (peerID: string) => {
