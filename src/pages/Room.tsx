@@ -58,6 +58,23 @@ export default function Room() {
 		}
 	}, []) // Пустой массив зависимостей для выполнения при монтировании компонента
 
+	useEffect(() => {
+		const handleBeforeUnload = () => {
+			// Очищаем sessionStorage перед обновлением страницы
+			sessionStorage.removeItem('previousPage')
+		}
+
+		// Добавляем обработчик события beforeunload
+		window.addEventListener('beforeunload', handleBeforeUnload)
+
+		// Очищаем sessionStorage сразу после монтирования компонента (для сброса предыдущей страницы)
+
+		// Убираем обработчик при размонтировании компонента
+		return () => {
+			window.removeEventListener('beforeunload', handleBeforeUnload)
+		}
+	}, [])
+
 	const checkStreamAvailability = async () => {
 		try {
 			const response = await fetch('/movie/movie.mkv')
