@@ -10,6 +10,8 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"@geist-ui/core": "^2.3.8",
+		"@geist-ui/icons": "^1.0.2",
 		"@reduxjs/toolkit": "^2.5.0",
 		"@types/pg": "^8.11.10",
 		"axios": "^1.7.9",

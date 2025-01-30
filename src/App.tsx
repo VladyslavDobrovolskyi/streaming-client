@@ -10,6 +10,7 @@ function App() {
 				<Route path='/room/:id' element={<Room />} />
 				<Route path='/' element={<Main />} />
 				<Route path='/login' element={<LoginForm />} />
+				<Route path='/roomdev' element={<LoginForm />} />
 			</Routes>
 		</BrowserRouter>
 	)
