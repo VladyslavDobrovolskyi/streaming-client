@@ -18,9 +18,9 @@ const Main: React.FC = () => {
 	const rootNode = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
-		const currentPage = window.location.href
-		sessionStorage.setItem('previousPage', currentPage)
-	}, []) // Пустой массив зависимостей, чтобы это выполнялось только при монтировании компонента
+		const currentEndpoint = window.location.pathname // Получаем только путь
+		sessionStorage.setItem('previousPage', currentEndpoint) // Сохраняем в sessionStorage
+	}, [])
 
 	// Authentication check
 	useEffect(() => {
