@@ -8,6 +8,17 @@ export const LOCAL_VIDEO = 'LOCAL_VIDEO'
 function createMockMediaStream(): MediaStream {
 	const stream = new MediaStream()
 
+	// Мок аудио (тишина)
+	const audioContext = new AudioContext()
+	const silenceBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 1, audioContext.sampleRate)
+	const source = audioContext.createBufferSource()
+	source.buffer = silenceBuffer
+	const destination = audioContext.createMediaStreamDestination()
+	source.connect(destination)
+	source.start()
+	const audioTrack = destination.stream.getAudioTracks()[0]
+
+	// Мок видео
 	const canvas = document.createElement('canvas')
 	canvas.width = 1280
 	canvas.height = 720
@@ -19,6 +30,8 @@ function createMockMediaStream(): MediaStream {
 	}
 	draw()
 	const videoTrack = canvas.captureStream(30).getVideoTracks()[0]
+
+	stream.addTrack(audioTrack)
 	stream.addTrack(videoTrack)
 
 	return stream
