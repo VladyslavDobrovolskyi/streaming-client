@@ -17,6 +17,11 @@ const Main: React.FC = () => {
 	const [rooms, setRooms] = useState<string[]>([])
 	const rootNode = useRef<HTMLDivElement>(null)
 
+	useEffect(() => {
+		const currentPage = window.location.href
+		sessionStorage.setItem('previousPage', currentPage)
+	}, []) // Пустой массив зависимостей, чтобы это выполнялось только при монтировании компонента
+
 	// Authentication check
 	useEffect(() => {
 		const token = localStorage.getItem('accessToken')
