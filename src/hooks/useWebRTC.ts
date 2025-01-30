@@ -212,5 +212,6 @@ export default function useWebRTC(roomID: string) {
 	return {
 		clients,
 		provideMediaRef,
+		localStream: localMediaStream.current, // Return the local stream
 	}
 }

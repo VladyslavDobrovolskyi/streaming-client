@@ -36,11 +36,12 @@ function layout(clientsNumber = 1) {
 
 export default function Room() {
 	const { id: roomID } = useParams()
-	const { clients, provideMediaRef } = useWebRTC(roomID!)
+	const { clients, provideMediaRef, localStream } = useWebRTC(roomID!)
 	const videoLayout = layout(clients.length)
 	const videoRef = useRef<HTMLVideoElement>(null)
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [isMuted, setIsMuted] = useState(true)
+	const [micMuted, setMicMuted] = useState(false) // Add state for mic mute
 	const [error, setError] = useState<string | null>(null)
 	const isSyncingRef = useRef(false)
 
@@ -149,6 +150,17 @@ export default function Room() {
 		}
 	}
 
+	const handleMicMuteUnmute = () => {
+		if (localStream) {
+			const audioTracks = localStream.getAudioTracks()
+			if (audioTracks.length > 0) {
+				const track = audioTracks[0]
+				track.enabled = !track.enabled
+				setMicMuted(!track.enabled)
+			}
+		}
+	}
+
 	const handleSeek = useCallback(
 		(time: number) => {
 			if (!videoRef.current || isSyncingRef.current) return
@@ -244,6 +256,12 @@ export default function Room() {
 						style={{ padding: '10px 20px', fontSize: '16px', marginLeft: '10px' }}
 					>
 						{isMuted ? 'Unmute' : 'Mute'}
+					</button>
+					<button
+						onClick={handleMicMuteUnmute}
+						style={{ padding: '10px 20px', fontSize: '16px', marginLeft: '10px' }}
+					>
+						{micMuted ? 'Unmute Mic' : 'Mute Mic'}
 					</button>
 				</div>
 			</div>
