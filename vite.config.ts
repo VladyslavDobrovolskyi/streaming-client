@@ -7,5 +7,6 @@ export default defineConfig({
 	server: {
 		host: '0.0.0.0',
 		port: 7777, // Задайте нужный порт
+		allowedHosts: ['streaming.vladyslavdobrovolskyi.tech'],
 	},
 })
