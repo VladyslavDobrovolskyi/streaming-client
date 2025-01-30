@@ -67,7 +67,6 @@ export default function Room() {
 			setError('An error occurred while fetching the movie')
 		}
 	}
-
 	// Sync handlers
 	useEffect(() => {
 		const handlePlay = ({ time }: { time: number }) => {
