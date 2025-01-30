@@ -42,6 +42,8 @@ export default function Room() {
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [isMuted, setIsMuted] = useState(true)
 	const [micMuted, setMicMuted] = useState(false) // Add state for mic mute
+	const [cameraMuted, setCameraMuted] = useState(false) // Add state for camera mute
+
 	const [error, setError] = useState<string | null>(null)
 	const isSyncingRef = useRef(false)
 
@@ -160,6 +162,16 @@ export default function Room() {
 			}
 		}
 	}
+	const handleCameraMuteUnmute = () => {
+		if (localStream) {
+			const videoTracks = localStream.getVideoTracks()
+			if (videoTracks.length > 0) {
+				const track = videoTracks[0]
+				track.enabled = !track.enabled // Toggle video track state
+				setCameraMuted(!track.enabled) // Update camera state
+			}
+		}
+	}
 
 	const handleSeek = useCallback(
 		(time: number) => {
@@ -262,6 +274,12 @@ export default function Room() {
 						style={{ padding: '10px 20px', fontSize: '16px', marginLeft: '10px' }}
 					>
 						{micMuted ? 'Unmute Mic' : 'Mute Mic'}
+					</button>
+					<button
+						onClick={handleCameraMuteUnmute}
+						style={{ padding: '10px 20px', fontSize: '16px', marginLeft: '10px' }}
+					>
+						{cameraMuted ? 'Unmute Camera' : 'Mute Camera'}
 					</button>
 				</div>
 			</div>
