@@ -49,8 +49,8 @@ export default function Room() {
 	useEffect(() => {
 		const previousPage = sessionStorage.getItem('previousPage')
 		if (previousPage && previousPage !== '/') {
-			// Выполняем нативный переход на предыдущую страницу
-			window.location.href = previousPage
+			// Выполняем нативный переход на эндпоинт
+			window.location.assign(previousPage)
 		}
 	}, [])
 
