@@ -8,28 +8,17 @@ export const LOCAL_VIDEO = 'LOCAL_VIDEO'
 function createMockMediaStream(): MediaStream {
 	const stream = new MediaStream()
 
-	// Мок аудио
-	const audioContext = new AudioContext()
-	const oscillator = audioContext.createOscillator()
-	const destination = audioContext.createMediaStreamDestination()
-	oscillator.connect(destination)
-	oscillator.start()
-	const audioTrack = destination.stream.getAudioTracks()[0]
-
-	// Мок видео
 	const canvas = document.createElement('canvas')
 	canvas.width = 1280
 	canvas.height = 720
 	const ctx = canvas.getContext('2d')!
 	const draw = () => {
-		ctx.fillStyle = 'red'
+		ctx.fillStyle = 'black'
 		ctx.fillRect(0, 0, canvas.width, canvas.height)
 		requestAnimationFrame(draw)
 	}
 	draw()
 	const videoTrack = canvas.captureStream(30).getVideoTracks()[0]
-
-	stream.addTrack(audioTrack)
 	stream.addTrack(videoTrack)
 
 	return stream
@@ -214,6 +203,8 @@ export default function useWebRTC(roomID: string) {
 				console.error('Error capturing media, connection with mock:', error)
 				localMediaStream.current = createMockMediaStream() // Создаем пустой поток
 			} finally {
+				socket.emit(ACTIONS.JOIN, { room: roomID })
+
 				addNewClient(LOCAL_VIDEO, () => {
 					const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
 					if (localVideoElement) {
@@ -221,8 +212,6 @@ export default function useWebRTC(roomID: string) {
 						localVideoElement.srcObject = localMediaStream.current
 					}
 				})
-
-				socket.emit(ACTIONS.JOIN, { room: roomID })
 			}
 		}
 
