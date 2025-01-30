@@ -175,18 +175,16 @@ export default function useWebRTC(roomID: string) {
 	useEffect(() => {
 		async function startCapture() {
 			try {
-				// localMediaStream.current = await navigator.mediaDevices.getUserMedia({
-				// 	audio: false,
-				// 	video: false,
-				// })
+				// Убираем запрос медиаустройств
+				localMediaStream.current = new MediaStream() // Инициализируем пустой поток
 
-				// addNewClient(LOCAL_VIDEO, () => {
-				// 	const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
-				// 	if (localVideoElement) {
-				// 		localVideoElement.volume = 0
-				// 		localVideoElement.srcObject = localMediaStream.current
-				// 	}
-				// })
+				addNewClient(LOCAL_VIDEO, () => {
+					const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
+					if (localVideoElement) {
+						localVideoElement.volume = 0
+						localVideoElement.srcObject = localMediaStream.current
+					}
+				})
 
 				socket.emit(ACTIONS.JOIN, { room: roomID })
 			} catch (error) {
