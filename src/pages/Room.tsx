@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams } from 'react-router'
-import { useNavigate } from 'react-router-dom'
 import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
 import ACTIONS from '../socket/actions'
 import socket from '../socket'
@@ -44,19 +43,16 @@ export default function Room() {
 	const [isMuted, setIsMuted] = useState(true)
 	const [micMuted, setMicMuted] = useState(false) // Add state for mic mute
 	const [cameraMuted, setCameraMuted] = useState(false) // Add state for camera mute
-	const navigate = useNavigate()
 	const [error, setError] = useState<string | null>(null)
 	const isSyncingRef = useRef(false)
 
 	useEffect(() => {
 		const previousPage = sessionStorage.getItem('previousPage')
-		if (previousPage != '/') {
-			// Если предыдущая страница существует в sessionStorage
-			navigate('/')
-			// Можно сделать редирект или выполнить другие действия:
-			// window.location.href = previousPage;
+		if (previousPage && previousPage !== '/') {
+			// Выполняем нативный переход на предыдущую страницу
+			window.location.href = previousPage
 		}
-	}, []) // Пустой массив зависимостей для выполнения при монтировании компонента
+	}, [])
 
 	useEffect(() => {
 		const handleBeforeUnload = () => {
