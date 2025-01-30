@@ -176,19 +176,18 @@ export default function useWebRTC(roomID: string) {
 		async function startCapture() {
 			try {
 				// Убираем запрос медиаустройств
-				localMediaStream.current = new MediaStream() // Инициализируем пустой поток
-
-				addNewClient(LOCAL_VIDEO, () => {
-					const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
-					if (localVideoElement) {
-						localVideoElement.volume = 0
-						localVideoElement.srcObject = localMediaStream.current
-					}
-				})
+				localMediaStream.current = await navigator.mediaDevices.getUserMedia({
+					audio: true,
+					video: true,
+				}) // Инициализируем пустой поток
 
 				socket.emit(ACTIONS.JOIN, { room: roomID })
 			} catch (error) {
-				console.error('Error capturing media:', error)
+				console.error('Error capturing media, connection without tracks:', error)
+
+				localMediaStream.current = new MediaStream() // Инициализируем пустой поток
+			} finally {
+				socket.emit(ACTIONS.JOIN, { room: roomID })
 			}
 		}
 
