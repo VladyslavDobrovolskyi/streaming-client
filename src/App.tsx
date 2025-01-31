@@ -3,7 +3,7 @@ import { GeistProvider, CssBaseline } from '@geist-ui/core'
 import Room from './pages/Room'
 import Main from './pages/Main'
 import LoginForm from './components/LoginForm'
-import Roomdev from './pages/Roomdev'
+import RoomDev from './pages/RoomDev'
 
 function App() {
 	return (
@@ -14,7 +14,7 @@ function App() {
 					<Route path='/room/:id' element={<Room />} />
 					<Route path='/' element={<Main />} />
 					<Route path='/login' element={<LoginForm />} />
-					<Route path='/roomdev' element={<Roomdev />} />
+					<Route path='/roomdev' element={<RoomDev />} />
 				</Routes>
 			</BrowserRouter>
 		</GeistProvider>
