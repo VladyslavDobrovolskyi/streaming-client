@@ -23,6 +23,7 @@ interface KeyActionProps {
 const KeyAction = forwardRef<KeyActionHandle, KeyActionProps>(({ on, volume }, ref) => {
 	const rewindRef = useRef<HTMLDivElement>(null)
 	const skipRef = useRef<HTMLDivElement>(null)
+	const volumeRef = useRef<HTMLDivElement>(null)
 
 	useImperativeHandle(ref, () => ({
 		get rewind() {
@@ -35,8 +36,15 @@ const KeyAction = forwardRef<KeyActionHandle, KeyActionProps>(({ on, volume }, r
 
 	return (
 		<div className='vp-key-action'>
-			<CSSTransition in={on} classNames='vp-key-volume' timeout={300} mountOnEnter unmountOnExit>
-				<div className='vp-key-action__volume'>
+			<CSSTransition
+				in={on}
+				classNames='vp-key-volume'
+				timeout={300}
+				mountOnEnter
+				unmountOnExit
+				nodeRef={volumeRef}
+			>
+				<div className='vp-key-action__volume' ref={volumeRef}>
 					<div className='vp-key-action__volume__container'>
 						<div className='vp-key-action__volume__icon'>
 							{volume > 0.7 && <VolumeHighIcon />}
