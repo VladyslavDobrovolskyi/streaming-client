@@ -48,33 +48,20 @@ export default function Room() {
 	const [error, setError] = useState<string | null>(null)
 	const isSyncingRef = useRef(false)
 
+	// Сохраняем ID комнаты в sessionStorage, чтобы восстановить соединение после обновления
 	useEffect(() => {
-		const previousPage = sessionStorage.getItem('previousPage')
-		if (previousPage != '/') {
-			// Если предыдущая страница существует в sessionStorage
-			navigate('/')
-			window.location.reload()
-			// Можно сделать редирект или выполнить другие действия:
-			// window.location.href = previousPage;
+		if (roomID) {
+			sessionStorage.setItem('roomID', roomID)
 		}
-	}, []) // Пустой массив зависимостей для выполнения при монтировании компонента
+	}, [roomID])
 
+	// Восстановление комнаты после обновления страницы
 	useEffect(() => {
-		const handleBeforeUnload = () => {
-			// Очищаем sessionStorage перед обновлением страницы
-			sessionStorage.removeItem('previousPage')
+		const storedRoomID = sessionStorage.getItem('roomID')
+		if (!roomID && storedRoomID) {
+			navigate(`/room/${storedRoomID}`, { replace: true })
 		}
-
-		// Добавляем обработчик события beforeunload
-		window.addEventListener('beforeunload', handleBeforeUnload)
-
-		// Очищаем sessionStorage сразу после монтирования компонента (для сброса предыдущей страницы)
-
-		// Убираем обработчик при размонтировании компонента
-		return () => {
-			window.removeEventListener('beforeunload', handleBeforeUnload)
-		}
-	}, [])
+	}, [roomID, navigate])
 
 	const checkStreamAvailability = async () => {
 		try {
