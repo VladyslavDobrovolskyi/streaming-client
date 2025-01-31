@@ -93,6 +93,7 @@ export default function RoomDev() {
 			onMouseMove={showControlsHandler}
 			onMouseLeave={() => setShowControls(false)}
 			style={{
+				backgroundColor: isPlaying ? '#333' : '#000',
 				width: '100%',
 				height: '100%',
 				position: 'relative',
