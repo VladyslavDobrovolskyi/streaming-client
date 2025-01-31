@@ -98,6 +98,8 @@ export default function RoomDev() {
 				onProgress={handleProgress}
 				width='100%'
 				height='100%'
+				onMouseEnter={showControlsHandler}
+				onMouseLeave={() => setShowControls(false)}
 			/>
 			<div
 				className={`controls ${showControls ? 'visible' : 'hidden'}`}
