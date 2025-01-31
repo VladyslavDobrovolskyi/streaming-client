@@ -1,5 +1,9 @@
-import VideoPlayer from '../components/Player/VideoPlayer'
+import ReactPlayer from 'react-player'
 
 export default function RoomDev() {
-	return <VideoPlayer src='/stream/playlist.m3u8' />
+	return (
+		<div className='player-wrapper'>
+			<ReactPlayer className='react-player' url='/movie/movie.mkv' controls width='100%' height='100%' />
+		</div>
+	)
 }
