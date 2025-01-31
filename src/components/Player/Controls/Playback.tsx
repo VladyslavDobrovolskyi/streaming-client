@@ -1,8 +1,8 @@
 import { memo } from 'react'
 
 import Btn from './Btn'
-import PlayIcon from 'icons/play.svg'
-import PauseIcon from 'icons/pause.svg'
+import PlayIcon from '../../../icons/play.svg'
+import PauseIcon from '../../../icons/pause.svg'
 
 interface PlaybackProps {
 	isPlaying: boolean
