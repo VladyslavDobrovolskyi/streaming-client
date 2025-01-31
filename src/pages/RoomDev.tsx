@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import ReactPlayer from 'react-player'
+import { Play, Pause, Volume2, VolumeX } from '@geist-ui/icons'
 
 export default function RoomDev() {
 	const [isPlaying, setIsPlaying] = useState(false)
@@ -98,8 +99,6 @@ export default function RoomDev() {
 				onProgress={handleProgress}
 				width='100%'
 				height='100%'
-				onMouseEnter={showControlsHandler}
-				onMouseLeave={() => setShowControls(false)}
 			/>
 			<div
 				className={`controls ${showControls ? 'visible' : 'hidden'}`}
@@ -130,7 +129,7 @@ export default function RoomDev() {
 						cursor: 'pointer',
 					}}
 				>
-					{isPlaying ? 'Pause' : 'Play'}
+					{isPlaying ? <Pause /> : <Play />}
 				</button>
 				<button
 					onClick={handleToggleMuted}
@@ -144,7 +143,7 @@ export default function RoomDev() {
 						cursor: 'pointer',
 					}}
 				>
-					{muted ? 'Unmute' : 'Mute'}
+					{muted ? <VolumeX /> : <Volume2 />}
 				</button>
 				<label style={{ margin: '0.5rem', color: '#fff' }}>
 					Volume
