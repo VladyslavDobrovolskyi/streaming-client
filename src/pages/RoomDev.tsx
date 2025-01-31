@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import ReactPlayer from 'react-player'
-import './RoomDev.css'
 
 export default function RoomDev() {
 	const [isPlaying, setIsPlaying] = useState(false)
@@ -74,7 +73,16 @@ export default function RoomDev() {
 	}, [showControlsHandler])
 
 	return (
-		<div className={`player-wrapper ${isPlaying ? 'playing' : ''}`} onMouseMove={showControlsHandler}>
+		<div
+			className={`player-wrapper ${isPlaying ? 'playing' : ''}`}
+			onMouseMove={showControlsHandler}
+			style={{
+				backgroundColor: isPlaying ? '#333' : '#000',
+				width: '100%',
+				height: '100%',
+				position: 'relative',
+			}}
+		>
 			<ReactPlayer
 				ref={playerRef}
 				className='react-player'
@@ -90,16 +98,78 @@ export default function RoomDev() {
 				width='100%'
 				height='100%'
 			/>
-			<div className={`controls ${showControls ? 'visible' : 'hidden'}`}>
-				<button onClick={() => setIsPlaying(prev => !prev)}>{isPlaying ? 'Pause' : 'Play'}</button>
-				<button onClick={handleToggleMuted}>{muted ? 'Unmute' : 'Mute'}</button>
-				<label>
+			<div
+				className={`controls ${showControls ? 'visible' : 'hidden'}`}
+				style={{
+					position: 'absolute',
+					bottom: '10px',
+					left: '50%',
+					transform: 'translateX(-50%)',
+					display: 'flex',
+					flexDirection: 'row',
+					alignItems: 'center',
+					backgroundColor: 'rgba(0, 0, 0, 0.5)',
+					padding: '10px',
+					borderRadius: '5px',
+					transition: 'opacity 0.3s ease',
+					opacity: showControls ? 1 : 0,
+				}}
+			>
+				<button
+					onClick={() => setIsPlaying(prev => !prev)}
+					style={{
+						margin: '0.5rem',
+						color: '#fff',
+						backgroundColor: '#444',
+						border: 'none',
+						padding: '0.5rem 1rem',
+						borderRadius: '5px',
+						cursor: 'pointer',
+					}}
+				>
+					{isPlaying ? 'Pause' : 'Play'}
+				</button>
+				<button
+					onClick={handleToggleMuted}
+					style={{
+						margin: '0.5rem',
+						color: '#fff',
+						backgroundColor: '#444',
+						border: 'none',
+						padding: '0.5rem 1rem',
+						borderRadius: '5px',
+						cursor: 'pointer',
+					}}
+				>
+					{muted ? 'Unmute' : 'Mute'}
+				</button>
+				<label style={{ margin: '0.5rem', color: '#fff' }}>
 					Volume
-					<input type='range' min={0} max={1} step='0.01' value={volume} onChange={handleVolumeChange} />
+					<input
+						type='range'
+						min={0}
+						max={1}
+						step='0.01'
+						value={volume}
+						onChange={handleVolumeChange}
+						style={{ width: '100px' }}
+					/>
 				</label>
-				<label>
+				<label style={{ margin: '0.5rem', color: '#fff' }}>
 					Playback Rate
-					<select value={playbackRate} onChange={e => handlePlaybackRateChange(parseFloat(e.target.value))}>
+					<select
+						value={playbackRate}
+						onChange={e => handlePlaybackRateChange(parseFloat(e.target.value))}
+						style={{
+							margin: '0.5rem',
+							color: '#fff',
+							backgroundColor: '#444',
+							border: 'none',
+							padding: '0.5rem 1rem',
+							borderRadius: '5px',
+							cursor: 'pointer',
+						}}
+					>
 						<option value={0.5}>0.5x</option>
 						<option value={0.75}>0.75x</option>
 						<option value={1}>1x</option>
@@ -108,9 +178,17 @@ export default function RoomDev() {
 						<option value={2}>2x</option>
 					</select>
 				</label>
-				<label>
+				<label style={{ margin: '0.5rem', color: '#fff' }}>
 					Seek
-					<input type='range' min={0} max={1} step='0.01' value={played} onChange={handleSeekChange} />
+					<input
+						type='range'
+						min={0}
+						max={1}
+						step='0.01'
+						value={played}
+						onChange={handleSeekChange}
+						style={{ width: '100px' }}
+					/>
 				</label>
 			</div>
 		</div>
