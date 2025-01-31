@@ -8,7 +8,7 @@ export default function RoomDev() {
 	const [playbackRate, setPlaybackRate] = useState(1.0)
 	const [played, setPlayed] = useState(0)
 	const [loaded, setLoaded] = useState(0)
-	const [showControls, setShowControls] = useState(true)
+	const [showControls, setShowControls] = useState(false)
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -76,6 +76,7 @@ export default function RoomDev() {
 		<div
 			className={`player-wrapper ${isPlaying ? 'playing' : ''}`}
 			onMouseMove={showControlsHandler}
+			onMouseLeave={() => setShowControls(false)}
 			style={{
 				backgroundColor: isPlaying ? '#333' : '#000',
 				width: '100%',
