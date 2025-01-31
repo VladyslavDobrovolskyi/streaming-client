@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import ReactPlayer from 'react-player'
 import './RoomDev.css'
+
 export default function RoomDev() {
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [volume, setVolume] = useState(0.8)
@@ -8,7 +9,9 @@ export default function RoomDev() {
 	const [playbackRate, setPlaybackRate] = useState(1.0)
 	const [played, setPlayed] = useState(0)
 	const [loaded, setLoaded] = useState(0)
+	const [showControls, setShowControls] = useState(true)
 	const playerRef = useRef<ReactPlayer>(null)
+	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
 	useEffect(() => {
 		if (loaded) {
@@ -45,8 +48,33 @@ export default function RoomDev() {
 		playerRef.current?.seekTo(parseFloat(e.target.value))
 	}
 
+	const showControlsHandler = useCallback(() => {
+		setShowControls(true)
+		if (controlsTimeoutRef.current) {
+			clearTimeout(controlsTimeoutRef.current)
+		}
+		controlsTimeoutRef.current = setTimeout(() => {
+			setShowControls(false)
+		}, 3000)
+	}, [])
+
+	useEffect(() => {
+		const handleMouseMove = () => {
+			showControlsHandler()
+		}
+
+		document.addEventListener('mousemove', handleMouseMove)
+
+		return () => {
+			document.removeEventListener('mousemove', handleMouseMove)
+			if (controlsTimeoutRef.current) {
+				clearTimeout(controlsTimeoutRef.current)
+			}
+		}
+	}, [showControlsHandler])
+
 	return (
-		<div className={`player-wrapper ${isPlaying ? 'playing' : ''}`}>
+		<div className={`player-wrapper ${isPlaying ? 'playing' : ''}`} onMouseMove={showControlsHandler}>
 			<ReactPlayer
 				ref={playerRef}
 				className='react-player'
@@ -62,7 +90,7 @@ export default function RoomDev() {
 				width='100%'
 				height='100%'
 			/>
-			<div className='controls'>
+			<div className={`controls ${showControls ? 'visible' : 'hidden'}`}>
 				<button onClick={() => setIsPlaying(prev => !prev)}>{isPlaying ? 'Pause' : 'Play'}</button>
 				<button onClick={handleToggleMuted}>{muted ? 'Unmute' : 'Mute'}</button>
 				<label>
