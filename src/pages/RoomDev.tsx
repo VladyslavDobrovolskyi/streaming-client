@@ -137,7 +137,6 @@ export default function RoomDev() {
 					style={{
 						margin: '0.5rem',
 						color: '#fff',
-						backgroundColor: '#444',
 						border: 'none',
 						padding: '0.5rem 1rem',
 						borderRadius: '5px',
@@ -163,7 +162,6 @@ export default function RoomDev() {
 						position: 'relative',
 						margin: '0.5rem',
 						color: '#fff',
-						backgroundColor: '#444',
 						border: 'none',
 						padding: '0.5rem 1rem',
 						borderRadius: '5px',
@@ -202,7 +200,6 @@ export default function RoomDev() {
 						style={{
 							margin: '0.5rem',
 							color: '#fff',
-							backgroundColor: '#444',
 							border: 'none',
 							padding: '0.5rem 1rem',
 							borderRadius: '5px',
@@ -222,7 +219,6 @@ export default function RoomDev() {
 					style={{
 						margin: '0.5rem',
 						color: '#fff',
-						backgroundColor: '#444',
 						border: 'none',
 						padding: '0.5rem 1rem',
 						borderRadius: '5px',
