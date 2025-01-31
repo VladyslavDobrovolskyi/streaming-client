@@ -1,7 +1,6 @@
 import { useState, memo, useCallback, useRef, useEffect } from 'react'
 import { CSSTransition } from 'react-transition-group'
-
-import ArrowLeftIcon from '../../../icons/arrow-left.svg'
+import { ArrowLeft } from '@geist-ui/icons'
 
 interface DropdownProps {
 	on: boolean
@@ -103,7 +102,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 	const mainMenu = (
 		<div className='vp-dropdown__menu'>
 			<div className='vp-dropdown__label' onClick={() => setIsIndex(true)}>
-				<ArrowLeftIcon />
+				<ArrowLeft />
 				<span>
 					{activeType === 'speed' && 'Speed'}
 					{activeType === 'resolution' && 'Resolution'}

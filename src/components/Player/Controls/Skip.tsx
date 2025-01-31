@@ -1,7 +1,6 @@
 import { memo } from 'react'
-
 import Btn from './Btn'
-import TrackSkipIcon from '../../../icons/track-skip.svg'
+import { FastForward as TrackSkipIcon } from '@geist-ui/icons'
 
 interface SkipProps {
 	onSkip: () => void

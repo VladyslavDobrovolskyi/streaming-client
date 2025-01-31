@@ -1,8 +1,6 @@
 import { memo } from 'react'
-
 import Btn from './Btn'
-import FullscreenIcon from '../../../icons/fullscreen.svg'
-import FullscreenExitIcon from '../../../icons/fullscreen-exit.svg'
+import { FullScreen as FullscreenIcon, FullScreenClose as FullscreenExitIcon } from '@geist-ui/icons'
 
 interface FullscreenProps {
 	isFullscreen: boolean

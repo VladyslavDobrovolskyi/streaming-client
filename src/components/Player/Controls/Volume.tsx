@@ -1,10 +1,11 @@
 import { memo } from 'react'
-
 import Btn from './Btn'
-import VolumeHighIcon from '../../../icons/volume-high.svg'
-import VolumeMiddleIcon from '../../../icons/volume-middle.svg'
-import VolumeLowIcon from '../../../icons/volume-low.svg'
-import VolumeMuteIcon from '../../../icons/volume-mute.svg'
+import {
+	Volume2 as VolumeHighIcon,
+	Volume1 as VolumeMiddleIcon,
+	Volume as VolumeLowIcon,
+	VolumeX as VolumeMuteIcon,
+} from '@geist-ui/icons'
 
 interface VolumeProps {
 	volume: number

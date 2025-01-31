@@ -1,6 +1,5 @@
 import { memo } from 'react'
-
-import ReloadIcon from '../../../../icons/reload.svg'
+import { RefreshCw as ReloadIcon } from '@geist-ui/icons'
 import './Error.css'
 
 interface ErrorProps {

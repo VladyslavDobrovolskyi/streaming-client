@@ -1,7 +1,6 @@
 import { memo } from 'react'
-
 import Btn from './Btn'
-import TrackRewindIcon from '../../../icons/track-rewind.svg'
+import { Rewind as TrackRewindIcon } from '@geist-ui/icons'
 
 interface RewindProps {
 	onRewind: () => void

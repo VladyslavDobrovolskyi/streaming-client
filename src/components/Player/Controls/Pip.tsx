@@ -1,6 +1,5 @@
 import Btn from './Btn'
-import PipInIcon from '../../../icons/pip-in.svg'
-import PipOutIcon from '../../../icons/pip-out.svg'
+import { Circle as PipInIcon, Circle as PipOutIcon } from '@geist-ui/icons'
 
 interface PipProps {
 	isPipMode: boolean

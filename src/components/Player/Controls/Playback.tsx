@@ -1,8 +1,6 @@
 import { memo } from 'react'
-
 import Btn from './Btn'
-import PlayIcon from '../../../icons/play.svg'
-import PauseIcon from '../../../icons/pause.svg'
+import { Play as PlayIcon, Pause as PauseIcon } from '@geist-ui/icons'
 
 interface PlaybackProps {
 	isPlaying: boolean

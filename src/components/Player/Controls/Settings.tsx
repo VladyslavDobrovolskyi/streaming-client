@@ -1,7 +1,6 @@
 import { memo } from 'react'
-
 import Btn from './Btn'
-import SettingIcon from '../../../icons/gear.svg'
+import { Settings as SettingIcon } from '@geist-ui/icons'
 
 interface SettingsProps {
 	onToggle: () => void

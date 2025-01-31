@@ -1,12 +1,13 @@
 import { forwardRef, memo, useImperativeHandle, useRef } from 'react'
 import { CSSTransition } from 'react-transition-group'
-
-import VolumeHighIcon from '../../../../icons/volume-high.svg'
-import VolumeMiddleIcon from '../../../../icons/volume-middle.svg'
-import VolumeLowIcon from '../../../../icons/volume-low.svg'
-import VolumeMuteIcon from '../../../../icons/volume-mute.svg'
-import TrackRewindIcon from '../../../../icons/track-rewind.svg'
-import TrackSkipIcon from '../../../../icons/track-skip.svg'
+import {
+	Volume2 as VolumeHighIcon,
+	Volume1 as VolumeMiddleIcon,
+	Volume as VolumeLowIcon,
+	VolumeX as VolumeMuteIcon,
+	Rewind as TrackRewindIcon,
+	FastForward as TrackSkipIcon,
+} from '@geist-ui/icons'
 import './KeyAction.css'
 
 export interface KeyActionHandle {
