@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import ReactPlayer from 'react-player'
-import { Play, Pause, Volume2, VolumeX } from '@geist-ui/icons'
+import { Play, Pause, Volume2, VolumeX, Maximize, Minimize } from '@geist-ui/icons'
 
 export default function RoomDev() {
 	const [isPlaying, setIsPlaying] = useState(false)
@@ -11,8 +11,10 @@ export default function RoomDev() {
 	const [loaded, setLoaded] = useState(0)
 	const [showControls, setShowControls] = useState(false)
 	const [showVolumeControl, setShowVolumeControl] = useState(false)
+	const [isFullscreen, setIsFullscreen] = useState(false)
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+	const playerWrapperRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
 		if (loaded) {
@@ -59,6 +61,16 @@ export default function RoomDev() {
 		}, 3000)
 	}, [])
 
+	const handleFullscreenToggle = () => {
+		if (!document.fullscreenElement) {
+			playerWrapperRef.current?.requestFullscreen()
+			setIsFullscreen(true)
+		} else if (document.exitFullscreen) {
+			document.exitFullscreen()
+			setIsFullscreen(false)
+		}
+	}
+
 	useEffect(() => {
 		const handleMouseMove = () => {
 			showControlsHandler()
@@ -76,6 +88,7 @@ export default function RoomDev() {
 
 	return (
 		<div
+			ref={playerWrapperRef}
 			className={`player-wrapper ${isPlaying ? 'playing' : ''}`}
 			onMouseMove={showControlsHandler}
 			onMouseLeave={() => setShowControls(false)}
@@ -203,6 +216,20 @@ export default function RoomDev() {
 					}}
 				>
 					{isPlaying ? <Pause /> : <Play />}
+				</button>
+				<button
+					onClick={handleFullscreenToggle}
+					style={{
+						margin: '0.5rem',
+						color: '#fff',
+						backgroundColor: '#444',
+						border: 'none',
+						padding: '0.5rem 1rem',
+						borderRadius: '5px',
+						cursor: 'pointer',
+					}}
+				>
+					{isFullscreen ? <Minimize /> : <Maximize />}
 				</button>
 			</div>
 		</div>
