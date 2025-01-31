@@ -23,12 +23,14 @@ const Dropdown: React.FC<DropdownProps> = ({
 	const [dropdownHeight, setDropdownHeight] = useState<'initial' | number>('initial')
 
 	const dropdownRef = useRef<HTMLDivElement>(null)
+	const indexMenuRef = useRef<HTMLDivElement>(null)
+	const mainMenuRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
 		if (!isMounted) return
 
 		const outsideClickHandler = (event: MouseEvent) => {
-			if (!isMounted || !dropdownRef || !dropdownRef.current) return
+			if (!isMounted || !dropdownRef.current) return
 			if (!dropdownRef.current.contains(event.target as Node)) {
 				onClose(false)
 			}
@@ -43,11 +45,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 
 	useEffect(() => {
 		if (!on) return
-
-		const dropdown = dropdownRef.current!
-		const dropdownMenu = dropdown.firstChild as HTMLElement
-
-		setDropdownHeight(dropdownMenu?.offsetHeight || 'initial')
+		setDropdownHeight(indexMenuRef.current?.offsetHeight || 'initial')
 	}, [on])
 
 	const dropdownEnteredHandler = useCallback(() => {
@@ -82,25 +80,18 @@ const Dropdown: React.FC<DropdownProps> = ({
 	)
 
 	const indexMenu = (
-		<div className='vp-dropdown__menu'>
+		<div className='vp-dropdown__menu' ref={indexMenuRef}>
 			<ul className='vp-dropdown__list'>
 				<li className='vp-dropdown__item' onClick={selectMenuHandler('speed')}>
 					<span>Speed</span>
 					<span>x {activePlaybackRate}</span>
 				</li>
-				{/* <li
-          className="vp-dropdown__item"
-          onClick={selectMenuHandler('resolution')}
-        >
-          <span>Resolution</span>
-          <span>1080p</span>
-        </li> */}
 			</ul>
 		</div>
 	)
 
 	const mainMenu = (
-		<div className='vp-dropdown__menu'>
+		<div className='vp-dropdown__menu' ref={mainMenuRef}>
 			<div className='vp-dropdown__label' onClick={() => setIsIndex(true)}>
 				<ArrowLeft />
 				<span>
@@ -119,18 +110,6 @@ const Dropdown: React.FC<DropdownProps> = ({
 							{playbackRate}
 						</li>
 					))}
-				{/* {activeType === 'resolution' &&
-          [540, 720, 1080].map((resolution) => (
-            <li
-              key={resolution}
-              className={`vp-dropdown__item${
-                resolution === 1080 ? ' active' : ''
-              }`}
-              onClick={() => setIsIndex(true)}
-            >
-              {resolution}
-            </li>
-          ))} */}
 			</ul>
 		</div>
 	)
@@ -144,6 +123,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 			unmountOnExit
 			onEntered={dropdownEnteredHandler}
 			onExited={dropdownExitedHandler}
+			nodeRef={dropdownRef}
 		>
 			<div className='vp-dropdown' ref={dropdownRef} style={{ height: dropdownHeight }}>
 				<CSSTransition
@@ -153,6 +133,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 					mountOnEnter
 					unmountOnExit
 					onEnter={calcHeight}
+					nodeRef={indexMenuRef}
 				>
 					{indexMenu}
 				</CSSTransition>
@@ -164,6 +145,7 @@ const Dropdown: React.FC<DropdownProps> = ({
 					mountOnEnter
 					unmountOnExit
 					onEnter={calcHeight}
+					nodeRef={mainMenuRef}
 				>
 					{mainMenu}
 				</CSSTransition>
