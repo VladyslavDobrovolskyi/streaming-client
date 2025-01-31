@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import ReactPlayer from 'react-player'
-
+import './RoomDev.css'
 export default function RoomDev() {
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [volume, setVolume] = useState(0.8)
