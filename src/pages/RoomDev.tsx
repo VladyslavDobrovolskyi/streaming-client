@@ -10,6 +10,7 @@ export default function RoomDev() {
 	const [played, setPlayed] = useState(0)
 	const [loaded, setLoaded] = useState(0)
 	const [showControls, setShowControls] = useState(false)
+	const [showVolumeControl, setShowVolumeControl] = useState(false)
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -115,48 +116,57 @@ export default function RoomDev() {
 					borderRadius: '5px',
 					transition: 'opacity 0.3s ease',
 					opacity: showControls ? 1 : 0,
+					width: '90%',
 				}}
 			>
-				<button
-					onClick={() => setIsPlaying(prev => !prev)}
-					style={{
-						margin: '0.5rem',
-						color: '#fff',
-						backgroundColor: '#444',
-						border: 'none',
-						padding: '0.5rem 1rem',
-						borderRadius: '5px',
-						cursor: 'pointer',
-					}}
-				>
-					{isPlaying ? <Pause /> : <Play />}
-				</button>
-				<button
-					onClick={handleToggleMuted}
-					style={{
-						margin: '0.5rem',
-						color: '#fff',
-						backgroundColor: '#444',
-						border: 'none',
-						padding: '0.5rem 1rem',
-						borderRadius: '5px',
-						cursor: 'pointer',
-					}}
-				>
-					{muted ? <VolumeX /> : <Volume2 />}
-				</button>
-				<label style={{ margin: '0.5rem', color: '#fff' }}>
-					Volume
+				<label style={{ margin: '0.5rem', color: '#fff', flex: 1 }}>
+					Seek
 					<input
 						type='range'
 						min={0}
 						max={1}
 						step='0.01'
-						value={volume}
-						onChange={handleVolumeChange}
-						style={{ width: '100px' }}
+						value={played}
+						onChange={handleSeekChange}
+						style={{ width: '100%' }}
 					/>
 				</label>
+				<div
+					style={{
+						position: 'relative',
+						margin: '0.5rem',
+						color: '#fff',
+						backgroundColor: '#444',
+						border: 'none',
+						padding: '0.5rem 1rem',
+						borderRadius: '5px',
+						cursor: 'pointer',
+						display: 'flex',
+						alignItems: 'center',
+					}}
+					onMouseEnter={() => setShowVolumeControl(true)}
+					onMouseLeave={() => setShowVolumeControl(false)}
+					onClick={handleToggleMuted}
+				>
+					{muted ? <VolumeX /> : <Volume2 />}
+					{showVolumeControl && (
+						<input
+							type='range'
+							min={0}
+							max={1}
+							step='0.01'
+							value={volume}
+							onChange={handleVolumeChange}
+							style={{
+								position: 'absolute',
+								bottom: '100%',
+								left: '50%',
+								transform: 'translateX(-50%)',
+								width: '100px',
+							}}
+						/>
+					)}
+				</div>
 				<label style={{ margin: '0.5rem', color: '#fff' }}>
 					Playback Rate
 					<select
@@ -180,18 +190,20 @@ export default function RoomDev() {
 						<option value={2}>2x</option>
 					</select>
 				</label>
-				<label style={{ margin: '0.5rem', color: '#fff' }}>
-					Seek
-					<input
-						type='range'
-						min={0}
-						max={1}
-						step='0.01'
-						value={played}
-						onChange={handleSeekChange}
-						style={{ width: '100px' }}
-					/>
-				</label>
+				<button
+					onClick={() => setIsPlaying(prev => !prev)}
+					style={{
+						margin: '0.5rem',
+						color: '#fff',
+						backgroundColor: '#444',
+						border: 'none',
+						padding: '0.5rem 1rem',
+						borderRadius: '5px',
+						cursor: 'pointer',
+					}}
+				>
+					{isPlaying ? <Pause /> : <Play />}
+				</button>
 			</div>
 		</div>
 	)
