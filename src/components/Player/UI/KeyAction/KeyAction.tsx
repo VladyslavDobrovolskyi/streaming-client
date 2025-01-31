@@ -42,7 +42,7 @@ const KeyAction = forwardRef<KeyActionHandle, KeyActionProps>(({ on, volume }, r
 				timeout={300}
 				mountOnEnter
 				unmountOnExit
-				nodeRef={volumeRef}
+				nodeRef={volumeRef} // ✅ Добавляем nodeRef
 			>
 				<div className='vp-key-action__volume' ref={volumeRef}>
 					<div className='vp-key-action__volume__container'>
