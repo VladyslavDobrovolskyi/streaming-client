@@ -51,7 +51,7 @@ export default function RoomDev() {
 				ref={playerRef}
 				className='react-player'
 				url='/movie/movie.mkv'
-				controls={true}
+				controls={false}
 				playing={isPlaying}
 				volume={volume}
 				muted={muted}
