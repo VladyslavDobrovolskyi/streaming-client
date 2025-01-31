@@ -23,7 +23,7 @@ interface VideoPlayerProps {
 	autoPlay?: boolean
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, autoPlay = true }) => {
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, autoPlay = false }) => {
 	const [displayControls, setDisplayControls] = useState(true)
 	const [playbackState, setPlaybackState] = useState(false)
 	const [volumeState, setVolumeState] = useLocalStorage('video-volume', 1)
