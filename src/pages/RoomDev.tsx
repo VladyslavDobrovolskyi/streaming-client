@@ -132,6 +132,20 @@ export default function RoomDev() {
 					width: '90%',
 				}}
 			>
+				<button
+					onClick={() => setIsPlaying(prev => !prev)}
+					style={{
+						margin: '0.5rem',
+						color: '#fff',
+						backgroundColor: '#444',
+						border: 'none',
+						padding: '0.5rem 1rem',
+						borderRadius: '5px',
+						cursor: 'pointer',
+					}}
+				>
+					{isPlaying ? <Pause /> : <Play />}
+				</button>
 				<label style={{ margin: '0.5rem', color: '#fff', flex: 1 }}>
 					Seek
 					<input
@@ -203,20 +217,6 @@ export default function RoomDev() {
 						<option value={2}>2x</option>
 					</select>
 				</label>
-				<button
-					onClick={() => setIsPlaying(prev => !prev)}
-					style={{
-						margin: '0.5rem',
-						color: '#fff',
-						backgroundColor: '#444',
-						border: 'none',
-						padding: '0.5rem 1rem',
-						borderRadius: '5px',
-						cursor: 'pointer',
-					}}
-				>
-					{isPlaying ? <Pause /> : <Play />}
-				</button>
 				<button
 					onClick={handleFullscreenToggle}
 					style={{
