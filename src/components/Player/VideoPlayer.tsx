@@ -437,7 +437,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, autoPlay = true }) => {
 		document.addEventListener('fullscreenchange', fullscreenChangeHandler)
 
 		if (autoPlay) {
-			playPromise.current = video.play()
+			playPromise.current = video.play().catch(error => {
+				console.error('Error attempting to play video:', error)
+			})
 		}
 	}, [
 		autoPlay,
@@ -467,9 +469,24 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, autoPlay = true }) => {
 	 */
 
 	useEffect(() => {
+		const handleUserInteraction = () => {
+			if (videoRef.current) {
+				videoRef.current.play().catch(error => {
+					console.error('Error attempting to play video:', error)
+				})
+			}
+			document.removeEventListener('click', handleUserInteraction)
+			document.removeEventListener('keydown', handleUserInteraction)
+		}
+
+		document.addEventListener('click', handleUserInteraction)
+		document.addEventListener('keydown', handleUserInteraction)
+
 		return () => {
 			document.removeEventListener('fullscreenchange', fullscreenChangeHandler)
 			document.removeEventListener('keydown', keyEventHandler)
+			document.removeEventListener('click', handleUserInteraction)
+			document.removeEventListener('keydown', handleUserInteraction)
 		}
 	}, [fullscreenChangeHandler, keyEventHandler])
 
