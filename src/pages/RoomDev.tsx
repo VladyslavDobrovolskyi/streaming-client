@@ -140,6 +140,7 @@ export default function RoomDev() {
 						padding: '0.5rem 1rem',
 						borderRadius: '5px',
 						cursor: 'pointer',
+						background: 'none',
 					}}
 				>
 					{isPlaying ? <Pause /> : <Play />}
@@ -167,6 +168,7 @@ export default function RoomDev() {
 						cursor: 'pointer',
 						display: 'flex',
 						alignItems: 'center',
+						background: 'none',
 					}}
 					onMouseEnter={() => setShowVolumeControl(true)}
 					onMouseLeave={() => setShowVolumeControl(false)}
@@ -203,6 +205,7 @@ export default function RoomDev() {
 							padding: '0.5rem 1rem',
 							borderRadius: '5px',
 							cursor: 'pointer',
+							background: 'none',
 						}}
 					>
 						<option value={0.5}>0.5x</option>
@@ -222,6 +225,7 @@ export default function RoomDev() {
 						padding: '0.5rem 1rem',
 						borderRadius: '5px',
 						cursor: 'pointer',
+						background: 'none',
 					}}
 				>
 					{isFullscreen ? <Minimize /> : <Maximize />}
