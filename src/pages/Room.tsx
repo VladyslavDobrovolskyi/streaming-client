@@ -37,7 +37,7 @@ function layout(clientsNumber = 1) {
 
 export default function Room() {
 	const { id: roomID } = useParams()
-	const { clients, provideMediaRef, localStream } = useWebRTC(roomID!)
+	const { clients, provideMediaRef, localStream, reinitializeStream } = useWebRTC(roomID!)
 	const videoLayout = layout(clients.length)
 	const videoRef = useRef<HTMLVideoElement>(null)
 	const [isPlaying, setIsPlaying] = useState(false)
@@ -62,6 +62,23 @@ export default function Room() {
 			navigate(`/room/${storedRoomID}`, { replace: true })
 		}
 	}, [roomID, navigate])
+
+	useEffect(() => {
+		const reconnect = () => {
+			console.log('Переподключение к комнате...');
+			socket.emit(ACTIONS.JOIN, { roomID });
+			reinitializeStream(); // Перезапускаем медиа
+		};
+	
+		socket.on('disconnect', reconnect);
+		return () => socket.off('disconnect', reconnect);
+	}, [roomID, reinitializeStream]);
+
+	useEffect(() => {
+		if (!localStream) {
+			reinitializeStream();
+		}
+	}, [localStream, reinitializeStream]);
 
 	const checkStreamAvailability = async () => {
 		try {
