@@ -1,12 +1,12 @@
 import { forwardRef, memo, useImperativeHandle, useRef } from 'react'
 import { CSSTransition } from 'react-transition-group'
 
-import VolumeHighIcon from 'icons/volume-high.svg'
-import VolumeMiddleIcon from 'icons/volume-middle.svg'
-import VolumeLowIcon from 'icons/volume-low.svg'
-import VolumeMuteIcon from 'icons/volume-mute.svg'
-import TrackRewindIcon from 'icons/track-rewind.svg'
-import TrackSkipIcon from 'icons/track-skip.svg'
+import VolumeHighIcon from '../../../../icons/volume-high.svg'
+import VolumeMiddleIcon from '../../../../icons/volume-middle.svg'
+import VolumeLowIcon from '../../../../icons/volume-low.svg'
+import VolumeMuteIcon from '../../../../icons/volume-mute.svg'
+import TrackRewindIcon from '../../../../icons/track-rewind.svg'
+import TrackSkipIcon from '../../../../icons/track-skip.svg'
 import './KeyAction.css'
 
 export interface KeyActionHandle {

@@ -1,6 +1,6 @@
 import { memo } from 'react'
 
-import ReloadIcon from 'icons/reload.svg'
+import ReloadIcon from '../../../../icons/reload.svg'
 import './Error.css'
 
 interface ErrorProps {
