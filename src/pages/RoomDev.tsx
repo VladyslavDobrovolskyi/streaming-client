@@ -124,7 +124,6 @@ export default function RoomDev() {
 					display: 'flex',
 					flexDirection: 'row',
 					alignItems: 'center',
-					backgroundColor: 'rgba(0, 0, 0, 0.5)',
 					padding: '10px',
 					borderRadius: '5px',
 					transition: 'opacity 0.3s ease',
