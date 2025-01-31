@@ -109,26 +109,26 @@ export default function useWebRTC(roomID: string) {
 		return connection
 	}
 
-  const reinitializeStream = async () => {
-    try {
-        localMediaStream.current = await navigator.mediaDevices.getUserMedia({
-            audio: true,
-            video: true,
-        });
-    } catch (error) {
-        console.error('Ошибка при получении медиа: ', error);
-        localMediaStream.current = createMockMediaStream();
-    } finally {
-        socket.emit(ACTIONS.JOIN, { room: roomID });
-        addNewClient(LOCAL_VIDEO, () => {
-            const localVideoElement = peerMediaElements.current[LOCAL_VIDEO];
-            if (localVideoElement) {
-                localVideoElement.volume = 0;
-                localVideoElement.srcObject = localMediaStream.current;
-            }
-        });
-    }
-  };
+	const reinitializeStream = async () => {
+		try {
+			localMediaStream.current = await navigator.mediaDevices.getUserMedia({
+				audio: true,
+				video: true,
+			})
+		} catch (error) {
+			console.error('Ошибка при получении медиа: ', error)
+			localMediaStream.current = createMockMediaStream()
+		} finally {
+			socket.emit(ACTIONS.JOIN, { room: roomID })
+			addNewClient(LOCAL_VIDEO, () => {
+				const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
+				if (localVideoElement) {
+					localVideoElement.volume = 0
+					localVideoElement.srcObject = localMediaStream.current
+				}
+			})
+		}
+	}
 
 	// Handle new peer connection
 	socket.on(ACTIONS.ADD_PEER, async ({ peerID, createOffer }: { peerID: string; createOffer: boolean }) => {
@@ -257,7 +257,7 @@ export default function useWebRTC(roomID: string) {
 		}
 	}, [roomID, addNewClient])
 
-	const provideMediaRef = useCallback((id: string, node: HTMLVideoElement | null) => {
+	const provideMediaRef = useCallback(async (id: string, node: HTMLVideoElement | null) => {
 		peerMediaElements.current[id] = node
 	}, [])
 
@@ -265,6 +265,6 @@ export default function useWebRTC(roomID: string) {
 		clients,
 		provideMediaRef,
 		localStream: localMediaStream.current, // Return the local stream
-    reinitializeStream,
+		reinitializeStream,
 	}
 }

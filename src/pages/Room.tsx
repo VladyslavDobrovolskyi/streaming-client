@@ -65,20 +65,20 @@ export default function Room() {
 
 	useEffect(() => {
 		const reconnect = () => {
-			console.log('Переподключение к комнате...');
-			socket.emit(ACTIONS.JOIN, { roomID });
-			reinitializeStream(); // Перезапускаем медиа
-		};
-	
-		socket.on('disconnect', reconnect);
-		return () => socket.off('disconnect', reconnect);
-	}, [roomID, reinitializeStream]);
+			console.log('Переподключение к комнате...')
+			socket.emit(ACTIONS.JOIN, { roomID })
+			reinitializeStream() // Перезапускаем медиа
+		}
+
+		socket.on('disconnect', reconnect)
+		return () => socket.off('disconnect', reconnect)
+	}, [roomID, reinitializeStream])
 
 	useEffect(() => {
 		if (!localStream) {
-			reinitializeStream();
+			reinitializeStream()
 		}
-	}, [localStream, reinitializeStream]);
+	}, [localStream, reinitializeStream])
 
 	const checkStreamAvailability = async () => {
 		try {
@@ -250,7 +250,7 @@ export default function Room() {
 					<video
 						width='100%'
 						height='100%'
-						ref={instance => provideMediaRef(clientID, instance)}
+						ref={async instance => await provideMediaRef(clientID, instance)}
 						autoPlay
 						playsInline
 						muted={clientID === LOCAL_VIDEO}
