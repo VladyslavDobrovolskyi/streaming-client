@@ -252,9 +252,9 @@ export default function RoomDev() {
 			onMouseMove={showControlsHandler}
 			onMouseLeave={() => !isDragging && setShowControls(false)}
 			style={{
-				backgroundColor: '#1a1a1a',
-				width: '100vw',
-				height: '100vh',
+				// backgroundColor: '#1a1a1a',
+				// width: '100vw',
+				// height: '100vh',
 				position: 'fixed',
 				top: 0,
 				left: 0,
