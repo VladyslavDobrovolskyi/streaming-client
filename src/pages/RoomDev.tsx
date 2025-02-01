@@ -291,31 +291,36 @@ export default function RoomDev() {
 									style={{
 										position: 'absolute',
 										bottom: '100%',
-										left: '50%',
-										transform: 'translateX(-50%)',
+										left: '0',
 										background: 'rgba(0,0,0,0.9)',
 										padding: '0.5rem',
 										borderRadius: '4px',
+										display: 'flex',
+										alignItems: 'center',
+										gap: '0.5rem',
 									}}
 								>
 									<Slider
-										orientation='vertical'
+										orientation='horizontal'
 										min={0}
 										max={1}
 										step={0.01}
 										value={[volume]}
 										onValueChange={handleVolumeChange}
 										style={{
-											height: '100px',
+											width: '100px',
 										}}
 									/>
+									<span style={{ color: '#fff', fontSize: '12px' }}>{Math.round(volume * 100)}%</span>
 								</div>
 							)}
 						</div>
-						<span style={{ color: '#fff', fontSize: '14px' }}>
-							{formatTime(played * duration)} / {formatTime(duration)}
-						</span>
 					</div>
+
+					{/* Center time display */}
+					<span style={{ color: '#fff', fontSize: '14px', flexGrow: 1, textAlign: 'center' }}>
+						{formatTime(played * duration)} / {formatTime(duration)}
+					</span>
 
 					{/* Right controls group */}
 					<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
