@@ -60,7 +60,6 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 		socket.on(ACTIONS.VIDEO_PLAY, handlePlay)
 		socket.on(ACTIONS.VIDEO_PAUSE, handlePause)
 		socket.on(ACTIONS.VIDEO_SEEK, handleSeek)
-		setLastSeekDirection(lastSeekDirection)
 		socket.on(ACTIONS.REQUEST_SYNC, handleSyncRequest)
 
 		return () => {
@@ -69,7 +68,7 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 			socket.off(ACTIONS.VIDEO_SEEK, handleSeek)
 			socket.off(ACTIONS.REQUEST_SYNC, handleSyncRequest)
 		}
-	}, [handlePlay, handlePause, handleSeek, handleSyncRequest, lastSeekDirection])
+	}, [handlePlay, handlePause, handleSeek, handleSyncRequest])
 
 	const emitPlay = useCallback(
 		(time: number) => {
