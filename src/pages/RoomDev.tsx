@@ -19,6 +19,7 @@ import { useParams } from 'react-router'
 import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
 import ACTIONS from '../socket/actions'
 import socket from '../socket'
+import useRoomSync from '../hooks/useRoomSync'
 
 export default function RoomDev() {
 	const [isPlaying, setIsPlaying] = useState(false)
@@ -44,6 +45,7 @@ export default function RoomDev() {
 
 	const { id: roomID } = useParams()
 	const { clients, provideMediaRef, localStream, reinitializeStream } = useWebRTC(roomID!)
+	const { emitPlay, emitPause, emitSeek, requestSync } = useRoomSync(roomID!, playerRef)
 
 	useEffect(() => {
 		if (loaded) {
@@ -57,6 +59,7 @@ export default function RoomDev() {
 		playerRef.current?.seekTo(newTime, 'seconds')
 		setPlayed(newTime / duration)
 		showAction('forward')
+		emitSeek(newTime)
 	}
 
 	const handleBackward15 = () => {
@@ -65,16 +68,21 @@ export default function RoomDev() {
 		playerRef.current?.seekTo(newTime, 'seconds')
 		setPlayed(newTime / duration)
 		showAction('backward')
+		emitSeek(newTime)
 	}
 
 	const handlePlay = () => {
 		setIsPlaying(true)
 		showAction('play')
+		const currentTime = playerRef.current?.getCurrentTime() || 0
+		emitPlay(currentTime)
 	}
 
 	const handlePause = () => {
 		setIsPlaying(false)
 		showAction('pause')
+		const currentTime = playerRef.current?.getCurrentTime() || 0
+		emitPause(currentTime)
 	}
 
 	const handleVolumeChange = (newVolume: number) => {
@@ -151,7 +159,9 @@ export default function RoomDev() {
 
 	const handleSeekEnd = () => {
 		setIsDragging(false)
-		playerRef.current?.seekTo(played)
+		const newTime = played * duration
+		playerRef.current?.seekTo(newTime)
+		emitSeek(newTime)
 		showControlsHandler()
 	}
 
@@ -199,6 +209,12 @@ export default function RoomDev() {
 				setIsPlaying(prev => {
 					const newState = !prev
 					showAction(newState ? 'play' : 'pause')
+					const currentTime = playerRef.current?.getCurrentTime() || 0
+					if (newState) {
+						emitPlay(currentTime)
+					} else {
+						emitPause(currentTime)
+					}
 					return newState
 				})
 			} else if (e.code === 'ArrowRight') {
@@ -225,7 +241,7 @@ export default function RoomDev() {
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown)
 		}
-	})
+	}) // Added handleVolumeChange to dependencies
 
 	useEffect(() => {
 		if (roomID) {
@@ -249,6 +265,11 @@ export default function RoomDev() {
 			reinitializeStream()
 		}
 	}, [localStream, reinitializeStream])
+
+	useEffect(() => {
+		// Request sync when component mounts
+		requestSync()
+	}, [requestSync])
 
 	const formatTime = (seconds: number) => {
 		const date = new Date(seconds * 1000)
@@ -352,7 +373,7 @@ export default function RoomDev() {
 					justifyContent: 'center',
 					alignItems: 'center',
 					pointerEvents: 'none',
-					zIndex: 20, // Updated z-index
+					zIndex: 20,
 				}}
 			>
 				<ActionIndicator action={currentAction} volume={volume} />
@@ -414,7 +435,17 @@ export default function RoomDev() {
 					{/* Left controls group */}
 					<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: '1 0 auto' }}>
 						<button
-							onClick={() => setIsPlaying(prev => !prev)}
+							onClick={() =>
+								setIsPlaying(prev => {
+									const newState = !prev
+									if (newState) {
+										handlePlay()
+									} else {
+										handlePause()
+									}
+									return newState
+								})
+							}
 							style={{
 								color: '#fff',
 								border: 'none',
@@ -543,20 +574,6 @@ export default function RoomDev() {
 							justifyContent: 'flex-end',
 						}}
 					>
-						{/* <button
-							style={{
-								color: '#fff',
-								border: 'none',
-								padding: '0.5rem',
-								borderRadius: '5px',
-								cursor: 'pointer',
-								background: 'none',
-								display: 'flex',
-								alignItems: 'center',
-							}}
-						>
-							<GearIcon />
-						</button> */}
 						<button
 							style={{
 								color: '#fff',
@@ -586,17 +603,6 @@ export default function RoomDev() {
 						>
 							{isFullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
 						</button>
-						{/* <span
-							style={{
-								color: '#fff',
-								fontSize: '14px',
-								padding: '2px 6px',
-								border: '1px solid #fff',
-								borderRadius: '4px',
-							}}
-						>
-							HD
-						</span> */}
 					</div>
 				</div>
 			</div>

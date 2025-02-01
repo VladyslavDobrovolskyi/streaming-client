@@ -1,8 +1,9 @@
 import { useEffect, useRef, useCallback } from 'react'
 import socket from '../socket'
 import ACTIONS from '../socket/actions'
+import ReactPlayer from 'react-player'
 
-export default function useRoomSync(roomID: string, videoRef: React.RefObject<HTMLVideoElement>) {
+export default function useRoomSync(roomID: string, videoRef: React.RefObject<ReactPlayer>) {
 	const isSyncingRef = useRef(false)
 
 	const handlePlay = useCallback(
@@ -10,10 +11,8 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<HT
 			if (!videoRef.current || isSyncingRef.current) return
 
 			isSyncingRef.current = true
-			videoRef.current.currentTime = time
-			videoRef.current.play().finally(() => {
-				isSyncingRef.current = false
-			})
+			videoRef.current.seekTo(time, 'seconds')
+			isSyncingRef.current = false
 		},
 		[videoRef]
 	)
@@ -23,8 +22,8 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<HT
 			if (!videoRef.current || isSyncingRef.current) return
 
 			isSyncingRef.current = true
-			videoRef.current.currentTime = time
-			videoRef.current.pause()
+			videoRef.current.seekTo(time, 'seconds')
+			videoRef.current.getInternalPlayer().pause()
 			isSyncingRef.current = false
 		},
 		[videoRef]
@@ -35,7 +34,7 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<HT
 			if (!videoRef.current || isSyncingRef.current) return
 
 			isSyncingRef.current = true
-			videoRef.current.currentTime = time
+			videoRef.current.seekTo(time, 'seconds')
 			isSyncingRef.current = false
 		},
 		[videoRef]
@@ -43,8 +42,8 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<HT
 
 	const handleSyncRequest = useCallback(() => {
 		if (videoRef.current) {
-			const currentTime = videoRef.current.currentTime
-			const isPlaying = !videoRef.current.paused
+			const currentTime = videoRef.current.getCurrentTime
+			const isPlaying = !videoRef.current.getInternalPlayer().paused
 			socket.emit(ACTIONS.SYNC_STATE, {
 				roomID,
 				time: currentTime,
