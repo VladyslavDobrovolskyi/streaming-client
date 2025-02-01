@@ -1,3 +1,5 @@
+//// Вернуть костыль для обновления соедения при обновлении страницы (Возврат на /rooms)
+
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams } from 'react-router'
 import { useNavigate } from 'react-router-dom'
