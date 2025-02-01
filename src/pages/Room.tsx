@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
 import ACTIONS from '../socket/actions'
 import socket from '../socket'
+import useRoomSync from '../hooks/useRoomSync'
 
 function layout(clientsNumber = 1) {
 	const pairs = Array.from({ length: clientsNumber }).reduce((acc: [number, number?][], _next, index, arr) => {
@@ -16,23 +17,21 @@ function layout(clientsNumber = 1) {
 	const rowsNumber = pairs.length
 	const height = `${100 / rowsNumber}%`
 
-	return pairs
-		.map((row, index, arr) => {
-			if (index === arr.length - 1 && row.length === 1) {
-				return [
-					{
-						width: '100%',
-						height,
-					},
-				]
-			}
+	return pairs.flatMap((row, index, arr) => {
+		if (index === arr.length - 1 && row.length === 1) {
+			return [
+				{
+					width: '100%',
+					height,
+				},
+			]
+		}
 
-			return row.map(() => ({
-				width: '50%',
-				height,
-			}))
-		})
-		.flat()
+		return row.map(() => ({
+			width: '50%',
+			height,
+		}))
+	})
 }
 
 export default function Room() {
@@ -47,6 +46,7 @@ export default function Room() {
 	const navigate = useNavigate()
 	const [error, setError] = useState<string | null>(null)
 	const isSyncingRef = useRef(false)
+	const { emitPlay, emitPause, emitSeek } = useRoomSync(roomID!, videoRef)
 
 	// Сохраняем ID комнаты в sessionStorage, чтобы восстановить соединение после обновления
 	useEffect(() => {
@@ -100,61 +100,6 @@ export default function Room() {
 			setError('An error occurred while fetching the movie')
 		}
 	}
-	// Sync handlers
-	useEffect(() => {
-		const handlePlay = ({ time }: { time: number }) => {
-			if (!videoRef.current || isSyncingRef.current) return
-
-			isSyncingRef.current = true
-			videoRef.current.currentTime = time
-			videoRef.current.play().finally(() => {
-				isSyncingRef.current = false
-				setIsPlaying(true)
-			})
-		}
-
-		const handlePause = ({ time }: { time: number }) => {
-			if (!videoRef.current || isSyncingRef.current) return
-
-			isSyncingRef.current = true
-			videoRef.current.currentTime = time
-			videoRef.current.pause()
-			isSyncingRef.current = false
-			setIsPlaying(false)
-		}
-
-		const handleSeek = ({ time }: { time: number }) => {
-			if (!videoRef.current || isSyncingRef.current) return
-
-			isSyncingRef.current = true
-			videoRef.current.currentTime = time
-			isSyncingRef.current = false
-		}
-
-		const handleSyncRequest = () => {
-			if (videoRef.current) {
-				const currentTime = videoRef.current.currentTime
-				const isPlaying = !videoRef.current.paused
-				socket.emit(ACTIONS.SYNC_STATE, {
-					roomID,
-					time: currentTime,
-					isPlaying,
-				})
-			}
-		}
-
-		socket.on(ACTIONS.VIDEO_PLAY, handlePlay)
-		socket.on(ACTIONS.VIDEO_PAUSE, handlePause)
-		socket.on(ACTIONS.VIDEO_SEEK, handleSeek)
-		socket.on(ACTIONS.REQUEST_SYNC, handleSyncRequest)
-
-		return () => {
-			socket.off(ACTIONS.VIDEO_PLAY, handlePlay)
-			socket.off(ACTIONS.VIDEO_PAUSE, handlePause)
-			socket.off(ACTIONS.VIDEO_SEEK, handleSeek)
-			socket.off(ACTIONS.REQUEST_SYNC, handleSyncRequest)
-		}
-	}, [roomID])
 
 	useEffect(() => {
 		checkStreamAvailability()
@@ -168,10 +113,10 @@ export default function Room() {
 
 		if (mediaElement.paused) {
 			mediaElement.play().catch(console.error)
-			socket.emit(ACTIONS.VIDEO_PLAY, { roomID, time: currentTime })
+			emitPlay(currentTime)
 		} else {
 			mediaElement.pause()
-			socket.emit(ACTIONS.VIDEO_PAUSE, { roomID, time: currentTime })
+			emitPause(currentTime)
 		}
 		setIsPlaying(!mediaElement.paused)
 	}
@@ -211,13 +156,10 @@ export default function Room() {
 
 			isSyncingRef.current = true
 			videoRef.current.currentTime = time
-			socket.emit(ACTIONS.VIDEO_SEEK, {
-				roomID,
-				time,
-			})
+			emitSeek(time)
 			isSyncingRef.current = false
 		},
-		[roomID]
+		[emitSeek]
 	)
 
 	const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
