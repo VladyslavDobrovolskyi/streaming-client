@@ -253,9 +253,12 @@ export default function RoomDev() {
 			onMouseLeave={() => !isDragging && setShowControls(false)}
 			style={{
 				backgroundColor: '#1a1a1a',
-				width: '100%',
-				height: '100%',
-				position: 'relative',
+				width: '100vw',
+				height: '100vh',
+				position: 'fixed',
+				top: 0,
+				left: 0,
+				overflow: 'hidden',
 			}}
 		>
 			<ReactPlayer
@@ -272,7 +275,7 @@ export default function RoomDev() {
 				onDuration={duration => setDuration(duration)}
 				width='100%'
 				height='100%'
-				style={{ backgroundColor: '#1a1a1a' }}
+				style={{ backgroundColor: '#1a1a1a', objectFit: 'contain' }}
 			/>
 			<div
 				style={{
