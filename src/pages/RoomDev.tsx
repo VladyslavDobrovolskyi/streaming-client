@@ -27,6 +27,7 @@ export default function RoomDev() {
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
 	const canvasRef = useRef<HTMLCanvasElement>(null)
+	const sliderRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
 		if (loaded) {
@@ -69,9 +70,16 @@ export default function RoomDev() {
 		}
 	}
 
-	const handlePreviewChange = (value: number[]) => {
-		setPreviewTime(value[0])
-		updatePreviewFrame(value[0])
+	const handlePreviewMove = (e: React.MouseEvent<HTMLDivElement>) => {
+		if (sliderRef.current && playerRef.current) {
+			const rect = sliderRef.current.getBoundingClientRect()
+			const x = e.clientX - rect.left
+			const fraction = x / rect.width
+			const duration = playerRef.current.getDuration()
+			const newPreviewTime = fraction * duration
+			setPreviewTime(newPreviewTime)
+			updatePreviewFrame(newPreviewTime)
+		}
 	}
 
 	const updatePreviewFrame = (time: number) => {
@@ -199,7 +207,7 @@ export default function RoomDev() {
 				>
 					{isPlaying ? <PauseIcon /> : <PlayIcon />}
 				</button>
-				<div style={{ margin: '0.5rem', color: '#fff', flex: 1, position: 'relative' }}>
+				<div ref={sliderRef} style={{ margin: '0.5rem', color: '#fff', flex: 1, position: 'relative' }}>
 					<Slider
 						min={0}
 						max={playerRef.current?.getDuration() || 1}
@@ -212,30 +220,16 @@ export default function RoomDev() {
 					<div
 						style={{
 							position: 'absolute',
-							top: 0,
+							top: '-20px',
 							left: 0,
 							width: '100%',
-							height: '100%',
-							pointerEvents: 'none',
+							height: '40px',
+							cursor: 'pointer',
 						}}
 						onMouseEnter={() => setIsHoveringSlider(true)}
 						onMouseLeave={() => setIsHoveringSlider(false)}
-					>
-						<Slider
-							min={0}
-							max={playerRef.current?.getDuration() || 1}
-							step={0.01}
-							value={[
-								previewTime !== null ? previewTime : played * (playerRef.current?.getDuration() || 1),
-							]}
-							onValueChange={handlePreviewChange}
-							style={{
-								width: '100%',
-								opacity: 0,
-								pointerEvents: 'auto',
-							}}
-						/>
-					</div>
+						onMouseMove={handlePreviewMove}
+					/>
 					{isHoveringSlider && previewTime !== null && (
 						<div
 							style={{
