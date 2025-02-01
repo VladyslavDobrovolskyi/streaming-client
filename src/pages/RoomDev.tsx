@@ -336,7 +336,7 @@ export default function RoomDev() {
 						<video
 							width='100%'
 							height='100%'
-							ref={cameraMuted ? null : instance => provideMediaRef(clientID, instance)}
+							ref={instance => provideMediaRef(clientID, instance)}
 							autoPlay
 							playsInline
 							muted={clientID === LOCAL_VIDEO}
