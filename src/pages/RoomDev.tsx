@@ -313,18 +313,35 @@ export default function RoomDev() {
 	}
 
 	const renderParticipants = () => {
-		return clients.map(clientID => (
-			<div key={clientID} style={{ width: '200px', height: '150px', margin: '5px' }}>
-				<video
-					width='100%'
-					height='100%'
-					ref={instance => provideMediaRef(clientID, instance)}
-					autoPlay
-					playsInline
-					muted={clientID === LOCAL_VIDEO}
-				/>
+		return (
+			<div
+				style={{
+					position: 'absolute',
+					top: '10px',
+					right: '10px',
+					display: 'flex',
+					flexDirection: 'row',
+					justifyContent: 'flex-end',
+					gap: '5px',
+					maxWidth: '100%',
+					overflow: 'hidden',
+				}}
+			>
+				{clients.map(clientID => (
+					<div key={clientID} style={{ width: '150px', height: '100px' }}>
+						<video
+							width='100%'
+							height='100%'
+							ref={instance => provideMediaRef(clientID, instance)}
+							autoPlay
+							playsInline
+							muted={clientID === LOCAL_VIDEO}
+							style={{ objectFit: 'cover', borderRadius: '5px' }}
+						/>
+					</div>
+				))}
 			</div>
-		))
+		)
 	}
 
 	return (
@@ -359,19 +376,7 @@ export default function RoomDev() {
 				height='100%'
 				style={{ backgroundColor: '#1a1a1a', objectFit: 'contain' }}
 			/>
-			<div
-				style={{
-					position: 'absolute',
-					top: '10px',
-					right: '10px',
-					display: 'flex',
-					flexWrap: 'wrap',
-					maxWidth: '400px',
-					zIndex: 30,
-				}}
-			>
-				{renderParticipants()}
-			</div>
+			{renderParticipants()}
 			<div
 				style={{
 					position: 'absolute',
