@@ -205,7 +205,7 @@ export default function RoomDev() {
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown)
 		}
-	}, [handleBackward15, handleForward15, handleToggleMuted]) // Added dependencies to useEffect
+	}) // Added dependencies to useEffect
 
 	const formatTime = (seconds: number) => {
 		const date = new Date(seconds * 1000)
