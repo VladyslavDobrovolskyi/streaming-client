@@ -12,15 +12,15 @@ const ActionIndicator: React.FC<ActionIndicatorProps> = ({ action }) => {
 	const getIcon = () => {
 		switch (action) {
 			case 'play':
-				return <PlayIcon className='w-16 h-16' />
+				return <PlayIcon className='w-32 h-32' />
 			case 'pause':
-				return <PauseIcon className='w-16 h-16' />
+				return <PauseIcon className='w-32 h-32' />
 			case 'mute':
-				return <SpeakerOffIcon className='w-16 h-16' />
+				return <SpeakerOffIcon className='w-32 h-32' />
 			case 'forward':
-				return <DoubleArrowRightIcon className='w-16 h-16' />
+				return <DoubleArrowRightIcon className='w-32 h-32' />
 			case 'backward':
-				return <DoubleArrowLeftIcon className='w-16 h-16' />
+				return <DoubleArrowLeftIcon className='w-32 h-32' />
 			default:
 				return null
 		}
