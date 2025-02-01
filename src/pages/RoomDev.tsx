@@ -20,7 +20,8 @@ export default function RoomDev() {
 	const [showControls, setShowControls] = useState(false)
 	const [showVolumeControl, setShowVolumeControl] = useState(false)
 	const [isFullscreen, setIsFullscreen] = useState(false)
-	const [duration, setDuration] = useState(300) // 5 минут (300 секунд) по умолчанию
+	const [duration, setDuration] = useState(300)
+	const [isDragging, setIsDragging] = useState(false)
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -58,8 +59,10 @@ export default function RoomDev() {
 		playedSeconds: number
 		loadedSeconds: number
 	}) => {
-		setPlayed(state.played)
-		setLoaded(state.loaded)
+		if (!isDragging) {
+			setPlayed(state.played)
+			setLoaded(state.loaded)
+		}
 		if (state.loadedSeconds > 0 && duration === 300) {
 			setDuration(playerRef.current?.getDuration() || 300)
 		}
@@ -70,7 +73,12 @@ export default function RoomDev() {
 		setPlayed(newTime / duration)
 	}
 
+	const handleSeekStart = () => {
+		setIsDragging(true)
+	}
+
 	const handleSeekEnd = () => {
+		setIsDragging(false)
 		playerRef.current?.seekTo(played)
 	}
 
@@ -153,93 +161,123 @@ export default function RoomDev() {
 				className={`controls ${showControls ? 'visible' : 'hidden'}`}
 				style={{
 					position: 'absolute',
-					bottom: '10px',
-					left: '50%',
-					transform: 'translateX(-50%)',
+					bottom: '0',
+					left: '0',
+					right: '0',
 					display: 'flex',
-					flexDirection: 'row',
-					alignItems: 'center',
+					flexDirection: 'column',
 					padding: '10px',
-					borderRadius: '5px',
+					background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
 					transition: 'opacity 0.3s ease',
 					opacity: showControls ? 1 : 0,
-					width: '90%',
 				}}
 			>
-				<button
-					onClick={() => setIsPlaying(prev => !prev)}
+				<div
+					ref={sliderRef}
 					style={{
 						margin: '0.5rem',
 						color: '#fff',
-						border: 'none',
-						padding: '0.5rem 1rem',
-						borderRadius: '5px',
+						position: 'relative',
+						height: '20px',
 						cursor: 'pointer',
-						background: 'none',
 					}}
 				>
-					{isPlaying ? <PauseIcon /> : <PlayIcon />}
-				</button>
-				<div ref={sliderRef} style={{ margin: '0.5rem', color: '#fff', flex: 1, position: 'relative' }}>
 					<Slider
 						min={0}
 						max={duration}
 						step={0.01}
 						value={[played * duration]}
 						onValueChange={handleSeekChange}
-						onValueCommit={handleSeekEnd}
-						style={{ width: '100%' }}
+						onPointerDown={handleSeekStart}
+						onPointerUp={handleSeekEnd}
+						style={
+							{
+								width: '100%',
+								height: '100%',
+								'--slider-thumb-size': '16px',
+								'--slider-track-height': '8px',
+							} as React.CSSProperties
+						}
 					/>
-					<div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.25rem' }}>
+					<div
+						style={{
+							position: 'absolute',
+							left: 0,
+							right: 0,
+							bottom: '-20px',
+							display: 'flex',
+							justifyContent: 'space-between',
+						}}
+					>
 						<span>{formatTime(played * duration)}</span>
 						<span>{formatTime(duration)}</span>
 					</div>
 				</div>
 				<div
 					style={{
-						position: 'relative',
-						margin: '0.5rem',
-						color: '#fff',
-						border: 'none',
-						padding: '0.5rem 1rem',
-						borderRadius: '5px',
-						cursor: 'pointer',
 						display: 'flex',
 						alignItems: 'center',
-						background: 'none',
+						justifyContent: 'space-between',
+						marginTop: '20px',
 					}}
-					onMouseEnter={() => setShowVolumeControl(true)}
-					onMouseLeave={() => setShowVolumeControl(false)}
-					onClick={handleToggleMuted}
 				>
-					{muted ? <SpeakerOffIcon /> : <SpeakerLoudIcon />}
-					{showVolumeControl && (
-						<Slider
-							min={0}
-							max={1}
-							step={0.01}
-							value={[volume]}
-							onValueChange={handleVolumeChange}
+					<button
+						onClick={() => setIsPlaying(prev => !prev)}
+						style={{
+							color: '#fff',
+							border: 'none',
+							padding: '0.5rem',
+							borderRadius: '5px',
+							cursor: 'pointer',
+							background: 'none',
+						}}
+					>
+						{isPlaying ? <PauseIcon /> : <PlayIcon />}
+					</button>
+					<div
+						style={{
+							position: 'relative',
+							color: '#fff',
+							display: 'flex',
+							alignItems: 'center',
+						}}
+						onMouseEnter={() => setShowVolumeControl(true)}
+						onMouseLeave={() => setShowVolumeControl(false)}
+					>
+						<button
+							onClick={handleToggleMuted}
 							style={{
-								position: 'absolute',
-								bottom: '100%',
-								left: '50%',
-								transform: 'translateX(-50%)',
-								width: '100px',
+								color: '#fff',
+								border: 'none',
+								padding: '0.5rem',
+								borderRadius: '5px',
+								cursor: 'pointer',
+								background: 'none',
 							}}
-						/>
-					)}
-				</div>
-				<label style={{ margin: '0.5rem', color: '#fff' }}>
-					Playback Rate
+						>
+							{muted ? <SpeakerOffIcon /> : <SpeakerLoudIcon />}
+						</button>
+						{showVolumeControl && (
+							<Slider
+								min={0}
+								max={1}
+								step={0.01}
+								value={[volume]}
+								onValueChange={handleVolumeChange}
+								style={{
+									width: '100px',
+									marginLeft: '10px',
+								}}
+							/>
+						)}
+					</div>
 					<select
 						value={playbackRate}
 						onChange={e => handlePlaybackRateChange(Number.parseFloat(e.target.value))}
 						style={{
-							margin: '0.5rem',
 							color: '#fff',
 							border: 'none',
-							padding: '0.5rem 1rem',
+							padding: '0.5rem',
 							borderRadius: '5px',
 							cursor: 'pointer',
 							background: 'none',
@@ -252,21 +290,20 @@ export default function RoomDev() {
 						<option value={1.5}>1.5x</option>
 						<option value={2}>2x</option>
 					</select>
-				</label>
-				<button
-					onClick={handleFullscreenToggle}
-					style={{
-						margin: '0.5rem',
-						color: '#fff',
-						border: 'none',
-						padding: '0.5rem 1rem',
-						borderRadius: '5px',
-						cursor: 'pointer',
-						background: 'none',
-					}}
-				>
-					{isFullscreen ? <EnterFullScreenIcon /> : <ExitFullScreenIcon />}
-				</button>
+					<button
+						onClick={handleFullscreenToggle}
+						style={{
+							color: '#fff',
+							border: 'none',
+							padding: '0.5rem',
+							borderRadius: '5px',
+							cursor: 'pointer',
+							background: 'none',
+						}}
+					>
+						{isFullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
+					</button>
+				</div>
 			</div>
 		</div>
 	)
