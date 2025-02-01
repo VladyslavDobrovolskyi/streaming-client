@@ -27,3 +27,8 @@ svg {
 	height: 2.5rem;
 	fill: currentColor;
 }
+
+.time {
+	font-family: 'Times New Roman', Times, serif;
+	color: white;
+}
