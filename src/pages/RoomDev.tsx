@@ -19,8 +19,6 @@ import { Slider } from '@radix-ui/themes'
 import ActionIndicator from '../components/ActionIndicator'
 import { useParams } from 'react-router'
 import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
-import ACTIONS from '../socket/actions'
-import socket from '../socket'
 import useRoomSync from '../hooks/useRoomSync'
 
 export default function RoomDev() {
@@ -41,6 +39,7 @@ export default function RoomDev() {
 	>(null)
 	const [micMuted, setMicMuted] = useState(false)
 	const [cameraMuted, setCameraMuted] = useState(false)
+	//const [mutedCameras, setMutedCameras] = useState<Record<string, boolean>>({})
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -264,17 +263,6 @@ export default function RoomDev() {
 	}, [roomID])
 
 	useEffect(() => {
-		const reconnect = () => {
-			console.log('Переподключение к комнате...')
-			socket.emit(ACTIONS.JOIN, { roomID })
-			reinitializeStream()
-		}
-
-		socket.on('disconnect', reconnect)
-		return () => socket.off('disconnect', reconnect)
-	}, [roomID, reinitializeStream])
-
-	useEffect(() => {
 		if (!localStream) {
 			reinitializeStream()
 		}
@@ -332,7 +320,7 @@ export default function RoomDev() {
 				}}
 			>
 				{clients.map(clientID => (
-					<div key={clientID} style={{ width: '150px', height: '100px' }}>
+					<div key={clientID} style={{ width: '150px', height: '100px', position: 'relative' }}>
 						<video
 							width='100%'
 							height='100%'
@@ -342,6 +330,26 @@ export default function RoomDev() {
 							muted={clientID === LOCAL_VIDEO}
 							style={{ objectFit: 'cover', borderRadius: '5px' }}
 						/>
+						{clientID === LOCAL_VIDEO && cameraMuted && (
+							<div
+								style={{
+									position: 'absolute',
+									top: 0,
+									left: 0,
+									width: '100%',
+									height: '100%',
+									backgroundColor: 'black',
+									borderRadius: '5px',
+									display: 'flex',
+									justifyContent: 'center',
+									alignItems: 'center',
+									color: 'white',
+									fontSize: '12px',
+								}}
+							>
+								Camera Off
+							</div>
+						)}
 					</div>
 				))}
 			</div>
