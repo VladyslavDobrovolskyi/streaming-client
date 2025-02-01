@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react'
 import socket from '../socket'
 import ACTIONS from '../socket/actions'
-import ReactPlayer from 'react-player'
+import type ReactPlayer from 'react-player'
 
 export default function useRoomSync(roomID: string, videoRef: React.RefObject<ReactPlayer>) {
 	const isSyncingRef = useRef(false)
@@ -42,7 +42,7 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 
 	const handleSyncRequest = useCallback(() => {
 		if (videoRef.current) {
-			const currentTime = videoRef.current.getCurrentTime
+			const currentTime = videoRef.current.getCurrentTime()
 			const isPlaying = !videoRef.current.getInternalPlayer().paused
 			socket.emit(ACTIONS.SYNC_STATE, {
 				roomID,
