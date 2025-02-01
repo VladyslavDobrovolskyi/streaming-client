@@ -379,8 +379,9 @@ export default function RoomDev() {
 							left: '50%',
 							transform: 'translateX(-50%)',
 							color: 'white',
-							fontSize: '14px',
+							fontSize: '18px',
 							textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+							fontFamily: 'Roboto, sans-serif',
 						}}
 					>
 						{formatTime(played * duration)} / {formatTime(duration)}
