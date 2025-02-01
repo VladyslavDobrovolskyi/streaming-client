@@ -22,6 +22,7 @@ export default function RoomDev() {
 	const [isFullscreen, setIsFullscreen] = useState(false)
 	const [previewTime, setPreviewTime] = useState<number | null>(null)
 	const [isHoveringSlider, setIsHoveringSlider] = useState(false)
+	const [duration, setDuration] = useState(300) // 5 минут (300 секунд) по умолчанию
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -54,19 +55,22 @@ export default function RoomDev() {
 		setPlaybackRate(rate)
 	}
 
-	const handleProgress = (state: { played: number; loaded: number }) => {
+	const handleProgress = (state: {
+		played: number
+		loaded: number
+		playedSeconds: number
+		loadedSeconds: number
+	}) => {
 		setPlayed(state.played)
 		setLoaded(state.loaded)
+		if (state.loadedSeconds > 0 && duration === 300) {
+			setDuration(playerRef.current?.getDuration() || 300)
+		}
 	}
 
-	const handlePreviewChange = (value: number[]) => {
-		setPreviewTime(value[0])
-		updatePreviewFrame(value[0])
-	}
-
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const handleSeekChange = (_value: number[]) => {
-		// This function is intentionally left empty to prevent seeking on hover
+	const handleSeekChange = (value: number[]) => {
+		// Update played state without seeking
+		setPlayed(value[0] / duration)
 	}
 
 	const handleSeekCommit = (value: number[]) => {
@@ -75,12 +79,10 @@ export default function RoomDev() {
 	}
 
 	const handlePreviewMove = (e: React.MouseEvent<HTMLDivElement>) => {
-		setIsHoveringSlider(true)
-		if (sliderRef.current && playerRef.current) {
+		if (sliderRef.current) {
 			const rect = sliderRef.current.getBoundingClientRect()
 			const x = e.clientX - rect.left
 			const fraction = x / rect.width
-			const duration = playerRef.current.getDuration()
 			const newPreviewTime = fraction * duration
 			setPreviewTime(newPreviewTime)
 			updatePreviewFrame(newPreviewTime)
@@ -175,6 +177,7 @@ export default function RoomDev() {
 				onPlay={handlePlay}
 				onPause={handlePause}
 				onProgress={handleProgress}
+				onDuration={duration => setDuration(duration)}
 				width='100%'
 				height='100%'
 			/>
@@ -210,38 +213,15 @@ export default function RoomDev() {
 					{isPlaying ? <PauseIcon /> : <PlayIcon />}
 				</button>
 				<div ref={sliderRef} style={{ margin: '0.5rem', color: '#fff', flex: 1, position: 'relative' }}>
-					{/* Слайдер для перемотки */}
 					<Slider
 						min={0}
-						max={playerRef.current?.getDuration() || 1}
+						max={duration}
 						step={0.01}
-						value={[played * (playerRef.current?.getDuration() || 1)]}
+						value={[played * duration]}
 						onValueChange={handleSeekChange}
 						onValueCommit={handleSeekCommit}
-						style={{ width: '100%', pointerEvents: 'none' }}
+						style={{ width: '100%' }}
 					/>
-					{/* Слайдер для предпросмотра */}
-					<div
-						style={{
-							position: 'absolute',
-							top: 0,
-							left: 0,
-							width: '100%',
-							height: '100%',
-							pointerEvents: 'none',
-						}}
-					>
-						<Slider
-							min={0}
-							max={playerRef.current?.getDuration() || 1}
-							step={0.01}
-							value={[
-								previewTime !== null ? previewTime : played * (playerRef.current?.getDuration() || 1),
-							]}
-							onValueChange={handlePreviewChange}
-							style={{ width: '100%', opacity: 0 }}
-						/>
-					</div>
 					<div
 						style={{
 							position: 'absolute',
@@ -254,23 +234,13 @@ export default function RoomDev() {
 						onMouseEnter={() => setIsHoveringSlider(true)}
 						onMouseLeave={() => setIsHoveringSlider(false)}
 						onMouseMove={handlePreviewMove}
-						onClick={e => {
-							const rect = sliderRef.current?.getBoundingClientRect()
-							if (rect) {
-								const x = e.clientX - rect.left
-								const fraction = x / rect.width
-								const duration = playerRef.current?.getDuration() || 1
-								const newTime = fraction * duration
-								handleSeekCommit([newTime])
-							}
-						}}
 					/>
 					{isHoveringSlider && previewTime !== null && (
 						<div
 							style={{
 								position: 'absolute',
 								top: '-140px',
-								left: `${(previewTime / (playerRef.current?.getDuration() || 1)) * 100}%`,
+								left: `${(previewTime / duration) * 100}%`,
 								transform: 'translateX(-50%)',
 								display: 'flex',
 								flexDirection: 'column',
