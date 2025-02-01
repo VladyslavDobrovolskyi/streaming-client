@@ -56,6 +56,8 @@ export default function RoomDev() {
 	useEffect(() => {
 		if (lastSeekDirection) {
 			showAction(lastSeekDirection)
+			// Add a console.log to debug
+			console.log('Showing seek action:', lastSeekDirection)
 		}
 	}, [lastSeekDirection])
 

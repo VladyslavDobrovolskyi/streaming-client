@@ -40,6 +40,9 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 			isSyncingRef.current = false
 
 			setLastSeekDirection(direction)
+
+			// Add a console.log to debug
+			console.log('Received seek event:', { time, direction })
 		},
 		[videoRef]
 	)
