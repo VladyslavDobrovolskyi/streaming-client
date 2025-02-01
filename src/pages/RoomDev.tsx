@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import ReactPlayer from 'react-player'
 import {
 	PauseIcon,
@@ -8,7 +8,7 @@ import {
 	EnterFullScreenIcon,
 	ExitFullScreenIcon,
 } from '@radix-ui/react-icons'
-import { Flex, Text, Button } from '@radix-ui/themes'
+import { Slider } from '@radix-ui/themes'
 
 export default function RoomDev() {
 	const [isPlaying, setIsPlaying] = useState(false)
@@ -38,8 +38,8 @@ export default function RoomDev() {
 		setIsPlaying(false)
 	}
 
-	const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setVolume(parseFloat(e.target.value))
+	const handleVolumeChange = (value: number[]) => {
+		setVolume(value[0])
 	}
 
 	const handleToggleMuted = () => {
@@ -55,8 +55,8 @@ export default function RoomDev() {
 		setLoaded(state.loaded)
 	}
 
-	const handleSeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		playerRef.current?.seekTo(parseFloat(e.target.value))
+	const handleSeekChange = (value: number[]) => {
+		playerRef.current?.seekTo(value[0])
 	}
 
 	const showControlsHandler = useCallback(() => {
@@ -155,13 +155,12 @@ export default function RoomDev() {
 				</button>
 				<label style={{ margin: '0.5rem', color: '#fff', flex: 1 }}>
 					Seek
-					<input
-						type='range'
+					<Slider
 						min={0}
-						max={1}
-						step='0.01'
-						value={played}
-						onChange={handleSeekChange}
+						max={playerRef.current?.getDuration() || 1}
+						step={0.01}
+						value={[played * (playerRef.current?.getDuration() || 1)]}
+						onValueChange={handleSeekChange}
 						style={{ width: '100%' }}
 					/>
 				</label>
@@ -184,13 +183,12 @@ export default function RoomDev() {
 				>
 					{muted ? <SpeakerOffIcon /> : <SpeakerLoudIcon />}
 					{showVolumeControl && (
-						<input
-							type='range'
+						<Slider
 							min={0}
 							max={1}
-							step='0.01'
-							value={volume}
-							onChange={handleVolumeChange}
+							step={0.01}
+							value={[volume]}
+							onValueChange={handleVolumeChange}
 							style={{
 								position: 'absolute',
 								bottom: '100%',
@@ -238,10 +236,6 @@ export default function RoomDev() {
 				>
 					{isFullscreen ? <EnterFullScreenIcon /> : <ExitFullScreenIcon />}
 				</button>
-				<Flex direction='column' gap='2'>
-					<Text>Hello from Radix Themes :)</Text>
-					<Button>Let's go</Button>
-				</Flex>
 			</div>
 		</div>
 	)
