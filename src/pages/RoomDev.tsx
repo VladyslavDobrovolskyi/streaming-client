@@ -21,7 +21,7 @@ export default function RoomDev() {
 	const [showVolumeControl, setShowVolumeControl] = useState(false)
 	const [isFullscreen, setIsFullscreen] = useState(false)
 	const [seekTime, setSeekTime] = useState<number | null>(null)
-	const [isSeeking, setIsSeeking] = useState(false)
+	const [isHoveringSlider, setIsHoveringSlider] = useState(false)
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -54,20 +54,16 @@ export default function RoomDev() {
 	}
 
 	const handleProgress = (state: { played: number; loaded: number }) => {
-		if (!isSeeking) {
-			setPlayed(state.played)
-			setLoaded(state.loaded)
-		}
+		setPlayed(state.played)
+		setLoaded(state.loaded)
 	}
 
 	const handleSeekChange = (value: number[]) => {
 		setSeekTime(value[0])
-		setIsSeeking(true)
 		updatePreviewFrame(value[0])
 	}
 
 	const handleSeekMouseUp = () => {
-		setIsSeeking(false)
 		if (seekTime !== null) {
 			playerRef.current?.seekTo(seekTime)
 		}
@@ -198,7 +194,11 @@ export default function RoomDev() {
 				>
 					{isPlaying ? <PauseIcon /> : <PlayIcon />}
 				</button>
-				<label style={{ margin: '0.5rem', color: '#fff', flex: 1, position: 'relative' }}>
+				<label
+					style={{ margin: '0.5rem', color: '#fff', flex: 1, position: 'relative' }}
+					onMouseEnter={() => setIsHoveringSlider(true)}
+					onMouseLeave={() => setIsHoveringSlider(false)}
+				>
 					Seek
 					<Slider
 						min={0}
@@ -206,10 +206,10 @@ export default function RoomDev() {
 						step={0.01}
 						value={[seekTime !== null ? seekTime : played * (playerRef.current?.getDuration() || 1)]}
 						onValueChange={handleSeekChange}
-						onPointerUp={handleSeekMouseUp}
+						onValueCommit={handleSeekMouseUp}
 						style={{ width: '100%' }}
 					/>
-					{isSeeking && seekTime !== null && (
+					{isHoveringSlider && seekTime !== null && (
 						<div
 							style={{
 								position: 'absolute',
