@@ -20,7 +20,6 @@ export default function RoomDev() {
 	const [showControls, setShowControls] = useState(false)
 	const [showVolumeControl, setShowVolumeControl] = useState(false)
 	const [isFullscreen, setIsFullscreen] = useState(false)
-	const [seekTime, setSeekTime] = useState<number | null>(null)
 	const [previewTime, setPreviewTime] = useState<number | null>(null)
 	const [isHoveringSlider, setIsHoveringSlider] = useState(false)
 	const playerRef = useRef<ReactPlayer>(null)
@@ -61,17 +60,16 @@ export default function RoomDev() {
 	}
 
 	const handleSeekChange = (value: number[]) => {
-		setSeekTime(value[0])
-		updatePreviewFrame(value[0])
+		setPreviewTime(value[0])
 	}
 
-	const handleSeekMouseUp = () => {
-		if (seekTime !== null) {
-			playerRef.current?.seekTo(seekTime)
-		}
+	const handleSeekMouseUp = (value: number[]) => {
+		const newTime = value[0]
+		playerRef.current?.seekTo(newTime)
 	}
 
 	const handlePreviewMove = (e: React.MouseEvent<HTMLDivElement>) => {
+		setIsHoveringSlider(true)
 		if (sliderRef.current && playerRef.current) {
 			const rect = sliderRef.current.getBoundingClientRect()
 			const x = e.clientX - rect.left
@@ -210,7 +208,11 @@ export default function RoomDev() {
 						min={0}
 						max={playerRef.current?.getDuration() || 1}
 						step={0.01}
-						value={[seekTime !== null ? seekTime : played * (playerRef.current?.getDuration() || 1)]}
+						value={[
+							isHoveringSlider && previewTime !== null
+								? previewTime
+								: played * (playerRef.current?.getDuration() || 1),
+						]}
 						onValueChange={handleSeekChange}
 						onValueCommit={handleSeekMouseUp}
 						style={{ width: '100%' }}
