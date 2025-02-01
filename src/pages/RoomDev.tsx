@@ -67,16 +67,11 @@ export default function RoomDev() {
 
 	const handleSeekChange = (value: number[]) => {
 		const newTime = value[0]
-		playerRef.current?.seekTo(newTime / duration)
 		setPlayed(newTime / duration)
 	}
 
-	const handleSeekStart = () => {
-		// Implement seek start logic if needed
-	}
-
 	const handleSeekEnd = () => {
-		// Implement seek end logic if needed
+		playerRef.current?.seekTo(played)
 	}
 
 	const showControlsHandler = useCallback(() => {
@@ -192,9 +187,7 @@ export default function RoomDev() {
 						step={0.01}
 						value={[played * duration]}
 						onValueChange={handleSeekChange}
-						onPointerDown={handleSeekStart}
-						onPointerUp={handleSeekEnd}
-						onPointerLeave={handleSeekEnd}
+						onValueCommit={handleSeekEnd}
 						style={{ width: '100%' }}
 					/>
 					<div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.25rem' }}>
