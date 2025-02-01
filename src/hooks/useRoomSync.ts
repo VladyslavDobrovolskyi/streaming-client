@@ -12,6 +12,7 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 
 			isSyncingRef.current = true
 			videoRef.current.seekTo(time, 'seconds')
+			videoRef.current.getInternalPlayer().play()
 			isSyncingRef.current = false
 		},
 		[videoRef]
