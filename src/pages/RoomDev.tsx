@@ -95,7 +95,7 @@ export default function RoomDev() {
 			const x = e.clientX - rect.left
 			const fraction = x / rect.width
 			const newPreviewTime = fraction * duration
-			setPreviewTime(newPreviewTime)
+			//setPreviewTime(newPreviewTime)
 			updatePreviewFrame(newPreviewTime)
 		}
 	}
