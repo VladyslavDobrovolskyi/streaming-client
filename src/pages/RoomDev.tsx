@@ -42,17 +42,17 @@ export default function RoomDev() {
 	}, [loaded])
 
 	const handleForward15 = () => {
-		const newTime = Math.min(played + 15 / duration, 1)
-		setPlayed(newTime)
-		playerRef.current?.seekTo(newTime)
-		setIsPlaying(true)
+		const currentTime = playerRef.current?.getCurrentTime() || 0
+		const newTime = Math.min(currentTime + 15, duration)
+		playerRef.current?.seekTo(newTime, 'seconds')
+		setPlayed(newTime / duration)
 	}
 
 	const handleBackward15 = () => {
-		const newTime = Math.max(played - 15 / duration, 0)
-		setPlayed(newTime)
-		playerRef.current?.seekTo(newTime)
-		setIsPlaying(true)
+		const currentTime = playerRef.current?.getCurrentTime() || 0
+		const newTime = Math.max(currentTime - 15, 0)
+		playerRef.current?.seekTo(newTime, 'seconds')
+		setPlayed(newTime / duration)
 	}
 
 	const handlePlay = () => {
@@ -170,6 +170,25 @@ export default function RoomDev() {
 			}
 		}
 	}, [showControlsHandler])
+
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.code === 'Space') {
+				e.preventDefault()
+				setIsPlaying(prev => !prev)
+			} else if (e.code === 'ArrowRight') {
+				handleForward15()
+			} else if (e.code === 'ArrowLeft') {
+				handleBackward15()
+			}
+		}
+
+		document.addEventListener('keydown', handleKeyDown)
+
+		return () => {
+			document.removeEventListener('keydown', handleKeyDown)
+		}
+	}, [])
 
 	const formatTime = (seconds: number) => {
 		const date = new Date(seconds * 1000)
