@@ -69,10 +69,10 @@ export default function RoomDev() {
 		updatePreviewFrame(value[0])
 	}
 
-	const handleSeekCommit = (value: number[]) => {
-		const newTime = value[0]
-		playerRef.current?.seekTo(newTime)
-	}
+	// const handleSeekCommit = (value: number[]) => {
+	// 	const newTime = value[0]
+	// 	playerRef.current?.seekTo(newTime)
+	// }
 
 	const handlePreviewMove = (e: React.MouseEvent<HTMLDivElement>) => {
 		setIsHoveringSlider(true)
@@ -216,8 +216,8 @@ export default function RoomDev() {
 						max={playerRef.current?.getDuration() || 1}
 						step={0.01}
 						value={[played * (playerRef.current?.getDuration() || 1)]}
-						onValueChange={handleSeekChange}
-						onValueCommit={handleSeekCommit}
+						//onValueChange={handleSeekChange}
+						onValueCommit={handleSeekChange}
 						style={{ width: '100%' }}
 					/>
 					{/* Слайдер для предпросмотра */}
