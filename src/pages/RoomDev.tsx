@@ -32,6 +32,7 @@ export default function RoomDev() {
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
 	const sliderRef = useRef<HTMLDivElement>(null)
+	const previousVolumeRef = useRef(volume)
 
 	useEffect(() => {
 		if (loaded) {
@@ -50,17 +51,25 @@ export default function RoomDev() {
 	const handleVolumeChange = (value: number[]) => {
 		const newVolume = value[0]
 		setVolume(newVolume)
-		setMuted(newVolume === 0)
+		if (newVolume > 0 && muted) {
+			setMuted(false)
+		}
+		if (newVolume > 0) {
+			previousVolumeRef.current = newVolume
+		}
 	}
 
 	const handleToggleMuted = () => {
 		setMuted(prevMuted => {
 			if (prevMuted) {
+				// Unmuting
+				if (volume === 0) {
+					setVolume(previousVolumeRef.current > 0 ? previousVolumeRef.current : 0.5)
+				}
 				return false
 			} else {
-				if (volume === 0) {
-					setVolume(0.5)
-				}
+				// Muting
+				previousVolumeRef.current = volume
 				return true
 			}
 		})
