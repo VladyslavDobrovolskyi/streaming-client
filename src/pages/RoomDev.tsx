@@ -45,7 +45,7 @@ export default function RoomDev() {
 
 	const { id: roomID } = useParams()
 	const { clients, provideMediaRef, localStream, reinitializeStream } = useWebRTC(roomID!)
-	const { emitPlay, emitPause, emitSeek, requestSync } = useRoomSync(roomID!, playerRef)
+	const { emitPlay, emitPause, emitSeek, requestSync, lastSeekDirection } = useRoomSync(roomID!, playerRef)
 
 	useEffect(() => {
 		if (loaded) {
@@ -53,13 +53,19 @@ export default function RoomDev() {
 		}
 	}, [loaded])
 
+	useEffect(() => {
+		if (lastSeekDirection) {
+			showAction(lastSeekDirection)
+		}
+	}, [lastSeekDirection])
+
 	const handleForward15 = () => {
 		const currentTime = playerRef.current?.getCurrentTime() || 0
 		const newTime = Math.min(currentTime + 15, duration)
 		playerRef.current?.seekTo(newTime, 'seconds')
 		setPlayed(newTime / duration)
 		showAction('forward')
-		emitSeek(newTime)
+		emitSeek(newTime, 'forward')
 	}
 
 	const handleBackward15 = () => {
@@ -68,7 +74,7 @@ export default function RoomDev() {
 		playerRef.current?.seekTo(newTime, 'seconds')
 		setPlayed(newTime / duration)
 		showAction('backward')
-		emitSeek(newTime)
+		emitSeek(newTime, 'backward')
 	}
 
 	const handlePlay = () => {
@@ -160,8 +166,10 @@ export default function RoomDev() {
 	const handleSeekEnd = () => {
 		setIsDragging(false)
 		const newTime = played * duration
+		const currentTime = playerRef.current?.getCurrentTime() || 0
+		const direction = newTime > currentTime ? 'forward' : 'backward'
 		playerRef.current?.seekTo(newTime)
-		emitSeek(newTime)
+		emitSeek(newTime, direction)
 		showControlsHandler()
 	}
 

@@ -1,10 +1,11 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import socket from '../socket'
 import ACTIONS from '../socket/actions'
 import type ReactPlayer from 'react-player'
 
 export default function useRoomSync(roomID: string, videoRef: React.RefObject<ReactPlayer>) {
 	const isSyncingRef = useRef(false)
+	const [lastSeekDirection, setLastSeekDirection] = useState<'forward' | 'backward' | null>(null)
 
 	const handlePlay = useCallback(
 		({ time }: { time: number }) => {
@@ -31,12 +32,14 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 	)
 
 	const handleSeek = useCallback(
-		({ time }: { time: number }) => {
+		({ time, direction }: { time: number; direction: 'forward' | 'backward' }) => {
 			if (!videoRef.current || isSyncingRef.current) return
 
 			isSyncingRef.current = true
 			videoRef.current.seekTo(time, 'seconds')
 			isSyncingRef.current = false
+
+			setLastSeekDirection(direction)
 		},
 		[videoRef]
 	)
@@ -82,8 +85,8 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 	)
 
 	const emitSeek = useCallback(
-		(time: number) => {
-			socket.emit(ACTIONS.VIDEO_SEEK, { roomID, time })
+		(time: number, direction: 'forward' | 'backward') => {
+			socket.emit(ACTIONS.VIDEO_SEEK, { roomID, time, direction })
 		},
 		[roomID]
 	)
@@ -92,5 +95,5 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 		socket.emit(ACTIONS.REQUEST_SYNC, { roomID })
 	}, [roomID])
 
-	return { emitPlay, emitPause, emitSeek, requestSync }
+	return { emitPlay, emitPause, emitSeek, requestSync, lastSeekDirection }
 }
