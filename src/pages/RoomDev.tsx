@@ -11,7 +11,7 @@ import {
 	ExitFullScreenIcon,
 	DoubleArrowLeftIcon,
 	DoubleArrowRightIcon,
-	GearIcon,
+	// GearIcon,
 	CircleIcon,
 } from '@radix-ui/react-icons'
 import { Slider, Text } from '@radix-ui/themes'
@@ -390,7 +390,7 @@ export default function RoomDev() {
 					</Text>
 
 					{/* Right controls group */}
-					<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+					{/* <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
 						<button
 							style={{
 								color: '#fff',
@@ -404,48 +404,36 @@ export default function RoomDev() {
 							}}
 						>
 							<GearIcon />
-						</button>
-						<button
-							style={{
-								color: '#fff',
-								border: 'none',
-								padding: '0.5rem',
-								borderRadius: '5px',
-								cursor: 'pointer',
-								background: 'none',
-								display: 'flex',
-								alignItems: 'center',
-							}}
-						>
-							<CircleIcon />
-						</button>
-						<button
-							onClick={handleFullscreenToggle}
-							style={{
-								color: '#fff',
-								border: 'none',
-								padding: '0.5rem',
-								borderRadius: '5px',
-								cursor: 'pointer',
-								background: 'none',
-								display: 'flex',
-								alignItems: 'center',
-							}}
-						>
-							{isFullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
-						</button>
-						<span
-							style={{
-								color: '#fff',
-								fontSize: '14px',
-								padding: '2px 6px',
-								border: '1px solid #fff',
-								borderRadius: '4px',
-							}}
-						>
-							HD
-						</span>
-					</div>
+						</button> */}
+					<button
+						style={{
+							color: '#fff',
+							border: 'none',
+							padding: '0.5rem',
+							borderRadius: '5px',
+							cursor: 'pointer',
+							background: 'none',
+							display: 'flex',
+							alignItems: 'center',
+						}}
+					>
+						<CircleIcon />
+					</button>
+					<button
+						onClick={handleFullscreenToggle}
+						style={{
+							color: '#fff',
+							border: 'none',
+							padding: '0.5rem',
+							borderRadius: '5px',
+							cursor: 'pointer',
+							background: 'none',
+							display: 'flex',
+							alignItems: 'center',
+						}}
+					>
+						{isFullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
+					</button>
 				</div>
 			</div>
 		</div>
