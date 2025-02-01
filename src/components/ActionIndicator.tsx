@@ -1,16 +1,26 @@
 import type React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { PlayIcon, PauseIcon, SpeakerOffIcon, DoubleArrowLeftIcon, DoubleArrowRightIcon } from '@radix-ui/react-icons'
+import {
+	PlayIcon,
+	PauseIcon,
+	SpeakerOffIcon,
+	DoubleArrowLeftIcon,
+	DoubleArrowRightIcon,
+	SpeakerLoudIcon,
+	SpeakerQuietIcon,
+	SpeakerModerateIcon,
+} from '@radix-ui/react-icons'
 
-type ActionType = 'play' | 'pause' | 'mute' | 'forward' | 'backward'
+type ActionType = 'play' | 'pause' | 'mute' | 'unmute' | 'forward' | 'backward'
 
 interface ActionIndicatorProps {
 	action: ActionType | null
+	volume: number
 }
 
-const ActionIndicator: React.FC<ActionIndicatorProps> = ({ action }) => {
+const ActionIndicator: React.FC<ActionIndicatorProps> = ({ action, volume }) => {
 	const getIcon = () => {
-		const iconStyle = { transform: 'scale(2.5)' } // Увеличиваем размер в 16 раз
+		const iconStyle = { transform: 'scale(2.5)' }
 		switch (action) {
 			case 'play':
 				return <PlayIcon style={iconStyle} />
@@ -18,6 +28,11 @@ const ActionIndicator: React.FC<ActionIndicatorProps> = ({ action }) => {
 				return <PauseIcon style={iconStyle} />
 			case 'mute':
 				return <SpeakerOffIcon style={iconStyle} />
+			case 'unmute':
+				if (volume === 0) return <SpeakerOffIcon style={iconStyle} />
+				if (volume < 0.25) return <SpeakerQuietIcon style={iconStyle} />
+				if (volume < 0.75) return <SpeakerModerateIcon style={iconStyle} />
+				return <SpeakerLoudIcon style={iconStyle} />
 			case 'forward':
 				return <DoubleArrowRightIcon style={iconStyle} />
 			case 'backward':

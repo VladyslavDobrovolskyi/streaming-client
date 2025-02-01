@@ -29,7 +29,9 @@ export default function RoomDev() {
 	const [isDragging, setIsDragging] = useState(false)
 	const [isVolumeActive, setIsVolumeActive] = useState(false)
 	const [mutedBySlider, setMutedBySlider] = useState(false)
-	const [currentAction, setCurrentAction] = useState<'play' | 'pause' | 'mute' | 'forward' | 'backward' | null>(null)
+	const [currentAction, setCurrentAction] = useState<
+		'play' | 'pause' | 'mute' | 'unmute' | 'forward' | 'backward' | null
+	>(null)
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -95,6 +97,7 @@ export default function RoomDev() {
 				} else {
 					setVolume(previousVolumeRef.current > 0 ? previousVolumeRef.current : 0.5)
 				}
+				showAction('unmute')
 				return false
 			} else {
 				// Muting
@@ -193,10 +196,10 @@ export default function RoomDev() {
 				handleToggleMuted()
 			} else if (e.code === 'ArrowUp') {
 				e.preventDefault()
-				setVolume(prev => Math.min(prev + 0.1, 1))
+				handleVolumeChange(Math.min(volume + 0.1, 1))
 			} else if (e.code === 'ArrowDown') {
 				e.preventDefault()
-				setVolume(prev => Math.max(prev - 0.1, 0))
+				handleVolumeChange(Math.max(volume - 0.1, 0))
 			}
 		}
 
@@ -205,7 +208,7 @@ export default function RoomDev() {
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown)
 		}
-	}) // Added dependencies to useEffect
+	}, [volume, handleToggleMuted, handleForward15, handleBackward15])
 
 	const formatTime = (seconds: number) => {
 		const date = new Date(seconds * 1000)
@@ -233,7 +236,7 @@ export default function RoomDev() {
 		setIsVolumeActive(false)
 	}
 
-	const showAction = (action: 'play' | 'pause' | 'mute' | 'forward' | 'backward') => {
+	const showAction = (action: 'play' | 'pause' | 'mute' | 'unmute' | 'forward' | 'backward') => {
 		setCurrentAction(action)
 		setTimeout(() => setCurrentAction(null), 1000)
 	}
@@ -281,7 +284,7 @@ export default function RoomDev() {
 					zIndex: 20, // Updated z-index
 				}}
 			>
-				<ActionIndicator action={currentAction} />
+				<ActionIndicator action={currentAction} volume={volume} />
 			</div>
 			<div
 				className={`controls ${showControls ? 'visible' : 'hidden'}`}
