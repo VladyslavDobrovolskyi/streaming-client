@@ -30,7 +30,7 @@ export default function RoomDev() {
 	const [isVolumeActive, setIsVolumeActive] = useState(false)
 	const [mutedBySlider, setMutedBySlider] = useState(false)
 	const [currentAction, setCurrentAction] = useState<
-		'play' | 'pause' | 'mute' | 'unmute' | 'forward' | 'backward' | null
+		'play' | 'pause' | 'mute' | 'unmute' | 'forward' | 'backward' | 'volume' | null
 	>(null)
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -196,10 +196,14 @@ export default function RoomDev() {
 				handleToggleMuted()
 			} else if (e.code === 'ArrowUp') {
 				e.preventDefault()
-				handleVolumeChange(Math.min(volume + 0.1, 1))
+				const newVolume = Math.min(volume + 0.1, 1)
+				handleVolumeChange(newVolume)
+				showAction('volume')
 			} else if (e.code === 'ArrowDown') {
 				e.preventDefault()
-				handleVolumeChange(Math.max(volume - 0.1, 0))
+				const newVolume = Math.max(volume - 0.1, 0)
+				handleVolumeChange(newVolume)
+				showAction('volume')
 			}
 		}
 
@@ -208,7 +212,7 @@ export default function RoomDev() {
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown)
 		}
-	}, [volume, handleToggleMuted, handleForward15, handleBackward15])
+	}, [volume, handleToggleMuted, handleForward15, handleBackward15, handleVolumeChange])
 
 	const formatTime = (seconds: number) => {
 		const date = new Date(seconds * 1000)
@@ -236,7 +240,7 @@ export default function RoomDev() {
 		setIsVolumeActive(false)
 	}
 
-	const showAction = (action: 'play' | 'pause' | 'mute' | 'unmute' | 'forward' | 'backward') => {
+	const showAction = (action: 'play' | 'pause' | 'mute' | 'unmute' | 'forward' | 'backward' | 'volume') => {
 		setCurrentAction(action)
 		setTimeout(() => setCurrentAction(null), 1000)
 	}

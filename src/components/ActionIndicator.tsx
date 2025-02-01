@@ -11,7 +11,7 @@ import {
 	SpeakerModerateIcon,
 } from '@radix-ui/react-icons'
 
-type ActionType = 'play' | 'pause' | 'mute' | 'unmute' | 'forward' | 'backward'
+type ActionType = 'play' | 'pause' | 'mute' | 'unmute' | 'forward' | 'backward' | 'volume'
 
 interface ActionIndicatorProps {
 	action: ActionType | null
@@ -29,6 +29,7 @@ const ActionIndicator: React.FC<ActionIndicatorProps> = ({ action, volume }) => 
 			case 'mute':
 				return <SpeakerOffIcon style={iconStyle} />
 			case 'unmute':
+			case 'volume':
 				if (volume === 0) return <SpeakerOffIcon style={iconStyle} />
 				if (volume < 0.25) return <SpeakerQuietIcon style={iconStyle} />
 				if (volume < 0.75) return <SpeakerModerateIcon style={iconStyle} />
