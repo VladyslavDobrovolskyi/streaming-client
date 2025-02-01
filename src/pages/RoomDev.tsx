@@ -14,7 +14,7 @@ import {
 	// GearIcon,
 	CircleIcon,
 } from '@radix-ui/react-icons'
-import { Slider, Text } from '@radix-ui/themes'
+import { Slider } from '@radix-ui/themes'
 
 export default function RoomDev() {
 	const [isPlaying, setIsPlaying] = useState(false)
@@ -49,17 +49,6 @@ export default function RoomDev() {
 		setIsPlaying(false)
 	}
 
-	const handleForward15 = () => {
-		const newTime = Math.min(played + 15 / duration, 1)
-		setPlayed(newTime)
-		playerRef.current?.seekTo(newTime)
-	}
-
-	const handleBackward15 = () => {
-		const newTime = Math.max(played - 15 / duration, 0)
-		setPlayed(newTime)
-		playerRef.current?.seekTo(newTime)
-	}
 	const handleVolumeChange = (value: number[]) => {
 		const newVolume = value[0]
 		if (newVolume === 0) {
@@ -278,7 +267,7 @@ export default function RoomDev() {
 					}}
 				>
 					{/* Left controls group */}
-					<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+					<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: '1 0 auto' }}>
 						<button
 							onClick={() => setIsPlaying(prev => !prev)}
 							style={{
@@ -295,7 +284,6 @@ export default function RoomDev() {
 							{isPlaying ? <PauseIcon /> : <PlayIcon />}
 						</button>
 						<button
-							onClick={handleBackward15}
 							style={{
 								color: '#fff',
 								border: 'none',
@@ -310,7 +298,6 @@ export default function RoomDev() {
 							<DoubleArrowLeftIcon />
 						</button>
 						<button
-							onClick={handleForward15}
 							style={{
 								color: '#fff',
 								border: 'none',
@@ -385,12 +372,44 @@ export default function RoomDev() {
 					</div>
 
 					{/* Center time display */}
-					<Text size='5' as='span' style={{ color: 'white' }}>
+					<div
+						style={{
+							position: 'absolute',
+							bottom: '10px',
+							left: '50%',
+							transform: 'translateX(-50%)',
+							color: 'white',
+							fontSize: '14px',
+							textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+						}}
+					>
 						{formatTime(played * duration)} / {formatTime(duration)}
-					</Text>
+					</div>
 
 					{/* Right controls group */}
-					<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+					<div
+						style={{
+							display: 'flex',
+							alignItems: 'center',
+							gap: '0.5rem',
+							flex: '1 0 auto',
+							justifyContent: 'flex-end',
+						}}
+					>
+						{/* <button
+							style={{
+								color: '#fff',
+								border: 'none',
+								padding: '0.5rem',
+								borderRadius: '5px',
+								cursor: 'pointer',
+								background: 'none',
+								display: 'flex',
+								alignItems: 'center',
+							}}
+						>
+							<GearIcon />
+						</button> */}
 						<button
 							style={{
 								color: '#fff',
@@ -420,6 +439,17 @@ export default function RoomDev() {
 						>
 							{isFullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
 						</button>
+						{/* <span
+							style={{
+								color: '#fff',
+								fontSize: '14px',
+								padding: '2px 6px',
+								border: '1px solid #fff',
+								borderRadius: '4px',
+							}}
+						>
+							HD
+						</span> */}
 					</div>
 				</div>
 			</div>
