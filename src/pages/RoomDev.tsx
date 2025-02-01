@@ -57,9 +57,6 @@ export default function RoomDev() {
 	}
 
 	const handleSeekChange = (value: number[]) => {
-		if (animationFrameRef.current) {
-			cancelAnimationFrame(animationFrameRef.current)
-		}
 		animationFrameRef.current = requestAnimationFrame(() => {
 			playerRef.current?.seekTo(value[0])
 		})
@@ -160,7 +157,6 @@ export default function RoomDev() {
 					{isPlaying ? <PauseIcon /> : <PlayIcon />}
 				</button>
 				<label style={{ margin: '0.5rem', color: '#fff', flex: 1 }}>
-					Seek
 					<Slider
 						min={0}
 						max={playerRef.current?.getDuration() || 1}
