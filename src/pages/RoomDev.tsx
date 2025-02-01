@@ -11,7 +11,9 @@ import {
 	ExitFullScreenIcon,
 	DoubleArrowLeftIcon,
 	DoubleArrowRightIcon,
-	CircleIcon,
+	RadiobuttonIcon,
+	CircleBackslashIcon,
+	CameraIcon,
 } from '@radix-ui/react-icons'
 import { Slider } from '@radix-ui/themes'
 import ActionIndicator from '../components/ActionIndicator'
@@ -37,6 +39,8 @@ export default function RoomDev() {
 	const [currentAction, setCurrentAction] = useState<
 		'play' | 'pause' | 'mute' | 'unmute' | 'forward' | 'backward' | 'volume' | null
 	>(null)
+	const [micMuted, setMicMuted] = useState(false)
+	const [cameraMuted, setCameraMuted] = useState(false)
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -344,6 +348,28 @@ export default function RoomDev() {
 		)
 	}
 
+	const handleMicMuteUnmute = () => {
+		if (localStream) {
+			const audioTracks = localStream.getAudioTracks()
+			if (audioTracks.length > 0) {
+				const track = audioTracks[0]
+				track.enabled = !track.enabled
+				setMicMuted(!track.enabled)
+			}
+		}
+	}
+
+	const handleCameraMuteUnmute = () => {
+		if (localStream) {
+			const videoTracks = localStream.getVideoTracks()
+			if (videoTracks.length > 0) {
+				const track = videoTracks[0]
+				track.enabled = !track.enabled
+				setCameraMuted(!track.enabled)
+			}
+		}
+	}
+
 	return (
 		<div
 			ref={playerWrapperRef}
@@ -590,8 +616,9 @@ export default function RoomDev() {
 						}}
 					>
 						<button
+							onClick={handleMicMuteUnmute}
 							style={{
-								color: '#fff',
+								color: micMuted ? '#808080' : '#ff0000',
 								border: 'none',
 								padding: '0.5rem',
 								borderRadius: '5px',
@@ -601,7 +628,34 @@ export default function RoomDev() {
 								alignItems: 'center',
 							}}
 						>
-							<CircleIcon />
+							<RadiobuttonIcon />
+						</button>
+						<button
+							onClick={handleCameraMuteUnmute}
+							style={{
+								color: '#fff',
+								border: 'none',
+								padding: '0.5rem',
+								borderRadius: '5px',
+								cursor: 'pointer',
+								background: 'none',
+								display: 'flex',
+								alignItems: 'center',
+								position: 'relative',
+							}}
+						>
+							<CameraIcon style={{ color: cameraMuted ? '#808080' : '#fff' }} />
+							{cameraMuted && (
+								<CircleBackslashIcon
+									style={{
+										position: 'absolute',
+										top: '50%',
+										left: '50%',
+										transform: 'translate(-50%, -50%)',
+										color: '#fff',
+									}}
+								/>
+							)}
 						</button>
 						<button
 							onClick={handleFullscreenToggle}
