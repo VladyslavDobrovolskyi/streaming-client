@@ -213,20 +213,32 @@ export default function RoomDev() {
 						<div
 							style={{
 								position: 'absolute',
-								top: '-120px',
+								top: '-140px',
 								left: `${(seekTime / (playerRef.current?.getDuration() || 1)) * 100}%`,
 								transform: 'translateX(-50%)',
+								display: 'flex',
+								flexDirection: 'column',
+								alignItems: 'center',
 								background: 'rgba(0, 0, 0, 0.7)',
-								color: 'white',
-								padding: '2px 6px',
 								borderRadius: '4px',
-								fontSize: '12px',
+								padding: '4px',
 							}}
 						>
-							<div style={{ border: '1px solid rgba(255, 255, 255, 0.5)', marginBottom: '5px' }}>
+							<div style={{ border: '1px solid rgba(255, 255, 255, 0.5)' }}>
 								<canvas ref={canvasRef} width={160} height={90} />
 							</div>
-							<div>{formatTime(seekTime)}</div>
+							<div
+								style={{
+									color: 'white',
+									fontSize: '12px',
+									marginTop: '4px',
+									padding: '2px 6px',
+									background: 'rgba(0, 0, 0, 0.5)',
+									borderRadius: '2px',
+								}}
+							>
+								{formatTime(seekTime)}
+							</div>
 						</div>
 					)}
 				</label>
