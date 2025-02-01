@@ -23,6 +23,7 @@ export default function RoomDev() {
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
+	const animationFrameRef = useRef<number | null>(null)
 
 	useEffect(() => {
 		if (loaded) {
@@ -56,7 +57,12 @@ export default function RoomDev() {
 	}
 
 	const handleSeekChange = (value: number[]) => {
-		playerRef.current?.seekTo(value[0])
+		if (animationFrameRef.current) {
+			cancelAnimationFrame(animationFrameRef.current)
+		}
+		animationFrameRef.current = requestAnimationFrame(() => {
+			playerRef.current?.seekTo(value[0])
+		})
 	}
 
 	const showControlsHandler = useCallback(() => {
