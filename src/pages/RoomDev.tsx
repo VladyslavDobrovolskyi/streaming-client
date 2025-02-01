@@ -318,7 +318,7 @@ export default function RoomDev() {
 					</div>
 
 					{/* Center time display */}
-					<Text size='4' align='center' color='gray'>
+					<Text size='4' align='center' color='cyan'>
 						{formatTime(played * duration)} / {formatTime(duration)}
 					</Text>
 
