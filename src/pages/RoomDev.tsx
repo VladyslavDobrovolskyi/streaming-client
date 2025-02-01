@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import ReactPlayer from 'react-player'
 import { Play, Pause, Volume2, VolumeX, Maximize, Minimize } from '@geist-ui/icons'
+import { Flex, Text, Button } from '@radix-ui/themes'
 
 export default function RoomDev() {
 	const [isPlaying, setIsPlaying] = useState(false)
@@ -230,6 +231,10 @@ export default function RoomDev() {
 				>
 					{isFullscreen ? <Minimize /> : <Maximize />}
 				</button>
+				<Flex direction='column' gap='2'>
+					<Text>Hello from Radix Themes :)</Text>
+					<Button>Let's go</Button>
+				</Flex>
 			</div>
 		</div>
 	)
