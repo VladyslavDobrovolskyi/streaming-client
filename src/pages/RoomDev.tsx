@@ -27,7 +27,6 @@ export default function RoomDev() {
 	const [isFullscreen, setIsFullscreen] = useState(false)
 	const [duration, setDuration] = useState(300)
 	const [isDragging, setIsDragging] = useState(false)
-	const [isVolumeActive, setIsVolumeActive] = useState(false)
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -143,14 +142,6 @@ export default function RoomDev() {
 		if (volume < 0.25) return <SpeakerQuietIcon />
 		if (volume < 0.75) return <SpeakerModerateIcon />
 		return <SpeakerLoudIcon />
-	}
-
-	const handleVolumePointerDown = () => {
-		setIsVolumeActive(true)
-	}
-
-	const handleVolumePointerUp = () => {
-		setIsVolumeActive(false)
 	}
 
 	return (
@@ -288,11 +279,7 @@ export default function RoomDev() {
 								alignItems: 'center',
 							}}
 							onMouseEnter={() => setShowVolumeControl(true)}
-							onMouseLeave={() => {
-								if (!isVolumeActive) {
-									setShowVolumeControl(false)
-								}
-							}}
+							onMouseLeave={() => setShowVolumeControl(false)}
 						>
 							<button
 								onClick={handleToggleMuted}
@@ -309,7 +296,7 @@ export default function RoomDev() {
 							>
 								{getSpeakerIcon()}
 							</button>
-							{(showVolumeControl || isVolumeActive) && (
+							{showVolumeControl && (
 								<div
 									style={{
 										position: 'absolute',
@@ -326,15 +313,9 @@ export default function RoomDev() {
 										step={0.01}
 										value={[volume]}
 										onValueChange={handleVolumeChange}
-										onPointerDown={handleVolumePointerDown}
-										onPointerUp={handleVolumePointerUp}
-										style={
-											{
-												width: '100px',
-												'--slider-thumb-size': isVolumeActive ? '16px' : '12px',
-												transition: 'all 0.2s ease',
-											} as React.CSSProperties
-										}
+										style={{
+											width: '100px',
+										}}
 									/>
 								</div>
 							)}
