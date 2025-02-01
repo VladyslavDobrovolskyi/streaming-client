@@ -175,7 +175,6 @@ export default function RoomDev() {
 					{isPlaying ? <PauseIcon /> : <PlayIcon />}
 				</button>
 				<label style={{ margin: '0.5rem', color: '#fff', flex: 1, position: 'relative' }}>
-					Seek
 					<Slider
 						min={0}
 						max={playerRef.current?.getDuration() || 1}
