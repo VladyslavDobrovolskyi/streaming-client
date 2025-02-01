@@ -5,30 +5,33 @@ import {
 	PlayIcon,
 	SpeakerLoudIcon,
 	SpeakerOffIcon,
+	SpeakerQuietIcon,
+	SpeakerModerateIcon,
 	EnterFullScreenIcon,
 	ExitFullScreenIcon,
+	DoubleArrowLeftIcon,
+	DoubleArrowRightIcon,
+	GearIcon,
+	CircleIcon,
 } from '@radix-ui/react-icons'
-import { Slider } from '@radix-ui/themes'
+import { Slider, Text } from '@radix-ui/themes'
 
-export default function ARoom() {
+export default function RoomDev() {
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [volume, setVolume] = useState(0.8)
 	const [muted, setMuted] = useState(false)
-	const [playbackRate, setPlaybackRate] = useState(1.0)
 	const [played, setPlayed] = useState(0)
-	const [loaded] = useState(0)
+	const [loaded, setLoaded] = useState(0)
 	const [showControls, setShowControls] = useState(false)
 	const [showVolumeControl, setShowVolumeControl] = useState(false)
 	const [isFullscreen, setIsFullscreen] = useState(false)
-	const [duration, setDuration] = useState(300) // 5 минут (300 секунд) по умолчанию
-	const [previewTime, setPreviewTime] = useState<number | null>(null)
-	const [isHoveringSlider, setIsHoveringSlider] = useState(false)
-	const [seeking, setSeeking] = useState(false) // Добавляем флаг для отслеживания перемотки
+	const [duration, setDuration] = useState(300)
+	const [isDragging, setIsDragging] = useState(false)
+	const [isVolumeActive, setIsVolumeActive] = useState(false)
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
 	const sliderRef = useRef<HTMLDivElement>(null)
-	const canvasRef = useRef<HTMLCanvasElement>(null)
 
 	useEffect(() => {
 		if (loaded) {
@@ -45,15 +48,22 @@ export default function ARoom() {
 	}
 
 	const handleVolumeChange = (value: number[]) => {
-		setVolume(value[0])
+		const newVolume = value[0]
+		setVolume(newVolume)
+		setMuted(newVolume === 0)
 	}
 
 	const handleToggleMuted = () => {
-		setMuted(prevMuted => !prevMuted)
-	}
-
-	const handlePlaybackRateChange = (rate: number) => {
-		setPlaybackRate(rate)
+		setMuted(prevMuted => {
+			if (prevMuted) {
+				return false
+			} else {
+				if (volume === 0) {
+					setVolume(0.5)
+				}
+				return true
+			}
+		})
 	}
 
 	const handleProgress = (state: {
@@ -62,80 +72,46 @@ export default function ARoom() {
 		playedSeconds: number
 		loadedSeconds: number
 	}) => {
-		setPlayed(state.played)
+		if (!isDragging) {
+			setPlayed(state.played)
+			setLoaded(state.loaded)
+		}
 		if (state.loadedSeconds > 0 && duration === 300) {
 			setDuration(playerRef.current?.getDuration() || 300)
 		}
 	}
 
-	// Функции для перемотки и отображения превью
-	const handlePlayerSeek = (newValue: number) => {
-		if (!seeking) {
-			// Показываем момент времени, но не перематываем видео
-			setPreviewTime(newValue)
-		}
-	}
-
-	const handlePlayerMouseSeekUp = (event: React.PointerEvent<HTMLDivElement>) => {
-		const rect = sliderRef.current?.getBoundingClientRect()
-		if (rect) {
-			const newValue = ((event.clientX - rect.left) / rect.width) * 100
-			setSeeking(false)
-			playerRef.current?.seekTo(newValue / 100)
-			setPlayed(newValue / 100)
-		}
+	const handleSeekChange = (value: number[]) => {
+		const newTime = value[0]
+		setPlayed(newTime / duration)
 	}
 
 	const handleSeekStart = () => {
-		setSeeking(true)
-	}
-
-	const handleSeekChange = (value: number[]) => {
-		if (seeking) {
-			handlePlayerSeek(value[0]) // Показываем временной момент
+		setIsDragging(true)
+		setShowControls(true)
+		if (controlsTimeoutRef.current) {
+			clearTimeout(controlsTimeoutRef.current)
 		}
 	}
 
-	const handlePreviewMove = (e: React.MouseEvent<HTMLDivElement>) => {
-		if (sliderRef.current && playerRef.current) {
-			const rect = sliderRef.current.getBoundingClientRect()
-			const x = e.clientX - rect.left
-			const fraction = x / rect.width
-			const newPreviewTime = fraction * duration
-			handlePlayerSeek(newPreviewTime) // Обновляем превью без перемотки
-		}
+	const handleSeekEnd = () => {
+		setIsDragging(false)
+		playerRef.current?.seekTo(played)
+		showControlsHandler()
 	}
 
-	// Отображаем превью фрейма на canvas
-	// const updatePreviewFrame = (time: number) => {
-	// 	const player = playerRef.current?.getInternalPlayer() as HTMLVideoElement
-	// 	if (player && canvasRef.current) {
-	// 		const canvas = canvasRef.current
-	// 		const ctx = canvas.getContext('2d')
-	// 		if (ctx) {
-	// 			const currentTime = player.currentTime
-	// 			player.currentTime = time
-	// 			player.onseeked = () => {
-	// 				ctx.drawImage(player, 0, 0, canvas.width, canvas.height)
-	// 				player.currentTime = currentTime
-	// 				player.onseeked = null
-	// 			}
-	// 		}
-	// 	}
-	// }
-
-	// Отображаем элементы управления
 	const showControlsHandler = useCallback(() => {
 		setShowControls(true)
 		if (controlsTimeoutRef.current) {
 			clearTimeout(controlsTimeoutRef.current)
 		}
-		controlsTimeoutRef.current = setTimeout(() => {
-			setShowControls(false)
-		}, 3000)
-	}, [])
+		if (!isDragging) {
+			controlsTimeoutRef.current = setTimeout(() => {
+				setShowControls(false)
+			}, 3000)
+		}
+	}, [isDragging])
 
-	// Управление полноэкранным режимом
 	const handleFullscreenToggle = () => {
 		if (!document.fullscreenElement) {
 			playerWrapperRef.current?.requestFullscreen()
@@ -172,14 +148,29 @@ export default function ARoom() {
 		return `${mm}:${ss}`
 	}
 
+	const getSpeakerIcon = () => {
+		if (muted || volume === 0) return <SpeakerOffIcon />
+		if (volume < 0.25) return <SpeakerQuietIcon />
+		if (volume < 0.75) return <SpeakerModerateIcon />
+		return <SpeakerLoudIcon />
+	}
+
+	const handleVolumePointerDown = () => {
+		setIsVolumeActive(true)
+	}
+
+	const handleVolumePointerUp = () => {
+		setIsVolumeActive(false)
+	}
+
 	return (
 		<div
 			ref={playerWrapperRef}
 			className={`player-wrapper ${isPlaying ? 'playing' : ''}`}
 			onMouseMove={showControlsHandler}
-			onMouseLeave={() => setShowControls(false)}
+			onMouseLeave={() => !isDragging && setShowControls(false)}
 			style={{
-				backgroundColor: isPlaying ? '#333' : '#000',
+				backgroundColor: '#1a1a1a',
 				width: '100%',
 				height: '100%',
 				position: 'relative',
@@ -193,179 +184,236 @@ export default function ARoom() {
 				playing={isPlaying}
 				volume={volume}
 				muted={muted}
-				playbackRate={playbackRate}
 				onPlay={handlePlay}
 				onPause={handlePause}
 				onProgress={handleProgress}
 				onDuration={duration => setDuration(duration)}
 				width='100%'
 				height='100%'
+				style={{ backgroundColor: '#1a1a1a' }}
 			/>
 			<div
 				className={`controls ${showControls ? 'visible' : 'hidden'}`}
 				style={{
 					position: 'absolute',
-					bottom: '10px',
-					left: '50%',
-					transform: 'translateX(-50%)',
+					bottom: '0',
+					left: '0',
+					right: '0',
 					display: 'flex',
-					flexDirection: 'row',
-					alignItems: 'center',
+					flexDirection: 'column',
 					padding: '10px',
-					borderRadius: '5px',
+					background: 'linear-gradient(transparent, rgba(0,0,0,0.9))',
 					transition: 'opacity 0.3s ease',
 					opacity: showControls ? 1 : 0,
-					width: '90%',
 				}}
 			>
-				<button
-					onClick={() => setIsPlaying(prev => !prev)}
+				{/* Progress bar */}
+				<div
+					ref={sliderRef}
 					style={{
-						margin: '0.5rem',
+						margin: '0 0.5rem',
 						color: '#fff',
-						border: 'none',
-						padding: '0.5rem 1rem',
-						borderRadius: '5px',
+						position: 'relative',
+						height: '20px',
 						cursor: 'pointer',
-						background: 'none',
 					}}
 				>
-					{isPlaying ? <PauseIcon /> : <PlayIcon />}
-				</button>
-				<div ref={sliderRef} style={{ margin: '0.5rem', color: '#fff', flex: 1, position: 'relative' }}>
 					<Slider
 						min={0}
 						max={duration}
 						step={0.01}
 						value={[played * duration]}
-						onValueCommit={handleSeekChange}
-						onPointerDown={handleSeekStart} // При нажатии ЛКМ
-						onPointerUp={handlePlayerMouseSeekUp} // Когда ЛКМ отпустили
-						onPointerLeave={handlePlayerMouseSeekUp} // Если курсор вышел
-						style={{ width: '100%' }}
+						onValueChange={handleSeekChange}
+						onPointerDown={handleSeekStart}
+						onPointerUp={handleSeekEnd}
+						style={
+							{
+								width: '100%',
+								height: '100%',
+								'--slider-thumb-size': '12px',
+								'--slider-track-height': '4px',
+							} as React.CSSProperties
+						}
 					/>
-					<div
-						style={{
-							position: 'absolute',
-							top: '-20px',
-							left: 0,
-							width: '100%',
-							height: '40px',
-							cursor: 'pointer',
-						}}
-						onMouseEnter={() => setIsHoveringSlider(true)}
-						onMouseLeave={() => setIsHoveringSlider(false)}
-						onMouseMove={handlePreviewMove}
-					/>
-					{isHoveringSlider && previewTime !== null && (
-						<div
-							style={{
-								position: 'absolute',
-								top: '-140px',
-								left: `${(previewTime / duration) * 100}%`,
-								transform: 'translateX(-50%)',
-								display: 'flex',
-								flexDirection: 'column',
-								alignItems: 'center',
-								background: 'rgba(0, 0, 0, 0.7)',
-								borderRadius: '4px',
-								padding: '4px',
-							}}
-						>
-							<div style={{ border: '1px solid rgba(255, 255, 255, 0.5)' }}>
-								<canvas ref={canvasRef} width={160} height={90} />
-							</div>
-							<div
-								style={{
-									color: 'white',
-									fontSize: '12px',
-									marginTop: '4px',
-									padding: '2px 6px',
-									background: 'rgba(0, 0, 0, 0.5)',
-									borderRadius: '2px',
-								}}
-							>
-								{formatTime(previewTime)}
-							</div>
-						</div>
-					)}
-					<div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.25rem' }}>
-						<span>{formatTime(played * duration)}</span>
-						<span>{formatTime(duration)}</span>
-					</div>
 				</div>
+
+				{/* Controls bar */}
 				<div
 					style={{
-						position: 'relative',
-						margin: '0.5rem',
-						color: '#fff',
-						border: 'none',
-						padding: '0.5rem 1rem',
-						borderRadius: '5px',
-						cursor: 'pointer',
 						display: 'flex',
 						alignItems: 'center',
-						background: 'none',
+						justifyContent: 'space-between',
+						padding: '0 0.5rem',
 					}}
-					onMouseEnter={() => setShowVolumeControl(true)}
-					onMouseLeave={() => setShowVolumeControl(false)}
-					onClick={handleToggleMuted}
 				>
-					{muted ? <SpeakerOffIcon /> : <SpeakerLoudIcon />}
-					{showVolumeControl && (
-						<Slider
-							min={0}
-							max={1}
-							step={0.01}
-							value={[volume]}
-							onValueChange={handleVolumeChange}
+					{/* Left controls group */}
+					<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+						<button
+							onClick={() => setIsPlaying(prev => !prev)}
 							style={{
-								position: 'absolute',
-								bottom: '100%',
-								left: '50%',
-								transform: 'translateX(-50%)',
-								width: '100px',
+								color: '#fff',
+								border: 'none',
+								padding: '0.5rem',
+								borderRadius: '5px',
+								cursor: 'pointer',
+								background: 'none',
+								display: 'flex',
+								alignItems: 'center',
 							}}
-						/>
-					)}
+						>
+							{isPlaying ? <PauseIcon /> : <PlayIcon />}
+						</button>
+						<button
+							style={{
+								color: '#fff',
+								border: 'none',
+								padding: '0.5rem',
+								borderRadius: '5px',
+								cursor: 'pointer',
+								background: 'none',
+								display: 'flex',
+								alignItems: 'center',
+							}}
+						>
+							<DoubleArrowLeftIcon />
+						</button>
+						<button
+							style={{
+								color: '#fff',
+								border: 'none',
+								padding: '0.5rem',
+								borderRadius: '5px',
+								cursor: 'pointer',
+								background: 'none',
+								display: 'flex',
+								alignItems: 'center',
+							}}
+						>
+							<DoubleArrowRightIcon />
+						</button>
+						<div
+							style={{
+								position: 'relative',
+								display: 'flex',
+								alignItems: 'center',
+							}}
+							onMouseEnter={() => setShowVolumeControl(true)}
+							onMouseLeave={() => {
+								if (!isVolumeActive) {
+									setShowVolumeControl(false)
+								}
+							}}
+						>
+							<button
+								onClick={handleToggleMuted}
+								style={{
+									color: '#fff',
+									border: 'none',
+									padding: '0.5rem',
+									borderRadius: '5px',
+									cursor: 'pointer',
+									background: 'none',
+									display: 'flex',
+									alignItems: 'center',
+								}}
+							>
+								{getSpeakerIcon()}
+							</button>
+							{!muted && (showVolumeControl || isVolumeActive) && (
+								<div
+									style={{
+										position: 'absolute',
+										left: '100%',
+										display: 'flex',
+										alignItems: 'center',
+										height: '100%',
+									}}
+								>
+									<Slider
+										orientation='horizontal'
+										min={0}
+										max={1}
+										step={0.01}
+										value={[volume]}
+										onValueChange={handleVolumeChange}
+										onPointerDown={handleVolumePointerDown}
+										onPointerUp={handleVolumePointerUp}
+										style={
+											{
+												width: '100px',
+												'--slider-thumb-size': isVolumeActive ? '16px' : '12px',
+												transition: 'all 0.2s ease',
+											} as React.CSSProperties
+										}
+									/>
+								</div>
+							)}
+						</div>
+					</div>
+
+					{/* Center time display */}
+					<Text size='5' as='span' style={{ color: 'white' }}>
+						{formatTime(played * duration)} / {formatTime(duration)}
+					</Text>
+
+					{/* Right controls group */}
+					<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+						<button
+							style={{
+								color: '#fff',
+								border: 'none',
+								padding: '0.5rem',
+								borderRadius: '5px',
+								cursor: 'pointer',
+								background: 'none',
+								display: 'flex',
+								alignItems: 'center',
+							}}
+						>
+							<GearIcon />
+						</button>
+						<button
+							style={{
+								color: '#fff',
+								border: 'none',
+								padding: '0.5rem',
+								borderRadius: '5px',
+								cursor: 'pointer',
+								background: 'none',
+								display: 'flex',
+								alignItems: 'center',
+							}}
+						>
+							<CircleIcon />
+						</button>
+						<button
+							onClick={handleFullscreenToggle}
+							style={{
+								color: '#fff',
+								border: 'none',
+								padding: '0.5rem',
+								borderRadius: '5px',
+								cursor: 'pointer',
+								background: 'none',
+								display: 'flex',
+								alignItems: 'center',
+							}}
+						>
+							{isFullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
+						</button>
+						<span
+							style={{
+								color: '#fff',
+								fontSize: '14px',
+								padding: '2px 6px',
+								border: '1px solid #fff',
+								borderRadius: '4px',
+							}}
+						>
+							HD
+						</span>
+					</div>
 				</div>
-				<label style={{ margin: '0.5rem', color: '#fff' }}>
-					Playback Rate
-					<select
-						value={playbackRate}
-						onChange={e => handlePlaybackRateChange(Number.parseFloat(e.target.value))}
-						style={{
-							margin: '0.5rem',
-							color: '#fff',
-							border: 'none',
-							padding: '0.5rem 1rem',
-							borderRadius: '5px',
-							cursor: 'pointer',
-							background: 'none',
-						}}
-					>
-						<option value={0.5}>0.5x</option>
-						<option value={0.75}>0.75x</option>
-						<option value={1}>1x</option>
-						<option value={1.25}>1.25x</option>
-						<option value={1.5}>1.5x</option>
-						<option value={2}>2x</option>
-					</select>
-				</label>
-				<button
-					onClick={handleFullscreenToggle}
-					style={{
-						margin: '0.5rem',
-						color: '#fff',
-						border: 'none',
-						padding: '0.5rem 1rem',
-						borderRadius: '5px',
-						cursor: 'pointer',
-						background: 'none',
-					}}
-				>
-					{isFullscreen ? <EnterFullScreenIcon /> : <ExitFullScreenIcon />}
-				</button>
 			</div>
 		</div>
 	)
