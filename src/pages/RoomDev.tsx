@@ -50,9 +50,14 @@ export default function RoomDev() {
 
 	const handleVolumeChange = (value: number[]) => {
 		const newVolume = value[0]
-		setVolume(newVolume)
-		if (newVolume > 0 && muted) {
-			setMuted(false)
+		if (newVolume === 0) {
+			setMuted(true)
+			setVolume(0.5)
+		} else {
+			setVolume(newVolume)
+			if (muted) {
+				setMuted(false)
+			}
 		}
 		if (newVolume > 0) {
 			previousVolumeRef.current = newVolume
@@ -63,9 +68,7 @@ export default function RoomDev() {
 		setMuted(prevMuted => {
 			if (prevMuted) {
 				// Unmuting
-				if (volume === 0) {
-					setVolume(previousVolumeRef.current > 0 ? previousVolumeRef.current : 0.5)
-				}
+				setVolume(previousVolumeRef.current > 0 ? previousVolumeRef.current : 0.5)
 				return false
 			} else {
 				// Muting
@@ -328,7 +331,7 @@ export default function RoomDev() {
 							>
 								{getSpeakerIcon()}
 							</button>
-							{!muted && (showVolumeControl || isVolumeActive) && (
+							{(showVolumeControl || isVolumeActive) && (
 								<div
 									style={{
 										position: 'absolute',
@@ -343,7 +346,7 @@ export default function RoomDev() {
 										min={0}
 										max={1}
 										step={0.01}
-										value={[volume]}
+										value={[muted ? 0 : volume]}
 										onValueChange={handleVolumeChange}
 										onPointerDown={handleVolumePointerDown}
 										onPointerUp={handleVolumePointerUp}
