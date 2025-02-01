@@ -59,11 +59,12 @@ export default function RoomDev() {
 		setLoaded(state.loaded)
 	}
 
-	const handleSeekChange = (value: number[]) => {
+	const handlePreviewChange = (value: number[]) => {
 		setPreviewTime(value[0])
+		updatePreviewFrame(value[0])
 	}
 
-	const handleSeekMouseUp = (value: number[]) => {
+	const handleSeekChange = (value: number[]) => {
 		const newTime = value[0]
 		playerRef.current?.seekTo(newTime)
 	}
@@ -204,19 +205,37 @@ export default function RoomDev() {
 					{isPlaying ? <PauseIcon /> : <PlayIcon />}
 				</button>
 				<div ref={sliderRef} style={{ margin: '0.5rem', color: '#fff', flex: 1, position: 'relative' }}>
+					{/* Слайдер для перемотки */}
 					<Slider
 						min={0}
 						max={playerRef.current?.getDuration() || 1}
 						step={0.01}
-						value={[
-							isHoveringSlider && previewTime !== null
-								? previewTime
-								: played * (playerRef.current?.getDuration() || 1),
-						]}
+						value={[played * (playerRef.current?.getDuration() || 1)]}
 						onValueChange={handleSeekChange}
-						onValueCommit={handleSeekMouseUp}
 						style={{ width: '100%' }}
 					/>
+					{/* Слайдер для предпросмотра */}
+					<div
+						style={{
+							position: 'absolute',
+							top: 0,
+							left: 0,
+							width: '100%',
+							height: '100%',
+							pointerEvents: 'none',
+						}}
+					>
+						<Slider
+							min={0}
+							max={playerRef.current?.getDuration() || 1}
+							step={0.01}
+							value={[
+								previewTime !== null ? previewTime : played * (playerRef.current?.getDuration() || 1),
+							]}
+							onValueChange={handlePreviewChange}
+							style={{ width: '100%', opacity: 0 }}
+						/>
+					</div>
 					<div
 						style={{
 							position: 'absolute',
