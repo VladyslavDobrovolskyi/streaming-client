@@ -12,7 +12,7 @@ import {
 	GearIcon,
 	CircleIcon,
 } from '@radix-ui/react-icons'
-import { Slider } from '@radix-ui/themes'
+import { Slider, Text } from '@radix-ui/themes'
 
 export default function RoomDev() {
 	const [isPlaying, setIsPlaying] = useState(false)
@@ -318,9 +318,9 @@ export default function RoomDev() {
 					</div>
 
 					{/* Center time display */}
-					<span style={{ color: '#fff', fontSize: '18px', flexGrow: 1, textAlign: 'center' }}>
+					<Text size='2'>
 						{formatTime(played * duration)} / {formatTime(duration)}
-					</span>
+					</Text>
 
 					{/* Right controls group */}
 					<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
