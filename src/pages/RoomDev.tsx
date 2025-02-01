@@ -20,10 +20,10 @@ export default function RoomDev() {
 	const [showControls, setShowControls] = useState(false)
 	const [showVolumeControl, setShowVolumeControl] = useState(false)
 	const [isFullscreen, setIsFullscreen] = useState(false)
+	const [seekTime, setSeekTime] = useState<number | null>(null)
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
-	const animationFrameRef = useRef<number | null>(null)
 
 	useEffect(() => {
 		if (loaded) {
@@ -57,9 +57,14 @@ export default function RoomDev() {
 	}
 
 	const handleSeekChange = (value: number[]) => {
-		animationFrameRef.current = requestAnimationFrame(() => {
-			playerRef.current?.seekTo(value[0])
-		})
+		setSeekTime(value[0])
+	}
+
+	const handleSeekMouseUp = () => {
+		if (seekTime !== null) {
+			playerRef.current?.seekTo(seekTime)
+			setSeekTime(null)
+		}
 	}
 
 	const showControlsHandler = useCallback(() => {
@@ -157,12 +162,14 @@ export default function RoomDev() {
 					{isPlaying ? <PauseIcon /> : <PlayIcon />}
 				</button>
 				<label style={{ margin: '0.5rem', color: '#fff', flex: 1 }}>
+					Seek
 					<Slider
 						min={0}
 						max={playerRef.current?.getDuration() || 1}
 						step={0.01}
-						value={[played * (playerRef.current?.getDuration() || 1)]}
+						value={[seekTime !== null ? seekTime : played * (playerRef.current?.getDuration() || 1)]}
 						onValueChange={handleSeekChange}
+						onMouseUp={handleSeekMouseUp}
 						style={{ width: '100%' }}
 					/>
 				</label>
