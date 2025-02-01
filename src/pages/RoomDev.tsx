@@ -301,12 +301,8 @@ export default function RoomDev() {
 									style={{
 										position: 'absolute',
 										left: '100%',
-										background: 'rgba(0,0,0,0.9)',
-										padding: '0.5rem',
-										borderRadius: '4px',
 										display: 'flex',
 										alignItems: 'center',
-										gap: '0.5rem',
 										height: '100%',
 									}}
 								>
@@ -321,9 +317,6 @@ export default function RoomDev() {
 											width: '100px',
 										}}
 									/>
-									<span style={{ color: '#fff', fontSize: '12px', whiteSpace: 'nowrap' }}>
-										{Math.round(volume * 100)}%
-									</span>
 								</div>
 							)}
 						</div>
