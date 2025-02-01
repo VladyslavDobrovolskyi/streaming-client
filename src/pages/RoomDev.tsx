@@ -212,7 +212,7 @@ export default function RoomDev() {
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown)
 		}
-	}, [volume, handleToggleMuted, handleForward15, handleBackward15, handleVolumeChange])
+	})
 
 	const formatTime = (seconds: number) => {
 		const date = new Date(seconds * 1000)
