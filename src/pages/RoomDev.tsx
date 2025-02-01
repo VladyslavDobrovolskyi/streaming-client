@@ -28,6 +28,7 @@ export default function RoomDev() {
 	const [duration, setDuration] = useState(300)
 	const [isDragging, setIsDragging] = useState(false)
 	const [isVolumeActive, setIsVolumeActive] = useState(false)
+	const [mutedBySlider, setMutedBySlider] = useState(false)
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -52,11 +53,13 @@ export default function RoomDev() {
 		const newVolume = value[0]
 		if (newVolume === 0) {
 			setMuted(true)
+			setMutedBySlider(true)
 			setVolume(0.5)
 		} else {
 			setVolume(newVolume)
 			if (muted) {
 				setMuted(false)
+				setMutedBySlider(false)
 			}
 		}
 		if (newVolume > 0) {
@@ -68,7 +71,12 @@ export default function RoomDev() {
 		setMuted(prevMuted => {
 			if (prevMuted) {
 				// Unmuting
-				setVolume(previousVolumeRef.current > 0 ? previousVolumeRef.current : 0.5)
+				if (mutedBySlider) {
+					setVolume(0.5)
+					setMutedBySlider(false)
+				} else {
+					setVolume(previousVolumeRef.current > 0 ? previousVolumeRef.current : 0.5)
+				}
 				return false
 			} else {
 				// Muting
@@ -331,7 +339,7 @@ export default function RoomDev() {
 							>
 								{getSpeakerIcon()}
 							</button>
-							{(showVolumeControl || isVolumeActive) && (
+							{!muted && (showVolumeControl || isVolumeActive) && (
 								<div
 									style={{
 										position: 'absolute',
@@ -346,7 +354,7 @@ export default function RoomDev() {
 										min={0}
 										max={1}
 										step={0.01}
-										value={[muted ? 0 : volume]}
+										value={[volume]}
 										onValueChange={handleVolumeChange}
 										onPointerDown={handleVolumePointerDown}
 										onPointerUp={handleVolumePointerUp}
