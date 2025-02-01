@@ -64,15 +64,15 @@ export default function RoomDev() {
 		updatePreviewFrame(value[0])
 	}
 
-	const handleSeekChange = (value: number[]) => {
-		setPreviewTime(value[0])
-		updatePreviewFrame(value[0])
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const handleSeekChange = (_value: number[]) => {
+		// This function is intentionally left empty to prevent seeking on hover
 	}
 
-	// const handleSeekCommit = (value: number[]) => {
-	// 	const newTime = value[0]
-	// 	playerRef.current?.seekTo(newTime)
-	// }
+	const handleSeekCommit = (value: number[]) => {
+		const newTime = value[0]
+		playerRef.current?.seekTo(newTime)
+	}
 
 	const handlePreviewMove = (e: React.MouseEvent<HTMLDivElement>) => {
 		setIsHoveringSlider(true)
@@ -216,9 +216,9 @@ export default function RoomDev() {
 						max={playerRef.current?.getDuration() || 1}
 						step={0.01}
 						value={[played * (playerRef.current?.getDuration() || 1)]}
-						//onValueChange={handleSeekChange}
-						onValueCommit={handleSeekChange}
-						style={{ width: '100%' }}
+						onValueChange={handleSeekChange}
+						onValueCommit={handleSeekCommit}
+						style={{ width: '100%', pointerEvents: 'none' }}
 					/>
 					{/* Слайдер для предпросмотра */}
 					<div
@@ -254,6 +254,16 @@ export default function RoomDev() {
 						onMouseEnter={() => setIsHoveringSlider(true)}
 						onMouseLeave={() => setIsHoveringSlider(false)}
 						onMouseMove={handlePreviewMove}
+						onClick={e => {
+							const rect = sliderRef.current?.getBoundingClientRect()
+							if (rect) {
+								const x = e.clientX - rect.left
+								const fraction = x / rect.width
+								const duration = playerRef.current?.getDuration() || 1
+								const newTime = fraction * duration
+								handleSeekCommit([newTime])
+							}
+						}}
 					/>
 					{isHoveringSlider && previewTime !== null && (
 						<div
