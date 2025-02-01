@@ -223,7 +223,9 @@ export default function RoomDev() {
 								fontSize: '12px',
 							}}
 						>
-							<canvas ref={canvasRef} width={160} height={90} style={{ marginBottom: '5px' }} />
+							<div style={{ border: '1px solid rgba(255, 255, 255, 0.5)', marginBottom: '5px' }}>
+								<canvas ref={canvasRef} width={160} height={90} />
+							</div>
 							<div>{formatTime(seekTime)}</div>
 						</div>
 					)}
