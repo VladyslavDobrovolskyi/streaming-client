@@ -375,11 +375,10 @@ export default function RoomDev() {
 					<div
 						style={{
 							position: 'absolute',
-							bottom: '10px',
 							left: '50%',
 							transform: 'translateX(-50%)',
 							color: 'white',
-							fontSize: '18px',
+							fontSize: '24px',
 							textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
 							fontFamily: 'Roboto, sans-serif',
 						}}
