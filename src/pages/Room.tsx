@@ -1,4 +1,4 @@
-//// Вернуть костыль для обновления соедения при обновлении страницы (Возврат на /rooms)
+//// Вернуть костыль для обновления соедения при обновлении страницы (Возврат на )
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams } from 'react-router'

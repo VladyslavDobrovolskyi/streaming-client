@@ -15,6 +15,10 @@ import {
 } from '@radix-ui/react-icons'
 import { Slider } from '@radix-ui/themes'
 import ActionIndicator from '../components/ActionIndicator'
+import { useParams } from 'react-router'
+import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
+import ACTIONS from '../socket/actions'
+import socket from '../socket'
 
 export default function RoomDev() {
 	const [isPlaying, setIsPlaying] = useState(false)
@@ -37,6 +41,9 @@ export default function RoomDev() {
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
 	const sliderRef = useRef<HTMLDivElement>(null)
 	const previousVolumeRef = useRef(volume)
+
+	const { id: roomID } = useParams()
+	const { clients, provideMediaRef, localStream, reinitializeStream } = useWebRTC(roomID!)
 
 	useEffect(() => {
 		if (loaded) {
@@ -89,6 +96,12 @@ export default function RoomDev() {
 
 	const handleToggleMuted = () => {
 		setMuted(prevMuted => {
+			const newMutedState = !prevMuted
+			if (localStream) {
+				localStream.getAudioTracks().forEach(track => {
+					track.enabled = !newMutedState
+				})
+			}
 			if (prevMuted) {
 				// Unmuting
 				if (mutedBySlider) {
@@ -214,6 +227,29 @@ export default function RoomDev() {
 		}
 	})
 
+	useEffect(() => {
+		if (roomID) {
+			sessionStorage.setItem('roomID', roomID)
+		}
+	}, [roomID])
+
+	useEffect(() => {
+		const reconnect = () => {
+			console.log('Переподключение к комнате...')
+			socket.emit(ACTIONS.JOIN, { roomID })
+			reinitializeStream()
+		}
+
+		socket.on('disconnect', reconnect)
+		return () => socket.off('disconnect', reconnect)
+	}, [roomID, reinitializeStream])
+
+	useEffect(() => {
+		if (!localStream) {
+			reinitializeStream()
+		}
+	}, [localStream, reinitializeStream])
+
 	const formatTime = (seconds: number) => {
 		const date = new Date(seconds * 1000)
 		const hh = date.getUTCHours()
@@ -243,6 +279,21 @@ export default function RoomDev() {
 	const showAction = (action: 'play' | 'pause' | 'mute' | 'unmute' | 'forward' | 'backward' | 'volume') => {
 		setCurrentAction(action)
 		setTimeout(() => setCurrentAction(null), 1000)
+	}
+
+	const renderParticipants = () => {
+		return clients.map(clientID => (
+			<div key={clientID} style={{ width: '200px', height: '150px', margin: '5px' }}>
+				<video
+					width='100%'
+					height='100%'
+					ref={instance => provideMediaRef(clientID, instance)}
+					autoPlay
+					playsInline
+					muted={clientID === LOCAL_VIDEO}
+				/>
+			</div>
+		))
 	}
 
 	return (
@@ -277,6 +328,19 @@ export default function RoomDev() {
 				height='100%'
 				style={{ backgroundColor: '#1a1a1a', objectFit: 'contain' }}
 			/>
+			<div
+				style={{
+					position: 'absolute',
+					top: '10px',
+					right: '10px',
+					display: 'flex',
+					flexWrap: 'wrap',
+					maxWidth: '400px',
+					zIndex: 30,
+				}}
+			>
+				{renderParticipants()}
+			</div>
 			<div
 				style={{
 					position: 'absolute',
