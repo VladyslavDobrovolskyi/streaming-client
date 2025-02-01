@@ -65,6 +65,11 @@ export default function RoomDev() {
 	}
 
 	const handleSeekChange = (value: number[]) => {
+		setPreviewTime(value[0])
+		updatePreviewFrame(value[0])
+	}
+
+	const handleSeekCommit = (value: number[]) => {
 		const newTime = value[0]
 		playerRef.current?.seekTo(newTime)
 	}
@@ -212,6 +217,7 @@ export default function RoomDev() {
 						step={0.01}
 						value={[played * (playerRef.current?.getDuration() || 1)]}
 						onValueChange={handleSeekChange}
+						onValueCommit={handleSeekCommit}
 						style={{ width: '100%' }}
 					/>
 					{/* Слайдер для предпросмотра */}
