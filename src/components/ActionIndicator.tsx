@@ -10,7 +10,7 @@ interface ActionIndicatorProps {
 
 const ActionIndicator: React.FC<ActionIndicatorProps> = ({ action }) => {
 	const getIcon = () => {
-		const iconStyle = { transform: 'scale(2)' } // Увеличиваем размер в 16 раз
+		const iconStyle = { transform: 'scale(2.5)' } // Увеличиваем размер в 16 раз
 		switch (action) {
 			case 'play':
 				return <PlayIcon style={iconStyle} />
