@@ -21,13 +21,9 @@ export default function RoomDev() {
 	const [showVolumeControl, setShowVolumeControl] = useState(false)
 	const [isFullscreen, setIsFullscreen] = useState(false)
 	const [duration, setDuration] = useState(300) // 5 минут (300 секунд) по умолчанию
-	const [previewTime, setPreviewTime] = useState<number | null>(null)
-	const [isHoveringSlider, setIsHoveringSlider] = useState(false)
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
-	const sliderRef = useRef<HTMLDivElement>(null)
-	const canvasRef = useRef<HTMLCanvasElement>(null)
 
 	useEffect(() => {
 		if (loaded) {
@@ -71,35 +67,6 @@ export default function RoomDev() {
 	const handleSeekChange = (value: number[]) => {
 		const newTime = value[0]
 		playerRef.current?.seekTo(newTime / duration)
-		setPlayed(newTime / duration)
-	}
-
-	const handlePreviewMove = (e: React.MouseEvent<HTMLDivElement>) => {
-		if (sliderRef.current && playerRef.current) {
-			const rect = sliderRef.current.getBoundingClientRect()
-			const x = e.clientX - rect.left
-			const fraction = x / rect.width
-			const newPreviewTime = fraction * duration
-			setPreviewTime(newPreviewTime)
-			updatePreviewFrame(newPreviewTime)
-		}
-	}
-
-	const updatePreviewFrame = (time: number) => {
-		const player = playerRef.current?.getInternalPlayer() as HTMLVideoElement
-		if (player && canvasRef.current) {
-			const canvas = canvasRef.current
-			const ctx = canvas.getContext('2d')
-			if (ctx) {
-				const currentTime = player.currentTime
-				player.currentTime = time
-				player.onseeked = () => {
-					ctx.drawImage(player, 0, 0, canvas.width, canvas.height)
-					player.currentTime = currentTime
-					player.onseeked = null
-				}
-			}
-		}
 	}
 
 	const showControlsHandler = useCallback(() => {
@@ -208,60 +175,15 @@ export default function RoomDev() {
 				>
 					{isPlaying ? <PauseIcon /> : <PlayIcon />}
 				</button>
-				<div ref={sliderRef} style={{ margin: '0.5rem', color: '#fff', flex: 1, position: 'relative' }}>
+				<div style={{ margin: '0.5rem', color: '#fff', flex: 1, position: 'relative' }}>
 					<Slider
 						min={0}
 						max={duration}
 						step={0.01}
 						value={[played * duration]}
-						onValueChange={handleSeekChange}
+						onValueCommit={handleSeekChange}
 						style={{ width: '100%' }}
 					/>
-					<div
-						style={{
-							position: 'absolute',
-							top: '-20px',
-							left: 0,
-							width: '100%',
-							height: '40px',
-							cursor: 'pointer',
-						}}
-						onMouseEnter={() => setIsHoveringSlider(true)}
-						onMouseLeave={() => setIsHoveringSlider(false)}
-						onMouseMove={handlePreviewMove}
-					/>
-					{isHoveringSlider && previewTime !== null && (
-						<div
-							style={{
-								position: 'absolute',
-								top: '-140px',
-								left: `${(previewTime / duration) * 100}%`,
-								transform: 'translateX(-50%)',
-								display: 'flex',
-								flexDirection: 'column',
-								alignItems: 'center',
-								background: 'rgba(0, 0, 0, 0.7)',
-								borderRadius: '4px',
-								padding: '4px',
-							}}
-						>
-							<div style={{ border: '1px solid rgba(255, 255, 255, 0.5)' }}>
-								<canvas ref={canvasRef} width={160} height={90} />
-							</div>
-							<div
-								style={{
-									color: 'white',
-									fontSize: '12px',
-									marginTop: '4px',
-									padding: '2px 6px',
-									background: 'rgba(0, 0, 0, 0.5)',
-									borderRadius: '2px',
-								}}
-							>
-								{formatTime(previewTime)}
-							</div>
-						</div>
-					)}
 					<div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.25rem' }}>
 						<span>{formatTime(played * duration)}</span>
 						<span>{formatTime(duration)}</span>
