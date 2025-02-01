@@ -163,6 +163,20 @@ export default function RoomDev() {
 		setIsVolumeActive(false)
 	}
 
+	const handleForward15 = () => {
+		const newTime = Math.min(played + 15 / duration, 1)
+		setPlayed(newTime)
+		playerRef.current?.seekTo(newTime)
+		setIsPlaying(true)
+	}
+
+	const handleBackward15 = () => {
+		const newTime = Math.max(played - 15 / duration, 0)
+		setPlayed(newTime)
+		playerRef.current?.seekTo(newTime)
+		setIsPlaying(true)
+	}
+
 	return (
 		<div
 			ref={playerWrapperRef}
@@ -264,6 +278,7 @@ export default function RoomDev() {
 							{isPlaying ? <PauseIcon /> : <PlayIcon />}
 						</button>
 						<button
+							onClick={handleBackward15}
 							style={{
 								color: '#fff',
 								border: 'none',
@@ -278,6 +293,7 @@ export default function RoomDev() {
 							<DoubleArrowLeftIcon />
 						</button>
 						<button
+							onClick={handleForward15}
 							style={{
 								color: '#fff',
 								border: 'none',
