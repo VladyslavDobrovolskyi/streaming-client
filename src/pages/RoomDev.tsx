@@ -161,17 +161,18 @@ export default function RoomDev() {
 				>
 					{isPlaying ? <PauseIcon /> : <PlayIcon />}
 				</button>
-
-				<Slider
-					min={0}
-					max={playerRef.current?.getDuration() || 1}
-					step={0.01}
-					value={[seekTime !== null ? seekTime : played * (playerRef.current?.getDuration() || 1)]}
-					onValueChange={handleSeekChange}
-					onMouseUp={handleSeekMouseUp}
-					style={{ width: '100%' }}
-				/>
-
+				<label style={{ margin: '0.5rem', color: '#fff', flex: 1 }}>
+					Seek
+					<Slider
+						min={0}
+						max={playerRef.current?.getDuration() || 1}
+						step={0.01}
+						value={[seekTime !== null ? seekTime : played * (playerRef.current?.getDuration() || 1)]}
+						onValueChange={handleSeekChange}
+						onMouseUp={handleSeekMouseUp}
+						style={{ width: '100%' }}
+					/>
+				</label>
 				<div
 					style={{
 						position: 'relative',
