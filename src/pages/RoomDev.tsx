@@ -21,6 +21,7 @@ export default function RoomDev() {
 	const [showVolumeControl, setShowVolumeControl] = useState(false)
 	const [isFullscreen, setIsFullscreen] = useState(false)
 	const [seekTime, setSeekTime] = useState<number | null>(null)
+	const [isSeeking, setIsSeeking] = useState(false) // Added state for seeking
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -58,13 +59,14 @@ export default function RoomDev() {
 
 	const handleSeekChange = (value: number[]) => {
 		setSeekTime(value[0])
+		setIsSeeking(true)
 	}
 
 	const handleSeekMouseUp = () => {
 		if (seekTime !== null) {
 			playerRef.current?.seekTo(seekTime)
-			setSeekTime(null)
 		}
+		setIsSeeking(false)
 	}
 
 	const showControlsHandler = useCallback(() => {
@@ -101,6 +103,17 @@ export default function RoomDev() {
 			}
 		}
 	}, [showControlsHandler])
+
+	const formatTime = (seconds: number) => {
+		const date = new Date(seconds * 1000)
+		const hh = date.getUTCHours()
+		const mm = date.getUTCMinutes()
+		const ss = date.getUTCSeconds().toString().padStart(2, '0')
+		if (hh) {
+			return `${hh}:${mm.toString().padStart(2, '0')}:${ss}`
+		}
+		return `${mm}:${ss}`
+	}
 
 	return (
 		<div
@@ -161,7 +174,7 @@ export default function RoomDev() {
 				>
 					{isPlaying ? <PauseIcon /> : <PlayIcon />}
 				</button>
-				<label style={{ margin: '0.5rem', color: '#fff', flex: 1 }}>
+				<label style={{ margin: '0.5rem', color: '#fff', flex: 1, position: 'relative' }}>
 					Seek
 					<Slider
 						min={0}
@@ -169,9 +182,26 @@ export default function RoomDev() {
 						step={0.01}
 						value={[seekTime !== null ? seekTime : played * (playerRef.current?.getDuration() || 1)]}
 						onValueChange={handleSeekChange}
-						onMouseUp={handleSeekMouseUp}
+						onPointerUp={handleSeekMouseUp}
 						style={{ width: '100%' }}
 					/>
+					{isSeeking && seekTime !== null && (
+						<div
+							style={{
+								position: 'absolute',
+								top: '-30px',
+								left: `${(seekTime / (playerRef.current?.getDuration() || 1)) * 100}%`,
+								transform: 'translateX(-50%)',
+								background: 'rgba(0, 0, 0, 0.7)',
+								color: 'white',
+								padding: '2px 6px',
+								borderRadius: '4px',
+								fontSize: '12px',
+							}}
+						>
+							{formatTime(seekTime)}
+						</div>
+					)}
 				</label>
 				<div
 					style={{
@@ -212,7 +242,7 @@ export default function RoomDev() {
 					Playback Rate
 					<select
 						value={playbackRate}
-						onChange={e => handlePlaybackRateChange(parseFloat(e.target.value))}
+						onChange={e => handlePlaybackRateChange(Number.parseFloat(e.target.value))}
 						style={{
 							margin: '0.5rem',
 							color: '#fff',
