@@ -62,6 +62,7 @@ export default function RoomDev() {
 
 	const handleSeekChange = (value: number[]) => {
 		setSeekTime(value[0])
+		updatePreviewFrame(value[0])
 	}
 
 	const handleSeekMouseUp = () => {
@@ -88,13 +89,10 @@ export default function RoomDev() {
 			const canvas = canvasRef.current
 			const ctx = canvas.getContext('2d')
 			if (ctx) {
-				// Сохраняем текущее время воспроизведения
 				const currentTime = player.currentTime
-				// Устанавливаем время для предпросмотра
 				player.currentTime = time
 				player.onseeked = () => {
 					ctx.drawImage(player, 0, 0, canvas.width, canvas.height)
-					// Возвращаем исходное время воспроизведения
 					player.currentTime = currentTime
 					player.onseeked = null
 				}
