@@ -12,15 +12,15 @@ const ActionIndicator: React.FC<ActionIndicatorProps> = ({ action }) => {
 	const getIcon = () => {
 		switch (action) {
 			case 'play':
-				return <PlayIcon className='w-32 h-32' />
+				return <PlayIcon className='w-48 h-48' />
 			case 'pause':
-				return <PauseIcon className='w-32 h-32' />
+				return <PauseIcon className='w-48 h-48' />
 			case 'mute':
-				return <SpeakerOffIcon className='w-32 h-32' />
+				return <SpeakerOffIcon className='w-48 h-48' />
 			case 'forward':
-				return <DoubleArrowRightIcon className='w-32 h-32' />
+				return <DoubleArrowRightIcon className='w-48 h-48' />
 			case 'backward':
-				return <DoubleArrowLeftIcon className='w-32 h-32' />
+				return <DoubleArrowLeftIcon className='w-48 h-48' />
 			default:
 				return null
 		}
@@ -34,7 +34,7 @@ const ActionIndicator: React.FC<ActionIndicatorProps> = ({ action }) => {
 					animate={{ opacity: 1, scale: 1 }}
 					exit={{ opacity: 0, scale: 0.5 }}
 					transition={{ duration: 0.3 }}
-					className='bg-black bg-opacity-50 rounded-full p-4'
+					className='bg-black bg-opacity-50 rounded-full p-12'
 				>
 					{getIcon()}
 				</motion.div>

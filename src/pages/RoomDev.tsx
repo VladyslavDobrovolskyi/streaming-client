@@ -278,7 +278,7 @@ export default function RoomDev() {
 					justifyContent: 'center',
 					alignItems: 'center',
 					pointerEvents: 'none',
-					zIndex: 10,
+					zIndex: 20, // Updated z-index
 				}}
 			>
 				<ActionIndicator action={currentAction} />
