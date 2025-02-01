@@ -1,6 +1,13 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import ReactPlayer from 'react-player'
-import { Play, Pause, Volume2, VolumeX, Maximize, Minimize } from '@geist-ui/icons'
+import {
+	PauseIcon,
+	PlayIcon,
+	SpeakerLoudIcon,
+	SpeakerOffIcon,
+	EnterFullScreenIcon,
+	ExitFullScreenIcon,
+} from '@radix-ui/react-icons'
 import { Flex, Text, Button } from '@radix-ui/themes'
 
 export default function RoomDev() {
@@ -144,7 +151,7 @@ export default function RoomDev() {
 						background: 'none',
 					}}
 				>
-					{isPlaying ? <Pause /> : <Play />}
+					{isPlaying ? <PauseIcon /> : <PlayIcon />}
 				</button>
 				<label style={{ margin: '0.5rem', color: '#fff', flex: 1 }}>
 					Seek
@@ -175,7 +182,7 @@ export default function RoomDev() {
 					onMouseLeave={() => setShowVolumeControl(false)}
 					onClick={handleToggleMuted}
 				>
-					{muted ? <VolumeX /> : <Volume2 />}
+					{muted ? <SpeakerOffIcon /> : <SpeakerLoudIcon />}
 					{showVolumeControl && (
 						<input
 							type='range'
@@ -229,7 +236,7 @@ export default function RoomDev() {
 						background: 'none',
 					}}
 				>
-					{isFullscreen ? <Minimize /> : <Maximize />}
+					{isFullscreen ? <EnterFullScreenIcon /> : <ExitFullScreenIcon />}
 				</button>
 				<Flex direction='column' gap='2'>
 					<Text>Hello from Radix Themes :)</Text>
