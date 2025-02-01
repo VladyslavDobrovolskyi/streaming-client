@@ -55,10 +55,14 @@ export default function RoomDev() {
 
 	const handleToggleMuted = () => {
 		setMuted(prevMuted => {
-			if (prevMuted && volume === 0) {
-				setVolume(0.5)
+			if (prevMuted) {
+				return false
+			} else {
+				if (volume === 0) {
+					setVolume(0.5)
+				}
+				return true
 			}
-			return !prevMuted
 		})
 	}
 
@@ -315,7 +319,7 @@ export default function RoomDev() {
 							>
 								{getSpeakerIcon()}
 							</button>
-							{(showVolumeControl || isVolumeActive) && (
+							{!muted && (showVolumeControl || isVolumeActive) && (
 								<div
 									style={{
 										position: 'absolute',
