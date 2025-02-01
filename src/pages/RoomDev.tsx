@@ -390,7 +390,7 @@ export default function RoomDev() {
 					</Text>
 
 					{/* Right controls group */}
-					{/* <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+					<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
 						<button
 							style={{
 								color: '#fff',
@@ -403,37 +403,24 @@ export default function RoomDev() {
 								alignItems: 'center',
 							}}
 						>
-							<GearIcon />
-						</button> */}
-					<button
-						style={{
-							color: '#fff',
-							border: 'none',
-							padding: '0.5rem',
-							borderRadius: '5px',
-							cursor: 'pointer',
-							background: 'none',
-							display: 'flex',
-							alignItems: 'center',
-						}}
-					>
-						<CircleIcon />
-					</button>
-					<button
-						onClick={handleFullscreenToggle}
-						style={{
-							color: '#fff',
-							border: 'none',
-							padding: '0.5rem',
-							borderRadius: '5px',
-							cursor: 'pointer',
-							background: 'none',
-							display: 'flex',
-							alignItems: 'center',
-						}}
-					>
-						{isFullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
-					</button>
+							<CircleIcon />
+						</button>
+						<button
+							onClick={handleFullscreenToggle}
+							style={{
+								color: '#fff',
+								border: 'none',
+								padding: '0.5rem',
+								borderRadius: '5px',
+								cursor: 'pointer',
+								background: 'none',
+								display: 'flex',
+								alignItems: 'center',
+							}}
+						>
+							{isFullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
