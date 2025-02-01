@@ -7,6 +7,10 @@ import {
 	SpeakerOffIcon,
 	EnterFullScreenIcon,
 	ExitFullScreenIcon,
+	DoubleArrowLeftIcon,
+	DoubleArrowRightIcon,
+	GearIcon,
+	CircleIcon,
 } from '@radix-ui/react-icons'
 import { Slider } from '@radix-ui/themes'
 
@@ -14,7 +18,6 @@ export default function RoomDev() {
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [volume, setVolume] = useState(0.8)
 	const [muted, setMuted] = useState(false)
-	const [playbackRate, setPlaybackRate] = useState(1.0)
 	const [played, setPlayed] = useState(0)
 	const [loaded, setLoaded] = useState(0)
 	const [showControls, setShowControls] = useState(false)
@@ -47,10 +50,6 @@ export default function RoomDev() {
 
 	const handleToggleMuted = () => {
 		setMuted(prevMuted => !prevMuted)
-	}
-
-	const handlePlaybackRateChange = (rate: number) => {
-		setPlaybackRate(rate)
 	}
 
 	const handleProgress = (state: {
@@ -142,7 +141,7 @@ export default function RoomDev() {
 			onMouseMove={showControlsHandler}
 			onMouseLeave={() => !isDragging && setShowControls(false)}
 			style={{
-				backgroundColor: isPlaying ? '#333' : '#000',
+				backgroundColor: '#1a1a1a',
 				width: '100%',
 				height: '100%',
 				position: 'relative',
@@ -156,13 +155,13 @@ export default function RoomDev() {
 				playing={isPlaying}
 				volume={volume}
 				muted={muted}
-				playbackRate={playbackRate}
 				onPlay={handlePlay}
 				onPause={handlePause}
 				onProgress={handleProgress}
 				onDuration={duration => setDuration(duration)}
 				width='100%'
 				height='100%'
+				style={{ backgroundColor: '#1a1a1a' }}
 			/>
 			<div
 				className={`controls ${showControls ? 'visible' : 'hidden'}`}
@@ -174,15 +173,16 @@ export default function RoomDev() {
 					display: 'flex',
 					flexDirection: 'column',
 					padding: '10px',
-					background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+					background: 'linear-gradient(transparent, rgba(0,0,0,0.9))',
 					transition: 'opacity 0.3s ease',
 					opacity: showControls ? 1 : 0,
 				}}
 			>
+				{/* Progress bar */}
 				<div
 					ref={sliderRef}
 					style={{
-						margin: '0.5rem',
+						margin: '0 0.5rem',
 						color: '#fff',
 						position: 'relative',
 						height: '20px',
@@ -201,58 +201,26 @@ export default function RoomDev() {
 							{
 								width: '100%',
 								height: '100%',
-								'--slider-thumb-size': '16px',
-								'--slider-track-height': '8px',
+								'--slider-thumb-size': '12px',
+								'--slider-track-height': '4px',
 							} as React.CSSProperties
 						}
 					/>
-					<div
-						style={{
-							position: 'absolute',
-							left: 0,
-							right: 0,
-							bottom: '-20px',
-							display: 'flex',
-							justifyContent: 'space-between',
-						}}
-					>
-						<span>{formatTime(played * duration)}</span>
-						<span>{formatTime(duration)}</span>
-					</div>
 				</div>
+
+				{/* Controls bar */}
 				<div
 					style={{
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'space-between',
-						marginTop: '20px',
+						padding: '0 0.5rem',
 					}}
 				>
-					<button
-						onClick={() => setIsPlaying(prev => !prev)}
-						style={{
-							color: '#fff',
-							border: 'none',
-							padding: '0.5rem',
-							borderRadius: '5px',
-							cursor: 'pointer',
-							background: 'none',
-						}}
-					>
-						{isPlaying ? <PauseIcon /> : <PlayIcon />}
-					</button>
-					<div
-						style={{
-							position: 'relative',
-							color: '#fff',
-							display: 'flex',
-							alignItems: 'center',
-						}}
-						onMouseEnter={() => setShowVolumeControl(true)}
-						onMouseLeave={() => setShowVolumeControl(false)}
-					>
+					{/* Left controls group */}
+					<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
 						<button
-							onClick={handleToggleMuted}
+							onClick={() => setIsPlaying(prev => !prev)}
 							style={{
 								color: '#fff',
 								border: 'none',
@@ -260,56 +228,152 @@ export default function RoomDev() {
 								borderRadius: '5px',
 								cursor: 'pointer',
 								background: 'none',
+								display: 'flex',
+								alignItems: 'center',
 							}}
 						>
-							{muted ? <SpeakerOffIcon /> : <SpeakerLoudIcon />}
+							{isPlaying ? <PauseIcon /> : <PlayIcon />}
 						</button>
-						{showVolumeControl && (
-							<Slider
-								min={0}
-								max={1}
-								step={0.01}
-								value={[volume]}
-								onValueChange={handleVolumeChange}
+						<button
+							style={{
+								color: '#fff',
+								border: 'none',
+								padding: '0.5rem',
+								borderRadius: '5px',
+								cursor: 'pointer',
+								background: 'none',
+								display: 'flex',
+								alignItems: 'center',
+							}}
+						>
+							<DoubleArrowLeftIcon />
+						</button>
+						<button
+							style={{
+								color: '#fff',
+								border: 'none',
+								padding: '0.5rem',
+								borderRadius: '5px',
+								cursor: 'pointer',
+								background: 'none',
+								display: 'flex',
+								alignItems: 'center',
+							}}
+						>
+							<DoubleArrowRightIcon />
+						</button>
+						<div
+							style={{
+								position: 'relative',
+								display: 'flex',
+								alignItems: 'center',
+							}}
+							onMouseEnter={() => setShowVolumeControl(true)}
+							onMouseLeave={() => setShowVolumeControl(false)}
+						>
+							<button
+								onClick={handleToggleMuted}
 								style={{
-									width: '100px',
-									marginLeft: '10px',
+									color: '#fff',
+									border: 'none',
+									padding: '0.5rem',
+									borderRadius: '5px',
+									cursor: 'pointer',
+									background: 'none',
+									display: 'flex',
+									alignItems: 'center',
 								}}
-							/>
-						)}
+							>
+								{muted ? <SpeakerOffIcon /> : <SpeakerLoudIcon />}
+							</button>
+							{showVolumeControl && (
+								<div
+									style={{
+										position: 'absolute',
+										bottom: '100%',
+										left: '50%',
+										transform: 'translateX(-50%)',
+										background: 'rgba(0,0,0,0.9)',
+										padding: '0.5rem',
+										borderRadius: '4px',
+									}}
+								>
+									<Slider
+										orientation='vertical'
+										min={0}
+										max={1}
+										step={0.01}
+										value={[volume]}
+										onValueChange={handleVolumeChange}
+										style={{
+											height: '100px',
+										}}
+									/>
+								</div>
+							)}
+						</div>
+						<span style={{ color: '#fff', fontSize: '14px' }}>
+							{formatTime(played * duration)} / {formatTime(duration)}
+						</span>
 					</div>
-					<select
-						value={playbackRate}
-						onChange={e => handlePlaybackRateChange(Number.parseFloat(e.target.value))}
-						style={{
-							color: '#fff',
-							border: 'none',
-							padding: '0.5rem',
-							borderRadius: '5px',
-							cursor: 'pointer',
-							background: 'none',
-						}}
-					>
-						<option value={0.5}>0.5x</option>
-						<option value={0.75}>0.75x</option>
-						<option value={1}>1x</option>
-						<option value={1.25}>1.25x</option>
-						<option value={1.5}>1.5x</option>
-						<option value={2}>2x</option>
-					</select>
-					<button
-						onClick={handleFullscreenToggle}
-						style={{
-							color: '#fff',
-							border: 'none',
-							padding: '0.5rem',
-							borderRadius: '5px',
-							cursor: 'pointer',
-							background: 'none',
-						}}
-					>
-						{isFullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
-					</button>
+
+					{/* Right controls group */}
+					<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+						<button
+							style={{
+								color: '#fff',
+								border: 'none',
+								padding: '0.5rem',
+								borderRadius: '5px',
+								cursor: 'pointer',
+								background: 'none',
+								display: 'flex',
+								alignItems: 'center',
+							}}
+						>
+							<GearIcon />
+						</button>
+						<button
+							style={{
+								color: '#fff',
+								border: 'none',
+								padding: '0.5rem',
+								borderRadius: '5px',
+								cursor: 'pointer',
+								background: 'none',
+								display: 'flex',
+								alignItems: 'center',
+							}}
+						>
+							<CircleIcon />
+						</button>
+						<button
+							onClick={handleFullscreenToggle}
+							style={{
+								color: '#fff',
+								border: 'none',
+								padding: '0.5rem',
+								borderRadius: '5px',
+								cursor: 'pointer',
+								background: 'none',
+								display: 'flex',
+								alignItems: 'center',
+							}}
+						>
+							{isFullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
+						</button>
+						<span
+							style={{
+								color: '#fff',
+								fontSize: '14px',
+								padding: '2px 6px',
+								border: '1px solid #fff',
+								borderRadius: '4px',
+							}}
+						>
+							HD
+						</span>
+					</div>
 				</div>
 			</div>
 		</div>
