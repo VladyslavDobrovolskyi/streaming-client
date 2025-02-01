@@ -5,6 +5,8 @@ import {
 	PlayIcon,
 	SpeakerLoudIcon,
 	SpeakerOffIcon,
+	SpeakerQuietIcon,
+	SpeakerModerateIcon,
 	EnterFullScreenIcon,
 	ExitFullScreenIcon,
 	DoubleArrowLeftIcon,
@@ -46,6 +48,7 @@ export default function RoomDev() {
 
 	const handleVolumeChange = (value: number[]) => {
 		setVolume(value[0])
+		setMuted(value[0] === 0)
 	}
 
 	const handleToggleMuted = () => {
@@ -132,6 +135,13 @@ export default function RoomDev() {
 			return `${hh}:${mm.toString().padStart(2, '0')}:${ss}`
 		}
 		return `${mm}:${ss}`
+	}
+
+	const getSpeakerIcon = () => {
+		if (muted || volume === 0) return <SpeakerOffIcon />
+		if (volume < 0.25) return <SpeakerQuietIcon />
+		if (volume < 0.75) return <SpeakerModerateIcon />
+		return <SpeakerLoudIcon />
 	}
 
 	return (
@@ -284,20 +294,20 @@ export default function RoomDev() {
 									alignItems: 'center',
 								}}
 							>
-								{muted ? <SpeakerOffIcon /> : <SpeakerLoudIcon />}
+								{getSpeakerIcon()}
 							</button>
 							{showVolumeControl && (
 								<div
 									style={{
 										position: 'absolute',
-										bottom: '100%',
-										left: '0',
+										left: '100%',
 										background: 'rgba(0,0,0,0.9)',
 										padding: '0.5rem',
 										borderRadius: '4px',
 										display: 'flex',
 										alignItems: 'center',
 										gap: '0.5rem',
+										height: '100%',
 									}}
 								>
 									<Slider
@@ -311,14 +321,16 @@ export default function RoomDev() {
 											width: '100px',
 										}}
 									/>
-									<span style={{ color: '#fff', fontSize: '12px' }}>{Math.round(volume * 100)}%</span>
+									<span style={{ color: '#fff', fontSize: '12px', whiteSpace: 'nowrap' }}>
+										{Math.round(volume * 100)}%
+									</span>
 								</div>
 							)}
 						</div>
 					</div>
 
 					{/* Center time display */}
-					<Text size='5' align='center' as='span' className='time'>
+					<Text size='5' as='span' style={{ color: 'white' }}>
 						{formatTime(played * duration)} / {formatTime(duration)}
 					</Text>
 
