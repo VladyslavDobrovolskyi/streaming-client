@@ -21,10 +21,11 @@ export default function RoomDev() {
 	const [showVolumeControl, setShowVolumeControl] = useState(false)
 	const [isFullscreen, setIsFullscreen] = useState(false)
 	const [seekTime, setSeekTime] = useState<number | null>(null)
-	const [isSeeking, setIsSeeking] = useState(false) // Added state for seeking
+	const [isSeeking, setIsSeeking] = useState(false)
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
+	const canvasRef = useRef<HTMLCanvasElement>(null)
 
 	useEffect(() => {
 		if (loaded) {
@@ -60,6 +61,7 @@ export default function RoomDev() {
 	const handleSeekChange = (value: number[]) => {
 		setSeekTime(value[0])
 		setIsSeeking(true)
+		updatePreviewFrame(value[0])
 	}
 
 	const handleSeekMouseUp = () => {
@@ -67,6 +69,18 @@ export default function RoomDev() {
 			playerRef.current?.seekTo(seekTime)
 		}
 		setIsSeeking(false)
+	}
+
+	const updatePreviewFrame = (time: number) => {
+		const player = playerRef.current?.getInternalPlayer() as HTMLVideoElement
+		if (player && canvasRef.current) {
+			player.currentTime = time
+			const canvas = canvasRef.current
+			const ctx = canvas.getContext('2d')
+			if (ctx) {
+				ctx.drawImage(player, 0, 0, canvas.width, canvas.height)
+			}
+		}
 	}
 
 	const showControlsHandler = useCallback(() => {
@@ -175,6 +189,7 @@ export default function RoomDev() {
 					{isPlaying ? <PauseIcon /> : <PlayIcon />}
 				</button>
 				<label style={{ margin: '0.5rem', color: '#fff', flex: 1, position: 'relative' }}>
+					Seek
 					<Slider
 						min={0}
 						max={playerRef.current?.getDuration() || 1}
@@ -188,7 +203,7 @@ export default function RoomDev() {
 						<div
 							style={{
 								position: 'absolute',
-								top: '-30px',
+								top: '-120px',
 								left: `${(seekTime / (playerRef.current?.getDuration() || 1)) * 100}%`,
 								transform: 'translateX(-50%)',
 								background: 'rgba(0, 0, 0, 0.7)',
@@ -198,7 +213,8 @@ export default function RoomDev() {
 								fontSize: '12px',
 							}}
 						>
-							{formatTime(seekTime)}
+							<canvas ref={canvasRef} width={160} height={90} style={{ marginBottom: '5px' }} />
+							<div>{formatTime(seekTime)}</div>
 						</div>
 					)}
 				</label>
