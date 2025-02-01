@@ -54,8 +54,10 @@ export default function RoomDev() {
 	}
 
 	const handleProgress = (state: { played: number; loaded: number }) => {
-		setPlayed(state.played)
-		setLoaded(state.loaded)
+		if (!isSeeking) {
+			setPlayed(state.played)
+			setLoaded(state.loaded)
+		}
 	}
 
 	const handleSeekChange = (value: number[]) => {
@@ -65,20 +67,28 @@ export default function RoomDev() {
 	}
 
 	const handleSeekMouseUp = () => {
+		setIsSeeking(false)
 		if (seekTime !== null) {
 			playerRef.current?.seekTo(seekTime)
 		}
-		setIsSeeking(false)
 	}
 
 	const updatePreviewFrame = (time: number) => {
 		const player = playerRef.current?.getInternalPlayer() as HTMLVideoElement
 		if (player && canvasRef.current) {
-			player.currentTime = time
 			const canvas = canvasRef.current
 			const ctx = canvas.getContext('2d')
 			if (ctx) {
-				ctx.drawImage(player, 0, 0, canvas.width, canvas.height)
+				// Сохраняем текущее время воспроизведения
+				const currentTime = player.currentTime
+				// Устанавливаем время для предпросмотра
+				player.currentTime = time
+				player.onseeked = () => {
+					ctx.drawImage(player, 0, 0, canvas.width, canvas.height)
+					// Возвращаем исходное время воспроизведения
+					player.currentTime = currentTime
+					player.onseeked = null
+				}
 			}
 		}
 	}
