@@ -1,4 +1,4 @@
-import React from 'react'
+import type React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { PlayIcon, PauseIcon, SpeakerOffIcon, DoubleArrowLeftIcon, DoubleArrowRightIcon } from '@radix-ui/react-icons'
 
@@ -34,7 +34,7 @@ const ActionIndicator: React.FC<ActionIndicatorProps> = ({ action }) => {
 					animate={{ opacity: 1, scale: 1 }}
 					exit={{ opacity: 0, scale: 0.5 }}
 					transition={{ duration: 0.3 }}
-					className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-50 rounded-full p-4'
+					className='bg-black bg-opacity-50 rounded-full p-4'
 				>
 					{getIcon()}
 				</motion.div>

@@ -205,7 +205,7 @@ export default function RoomDev() {
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown)
 		}
-	}) // Added dependencies to useEffect
+	}, [handleBackward15, handleForward15, handleToggleMuted]) // Added dependencies to useEffect
 
 	const formatTime = (seconds: number) => {
 		const date = new Date(seconds * 1000)
@@ -267,7 +267,22 @@ export default function RoomDev() {
 				height='100%'
 				style={{ backgroundColor: '#1a1a1a' }}
 			/>
-			<ActionIndicator action={currentAction} />
+			<div
+				style={{
+					position: 'absolute',
+					top: 0,
+					left: 0,
+					right: 0,
+					bottom: 0,
+					display: 'flex',
+					justifyContent: 'center',
+					alignItems: 'center',
+					pointerEvents: 'none',
+					zIndex: 10,
+				}}
+			>
+				<ActionIndicator action={currentAction} />
+			</div>
 			<div
 				className={`controls ${showControls ? 'visible' : 'hidden'}`}
 				style={{
