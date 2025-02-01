@@ -11,10 +11,10 @@ import {
 	ExitFullScreenIcon,
 	DoubleArrowLeftIcon,
 	DoubleArrowRightIcon,
-	// GearIcon,
 	CircleIcon,
 } from '@radix-ui/react-icons'
 import { Slider } from '@radix-ui/themes'
+import ActionIndicator from '../components/ActionIndicator'
 
 export default function RoomDev() {
 	const [isPlaying, setIsPlaying] = useState(false)
@@ -29,6 +29,7 @@ export default function RoomDev() {
 	const [isDragging, setIsDragging] = useState(false)
 	const [isVolumeActive, setIsVolumeActive] = useState(false)
 	const [mutedBySlider, setMutedBySlider] = useState(false)
+	const [currentAction, setCurrentAction] = useState<'play' | 'pause' | 'mute' | 'forward' | 'backward' | null>(null)
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -46,6 +47,7 @@ export default function RoomDev() {
 		const newTime = Math.min(currentTime + 15, duration)
 		playerRef.current?.seekTo(newTime, 'seconds')
 		setPlayed(newTime / duration)
+		showAction('forward')
 	}
 
 	const handleBackward15 = () => {
@@ -53,14 +55,17 @@ export default function RoomDev() {
 		const newTime = Math.max(currentTime - 15, 0)
 		playerRef.current?.seekTo(newTime, 'seconds')
 		setPlayed(newTime / duration)
+		showAction('backward')
 	}
 
 	const handlePlay = () => {
 		setIsPlaying(true)
+		showAction('play')
 	}
 
 	const handlePause = () => {
 		setIsPlaying(false)
+		showAction('pause')
 	}
 
 	const handleVolumeChange = (newVolume: number) => {
@@ -94,6 +99,7 @@ export default function RoomDev() {
 			} else {
 				// Muting
 				previousVolumeRef.current = volume
+				showAction('mute')
 				return true
 			}
 		})
@@ -174,7 +180,11 @@ export default function RoomDev() {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.code === 'Space') {
 				e.preventDefault()
-				setIsPlaying(prev => !prev)
+				setIsPlaying(prev => {
+					const newState = !prev
+					showAction(newState ? 'play' : 'pause')
+					return newState
+				})
 			} else if (e.code === 'ArrowRight') {
 				handleForward15()
 			} else if (e.code === 'ArrowLeft') {
@@ -195,7 +205,7 @@ export default function RoomDev() {
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown)
 		}
-	}, [])
+	}) // Added dependencies to useEffect
 
 	const formatTime = (seconds: number) => {
 		const date = new Date(seconds * 1000)
@@ -221,6 +231,11 @@ export default function RoomDev() {
 
 	const handleVolumePointerUp = () => {
 		setIsVolumeActive(false)
+	}
+
+	const showAction = (action: 'play' | 'pause' | 'mute' | 'forward' | 'backward') => {
+		setCurrentAction(action)
+		setTimeout(() => setCurrentAction(null), 1000)
 	}
 
 	return (
@@ -252,6 +267,7 @@ export default function RoomDev() {
 				height='100%'
 				style={{ backgroundColor: '#1a1a1a' }}
 			/>
+			<ActionIndicator action={currentAction} />
 			<div
 				className={`controls ${showControls ? 'visible' : 'hidden'}`}
 				style={{
