@@ -10,17 +10,18 @@ interface ActionIndicatorProps {
 
 const ActionIndicator: React.FC<ActionIndicatorProps> = ({ action }) => {
 	const getIcon = () => {
+		const iconStyle = { transform: 'scale(3)' } // Увеличиваем размер в 16 раз
 		switch (action) {
 			case 'play':
-				return <PlayIcon className='w-48 h-48' />
+				return <PlayIcon style={iconStyle} />
 			case 'pause':
-				return <PauseIcon className='w-48 h-48' />
+				return <PauseIcon style={iconStyle} />
 			case 'mute':
-				return <SpeakerOffIcon className='w-48 h-48' />
+				return <SpeakerOffIcon style={iconStyle} />
 			case 'forward':
-				return <DoubleArrowRightIcon className='w-48 h-48' />
+				return <DoubleArrowRightIcon style={iconStyle} />
 			case 'backward':
-				return <DoubleArrowLeftIcon className='w-48 h-48' />
+				return <DoubleArrowLeftIcon style={iconStyle} />
 			default:
 				return null
 		}
