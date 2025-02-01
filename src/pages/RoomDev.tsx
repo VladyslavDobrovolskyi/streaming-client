@@ -28,6 +28,7 @@ export default function RoomDev() {
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
 	const sliderRef = useRef<HTMLDivElement>(null)
 	const canvasRef = useRef<HTMLCanvasElement>(null)
+	const [isDragging, setIsDragging] = useState(false)
 
 	useEffect(() => {
 		if (loaded) {
@@ -68,10 +69,24 @@ export default function RoomDev() {
 		}
 	}
 
+	const handleSeekStart = () => {
+		setIsDragging(true)
+	}
+	
+	const handleSeekEnd = () => {
+		if (isDragging && previewTime !== null) {
+			playerRef.current?.seekTo(previewTime / duration)
+			setPlayed(previewTime / duration)
+		}
+		setIsDragging(false)
+		setPreviewTime(null)
+	}
+	
+
 	const handleSeekChange = (value: number[]) => {
-		const newTime = value[0]
-		playerRef.current?.seekTo(newTime / duration)
-		setPlayed(newTime / duration)
+		if (isDragging) {
+			setPreviewTime(value[0])
+		}
 	}
 
 	const handlePreviewMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -215,6 +230,9 @@ export default function RoomDev() {
 						step={0.01}
 						value={[played * duration]}
 						onValueCommit={handleSeekChange}
+						onPointerDown={handleSeekStart}   // При нажатии ЛКМ
+    					onPointerUp={handleSeekEnd}       // Когда ЛКМ отпустили
+    					onPointerLeave={handleSeekEnd}    // Если курсор вышел
 						style={{ width: '100%' }}
 					/>
 					<div
