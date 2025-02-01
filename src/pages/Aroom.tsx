@@ -16,19 +16,19 @@ export default function ARoom() {
 	const [muted, setMuted] = useState(false)
 	const [playbackRate, setPlaybackRate] = useState(1.0)
 	const [played, setPlayed] = useState(0)
-	const [loaded, setLoaded] = useState(0)
+	const [loaded] = useState(0)
 	const [showControls, setShowControls] = useState(false)
 	const [showVolumeControl, setShowVolumeControl] = useState(false)
 	const [isFullscreen, setIsFullscreen] = useState(false)
 	const [duration, setDuration] = useState(300) // 5 минут (300 секунд) по умолчанию
 	const [previewTime, setPreviewTime] = useState<number | null>(null)
 	const [isHoveringSlider, setIsHoveringSlider] = useState(false)
+	const [seeking, setSeeking] = useState(false) // Добавляем флаг для отслеживания перемотки
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
 	const sliderRef = useRef<HTMLDivElement>(null)
 	const canvasRef = useRef<HTMLCanvasElement>(null)
-	const [isDragging, setIsDragging] = useState(false)
 
 	useEffect(() => {
 		if (loaded) {
@@ -63,28 +63,36 @@ export default function ARoom() {
 		loadedSeconds: number
 	}) => {
 		setPlayed(state.played)
-		setLoaded(state.loaded)
 		if (state.loadedSeconds > 0 && duration === 300) {
 			setDuration(playerRef.current?.getDuration() || 300)
 		}
 	}
 
-	const handleSeekStart = () => {
-		setIsDragging(true)
+	// Функции для перемотки и отображения превью
+	const handlePlayerSeek = (newValue: number) => {
+		if (!seeking) {
+			// Показываем момент времени, но не перематываем видео
+			setPreviewTime(newValue)
+		}
 	}
 
-	const handleSeekEnd = () => {
-		if (isDragging && previewTime !== null) {
-			playerRef.current?.seekTo(previewTime / duration)
-			setPlayed(previewTime / duration)
+	const handlePlayerMouseSeekUp = (event: React.PointerEvent<HTMLDivElement>) => {
+		const rect = sliderRef.current?.getBoundingClientRect()
+		if (rect) {
+			const newValue = ((event.clientX - rect.left) / rect.width) * 100
+			setSeeking(false)
+			playerRef.current?.seekTo(newValue / 100)
+			setPlayed(newValue / 100)
 		}
-		setIsDragging(false)
-		setPreviewTime(null)
+	}
+
+	const handleSeekStart = () => {
+		setSeeking(true)
 	}
 
 	const handleSeekChange = (value: number[]) => {
-		if (isDragging) {
-			setPreviewTime(value[0])
+		if (seeking) {
+			handlePlayerSeek(value[0]) // Показываем временной момент
 		}
 	}
 
@@ -94,28 +102,29 @@ export default function ARoom() {
 			const x = e.clientX - rect.left
 			const fraction = x / rect.width
 			const newPreviewTime = fraction * duration
-			setPreviewTime(newPreviewTime)
-			updatePreviewFrame(newPreviewTime)
+			handlePlayerSeek(newPreviewTime) // Обновляем превью без перемотки
 		}
 	}
 
-	const updatePreviewFrame = (time: number) => {
-		const player = playerRef.current?.getInternalPlayer() as HTMLVideoElement
-		if (player && canvasRef.current) {
-			const canvas = canvasRef.current
-			const ctx = canvas.getContext('2d')
-			if (ctx) {
-				const currentTime = player.currentTime
-				player.currentTime = time
-				player.onseeked = () => {
-					ctx.drawImage(player, 0, 0, canvas.width, canvas.height)
-					player.currentTime = currentTime
-					player.onseeked = null
-				}
-			}
-		}
-	}
+	// Отображаем превью фрейма на canvas
+	// const updatePreviewFrame = (time: number) => {
+	// 	const player = playerRef.current?.getInternalPlayer() as HTMLVideoElement
+	// 	if (player && canvasRef.current) {
+	// 		const canvas = canvasRef.current
+	// 		const ctx = canvas.getContext('2d')
+	// 		if (ctx) {
+	// 			const currentTime = player.currentTime
+	// 			player.currentTime = time
+	// 			player.onseeked = () => {
+	// 				ctx.drawImage(player, 0, 0, canvas.width, canvas.height)
+	// 				player.currentTime = currentTime
+	// 				player.onseeked = null
+	// 			}
+	// 		}
+	// 	}
+	// }
 
+	// Отображаем элементы управления
 	const showControlsHandler = useCallback(() => {
 		setShowControls(true)
 		if (controlsTimeoutRef.current) {
@@ -126,6 +135,7 @@ export default function ARoom() {
 		}, 3000)
 	}, [])
 
+	// Управление полноэкранным режимом
 	const handleFullscreenToggle = () => {
 		if (!document.fullscreenElement) {
 			playerWrapperRef.current?.requestFullscreen()
@@ -230,8 +240,8 @@ export default function ARoom() {
 						value={[played * duration]}
 						onValueCommit={handleSeekChange}
 						onPointerDown={handleSeekStart} // При нажатии ЛКМ
-						onPointerUp={handleSeekEnd} // Когда ЛКМ отпустили
-						onPointerLeave={handleSeekEnd} // Если курсор вышел
+						onPointerUp={handlePlayerMouseSeekUp} // Когда ЛКМ отпустили
+						onPointerLeave={handlePlayerMouseSeekUp} // Если курсор вышел
 						style={{ width: '100%' }}
 					/>
 					<div
