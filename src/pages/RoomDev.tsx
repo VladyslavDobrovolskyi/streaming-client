@@ -63,12 +63,11 @@ export default function RoomDev() {
 		setIsPlaying(false)
 	}
 
-	const handleVolumeChange = (value: number[]) => {
-		const newVolume = value[0]
+	const handleVolumeChange = (newVolume: number) => {
 		if (newVolume === 0) {
 			setMuted(true)
 			setMutedBySlider(true)
-			setVolume(0.5)
+			setVolume(0)
 		} else {
 			setVolume(newVolume)
 			if (muted) {
@@ -180,6 +179,14 @@ export default function RoomDev() {
 				handleForward15()
 			} else if (e.code === 'ArrowLeft') {
 				handleBackward15()
+			} else if (e.code === 'KeyM') {
+				handleToggleMuted()
+			} else if (e.code === 'ArrowUp') {
+				e.preventDefault()
+				setVolume(prev => Math.min(prev + 0.1, 1))
+			} else if (e.code === 'ArrowDown') {
+				e.preventDefault()
+				setVolume(prev => Math.max(prev - 0.1, 0))
 			}
 		}
 
@@ -389,8 +396,8 @@ export default function RoomDev() {
 										min={0}
 										max={1}
 										step={0.01}
-										value={[volume]}
-										onValueChange={handleVolumeChange}
+										value={[muted ? 0 : volume]}
+										onValueChange={value => handleVolumeChange(value[0])}
 										onPointerDown={handleVolumePointerDown}
 										onPointerUp={handleVolumePointerUp}
 										style={
