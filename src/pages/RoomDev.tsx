@@ -75,11 +75,16 @@ export default function RoomDev() {
 
 	const handleSeekStart = () => {
 		setIsDragging(true)
+		setShowControls(true)
+		if (controlsTimeoutRef.current) {
+			clearTimeout(controlsTimeoutRef.current)
+		}
 	}
 
 	const handleSeekEnd = () => {
 		setIsDragging(false)
 		playerRef.current?.seekTo(played)
+		showControlsHandler()
 	}
 
 	const showControlsHandler = useCallback(() => {
@@ -87,10 +92,12 @@ export default function RoomDev() {
 		if (controlsTimeoutRef.current) {
 			clearTimeout(controlsTimeoutRef.current)
 		}
-		controlsTimeoutRef.current = setTimeout(() => {
-			setShowControls(false)
-		}, 3000)
-	}, [])
+		if (!isDragging) {
+			controlsTimeoutRef.current = setTimeout(() => {
+				setShowControls(false)
+			}, 3000)
+		}
+	}, [isDragging])
 
 	const handleFullscreenToggle = () => {
 		if (!document.fullscreenElement) {
@@ -133,7 +140,7 @@ export default function RoomDev() {
 			ref={playerWrapperRef}
 			className={`player-wrapper ${isPlaying ? 'playing' : ''}`}
 			onMouseMove={showControlsHandler}
-			onMouseLeave={() => setShowControls(false)}
+			onMouseLeave={() => !isDragging && setShowControls(false)}
 			style={{
 				backgroundColor: isPlaying ? '#333' : '#000',
 				width: '100%',
