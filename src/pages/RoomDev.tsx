@@ -403,20 +403,14 @@ export default function RoomDev() {
 											setPreviousVolumes(prev => ({ ...prev, [clientID]: currentVolume }))
 											setClientVolumes(prev => ({ ...prev, [clientID]: 0.0 }))
 											videoElement.muted = true
+											videoElement.volume = 0.0
 										} else {
 											setClientVolumes(prev => ({
 												...prev,
 												[clientID]: previousVolumes[clientID],
 											}))
-											videoElement.muted = true
-										}
-
-										if (videoElement.volume > 0) {
 											videoElement.muted = false
-											videoElement.volume = clientVolumes[clientID]
-										} else {
-											videoElement.muted = true
-											videoElement.volume = clientVolumes[clientID]
+											videoElement.volume = previousVolumes[clientID]
 										}
 									}}
 									style={{
