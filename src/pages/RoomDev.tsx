@@ -387,12 +387,11 @@ export default function RoomDev() {
 							<div
 								style={{
 									position: 'absolute',
-									bottom: '5px',
-									left: '5px',
+									bottom: '-5px',
+									left: '0px',
 									right: '5px',
 									display: 'flex',
 									alignItems: 'center',
-									padding: '2px',
 								}}
 							>
 								<button
