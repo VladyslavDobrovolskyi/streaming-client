@@ -394,19 +394,23 @@ export default function RoomDev() {
 							>
 								<button
 									onClick={() => {
+										const videoElement = document.querySelector(
+											`video[data-client-id="${clientID}"]`
+										) as HTMLVideoElement
 										const currentVolume = clientVolumes[clientID]
+
 										if (currentVolume > 0.0) {
 											setPreviousVolumes(prev => ({ ...prev, [clientID]: currentVolume }))
 											setClientVolumes(prev => ({ ...prev, [clientID]: 0.0 }))
+											videoElement.muted = true
 										} else {
 											setClientVolumes(prev => ({
 												...prev,
 												[clientID]: previousVolumes[clientID],
 											}))
+											videoElement.muted = true
 										}
-										const videoElement = document.querySelector(
-											`video[data-client-id="${clientID}"]`
-										) as HTMLVideoElement
+
 										if (videoElement.volume > 0) {
 											videoElement.muted = false
 											videoElement.volume = clientVolumes[clientID]
