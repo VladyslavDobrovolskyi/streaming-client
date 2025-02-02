@@ -425,7 +425,7 @@ export default function RoomDev() {
 									step={0.01}
 									value={[clientVolumes[clientID] || 1]}
 									onValueChange={value => {
-										const newVolume = value[0] === 0 ? 0.01 : value[0]
+										const newVolume = value[0] === 0.01 ? 0 : value[0]
 										console.log(clientID, newVolume)
 										setClientVolumes(prev => ({ ...prev, [clientID]: newVolume }))
 										setPreviousVolumes(prev => ({ ...prev, [clientID]: newVolume }))
