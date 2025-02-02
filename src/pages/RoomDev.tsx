@@ -392,8 +392,6 @@ export default function RoomDev() {
 									right: '5px',
 									display: 'flex',
 									alignItems: 'center',
-									background: 'rgba(0, 0, 0, 0.5)',
-									borderRadius: '3px',
 									padding: '2px',
 								}}
 							>
