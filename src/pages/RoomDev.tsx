@@ -40,6 +40,7 @@ export default function RoomDev() {
 	const [micMuted, setMicMuted] = useState(false)
 	const [cameraMuted, setCameraMuted] = useState(false)
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
+	const [clientVolumes, setClientVolumes] = useState<Record<string, number>>({})
 	//const [mutedCameras, setMutedCameras] = useState<Record<string, boolean>>({})
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -330,7 +331,20 @@ export default function RoomDev() {
 						<video
 							width='100%'
 							height='100%'
-							ref={instance => provideMediaRef(clientID, instance)}
+							ref={instance => {
+								const videoElement = provideMediaRef(clientID, instance)
+								if (videoElement && clientID !== LOCAL_VIDEO) {
+									videoElement.then(() => {
+										const video = document.querySelector(
+											`video[data-client-id="${clientID}"]`
+										) as HTMLVideoElement
+										if (video) {
+											video.volume = clientVolumes[clientID] || 1
+										}
+									})
+								}
+							}}
+							data-client-id={clientID}
 							autoPlay
 							playsInline
 							muted={clientID === LOCAL_VIDEO}
@@ -375,10 +389,16 @@ export default function RoomDev() {
 									min={0}
 									max={1}
 									step={0.01}
-									value={[1]} // You may want to track individual client volumes
+									value={[clientVolumes[clientID] || 1]}
 									onValueChange={value => {
-										// Handle volume change for this specific client
-										console.log(`Changed volume for client ${clientID} to ${value[0]}`)
+										const newVolume = value[0]
+										setClientVolumes(prev => ({ ...prev, [clientID]: newVolume }))
+										const videoElement = document.querySelector(
+											`video[data-client-id="${clientID}"]`
+										) as HTMLVideoElement
+										if (videoElement) {
+											videoElement.volume = newVolume
+										}
 									}}
 									style={
 										{
