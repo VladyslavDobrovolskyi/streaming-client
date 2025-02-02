@@ -44,7 +44,7 @@ export default function RoomDev() {
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
 	const [clientVolumes, setClientVolumes] = useState<Record<string, number>>({})
 	const [previousVolumes, setPreviousVolumes] = useState<Record<string, number>>({})
-	const [coveredClient, setCoveredClient] = useState<string | null>(null)
+	const [coveredClients, setCoveredClients] = useState<Record<string, boolean>>({})
 	//const [mutedCameras, setMutedCameras] = useState<Record<string, boolean>>({})
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -395,14 +395,12 @@ export default function RoomDev() {
 									transform: 'translate(-50%, -50%)',
 									cursor: 'pointer',
 								}}
-								onClick={() =>
-									setCoveredClient(prevClient => (prevClient === clientID ? null : clientID))
-								}
+								onClick={() => setCoveredClients(prev => ({ ...prev, [clientID]: !prev[clientID] }))}
 							>
-								<EyeOpenIcon style={{ color: 'white', transform: 'scale(2)' }} />
+								<EyeOpenIcon style={{ color: 'white', transform: 'scale(1)' }} />
 							</div>
 						)}
-						{coveredClient === clientID && (
+						{coveredClients[clientID] && (
 							<div
 								style={{
 									position: 'absolute',
@@ -417,7 +415,7 @@ export default function RoomDev() {
 									alignItems: 'center',
 								}}
 							>
-								<EyeClosedIcon style={{ color: 'white', transform: 'scale(2)' }} />
+								<EyeClosedIcon style={{ color: 'white', transform: 'scale(1)' }} />
 							</div>
 						)}
 						{hoveredClient === clientID && clientID !== LOCAL_VIDEO && (
