@@ -407,7 +407,11 @@ export default function RoomDev() {
 										const videoElement = document.querySelector(
 											`video[data-client-id="${clientID}"]`
 										) as HTMLVideoElement
-										if (videoElement) {
+										if (videoElement.volume > 0) {
+											videoElement.muted = false
+											videoElement.volume = clientVolumes[clientID]
+										} else {
+											videoElement.muted = true
 											videoElement.volume = clientVolumes[clientID]
 										}
 									}}
@@ -435,6 +439,9 @@ export default function RoomDev() {
 										) as HTMLVideoElement
 										if (videoElement) {
 											videoElement.volume = newVolume
+										}
+										if (newVolume === 0) {
+											videoElement.muted = true
 										}
 									}}
 									style={
