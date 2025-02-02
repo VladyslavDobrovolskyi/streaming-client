@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
-import { authLoginUser, registerUser, refreshAccessToken } from './AuthService'
+import { authLoginUser, refreshAccessToken } from './AuthService'
 
 // Типы для состояния и данных
 interface AuthState {
@@ -27,24 +27,6 @@ const initialState: AuthState = {
 	error: null,
 	isAuthenticated: Boolean(localStorage.getItem('accessToken')),
 }
-
-// Асинхронные экшены
-export const register = createAsyncThunk(
-	'auth/register',
-	async (userData: { email: string; password: string }, { rejectWithValue }) => {
-		try {
-			const { id, email, token } = await registerUser(userData)
-			console.log('Register successful:', { id, email, token })
-			return { id, email, token }
-		} catch (error) {
-			console.error('Register failed:', error)
-			if (error instanceof Error) {
-				return rejectWithValue(error.message)
-			}
-			return rejectWithValue('An unknown error occurred')
-		}
-	}
-)
 
 export const login = createAsyncThunk(
 	'auth/login',

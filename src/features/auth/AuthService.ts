@@ -1,31 +1,11 @@
 import api from '../../services/api'
 import axios from 'axios'
 
-interface RegisterResponse {
-	id: string
-	email: string
-	token: string
-}
-
 interface LoginResponse {
 	id: string
 	email: string
 	accessToken: string
 	refreshToken: string
-}
-
-export const registerUser = async (userData: { email: string; password: string }): Promise<RegisterResponse> => {
-	try {
-		const response = await api.post('/auth/register', userData, {
-			headers: { 'Content-Type': 'application/json' },
-		})
-		return response.data
-	} catch (error: unknown) {
-		if (axios.isAxiosError(error) && error.response) {
-			throw new Error(error.response.data.message || 'Registration failed')
-		}
-		throw new Error('Registration failed')
-	}
 }
 
 export const authLoginUser = async (credentials: { email: string; password: string }): Promise<LoginResponse> => {
