@@ -395,9 +395,9 @@ export default function RoomDev() {
 								<button
 									onClick={() => {
 										const currentVolume = clientVolumes[clientID]
-										if (currentVolume > 0) {
+										if (currentVolume > 0.0) {
 											setPreviousVolumes(prev => ({ ...prev, [clientID]: currentVolume }))
-											setClientVolumes(prev => ({ ...prev, [clientID]: 0 }))
+											setClientVolumes(prev => ({ ...prev, [clientID]: 0.0 }))
 										} else {
 											setClientVolumes(prev => ({
 												...prev,
@@ -422,12 +422,12 @@ export default function RoomDev() {
 								</button>
 								<Slider
 									orientation='horizontal'
-									min={0}
-									max={1}
+									min={0.0}
+									max={1.0}
 									step={0.01}
 									value={[clientVolumes[clientID]]}
 									onValueChange={value => {
-										const newVolume = value[0] === 0.01 ? 0 : value[0]
+										const newVolume = value[0] === 0.01 ? 0.0 : value[0]
 										console.log(clientID, newVolume)
 										setClientVolumes(prev => ({ ...prev, [clientID]: newVolume }))
 										const videoElement = document.querySelector(
