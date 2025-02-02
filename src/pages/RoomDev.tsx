@@ -14,6 +14,8 @@ import {
 	RadiobuttonIcon,
 	CircleBackslashIcon,
 	CameraIcon,
+	EyeOpenIcon,
+	EyeClosedIcon,
 } from '@radix-ui/react-icons'
 import { Slider } from '@radix-ui/themes'
 import ActionIndicator from '../components/ActionIndicator'
@@ -42,6 +44,7 @@ export default function RoomDev() {
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
 	const [clientVolumes, setClientVolumes] = useState<Record<string, number>>({})
 	const [previousVolumes, setPreviousVolumes] = useState<Record<string, number>>({})
+	const [coveredClient, setCoveredClient] = useState<string | null>(null)
 	//const [mutedCameras, setMutedCameras] = useState<Record<string, boolean>>({})
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -381,6 +384,40 @@ export default function RoomDev() {
 								}}
 							>
 								Camera Off
+							</div>
+						)}
+						{hoveredClient === clientID && (
+							<div
+								style={{
+									position: 'absolute',
+									top: '50%',
+									left: '50%',
+									transform: 'translate(-50%, -50%)',
+									cursor: 'pointer',
+								}}
+								onClick={() =>
+									setCoveredClient(prevClient => (prevClient === clientID ? null : clientID))
+								}
+							>
+								<EyeOpenIcon style={{ color: 'white', transform: 'scale(2)' }} />
+							</div>
+						)}
+						{coveredClient === clientID && (
+							<div
+								style={{
+									position: 'absolute',
+									top: 0,
+									left: 0,
+									width: '100%',
+									height: '100%',
+									backgroundColor: 'black',
+									borderRadius: '5px',
+									display: 'flex',
+									justifyContent: 'center',
+									alignItems: 'center',
+								}}
+							>
+								<EyeClosedIcon style={{ color: 'white', transform: 'scale(2)' }} />
 							</div>
 						)}
 						{hoveredClient === clientID && clientID !== LOCAL_VIDEO && (
