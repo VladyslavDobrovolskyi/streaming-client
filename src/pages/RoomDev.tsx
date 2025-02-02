@@ -316,7 +316,7 @@ export default function RoomDev() {
 		if (volume === 0) return <SpeakerOffIcon style={IconStyles} />
 		if (volume < 0.33) return <SpeakerQuietIcon style={IconStyles} />
 		if (volume < 0.66) return <SpeakerModerateIcon style={IconStyles} />
-		return <SpeakerLoudIcon style={{ color: 'white' }} />
+		return <SpeakerLoudIcon style={IconStyles} />
 	}
 
 	const renderParticipants = () => {
@@ -430,7 +430,7 @@ export default function RoomDev() {
 										padding: 0,
 									}}
 								>
-									{getVolumeIcon(clientVolumes[clientID] ?? 1.0)}
+									{getVolumeIcon(clientVolumes[clientID])}
 								</button>
 
 								{clientVolumes[clientID] !== 0 && (
