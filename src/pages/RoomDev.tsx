@@ -430,7 +430,7 @@ export default function RoomDev() {
 										padding: 0,
 									}}
 								>
-									{getVolumeIcon(clientVolumes[clientID])}
+									{getVolumeIcon(clientVolumes[clientID] ?? 1.0)}
 								</button>
 
 								{clientVolumes[clientID] !== 0 && (
