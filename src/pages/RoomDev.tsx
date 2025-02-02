@@ -41,6 +41,7 @@ export default function RoomDev() {
 	const [cameraMuted, setCameraMuted] = useState(false)
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
 	const [clientVolumes, setClientVolumes] = useState<Record<string, number>>({})
+	const [previousVolumes, setPreviousVolumes] = useState<Record<string, number>>({})
 	//const [mutedCameras, setMutedCameras] = useState<Record<string, boolean>>({})
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -391,7 +392,32 @@ export default function RoomDev() {
 									padding: '2px',
 								}}
 							>
-								{getVolumeIcon(clientVolumes[clientID] || 1)}
+								<button
+									onClick={() => {
+										const currentVolume = clientVolumes[clientID] || 1
+										if (currentVolume > 0) {
+											setPreviousVolumes(prev => ({ ...prev, [clientID]: currentVolume }))
+											setClientVolumes(prev => ({ ...prev, [clientID]: 0 }))
+										} else {
+											const prevVolume = previousVolumes[clientID] || 1
+											setClientVolumes(prev => ({ ...prev, [clientID]: prevVolume }))
+										}
+										const videoElement = document.querySelector(
+											`video[data-client-id="${clientID}"]`
+										) as HTMLVideoElement
+										if (videoElement) {
+											videoElement.volume = currentVolume > 0 ? 0 : previousVolumes[clientID] || 1
+										}
+									}}
+									style={{
+										background: 'none',
+										border: 'none',
+										cursor: 'pointer',
+										padding: 0,
+									}}
+								>
+									{getVolumeIcon(clientVolumes[clientID] || 1)}
+								</button>
 								<Slider
 									orientation='horizontal'
 									min={0}
@@ -401,6 +427,7 @@ export default function RoomDev() {
 									onValueChange={value => {
 										const newVolume = value[0]
 										setClientVolumes(prev => ({ ...prev, [clientID]: newVolume }))
+										setPreviousVolumes(prev => ({ ...prev, [clientID]: newVolume }))
 										const videoElement = document.querySelector(
 											`video[data-client-id="${clientID}"]`
 										) as HTMLVideoElement
