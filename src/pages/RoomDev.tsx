@@ -306,6 +306,13 @@ export default function RoomDev() {
 		setTimeout(() => setCurrentAction(null), 1000)
 	}
 
+	const getVolumeIcon = (volume: number) => {
+		if (volume === 0) return <SpeakerOffIcon style={{ color: 'white' }} />
+		if (volume < 0.33) return <SpeakerQuietIcon style={{ color: 'white' }} />
+		if (volume < 0.66) return <SpeakerModerateIcon style={{ color: 'white' }} />
+		return <SpeakerLoudIcon style={{ color: 'white' }} />
+	}
+
 	const renderParticipants = () => {
 		return (
 			<div
@@ -384,6 +391,7 @@ export default function RoomDev() {
 									padding: '2px',
 								}}
 							>
+								{getVolumeIcon(clientVolumes[clientID] || 1)}
 								<Slider
 									orientation='horizontal'
 									min={0}
@@ -403,6 +411,7 @@ export default function RoomDev() {
 									style={
 										{
 											width: '100%',
+											marginLeft: '5px',
 											'--slider-thumb-size': '10px',
 										} as React.CSSProperties
 									}
