@@ -398,9 +398,6 @@ export default function RoomDev() {
 										if (currentVolume > 0) {
 											setPreviousVolumes(prev => ({ ...prev, [clientID]: currentVolume }))
 											setClientVolumes(prev => ({ ...prev, [clientID]: 0 }))
-										} else {
-											const prevVolume = previousVolumes[clientID]
-											setClientVolumes(prev => ({ ...prev, [clientID]: prevVolume }))
 										}
 										const videoElement = document.querySelector(
 											`video[data-client-id="${clientID}"]`
