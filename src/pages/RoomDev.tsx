@@ -423,7 +423,7 @@ export default function RoomDev() {
 									min={0}
 									max={1}
 									step={0.01}
-									value={[clientVolumes[clientID] || 1]}
+									value={[clientVolumes[clientID]]}
 									onValueChange={value => {
 										const newVolume = value[0] === 0.01 ? 0 : value[0]
 										console.log(clientID, newVolume)
