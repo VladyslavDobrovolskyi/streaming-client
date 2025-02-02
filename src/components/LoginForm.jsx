@@ -97,7 +97,7 @@ const LoginForm = () => {
 				</button>
 			</form>
 			<p className={styles.registerLink}>
-				Don't have an account? <Link to='/register'>Create one</Link>
+				Don't have an account? <Link to='/registration'>Create one</Link>
 			</p>
 		</div>
 	)
