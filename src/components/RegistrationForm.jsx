@@ -66,7 +66,7 @@ const RegistrationForm = () => {
 
 	return (
 		<div className={`${styles.authForm} ${styles.loginForm}`}>
-			<h2>Sign In</h2>
+			<h2>Sign Up</h2>
 			<form onSubmit={handleSubmit}>
 				<div className={styles.formGroup}>
 					<label htmlFor='username'>Username</label>
@@ -93,7 +93,7 @@ const RegistrationForm = () => {
 					{errors.password && <p className={styles.errorMessage}>{errors.password}</p>}
 				</div>
 				<button type='submit' className={styles.submitButton}>
-					Sign In
+					Create Account
 				</button>
 			</form>
 			<p className={styles.registerLink}>
