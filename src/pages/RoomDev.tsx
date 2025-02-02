@@ -428,34 +428,37 @@ export default function RoomDev() {
 								>
 									{getVolumeIcon(clientVolumes[clientID])}
 								</button>
-								<Slider
-									orientation='horizontal'
-									min={0.0}
-									max={1.0}
-									step={0.01}
-									value={[clientVolumes[clientID]]}
-									onValueChange={value => {
-										const newVolume = value[0] === 0.01 ? 0.0 : value[0]
-										console.log(clientID, newVolume)
-										setClientVolumes(prev => ({ ...prev, [clientID]: newVolume }))
-										const videoElement = document.querySelector(
-											`video[data-client-id="${clientID}"]`
-										) as HTMLVideoElement
-										if (videoElement) {
-											videoElement.volume = newVolume
+
+								{clientVolumes[clientID] !== 0 && (
+									<Slider
+										orientation='horizontal'
+										min={0.0}
+										max={1.0}
+										step={0.01}
+										value={[clientVolumes[clientID]]}
+										onValueChange={value => {
+											const newVolume = value[0] === 0.01 ? 0.0 : value[0]
+											console.log(clientID, newVolume)
+											setClientVolumes(prev => ({ ...prev, [clientID]: newVolume }))
+											const videoElement = document.querySelector(
+												`video[data-client-id="${clientID}"]`
+											) as HTMLVideoElement
+											if (videoElement) {
+												videoElement.volume = newVolume
+											}
+											if (newVolume === 0) {
+												videoElement.muted = true
+											}
+										}}
+										style={
+											{
+												width: '100%',
+												marginLeft: '5px',
+												'--slider-thumb-size': '10px',
+											} as React.CSSProperties
 										}
-										if (newVolume === 0) {
-											videoElement.muted = true
-										}
-									}}
-									style={
-										{
-											width: '100%',
-											marginLeft: '5px',
-											'--slider-thumb-size': '10px',
-										} as React.CSSProperties
-									}
-								/>
+									/>
+								)}
 							</div>
 						)}
 					</div>
