@@ -39,6 +39,7 @@ export default function RoomDev() {
 	>(null)
 	const [micMuted, setMicMuted] = useState(false)
 	const [cameraMuted, setCameraMuted] = useState(false)
+	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
 	//const [mutedCameras, setMutedCameras] = useState<Record<string, boolean>>({})
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -320,7 +321,12 @@ export default function RoomDev() {
 				}}
 			>
 				{clients.map(clientID => (
-					<div key={clientID} style={{ width: '150px', height: '100px', position: 'relative' }}>
+					<div
+						key={clientID}
+						style={{ width: '150px', height: '100px', position: 'relative' }}
+						onMouseEnter={() => setHoveredClient(clientID)}
+						onMouseLeave={() => setHoveredClient(null)}
+					>
 						<video
 							width='100%'
 							height='100%'
@@ -348,6 +354,39 @@ export default function RoomDev() {
 								}}
 							>
 								Camera Off
+							</div>
+						)}
+						{hoveredClient === clientID && clientID !== LOCAL_VIDEO && (
+							<div
+								style={{
+									position: 'absolute',
+									bottom: '5px',
+									left: '5px',
+									right: '5px',
+									display: 'flex',
+									alignItems: 'center',
+									background: 'rgba(0, 0, 0, 0.5)',
+									borderRadius: '3px',
+									padding: '2px',
+								}}
+							>
+								<Slider
+									orientation='horizontal'
+									min={0}
+									max={1}
+									step={0.01}
+									value={[1]} // You may want to track individual client volumes
+									onValueChange={value => {
+										// Handle volume change for this specific client
+										console.log(`Changed volume for client ${clientID} to ${value[0]}`)
+									}}
+									style={
+										{
+											width: '100%',
+											'--slider-thumb-size': '10px',
+										} as React.CSSProperties
+									}
+								/>
 							</div>
 						)}
 					</div>
