@@ -426,6 +426,7 @@ export default function RoomDev() {
 									value={[clientVolumes[clientID] || 1]}
 									onValueChange={value => {
 										const newVolume = value[0]
+										console.log(clientID, newVolume)
 										setClientVolumes(prev => ({ ...prev, [clientID]: newVolume }))
 										setPreviousVolumes(prev => ({ ...prev, [clientID]: newVolume }))
 										const videoElement = document.querySelector(
