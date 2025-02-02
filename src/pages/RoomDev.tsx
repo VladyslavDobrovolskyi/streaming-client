@@ -308,9 +308,14 @@ export default function RoomDev() {
 	}
 
 	const getVolumeIcon = (volume: number) => {
-		if (volume === 0) return <SpeakerOffIcon style={{ color: 'white' }} />
-		if (volume < 0.33) return <SpeakerQuietIcon style={{ color: 'white' }} />
-		if (volume < 0.66) return <SpeakerModerateIcon style={{ color: 'white' }} />
+		const IconStyles = {
+			color: 'white',
+			transform: 'scale(0.5)',
+		}
+
+		if (volume === 0) return <SpeakerOffIcon style={IconStyles} />
+		if (volume < 0.33) return <SpeakerQuietIcon style={IconStyles} />
+		if (volume < 0.66) return <SpeakerModerateIcon style={IconStyles} />
 		return <SpeakerLoudIcon style={{ color: 'white' }} />
 	}
 
