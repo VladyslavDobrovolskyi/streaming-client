@@ -428,6 +428,8 @@ export default function RoomDev() {
 										border: 'none',
 										cursor: 'pointer',
 										padding: 0,
+										display: 'flex',
+										alignItems: 'center',
 									}}
 								>
 									{getVolumeIcon(clientVolumes[clientID])}
@@ -459,6 +461,7 @@ export default function RoomDev() {
 												width: '100%',
 												marginLeft: '5px',
 												'--slider-thumb-size': '10px',
+												'--slider-track-height': '2px',
 											} as React.CSSProperties
 										}
 									/>
