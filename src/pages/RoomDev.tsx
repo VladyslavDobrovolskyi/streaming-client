@@ -406,7 +406,7 @@ export default function RoomDev() {
 											`video[data-client-id="${clientID}"]`
 										) as HTMLVideoElement
 										if (videoElement) {
-											videoElement.volume = currentVolume > 0 ? 0 : previousVolumes[clientID] || 1
+											videoElement.volume = currentVolume
 										}
 									}}
 									style={{
