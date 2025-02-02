@@ -97,7 +97,7 @@ const RegistrationForm = () => {
 				</button>
 			</form>
 			<p className={styles.registerLink}>
-				Already have an account? <Link to='/register'>Sign In</Link>
+				Already have an account? <Link to='/login'>Sign In</Link>
 			</p>
 		</div>
 	)
