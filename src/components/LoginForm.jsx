@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import DOMPurify from 'dompurify'
-import { validatePasswordLength } from '../utils/validation'
+// import { validatePasswordLength } from '../utils/validation'
 import { login } from '../features/auth/authSlice'
 import { Link } from 'react-router-dom'
 import styles from './AuthForm.module.css'
@@ -47,10 +47,10 @@ const LoginForm = () => {
 			formIsValid = false
 		}
 
-		if (!validatePasswordLength(password)) {
-			setErrors(prevState => ({ ...prevState, password: 'Password must be at least 8 characters long.' }))
-			formIsValid = false
-		}
+		// if (!validatePasswordLength(password)) {
+		// 	setErrors(prevState => ({ ...prevState, password: 'Password must be at least 8 characters long.' }))
+		// 	formIsValid = false
+		// }
 
 		if (!formIsValid) return
 
