@@ -402,6 +402,7 @@ export default function RoomDev() {
 						)}
 						{coveredClients[clientID] && (
 							<div
+								onClick={() => setCoveredClients(prev => ({ ...prev, [clientID]: !prev[clientID] }))}
 								style={{
 									position: 'absolute',
 									top: 0,
