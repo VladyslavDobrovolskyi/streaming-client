@@ -398,12 +398,17 @@ export default function RoomDev() {
 										if (currentVolume > 0) {
 											setPreviousVolumes(prev => ({ ...prev, [clientID]: currentVolume }))
 											setClientVolumes(prev => ({ ...prev, [clientID]: 0 }))
+										} else {
+											setClientVolumes(prev => ({
+												...prev,
+												[clientID]: previousVolumes[clientID],
+											}))
 										}
 										const videoElement = document.querySelector(
 											`video[data-client-id="${clientID}"]`
 										) as HTMLVideoElement
 										if (videoElement) {
-											videoElement.volume = currentVolume > 0 ? 0 : previousVolumes[clientID]
+											videoElement.volume = clientVolumes[clientID]
 										}
 									}}
 									style={{
@@ -425,7 +430,6 @@ export default function RoomDev() {
 										const newVolume = value[0] === 0.01 ? 0 : value[0]
 										console.log(clientID, newVolume)
 										setClientVolumes(prev => ({ ...prev, [clientID]: newVolume }))
-										setPreviousVolumes(prev => ({ ...prev, [clientID]: newVolume }))
 										const videoElement = document.querySelector(
 											`video[data-client-id="${clientID}"]`
 										) as HTMLVideoElement
