@@ -416,7 +416,7 @@ export default function RoomDev() {
 										padding: 0,
 									}}
 								>
-									{getVolumeIcon(clientVolumes[clientID] || 1)}
+									{getVolumeIcon(clientVolumes[clientID])}
 								</button>
 								<Slider
 									orientation='horizontal'
