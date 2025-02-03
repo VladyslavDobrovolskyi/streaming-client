@@ -325,7 +325,6 @@ export default function RoomDev() {
 	}
 
 	const renderParticipants = () => {
-		if (!isMovieMode) return null
 		return (
 			<div
 				style={{
@@ -338,6 +337,9 @@ export default function RoomDev() {
 					gap: '5px',
 					maxWidth: '100%',
 					overflow: 'hidden',
+					zIndex: isMovieMode ? 0 : 10,
+					opacity: isMovieMode ? 0 : 1,
+					transition: 'opacity 0.3s ease-in-out',
 				}}
 			>
 				{clients.map(clientID => (
@@ -534,6 +536,8 @@ export default function RoomDev() {
 
 	const handleMovieModeToggle = () => {
 		setIsMovieMode(prev => !prev)
+		// Если нужно, здесь можно добавить дополнительную логику
+		// например, изменение размера видео или другие эффекты
 	}
 
 	return (
@@ -573,6 +577,8 @@ export default function RoomDev() {
 					top: 0,
 					left: 0,
 					zIndex: 1,
+					width: '100%',
+					height: '100%',
 				}}
 			/>
 			{renderParticipants()}
