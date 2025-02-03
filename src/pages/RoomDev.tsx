@@ -982,7 +982,7 @@ export default function RoomDev() {
 									}}
 									onMouseLeave={handleMenuClose}
 									style={{
-										zIndex: 5000,
+										zIndex: 1000,
 										minWidth: 220,
 										backgroundColor: 'rgba(0, 0, 0, 0.8)',
 										borderRadius: 6,
