@@ -368,13 +368,13 @@ export default function RoomDev() {
 		e.dataTransfer.setData('application/json', JSON.stringify({ offsetX, offsetY }))
 
 		// Create a transparent drag image
-		const dragImage = document.createElement('div')
-		dragImage.style.width = '150px'
-		dragImage.style.height = '100px'
-		dragImage.style.backgroundColor = 'transparent'
-		document.body.appendChild(dragImage)
-		e.dataTransfer.setDragImage(dragImage, 75, 50)
-		setTimeout(() => document.body.removeChild(dragImage), 0)
+		// const dragImage = document.createElement('div')
+		// dragImage.style.width = '150px'
+		// dragImage.style.height = '100px'
+		// dragImage.style.backgroundColor = 'transparent'
+		// document.body.appendChild(dragImage)
+		// e.dataTransfer.setDragImage(dragImage, 75, 50)
+		// setTimeout(() => document.body.removeChild(dragImage), 0)
 	}
 
 	const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
