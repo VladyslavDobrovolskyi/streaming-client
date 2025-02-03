@@ -469,50 +469,35 @@ export default function RoomDev() {
 						onMouseEnter={() => !draggingClient && setHoveredClient(clientID)}
 						onMouseLeave={() => !draggingClient && setHoveredClient(null)}
 					>
-						<video
-							width='100%'
-							height='100%'
-							ref={instance => {
-								const videoElement = provideMediaRef(clientID, instance)
-								if (videoElement && clientID !== LOCAL_VIDEO) {
-									videoElement.then(() => {
-										const video = document.querySelector(
-											`video[data-client-id="${clientID}"]`
-										) as HTMLVideoElement
-										if (video) {
-											video.volume = clientVolumes[clientID] || 1
-										}
-									})
-								}
-							}}
-							data-client-id={clientID}
-							autoPlay
-							playsInline
-							muted={clientID === LOCAL_VIDEO}
-							style={{
-								objectFit: 'cover',
-								borderRadius: '5px',
-							}}
-						/>
-						{draggingClient === clientID && (
-							<div
-								style={{
-									position: 'absolute',
-									top: '50%',
-									left: '50%',
-									transform: 'translate(-50%, -50%)',
-									padding: '10px',
+						{!cameraMuted || clientID !== LOCAL_VIDEO ? (
+							<video
+								width='100%'
+								height='100%'
+								ref={instance => {
+									const videoElement = provideMediaRef(clientID, instance)
+									if (videoElement && clientID !== LOCAL_VIDEO) {
+										videoElement.then(() => {
+											const video = document.querySelector(
+												`video[data-client-id="${clientID}"]`
+											) as HTMLVideoElement
+											if (video) {
+												video.volume = clientVolumes[clientID] || 1
+											}
+										})
+									}
 								}}
-							>
-								<MoveIcon style={{ color: 'white', transform: 'scale(1)' }} />
-							</div>
-						)}
-						{clientID === LOCAL_VIDEO && cameraMuted && (
+								data-client-id={clientID}
+								autoPlay
+								playsInline
+								muted={clientID === LOCAL_VIDEO}
+								style={{
+									objectFit: 'cover',
+									borderRadius: '5px',
+								}}
+							/>
+						) : (
 							<div
 								style={{
-									position: 'absolute',
-									top: 0,
-									left: 0,
 									width: '100%',
 									height: '100%',
 									backgroundColor: 'black',
@@ -525,6 +510,19 @@ export default function RoomDev() {
 								}}
 							>
 								Camera Off
+							</div>
+						)}
+						{draggingClient === clientID && (
+							<div
+								style={{
+									position: 'absolute',
+									top: '50%',
+									left: '50%',
+									transform: 'translate(-50%, -50%)',
+									padding: '10px',
+								}}
+							>
+								<MoveIcon style={{ color: 'white', transform: 'scale(1)' }} />
 							</div>
 						)}
 						{hoveredClient === clientID && !draggingClient && (
