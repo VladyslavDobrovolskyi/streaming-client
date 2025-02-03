@@ -480,12 +480,10 @@ export default function RoomDev() {
 									top: '50%',
 									left: '50%',
 									transform: 'translate(-50%, -50%)',
-									backgroundColor: 'rgba(0, 0, 0, 0.5)',
-									borderRadius: '50%',
 									padding: '10px',
 								}}
 							>
-								<MoveIcon style={{ color: 'white', width: '24px', height: '24px' }} />
+								<MoveIcon style={{ color: 'white', transform: 'scale(1.5)' }} />
 							</div>
 						)}
 						{clientID === LOCAL_VIDEO && cameraMuted && (
