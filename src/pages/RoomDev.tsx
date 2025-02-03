@@ -24,6 +24,16 @@ import { useParams } from 'react-router'
 import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
 import useRoomSync from '../hooks/useRoomSync'
 
+const createDashedSquareDragImage = () => {
+	const dragImage = document.createElement('div')
+	dragImage.style.width = '150px'
+	dragImage.style.height = '100px'
+	dragImage.style.border = '2px dashed white'
+	dragImage.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'
+	document.body.appendChild(dragImage)
+	return dragImage
+}
+
 export default function RoomDev() {
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [volume, setVolume] = useState(0.8)
@@ -367,14 +377,9 @@ export default function RoomDev() {
 		const offsetY = e.clientY - rect.top
 		e.dataTransfer.setData('application/json', JSON.stringify({ offsetX, offsetY }))
 
-		// Create a transparent drag image
-		// const dragImage = document.createElement('div')
-		// dragImage.style.width = '150px'
-		// dragImage.style.height = '100px'
-		// dragImage.style.backgroundColor = 'transparent'
-		// document.body.appendChild(dragImage)
-		// e.dataTransfer.setDragImage(dragImage, 75, 50)
-		// setTimeout(() => document.body.removeChild(dragImage), 0)
+		const dragImage = createDashedSquareDragImage()
+		e.dataTransfer.setDragImage(dragImage, 75, 50)
+		setTimeout(() => document.body.removeChild(dragImage), 0)
 	}
 
 	const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
