@@ -16,6 +16,7 @@ import {
 	SquareIcon,
 	MoveIcon,
 	DotsHorizontalIcon,
+	SectionIcon,
 } from '@radix-ui/react-icons'
 import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
@@ -1023,7 +1024,7 @@ export default function RoomDev() {
 											gap: '8px',
 										}}
 									>
-										<SquareIcon />
+										{isMovieMode ? <SectionIcon /> : <SquareIcon />}
 										{isMovieMode ? 'Disable Movie Mode' : 'Enable Movie Mode'}
 									</DropdownMenu.Item>
 									<DropdownMenu.Item
@@ -1036,7 +1037,7 @@ export default function RoomDev() {
 											gap: '8px',
 										}}
 									>
-										{hideUsers ? <EyeClosedIcon /> : <EyeOpenIcon />}
+										{hideUsers ? <EyeOpenIcon /> : <EyeClosedIcon />}
 										{hideUsers ? 'Show Users' : 'Hide Users'}
 									</DropdownMenu.Item>
 								</DropdownMenu.Content>
