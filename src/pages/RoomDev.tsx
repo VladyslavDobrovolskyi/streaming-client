@@ -392,7 +392,7 @@ export default function RoomDev() {
 		e.dataTransfer.setData('application/json', JSON.stringify({ offsetX, offsetY }))
 
 		const dragImage = createDashedSquareDragImage()
-		e.dataTransfer.setDragImage(dragImage, 75, 50)
+		e.dataTransfer.setDragImage(dragImage, offsetX, offsetY)
 		requestAnimationFrame(() => {
 			document.body.removeChild(dragImage)
 		})
@@ -405,7 +405,7 @@ export default function RoomDev() {
 			const offsetData = e.dataTransfer.getData('application/json')
 			const { offsetX, offsetY } = JSON.parse(offsetData)
 			const clientID = e.dataTransfer.getData('text/plain')
-			const x = Math.max(rect.width - 150, Math.min(e.clientX - rect.left - offsetX, rect.width))
+			const x = Math.max(0, Math.min(e.clientX - rect.left - offsetX, rect.width - 150))
 			const y = Math.max(0, Math.min(e.clientY - rect.top - offsetY, rect.height - 100))
 			setClientPositions(prev => ({
 				...prev,
@@ -419,8 +419,10 @@ export default function RoomDev() {
 		setDraggingClient(null)
 		const rect = playerWrapperRef.current?.getBoundingClientRect()
 		if (rect) {
-			const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width - 150))
-			const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height - 100))
+			const offsetData = e.dataTransfer.getData('application/json')
+			const { offsetX, offsetY } = JSON.parse(offsetData)
+			const x = Math.max(0, Math.min(e.clientX - rect.left - offsetX, rect.width - 150))
+			const y = Math.max(0, Math.min(e.clientY - rect.top - offsetY, rect.height - 100))
 			setClientPositions(prev => ({
 				...prev,
 				[clientID]: { x, y },
@@ -705,11 +707,13 @@ export default function RoomDev() {
 			onDragOver={e => e.preventDefault()}
 			onDrop={e => {
 				e.preventDefault()
-				const clientID = e.dataTransfer.getData('text')
+				const clientID = e.dataTransfer.getData('text/plain')
+				const offsetData = e.dataTransfer.getData('application/json')
+				const { offsetX, offsetY } = JSON.parse(offsetData)
 				const rect = playerWrapperRef.current?.getBoundingClientRect()
 				if (rect) {
-					const x = Math.max(rect.width - 150, Math.min(e.clientX - rect.left, rect.width))
-					const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height - 100))
+					const x = Math.max(0, Math.min(e.clientX - rect.left - offsetX, rect.width - 150))
+					const y = Math.max(0, Math.min(e.clientY - rect.top - offsetY, rect.height - 100))
 					setClientPositions(prev => ({
 						...prev,
 						[clientID]: { x, y },
