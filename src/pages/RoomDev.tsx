@@ -11,14 +11,13 @@ import {
 	ExitFullScreenIcon,
 	DoubleArrowLeftIcon,
 	DoubleArrowRightIcon,
-	RadiobuttonIcon,
-	CircleBackslashIcon,
-	CameraIcon,
 	EyeOpenIcon,
 	EyeClosedIcon,
 	SquareIcon,
 	MoveIcon,
 } from '@radix-ui/react-icons'
+import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
+import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
 import { Slider } from '@radix-ui/themes'
 import ActionIndicator from '../components/ActionIndicator'
 import { useParams } from 'react-router'
@@ -961,7 +960,7 @@ export default function RoomDev() {
 								alignItems: 'center',
 							}}
 						>
-							<RadiobuttonIcon />
+							{micMuted ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
 						</button>
 						<button
 							onClick={handleCameraMuteUnmute}
@@ -977,18 +976,7 @@ export default function RoomDev() {
 								position: 'relative',
 							}}
 						>
-							<CameraIcon style={{ color: cameraMuted ? '#808080' : '#fff' }} />
-							{cameraMuted && (
-								<CircleBackslashIcon
-									style={{
-										position: 'absolute',
-										top: '50%',
-										left: '50%',
-										transform: 'translate(-50%, -50%)',
-										color: '#fff',
-									}}
-								/>
-							)}
+							{cameraMuted ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
 						</button>
 						<button
 							onClick={handleFullscreenToggle}
