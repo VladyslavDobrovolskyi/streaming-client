@@ -33,7 +33,15 @@ const createDashedSquareDragImage = () => {
 	dragImage.style.padding = '5px'
 	dragImage.style.boxSizing = 'border-box'
 	dragImage.style.backgroundColor = 'rgba(0, 0, 0, 0.2)'
+	dragImage.style.position = 'absolute'
+	dragImage.style.top = '-1000px'
+	dragImage.style.left = '-1000px'
 	document.body.appendChild(dragImage)
+
+	// Принудительно применяем стили
+	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+	window.getComputedStyle(dragImage).opacity
+
 	return dragImage
 }
 
@@ -382,7 +390,9 @@ export default function RoomDev() {
 
 		const dragImage = createDashedSquareDragImage()
 		e.dataTransfer.setDragImage(dragImage, 75, 50)
-		setTimeout(() => document.body.removeChild(dragImage), 0)
+		requestAnimationFrame(() => {
+			document.body.removeChild(dragImage)
+		})
 	}
 
 	const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
