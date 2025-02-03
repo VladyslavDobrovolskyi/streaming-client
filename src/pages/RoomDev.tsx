@@ -979,6 +979,7 @@ export default function RoomDev() {
 							<DropdownMenu.Portal>
 								<DropdownMenu.Content
 									style={{
+										zIndex: 1000,
 										minWidth: 220,
 										backgroundColor: 'rgba(0, 0, 0, 0.8)',
 										borderRadius: 6,
