@@ -16,6 +16,7 @@ import {
 	SquareIcon,
 	DotsHorizontalIcon,
 	SectionIcon,
+	MoveIcon,
 } from '@radix-ui/react-icons'
 import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
@@ -474,6 +475,7 @@ export default function RoomDev() {
 							style={{
 								width: '100%',
 								height: '100%',
+								position: 'relative',
 							}}
 						>
 							<video
@@ -501,6 +503,19 @@ export default function RoomDev() {
 									borderRadius: '5px',
 								}}
 							/>
+							{draggingClient === clientID && (
+								<div
+									style={{
+										position: 'absolute',
+										top: '50%',
+										left: '50%',
+										transform: 'translate(-50%, -50%)',
+										pointerEvents: 'none',
+									}}
+								>
+									<MoveIcon style={{ color: 'white', transform: 'scale(1.0)' }} />
+								</div>
+							)}
 						</div>
 						{hoveredClient === clientID && !draggingClient && (
 							<>
