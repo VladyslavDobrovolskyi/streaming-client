@@ -47,6 +47,7 @@ export default function RoomDev() {
 	const [previousVolumes, setPreviousVolumes] = useState<Record<string, number>>({})
 	const [coveredClients, setCoveredClients] = useState<Record<string, boolean>>({})
 	const [isMovieMode, setIsMovieMode] = useState(false)
+	const [aspectRatio, setAspectRatio] = useState(16 / 9)
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -156,6 +157,16 @@ export default function RoomDev() {
 		}
 		if (state.loadedSeconds > 0 && duration === 300) {
 			setDuration(playerRef.current?.getDuration() || 300)
+
+			// Определяем соотношение сторон видео
+			const videoElement = playerRef.current?.getInternalPlayer()
+			if (videoElement) {
+				const videoWidth = videoElement.videoWidth
+				const videoHeight = videoElement.videoHeight
+				if (videoWidth && videoHeight) {
+					setAspectRatio(videoWidth / videoHeight)
+				}
+			}
 		}
 	}
 
@@ -576,11 +587,12 @@ export default function RoomDev() {
 				style={{
 					backgroundColor: '#1a1a1a',
 					objectFit: isMovieMode ? 'cover' : 'contain',
+					objectPosition: 'center',
 					position: 'absolute',
 					top: 0,
 					left: 0,
-					width: '100%',
-					height: '100%',
+					width: isMovieMode ? `${100 * Math.max(1, aspectRatio)}%` : '100%',
+					height: isMovieMode ? `${100 * Math.max(1, 1 / aspectRatio)}%` : '100%',
 					zIndex: 1,
 				}}
 			/>
