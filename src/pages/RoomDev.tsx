@@ -17,6 +17,7 @@ import {
 	EyeOpenIcon,
 	EyeClosedIcon,
 	SquareIcon,
+	MoveIcon,
 } from '@radix-ui/react-icons'
 import { Slider } from '@radix-ui/themes'
 import ActionIndicator from '../components/ActionIndicator'
@@ -270,7 +271,7 @@ export default function RoomDev() {
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown)
 		}
-	}, [volume, handleVolumeChange, emitPause, emitPlay, handlePlay, handlePause]) // Added emitPause and handlePlay to dependencies
+	}, [volume, handleVolumeChange, emitPause, emitPlay, handleForward15, handleBackward15]) // Added handleBackward15 and handleForward15 to dependencies
 
 	useEffect(() => {
 		if (roomID) {
@@ -472,6 +473,21 @@ export default function RoomDev() {
 								borderRadius: '5px',
 							}}
 						/>
+						{draggingClient === clientID && (
+							<div
+								style={{
+									position: 'absolute',
+									top: '50%',
+									left: '50%',
+									transform: 'translate(-50%, -50%)',
+									backgroundColor: 'rgba(0, 0, 0, 0.5)',
+									borderRadius: '50%',
+									padding: '10px',
+								}}
+							>
+								<MoveIcon style={{ color: 'white', width: '24px', height: '24px' }} />
+							</div>
+						)}
 						{clientID === LOCAL_VIDEO && cameraMuted && (
 							<div
 								style={{
