@@ -951,7 +951,7 @@ export default function RoomDev() {
 							onClick={handleMicMuteUnmute}
 							style={{
 								color: micMuted ? '#808080' : '#ffffff',
-								border: '1px green solid',
+								border: 'none',
 								padding: '0.5rem',
 								borderRadius: '5px',
 								cursor: 'pointer',
@@ -966,7 +966,7 @@ export default function RoomDev() {
 							onClick={handleCameraMuteUnmute}
 							style={{
 								color: cameraMuted ? '#808080' : '#ffffff',
-								border: '1px green solid',
+								border: 'none',
 								padding: '0.5rem',
 								borderRadius: '5px',
 								cursor: 'pointer',
