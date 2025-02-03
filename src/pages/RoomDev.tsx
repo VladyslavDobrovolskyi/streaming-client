@@ -73,6 +73,7 @@ export default function RoomDev() {
 	const [clientPositions, setClientPositions] = useState<Record<string, { x: number; y: number }>>({})
 	const [draggingClient, setDraggingClient] = useState<string | null>(null) // Added draggingClient state
 	const [hideUsers, setHideUsers] = useState(false) // Updated hideUsers state
+	const [isMenuOpen, setIsMenuOpen] = useState(false) // Added isMenuOpen state
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -215,12 +216,12 @@ export default function RoomDev() {
 		if (controlsTimeoutRef.current) {
 			clearTimeout(controlsTimeoutRef.current)
 		}
-		if (!isDragging) {
+		if (!isDragging && !isMenuOpen) {
 			controlsTimeoutRef.current = setTimeout(() => {
 				setShowControls(false)
 			}, 3000)
 		}
-	}, [isDragging])
+	}, [isDragging, isMenuOpen])
 
 	const handleFullscreenToggle = () => {
 		if (!document.fullscreenElement) {
@@ -662,12 +663,25 @@ export default function RoomDev() {
 		setIsMovieMode(prev => !prev)
 	}
 
+	const handleMenuOpen = () => {
+		setIsMenuOpen(true)
+		setShowControls(true)
+	}
+
+	const handleMenuClose = () => {
+		setIsMenuOpen(false)
+	}
+
 	return (
 		<div
 			ref={playerWrapperRef}
 			className={`player-wrapper ${isPlaying ? 'playing' : ''}`}
 			onMouseMove={showControlsHandler}
-			onMouseLeave={() => !isDragging && setShowControls(false)}
+			onMouseLeave={() => {
+				if (!isDragging && !isMenuOpen) {
+					setShowControls(false)
+				}
+			}}
 			style={{
 				backgroundColor: '#1a1a1a',
 				width: '100vw',
@@ -928,9 +942,10 @@ export default function RoomDev() {
 							justifyContent: 'flex-end',
 						}}
 					>
-						<DropdownMenu.Root>
+						<DropdownMenu.Root open={isMenuOpen} onOpenChange={setIsMenuOpen}>
 							<DropdownMenu.Trigger asChild>
 								<button
+									onClick={handleMenuOpen}
 									style={{
 										color: '#fff',
 										border: 'none',
@@ -947,6 +962,13 @@ export default function RoomDev() {
 							</DropdownMenu.Trigger>
 							<DropdownMenu.Portal>
 								<DropdownMenu.Content
+									onMouseEnter={() => {
+										setShowControls(true)
+										if (controlsTimeoutRef.current) {
+											clearTimeout(controlsTimeoutRef.current)
+										}
+									}}
+									onMouseLeave={handleMenuClose}
 									style={{
 										zIndex: 1000,
 										minWidth: 220,
