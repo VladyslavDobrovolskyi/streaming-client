@@ -469,35 +469,40 @@ export default function RoomDev() {
 						onMouseEnter={() => !draggingClient && setHoveredClient(clientID)}
 						onMouseLeave={() => !draggingClient && setHoveredClient(null)}
 					>
-						{!cameraMuted || clientID !== LOCAL_VIDEO ? (
-							<video
-								width='100%'
-								height='100%'
-								ref={instance => {
-									const videoElement = provideMediaRef(clientID, instance)
-									if (videoElement && clientID !== LOCAL_VIDEO) {
-										videoElement.then(() => {
-											const video = document.querySelector(
-												`video[data-client-id="${clientID}"]`
-											) as HTMLVideoElement
-											if (video) {
-												video.volume = clientVolumes[clientID] || 1
-											}
-										})
-									}
-								}}
-								data-client-id={clientID}
-								autoPlay
-								playsInline
-								muted={clientID === LOCAL_VIDEO}
-								style={{
-									objectFit: 'cover',
-									borderRadius: '5px',
-								}}
-							/>
-						) : (
+						<video
+							width='100%'
+							height='100%'
+							ref={instance => {
+								const videoElement = provideMediaRef(clientID, instance)
+								if (videoElement && clientID !== LOCAL_VIDEO) {
+									videoElement.then(() => {
+										const video = document.querySelector(
+											`video[data-client-id="${clientID}"]`
+										) as HTMLVideoElement
+										if (video) {
+											video.volume = clientVolumes[clientID] || 1
+										}
+									})
+								}
+							}}
+							data-client-id={clientID}
+							autoPlay
+							playsInline
+							muted={clientID === LOCAL_VIDEO}
+							style={{
+								objectFit: 'cover',
+								borderRadius: '5px',
+								opacity: clientID === LOCAL_VIDEO && cameraMuted ? 0 : 1,
+								visibility: clientID === LOCAL_VIDEO && cameraMuted ? 'hidden' : 'visible',
+								transition: 'opacity 0.3s ease, visibility 0.3s ease',
+							}}
+						/>
+						{clientID === LOCAL_VIDEO && cameraMuted && (
 							<div
 								style={{
+									position: 'absolute',
+									top: 0,
+									left: 0,
 									width: '100%',
 									height: '100%',
 									backgroundColor: 'black',
@@ -957,7 +962,6 @@ export default function RoomDev() {
 							justifyContent: 'flex-end',
 						}}
 					>
-						{/* REPLACEMENT START */}
 						<DropdownMenu.Root>
 							<DropdownMenu.Trigger asChild>
 								<button
@@ -1041,7 +1045,6 @@ export default function RoomDev() {
 								</DropdownMenu.Content>
 							</DropdownMenu.Portal>
 						</DropdownMenu.Root>
-						{/* REPLACEMENT END */}
 						<button
 							onClick={handleFullscreenToggle}
 							style={{
