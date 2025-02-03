@@ -370,7 +370,7 @@ export default function RoomDev() {
 	}
 
 	const handleDragStart = (clientID: string, e: React.DragEvent<HTMLDivElement>) => {
-		setDraggingClient(clientID) // Update: Set draggingClient
+		setDraggingClient(clientID)
 		e.dataTransfer.setData('text/plain', clientID)
 		const rect = e.currentTarget.getBoundingClientRect()
 		const offsetX = e.clientX - rect.left
@@ -400,7 +400,7 @@ export default function RoomDev() {
 
 	const handleDragEnd = (clientID: string, e: React.DragEvent<HTMLDivElement>) => {
 		e.preventDefault()
-		setDraggingClient(null) // Update: Reset draggingClient
+		setDraggingClient(null)
 		const rect = playerWrapperRef.current?.getBoundingClientRect()
 		if (rect) {
 			const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width - 150))
@@ -444,8 +444,8 @@ export default function RoomDev() {
 						onDragStart={e => handleDragStart(clientID, e)}
 						onDrag={handleDrag}
 						onDragEnd={e => handleDragEnd(clientID, e)}
-						onMouseEnter={() => setHoveredClient(clientID)}
-						onMouseLeave={() => setHoveredClient(null)}
+						onMouseEnter={() => !draggingClient && setHoveredClient(clientID)}
+						onMouseLeave={() => !draggingClient && setHoveredClient(null)}
 					>
 						<video
 							width='100%'
@@ -470,8 +470,6 @@ export default function RoomDev() {
 							style={{
 								objectFit: 'cover',
 								borderRadius: '5px',
-								opacity: draggingClient === clientID ? 0 : 1,
-								transition: 'opacity 0.2s ease-in-out',
 							}}
 						/>
 						{clientID === LOCAL_VIDEO && cameraMuted && (
@@ -494,19 +492,103 @@ export default function RoomDev() {
 								Camera Off
 							</div>
 						)}
-						{hoveredClient === clientID && (
-							<div
-								style={{
-									position: 'absolute',
-									top: '50%',
-									left: '50%',
-									transform: 'translate(-50%, -50%)',
-									cursor: 'pointer',
-								}}
-								onClick={() => setCoveredClients(prev => ({ ...prev, [clientID]: !prev[clientID] }))}
-							>
-								<EyeOpenIcon style={{ color: 'white', transform: 'scale(1)' }} />
-							</div>
+						{hoveredClient === clientID && !draggingClient && (
+							<>
+								<div
+									style={{
+										position: 'absolute',
+										top: '50%',
+										left: '50%',
+										transform: 'translate(-50%, -50%)',
+										cursor: 'pointer',
+									}}
+									onClick={() =>
+										setCoveredClients(prev => ({ ...prev, [clientID]: !prev[clientID] }))
+									}
+								>
+									<EyeOpenIcon style={{ color: 'white', transform: 'scale(1)' }} />
+								</div>
+								{clientID !== LOCAL_VIDEO && (
+									<div
+										style={{
+											position: 'absolute',
+											bottom: '-5px',
+											left: '0px',
+											right: '5px',
+											display: 'flex',
+											alignItems: 'center',
+										}}
+									>
+										<button
+											onClick={() => {
+												const videoElement = document.querySelector(
+													`video[data-client-id="${clientID}"]`
+												) as HTMLVideoElement | null
+
+												if (!videoElement) return
+
+												setClientVolumes(prev => {
+													const currentVolume = prev[clientID] ?? 1.0
+													const isMuted = currentVolume === 0.0
+
+													const newVolume = isMuted ? previousVolumes[clientID] ?? 1.0 : 0.0
+
+													if (!isMuted) {
+														setPreviousVolumes(pv => ({ ...pv, [clientID]: currentVolume }))
+													}
+
+													videoElement.muted = newVolume === 0.0
+													videoElement.volume = newVolume
+
+													return { ...prev, [clientID]: newVolume }
+												})
+											}}
+											style={{
+												background: 'none',
+												border: 'none',
+												cursor: 'pointer',
+												padding: 0,
+												display: 'flex',
+												alignItems: 'center',
+											}}
+										>
+											{getVolumeIcon(clientVolumes[clientID])}
+										</button>
+
+										{clientVolumes[clientID] !== 0 && (
+											<Slider
+												orientation='horizontal'
+												min={0.0}
+												max={1.0}
+												step={0.01}
+												value={[clientVolumes[clientID] ?? 1.0]}
+												onValueChange={value => {
+													const newVolume = value[0] === 0.01 ? 0.0 : value[0]
+													console.log(clientID, newVolume)
+													setClientVolumes(prev => ({ ...prev, [clientID]: newVolume }))
+													const videoElement = document.querySelector(
+														`video[data-client-id="${clientID}"]`
+													) as HTMLVideoElement
+													if (videoElement) {
+														videoElement.volume = newVolume
+													}
+													if (newVolume === 0) {
+														videoElement.muted = true
+													}
+												}}
+												style={
+													{
+														width: '100%',
+														marginLeft: '5px',
+														'--slider-thumb-size': '10px',
+														'--slider-track-height': '2px',
+													} as React.CSSProperties
+												}
+											/>
+										)}
+									</div>
+								)}
+							</>
 						)}
 						{coveredClients[clientID] && (
 							<div
@@ -525,86 +607,6 @@ export default function RoomDev() {
 								}}
 							>
 								<EyeClosedIcon style={{ color: 'white', transform: 'scale(1)' }} />
-							</div>
-						)}
-						{hoveredClient === clientID && clientID !== LOCAL_VIDEO && (
-							<div
-								style={{
-									position: 'absolute',
-									bottom: '-5px',
-									left: '0px',
-									right: '5px',
-									display: 'flex',
-									alignItems: 'center',
-								}}
-							>
-								<button
-									onClick={() => {
-										const videoElement = document.querySelector(
-											`video[data-client-id="${clientID}"]`
-										) as HTMLVideoElement | null
-
-										if (!videoElement) return
-
-										setClientVolumes(prev => {
-											const currentVolume = prev[clientID] ?? 1.0
-											const isMuted = currentVolume === 0.0
-
-											const newVolume = isMuted ? previousVolumes[clientID] ?? 1.0 : 0.0
-
-											if (!isMuted) {
-												setPreviousVolumes(pv => ({ ...pv, [clientID]: currentVolume }))
-											}
-
-											videoElement.muted = newVolume === 0.0
-											videoElement.volume = newVolume
-
-											return { ...prev, [clientID]: newVolume }
-										})
-									}}
-									style={{
-										background: 'none',
-										border: 'none',
-										cursor: 'pointer',
-										padding: 0,
-										display: 'flex',
-										alignItems: 'center',
-									}}
-								>
-									{getVolumeIcon(clientVolumes[clientID])}
-								</button>
-
-								{clientVolumes[clientID] !== 0 && (
-									<Slider
-										orientation='horizontal'
-										min={0.0}
-										max={1.0}
-										step={0.01}
-										value={[clientVolumes[clientID] ?? 1.0]}
-										onValueChange={value => {
-											const newVolume = value[0] === 0.01 ? 0.0 : value[0]
-											console.log(clientID, newVolume)
-											setClientVolumes(prev => ({ ...prev, [clientID]: newVolume }))
-											const videoElement = document.querySelector(
-												`video[data-client-id="${clientID}"]`
-											) as HTMLVideoElement
-											if (videoElement) {
-												videoElement.volume = newVolume
-											}
-											if (newVolume === 0) {
-												videoElement.muted = true
-											}
-										}}
-										style={
-											{
-												width: '100%',
-												marginLeft: '5px',
-												'--slider-thumb-size': '10px',
-												'--slider-track-height': '2px',
-											} as React.CSSProperties
-										}
-									/>
-								)}
 							</div>
 						)}
 					</div>
