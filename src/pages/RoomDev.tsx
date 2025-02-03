@@ -513,7 +513,7 @@ export default function RoomDev() {
 										pointerEvents: 'none',
 									}}
 								>
-									<MoveIcon style={{ color: 'white', transform: 'scale(0.5)' }} />
+									<MoveIcon style={{ color: 'white', transform: 'scale(0.75)' }} />
 								</div>
 							)}
 						</div>
