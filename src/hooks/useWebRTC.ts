@@ -63,6 +63,10 @@ export default function useWebRTC(roomID: string) {
 	const configuration = {
 		iceServers: [
 			{
+				iceTransportPolicy: 'all',
+				iceCandidatePoolSize: 10,
+				bundlePolicy: 'max-bundle',
+				rtcpMuxPolicy: 'require',
 				urls: [
 					'turn:92.112.180.234:3478', // URL for TURN server (UDP)
 					'turns:92.112.180.234:3478', // URL for TURN server (TLS)
