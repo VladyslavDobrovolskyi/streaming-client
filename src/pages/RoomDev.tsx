@@ -47,6 +47,7 @@ export default function RoomDev() {
 	const [previousVolumes, setPreviousVolumes] = useState<Record<string, number>>({})
 	const [coveredClients, setCoveredClients] = useState<Record<string, boolean>>({})
 	const [isMovieMode, setIsMovieMode] = useState(false)
+	const [clientPositions, setClientPositions] = useState<Record<string, { x: number; y: number }>>({})
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -357,19 +358,41 @@ export default function RoomDev() {
 		return <SpeakerLoudIcon style={IconStyles} />
 	}
 
+	const handleDragStart = (clientID: string, e: React.DragEvent<HTMLDivElement>) => {
+		e.dataTransfer.setData('text/plain', clientID)
+		// Add this line to set a custom drag image (optional)
+		const dragImage = new Image()
+		dragImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7' // 1x1 transparent GIF
+		e.dataTransfer.setDragImage(dragImage, 0, 0)
+	}
+
+	const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
+		e.preventDefault()
+	}
+
+	const handleDragEnd = (clientID: string, e: React.DragEvent<HTMLDivElement>) => {
+		e.preventDefault()
+		const rect = playerWrapperRef.current?.getBoundingClientRect()
+		if (rect) {
+			const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width - 150))
+			const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height - 100))
+			setClientPositions(prev => ({
+				...prev,
+				[clientID]: { x, y },
+			}))
+		}
+	}
+
 	const renderParticipants = () => {
 		return (
 			<div
 				style={{
 					position: 'absolute',
-					top: '10px',
-					right: '10px',
-					display: 'flex',
-					flexDirection: 'row',
-					justifyContent: 'flex-end',
-					gap: '5px',
-					maxWidth: '100%',
-					overflow: 'hidden',
+					top: '0',
+					left: '0',
+					width: '100%',
+					height: '100%',
+					pointerEvents: 'none',
 					zIndex: isMovieMode ? 0 : 10,
 					opacity: isMovieMode ? 0 : 1,
 					transition: 'opacity 0.3s ease-in-out',
@@ -378,7 +401,20 @@ export default function RoomDev() {
 				{clients.map(clientID => (
 					<div
 						key={clientID}
-						style={{ width: '150px', height: '100px', position: 'relative' }}
+						style={{
+							width: '150px',
+							height: '100px',
+							position: 'absolute',
+							top: `${clientPositions[clientID]?.y || 10}px`,
+							left: `${clientPositions[clientID]?.x || 10}px`,
+							pointerEvents: 'auto',
+							transition: 'all 0.1s ease-out',
+							cursor: 'move',
+						}}
+						draggable
+						onDragStart={e => handleDragStart(clientID, e)}
+						onDrag={handleDrag}
+						onDragEnd={e => handleDragEnd(clientID, e)}
 						onMouseEnter={() => setHoveredClient(clientID)}
 						onMouseLeave={() => setHoveredClient(null)}
 					>
@@ -583,6 +619,20 @@ export default function RoomDev() {
 				top: 0,
 				left: 0,
 				overflow: 'hidden',
+			}}
+			onDragOver={e => e.preventDefault()}
+			onDrop={e => {
+				e.preventDefault()
+				const clientID = e.dataTransfer.getData('text')
+				const rect = playerWrapperRef.current?.getBoundingClientRect()
+				if (rect) {
+					const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width - 150))
+					const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height - 100))
+					setClientPositions(prev => ({
+						...prev,
+						[clientID]: { x, y },
+					}))
+				}
 			}}
 		>
 			<ReactPlayer
