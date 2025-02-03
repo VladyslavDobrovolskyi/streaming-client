@@ -564,15 +564,15 @@ export default function RoomDev() {
 				onPause={handlePause}
 				onProgress={handleProgress}
 				onDuration={duration => setDuration(duration)}
-				width={isMovieMode ? '100%' : '100%'}
-				height={isMovieMode ? '100%' : '100%'}
+				width='100%'
+				height='100%'
 				style={{
 					backgroundColor: '#1a1a1a',
 					objectFit: isMovieMode ? 'contain' : 'cover',
-					position: isMovieMode ? 'absolute' : 'relative',
+					position: 'absolute',
 					top: 0,
 					left: 0,
-					zIndex: isMovieMode ? 10 : 'auto',
+					zIndex: 1,
 				}}
 			/>
 			{renderParticipants()}
@@ -587,7 +587,7 @@ export default function RoomDev() {
 					justifyContent: 'center',
 					alignItems: 'center',
 					pointerEvents: 'none',
-					zIndex: 20,
+					zIndex: 30,
 				}}
 			>
 				<ActionIndicator action={currentAction} volume={volume} />
@@ -605,6 +605,7 @@ export default function RoomDev() {
 					background: 'linear-gradient(transparent, rgba(0,0,0,0.9))',
 					transition: 'opacity 0.3s ease',
 					opacity: showControls ? 1 : 0,
+					zIndex: 20,
 				}}
 			>
 				{/* Progress bar */}
