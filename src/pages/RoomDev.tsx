@@ -325,7 +325,7 @@ export default function RoomDev() {
 	}
 
 	const renderParticipants = () => {
-		if (isMovieMode) return null
+		if (!isMovieMode) return null
 		return (
 			<div
 				style={{
