@@ -36,6 +36,7 @@ const createDashedSquareDragImage = () => {
 	dragImage.style.position = 'absolute'
 	dragImage.style.top = '-1000px'
 	dragImage.style.left = '-1000px'
+	dragImage.style.zIndex = '1000'
 	document.body.appendChild(dragImage)
 
 	// Принудительно применяем стили
