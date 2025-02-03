@@ -16,6 +16,7 @@ import {
 	CameraIcon,
 	EyeOpenIcon,
 	EyeClosedIcon,
+	SquareIcon,
 } from '@radix-ui/react-icons'
 import { Slider } from '@radix-ui/themes'
 import ActionIndicator from '../components/ActionIndicator'
@@ -31,7 +32,7 @@ export default function RoomDev() {
 	const [loaded, setLoaded] = useState(0)
 	const [showControls, setShowControls] = useState(false)
 	const [showVolumeControl, setShowVolumeControl] = useState(false)
-	const [isFullscreen, setIsFullscreen] = useState(false) // Added isFullscreen state
+	const [isFullscreen, setIsFullscreen] = useState(false)
 	const [duration, setDuration] = useState(300)
 	const [isDragging, setIsDragging] = useState(false)
 	const [isVolumeActive, setIsVolumeActive] = useState(false)
@@ -46,7 +47,6 @@ export default function RoomDev() {
 	const [previousVolumes, setPreviousVolumes] = useState<Record<string, number>>({})
 	const [coveredClients, setCoveredClients] = useState<Record<string, boolean>>({})
 	const [isMovieMode, setIsMovieMode] = useState(false)
-	//const [mutedCameras, setMutedCameras] = useState<Record<string, boolean>>({})
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -66,7 +66,6 @@ export default function RoomDev() {
 	useEffect(() => {
 		if (lastSeekDirection) {
 			showAction(lastSeekDirection)
-			// Add a console.log to debug
 			console.log('Showing seek action:', lastSeekDirection)
 		}
 	}, [lastSeekDirection])
@@ -129,7 +128,6 @@ export default function RoomDev() {
 				})
 			}
 			if (prevMuted) {
-				// Unmuting
 				if (mutedBySlider) {
 					setVolume(0.5)
 					setMutedBySlider(false)
@@ -139,7 +137,6 @@ export default function RoomDev() {
 				showAction('unmute')
 				return false
 			} else {
-				// Muting
 				previousVolumeRef.current = volume
 				showAction('mute')
 				return true
@@ -261,7 +258,7 @@ export default function RoomDev() {
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown)
 		}
-	}) // Added handleVolumeChange to dependencies
+	}, [volume, handleVolumeChange, emitPause, handlePlay]) // Added emitPause and handlePlay to dependencies
 
 	useEffect(() => {
 		if (roomID) {
@@ -276,12 +273,10 @@ export default function RoomDev() {
 	}, [localStream, reinitializeStream])
 
 	useEffect(() => {
-		// Request sync when component mounts
 		requestSync()
 	}, [requestSync])
 
 	useEffect(() => {
-		// Added fullscreenchange listener
 		const handleFullscreenChange = () => {
 			setIsFullscreen(!!document.fullscreenElement)
 		}
@@ -456,17 +451,15 @@ export default function RoomDev() {
 										if (!videoElement) return
 
 										setClientVolumes(prev => {
-											const currentVolume = prev[clientID] ?? 1.0 // Если нет значения, берём 1.0
+											const currentVolume = prev[clientID] ?? 1.0
 											const isMuted = currentVolume === 0.0
 
 											const newVolume = isMuted ? previousVolumes[clientID] ?? 1.0 : 0.0
 
-											// Обновляем предыдущую громкость, если отключаем звук
 											if (!isMuted) {
 												setPreviousVolumes(pv => ({ ...pv, [clientID]: currentVolume }))
 											}
 
-											// Обновляем громкость
 											videoElement.muted = newVolume === 0.0
 											videoElement.volume = newVolume
 
@@ -547,45 +540,8 @@ export default function RoomDev() {
 	}
 
 	const handleMovieModeToggle = () => {
-		setIsMovieMode(prev => {
-			const newMovieMode = !prev
-			if (newMovieMode) {
-				if (playerWrapperRef.current && !document.fullscreenElement) {
-					playerWrapperRef.current.requestFullscreen()
-				}
-			} else {
-				if (document.fullscreenElement) {
-					document.exitFullscreen()
-				}
-			}
-			// Добавьте задержку для изменения objectFit после завершения анимации fullscreen
-			setTimeout(() => {
-				if (playerRef.current) {
-					const videoElement = playerRef.current.getInternalPlayer() as HTMLVideoElement
-					if (videoElement) {
-						videoElement.style.objectFit = newMovieMode ? 'cover' : 'contain'
-					}
-				}
-			}, 300)
-			return newMovieMode
-		})
+		setIsMovieMode(prev => !prev)
 	}
-
-	useEffect(() => {
-		const handleResize = () => {
-			if (playerRef.current) {
-				const videoElement = playerRef.current.getInternalPlayer() as HTMLVideoElement
-				if (videoElement) {
-					videoElement.style.objectFit = isMovieMode ? 'cover' : 'contain'
-				}
-			}
-		}
-
-		window.addEventListener('resize', handleResize)
-		return () => {
-			window.removeEventListener('resize', handleResize)
-		}
-	}, [isMovieMode])
 
 	return (
 		<div
@@ -615,8 +571,8 @@ export default function RoomDev() {
 				onPause={handlePause}
 				onProgress={handleProgress}
 				onDuration={duration => setDuration(duration)}
-				width={isMovieMode ? '100%' : '100%'} // Updated width
-				height={isMovieMode ? '100%' : '100%'} // Updated height
+				width='100%'
+				height='100%'
 				style={{
 					backgroundColor: '#1a1a1a',
 					objectFit: isMovieMode ? 'cover' : 'contain',
@@ -661,7 +617,6 @@ export default function RoomDev() {
 					zIndex: 20,
 				}}
 			>
-				{/* Progress bar */}
 				<div
 					ref={sliderRef}
 					style={{
@@ -691,7 +646,6 @@ export default function RoomDev() {
 					/>
 				</div>
 
-				{/* Controls bar */}
 				<div
 					style={{
 						display: 'flex',
@@ -700,7 +654,6 @@ export default function RoomDev() {
 						padding: '0 0.5rem',
 					}}
 				>
-					{/* Left controls group */}
 					<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: '1 0 auto' }}>
 						<button
 							onClick={() =>
@@ -817,7 +770,6 @@ export default function RoomDev() {
 						</div>
 					</div>
 
-					{/* Center time display */}
 					<div
 						style={{
 							position: 'absolute',
@@ -832,7 +784,6 @@ export default function RoomDev() {
 						{formatTime(played * duration)} / {formatTime(duration)}
 					</div>
 
-					{/* Right controls group */}
 					<div
 						style={{
 							display: 'flex',
@@ -912,7 +863,7 @@ export default function RoomDev() {
 								alignItems: 'center',
 							}}
 						>
-							{isMovieMode ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />} {/* Updated button icon */}
+							<SquareIcon />
 						</button>
 					</div>
 				</div>
