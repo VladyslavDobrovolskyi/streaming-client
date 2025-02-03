@@ -71,7 +71,6 @@ export default function RoomDev() {
 	const [clientPositions, setClientPositions] = useState<Record<string, { x: number; y: number }>>({})
 	const [draggingClient, setDraggingClient] = useState<string | null>(null) // Added draggingClient state
 	const [hideUsers, setHideUsers] = useState(false) // Updated hideUsers state
-	const [, forceUpdate] = useState({}) // Added forceUpdate state
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -430,7 +429,6 @@ export default function RoomDev() {
 	}
 
 	const renderParticipants = () => {
-		if (hideUsers) return null
 		return (
 			<div
 				style={{
@@ -441,6 +439,9 @@ export default function RoomDev() {
 					height: '100%',
 					pointerEvents: 'none',
 					zIndex: 10,
+					opacity: hideUsers ? 0 : 1,
+					visibility: hideUsers ? 'hidden' : 'visible',
+					transition: 'opacity 0.3s ease, visibility 0.3s ease',
 				}}
 			>
 				{clients.map(clientID => (
@@ -1011,10 +1012,7 @@ export default function RoomDev() {
 							<SquareIcon />
 						</button>
 						<button
-							onClick={() => {
-								setHideUsers(prev => !prev)
-								forceUpdate({})
-							}}
+							onClick={() => setHideUsers(prev => !prev)}
 							style={{
 								color: hideUsers ? '#808080' : '#ffffff',
 								border: 'none',
