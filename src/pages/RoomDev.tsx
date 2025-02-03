@@ -81,6 +81,8 @@ export default function RoomDev() {
 	const { clients, provideMediaRef, localStream, reinitializeStream } = useWebRTC(roomID!)
 	const { emitPlay, emitPause, emitSeek, requestSync, lastSeekDirection } = useRoomSync(roomID!, playerRef)
 
+	useEffect(() => {}, [hideUsers])
+
 	useEffect(() => {
 		if (loaded) {
 			console.log('loaded')
