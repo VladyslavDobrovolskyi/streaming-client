@@ -16,7 +16,6 @@ import {
 	CameraIcon,
 	EyeOpenIcon,
 	EyeClosedIcon,
-	SquareIcon,
 } from '@radix-ui/react-icons'
 import { Slider } from '@radix-ui/themes'
 import ActionIndicator from '../components/ActionIndicator'
@@ -32,7 +31,7 @@ export default function RoomDev() {
 	const [loaded, setLoaded] = useState(0)
 	const [showControls, setShowControls] = useState(false)
 	const [showVolumeControl, setShowVolumeControl] = useState(false)
-	const [isFullscreen, setIsFullscreen] = useState(false)
+	const [isFullscreen, setIsFullscreen] = useState(false) // Added isFullscreen state
 	const [duration, setDuration] = useState(300)
 	const [isDragging, setIsDragging] = useState(false)
 	const [isVolumeActive, setIsVolumeActive] = useState(false)
@@ -280,6 +279,19 @@ export default function RoomDev() {
 		// Request sync when component mounts
 		requestSync()
 	}, [requestSync])
+
+	useEffect(() => {
+		// Added fullscreenchange listener
+		const handleFullscreenChange = () => {
+			setIsFullscreen(!!document.fullscreenElement)
+		}
+
+		document.addEventListener('fullscreenchange', handleFullscreenChange)
+
+		return () => {
+			document.removeEventListener('fullscreenchange', handleFullscreenChange)
+		}
+	}, [])
 
 	const formatTime = (seconds: number) => {
 		const date = new Date(seconds * 1000)
@@ -535,9 +547,19 @@ export default function RoomDev() {
 	}
 
 	const handleMovieModeToggle = () => {
-		setIsMovieMode(prev => !prev)
-		// Если нужно, здесь можно добавить дополнительную логику
-		// например, изменение размера видео или другие эффекты
+		setIsMovieMode(prev => {
+			const newMovieMode = !prev
+			if (newMovieMode) {
+				if (playerWrapperRef.current && !document.fullscreenElement) {
+					playerWrapperRef.current.requestFullscreen()
+				}
+			} else {
+				if (document.fullscreenElement) {
+					document.exitFullscreen()
+				}
+			}
+			return newMovieMode
+		})
 	}
 
 	return (
@@ -568,8 +590,8 @@ export default function RoomDev() {
 				onPause={handlePause}
 				onProgress={handleProgress}
 				onDuration={duration => setDuration(duration)}
-				width='100%'
-				height='100%'
+				width={isMovieMode ? '100%' : '100%'} // Updated width
+				height={isMovieMode ? '100%' : '100%'} // Updated height
 				style={{
 					backgroundColor: '#1a1a1a',
 					objectFit: isMovieMode ? 'contain' : 'cover',
@@ -577,8 +599,6 @@ export default function RoomDev() {
 					top: 0,
 					left: 0,
 					zIndex: 1,
-					width: '100%',
-					height: '100%',
 				}}
 			/>
 			{renderParticipants()}
@@ -865,7 +885,7 @@ export default function RoomDev() {
 								alignItems: 'center',
 							}}
 						>
-							<SquareIcon />
+							{isMovieMode ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />} {/* Updated button icon */}
 						</button>
 					</div>
 				</div>
