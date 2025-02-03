@@ -633,7 +633,7 @@ export default function RoomDev() {
 									alignItems: 'center',
 								}}
 							>
-								<EyeClosedIcon style={{ color: 'white', transform: 'scale(1)' }} />
+								<EyeClosedIcon style={{ color: 'white', transform: 'scale(1)', cursor: 'pointer' }} />
 							</div>
 						)}
 					</div>
