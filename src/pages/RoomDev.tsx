@@ -48,6 +48,7 @@ export default function RoomDev() {
 	const [coveredClients, setCoveredClients] = useState<Record<string, boolean>>({})
 	const [isMovieMode, setIsMovieMode] = useState(false)
 	const [clientPositions, setClientPositions] = useState<Record<string, { x: number; y: number }>>({})
+	const [draggingClient, setDraggingClient] = useState<string | null>(null) // Added draggingClient state
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -259,7 +260,7 @@ export default function RoomDev() {
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown)
 		}
-	}, [volume, handleVolumeChange, emitPause, handlePlay]) // Added emitPause and handlePlay to dependencies
+	}, [volume, handleVolumeChange, emitPause, emitPlay, handlePlay, handlePause]) // Added emitPause and handlePlay to dependencies
 
 	useEffect(() => {
 		if (roomID) {
@@ -359,19 +360,42 @@ export default function RoomDev() {
 	}
 
 	const handleDragStart = (clientID: string, e: React.DragEvent<HTMLDivElement>) => {
+		setDraggingClient(clientID) // Update: Set draggingClient
 		e.dataTransfer.setData('text/plain', clientID)
-		// Add this line to set a custom drag image (optional)
-		const dragImage = new Image()
-		dragImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7' // 1x1 transparent GIF
-		e.dataTransfer.setDragImage(dragImage, 0, 0)
+		const rect = e.currentTarget.getBoundingClientRect()
+		const offsetX = e.clientX - rect.left
+		const offsetY = e.clientY - rect.top
+		e.dataTransfer.setData('application/json', JSON.stringify({ offsetX, offsetY }))
+
+		// Create a transparent drag image
+		const dragImage = document.createElement('div')
+		dragImage.style.width = '150px'
+		dragImage.style.height = '100px'
+		dragImage.style.backgroundColor = 'transparent'
+		document.body.appendChild(dragImage)
+		e.dataTransfer.setDragImage(dragImage, 75, 50)
+		setTimeout(() => document.body.removeChild(dragImage), 0)
 	}
 
 	const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
 		e.preventDefault()
+		const rect = playerWrapperRef.current?.getBoundingClientRect()
+		if (rect) {
+			const offsetData = e.dataTransfer.getData('application/json')
+			const { offsetX, offsetY } = JSON.parse(offsetData)
+			const clientID = e.dataTransfer.getData('text/plain')
+			const x = Math.max(rect.width - 150, Math.min(e.clientX - rect.left - offsetX, rect.width))
+			const y = Math.max(0, Math.min(e.clientY - rect.top - offsetY, rect.height - 100))
+			setClientPositions(prev => ({
+				...prev,
+				[clientID]: { x, y },
+			}))
+		}
 	}
 
 	const handleDragEnd = (clientID: string, e: React.DragEvent<HTMLDivElement>) => {
 		e.preventDefault()
+		setDraggingClient(null) // Update: Reset draggingClient
 		const rect = playerWrapperRef.current?.getBoundingClientRect()
 		if (rect) {
 			const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width - 150))
@@ -438,7 +462,12 @@ export default function RoomDev() {
 							autoPlay
 							playsInline
 							muted={clientID === LOCAL_VIDEO}
-							style={{ objectFit: 'cover', borderRadius: '5px' }}
+							style={{
+								objectFit: 'cover',
+								borderRadius: '5px',
+								opacity: draggingClient === clientID ? 0 : 1,
+								transition: 'opacity 0.2s ease-in-out',
+							}}
 						/>
 						{clientID === LOCAL_VIDEO && cameraMuted && (
 							<div
@@ -579,6 +608,22 @@ export default function RoomDev() {
 		)
 	}
 
+	useEffect(() => {
+		const containerWidth = playerWrapperRef.current?.clientWidth || window.innerWidth
+		const newPositions: Record<string, { x: number; y: number }> = {}
+		clients.forEach((clientID, index) => {
+			if (!clientPositions[clientID]) {
+				newPositions[clientID] = {
+					x: containerWidth - 155 * (index + 1), // 155px is the width of each video container
+					y: 10, // 10px from the top
+				}
+			}
+		})
+		if (Object.keys(newPositions).length > 0) {
+			setClientPositions(prev => ({ ...prev, ...newPositions }))
+		}
+	}, [clients, clientPositions])
+
 	const handleMicMuteUnmute = () => {
 		if (localStream) {
 			const audioTracks = localStream.getAudioTracks()
@@ -626,7 +671,7 @@ export default function RoomDev() {
 				const clientID = e.dataTransfer.getData('text')
 				const rect = playerWrapperRef.current?.getBoundingClientRect()
 				if (rect) {
-					const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width - 150))
+					const x = Math.max(rect.width - 150, Math.min(e.clientX - rect.left, rect.width))
 					const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height - 100))
 					setClientPositions(prev => ({
 						...prev,
