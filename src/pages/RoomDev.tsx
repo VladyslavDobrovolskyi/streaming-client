@@ -14,7 +14,6 @@ import {
 	EyeOpenIcon,
 	EyeClosedIcon,
 	SquareIcon,
-	MoveIcon,
 	DotsHorizontalIcon,
 	SectionIcon,
 } from '@radix-ui/react-icons'
@@ -497,39 +496,6 @@ export default function RoomDev() {
 								transition: 'opacity 0.3s ease, visibility 0.3s ease',
 							}}
 						/>
-						{clientID === LOCAL_VIDEO && cameraMuted && (
-							<div
-								style={{
-									position: 'absolute',
-									top: 0,
-									left: 0,
-									width: '100%',
-									height: '100%',
-									backgroundColor: 'black',
-									borderRadius: '5px',
-									display: 'flex',
-									justifyContent: 'center',
-									alignItems: 'center',
-									color: 'white',
-									fontSize: '12px',
-								}}
-							>
-								Camera Off
-							</div>
-						)}
-						{draggingClient === clientID && (
-							<div
-								style={{
-									position: 'absolute',
-									top: '50%',
-									left: '50%',
-									transform: 'translate(-50%, -50%)',
-									padding: '10px',
-								}}
-							>
-								<MoveIcon style={{ color: 'white', transform: 'scale(1)' }} />
-							</div>
-						)}
 						{hoveredClient === clientID && !draggingClient && (
 							<>
 								<div
