@@ -997,7 +997,7 @@ export default function RoomDev() {
 						<button
 							onClick={handleMovieModeToggle}
 							style={{
-								color: isMovieMode ? '#ff0000' : '#fff',
+								color: isMovieMode ? '#ff0000' : '#ffffff',
 								border: 'none',
 								padding: '0.5rem',
 								borderRadius: '5px',
@@ -1012,7 +1012,7 @@ export default function RoomDev() {
 						<button
 							onClick={() => setHideUsers(prev => !prev)}
 							style={{
-								color: hideUsers ? '#ff0000' : '#fff',
+								color: hideUsers ? '#ff0000' : '#ffffff',
 								border: 'none',
 								padding: '0.5rem',
 								borderRadius: '5px',
