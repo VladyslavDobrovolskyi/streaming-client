@@ -965,8 +965,8 @@ export default function RoomDev() {
 						<button
 							onClick={handleCameraMuteUnmute}
 							style={{
-								color: cameraMuted ? '#808080' : '#ff0000',
-								border: 'none',
+								color: cameraMuted ? '#808080' : 'white',
+								border: '1px grenen solid',
 								padding: '0.5rem',
 								borderRadius: '5px',
 								cursor: 'pointer',
@@ -980,8 +980,8 @@ export default function RoomDev() {
 						<button
 							onClick={handleFullscreenToggle}
 							style={{
-								color: '#fff',
-								border: 'none',
+								color: cameraMuted ? '#808080' : 'white',
+								border: '1px grenen solid',
 								padding: '0.5rem',
 								borderRadius: '5px',
 								cursor: 'pointer',
