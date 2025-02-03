@@ -47,7 +47,6 @@ export default function RoomDev() {
 	const [previousVolumes, setPreviousVolumes] = useState<Record<string, number>>({})
 	const [coveredClients, setCoveredClients] = useState<Record<string, boolean>>({})
 	const [isMovieMode, setIsMovieMode] = useState(false)
-	const [aspectRatio, setAspectRatio] = useState(16 / 9)
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -157,16 +156,6 @@ export default function RoomDev() {
 		}
 		if (state.loadedSeconds > 0 && duration === 300) {
 			setDuration(playerRef.current?.getDuration() || 300)
-
-			// Определяем соотношение сторон видео
-			const videoElement = playerRef.current?.getInternalPlayer()
-			if (videoElement) {
-				const videoWidth = videoElement.videoWidth
-				const videoHeight = videoElement.videoHeight
-				if (videoWidth && videoHeight) {
-					setAspectRatio(videoWidth / videoHeight)
-				}
-			}
 		}
 	}
 
@@ -298,6 +287,32 @@ export default function RoomDev() {
 			document.removeEventListener('fullscreenchange', handleFullscreenChange)
 		}
 	}, [])
+
+	useEffect(() => {
+		const updateVideoSize = () => {
+			if (playerRef.current) {
+				const playerElement = playerRef.current.getInternalPlayer()
+				if (playerElement) {
+					if (isMovieMode) {
+						playerElement.style.width = '100vw'
+						playerElement.style.height = '100vh'
+						playerElement.style.objectFit = 'cover'
+					} else {
+						playerElement.style.width = '100%'
+						playerElement.style.height = '100%'
+						playerElement.style.objectFit = 'contain'
+					}
+				}
+			}
+		}
+
+		updateVideoSize()
+		window.addEventListener('resize', updateVideoSize)
+
+		return () => {
+			window.removeEventListener('resize', updateVideoSize)
+		}
+	}, [isMovieMode])
 
 	const formatTime = (seconds: number) => {
 		const date = new Date(seconds * 1000)
@@ -587,12 +602,11 @@ export default function RoomDev() {
 				style={{
 					backgroundColor: '#1a1a1a',
 					objectFit: isMovieMode ? 'cover' : 'contain',
-					objectPosition: 'center',
 					position: 'absolute',
 					top: 0,
 					left: 0,
-					width: isMovieMode ? `${100 * Math.max(1, aspectRatio)}%` : '100%',
-					height: isMovieMode ? `${100 * Math.max(1, 1 / aspectRatio)}%` : '100%',
+					width: '100%',
+					height: '100%',
 					zIndex: 1,
 				}}
 			/>
