@@ -950,8 +950,8 @@ export default function RoomDev() {
 						<button
 							onClick={handleMicMuteUnmute}
 							style={{
-								color: micMuted ? '#808080' : '#ff0000',
-								border: 'none',
+								color: micMuted ? '#808080' : '#ffffff',
+								border: '1px green solid',
 								padding: '0.5rem',
 								borderRadius: '5px',
 								cursor: 'pointer',
@@ -965,8 +965,8 @@ export default function RoomDev() {
 						<button
 							onClick={handleCameraMuteUnmute}
 							style={{
-								color: cameraMuted ? '#808080' : 'white',
-								border: '1px grenen solid',
+								color: cameraMuted ? '#808080' : '#ffffff',
+								border: '1px green solid',
 								padding: '0.5rem',
 								borderRadius: '5px',
 								cursor: 'pointer',
@@ -980,8 +980,8 @@ export default function RoomDev() {
 						<button
 							onClick={handleFullscreenToggle}
 							style={{
-								color: cameraMuted ? '#808080' : 'white',
-								border: '1px grenen solid',
+								color: '#fff',
+								border: 'none',
 								padding: '0.5rem',
 								borderRadius: '5px',
 								cursor: 'pointer',
