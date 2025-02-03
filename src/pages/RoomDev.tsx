@@ -29,9 +29,10 @@ const createDashedSquareDragImage = () => {
 	const dragImage = document.createElement('div')
 	dragImage.style.width = '150px'
 	dragImage.style.height = '100px'
-	dragImage.style.border = '2px dashed white'
+	dragImage.style.border = '2px dashed rgba(255, 255, 255, 0.5)'
 	dragImage.style.padding = '5px'
-	dragImage.style.backgroundColor = 'transparent'
+	dragImage.style.boxSizing = 'border-box'
+	dragImage.style.backgroundColor = 'rgba(0, 0, 0, 0.2)'
 	document.body.appendChild(dragImage)
 	return dragImage
 }
