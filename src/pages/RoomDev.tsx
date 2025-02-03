@@ -558,9 +558,34 @@ export default function RoomDev() {
 					document.exitFullscreen()
 				}
 			}
+			// Добавьте задержку для изменения objectFit после завершения анимации fullscreen
+			setTimeout(() => {
+				if (playerRef.current) {
+					const videoElement = playerRef.current.getInternalPlayer() as HTMLVideoElement
+					if (videoElement) {
+						videoElement.style.objectFit = newMovieMode ? 'cover' : 'contain'
+					}
+				}
+			}, 300)
 			return newMovieMode
 		})
 	}
+
+	useEffect(() => {
+		const handleResize = () => {
+			if (playerRef.current) {
+				const videoElement = playerRef.current.getInternalPlayer() as HTMLVideoElement
+				if (videoElement) {
+					videoElement.style.objectFit = isMovieMode ? 'cover' : 'contain'
+				}
+			}
+		}
+
+		window.addEventListener('resize', handleResize)
+		return () => {
+			window.removeEventListener('resize', handleResize)
+		}
+	}, [isMovieMode])
 
 	return (
 		<div
@@ -594,10 +619,12 @@ export default function RoomDev() {
 				height={isMovieMode ? '100%' : '100%'} // Updated height
 				style={{
 					backgroundColor: '#1a1a1a',
-					objectFit: isMovieMode ? 'contain' : 'cover',
+					objectFit: isMovieMode ? 'cover' : 'contain',
 					position: 'absolute',
 					top: 0,
 					left: 0,
+					width: '100%',
+					height: '100%',
 					zIndex: 1,
 				}}
 			/>
