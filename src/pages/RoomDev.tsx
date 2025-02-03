@@ -70,6 +70,7 @@ export default function RoomDev() {
 	const [isMovieMode, setIsMovieMode] = useState(false)
 	const [clientPositions, setClientPositions] = useState<Record<string, { x: number; y: number }>>({})
 	const [draggingClient, setDraggingClient] = useState<string | null>(null) // Added draggingClient state
+	const [hideUsers, setHideUsers] = useState(false) // Added hideUsers state
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -426,6 +427,7 @@ export default function RoomDev() {
 	}
 
 	const renderParticipants = () => {
+		if (hideUsers) return null
 		return (
 			<div
 				style={{
@@ -435,9 +437,7 @@ export default function RoomDev() {
 					width: '100%',
 					height: '100%',
 					pointerEvents: 'none',
-					zIndex: isMovieMode ? 0 : 10,
-					opacity: isMovieMode ? 0 : 1,
-					transition: 'opacity 0.3s ease-in-out',
+					zIndex: 10,
 				}}
 			>
 				{clients.map(clientID => (
@@ -1006,6 +1006,21 @@ export default function RoomDev() {
 							}}
 						>
 							<SquareIcon />
+						</button>
+						<button
+							onClick={() => setHideUsers(prev => !prev)}
+							style={{
+								color: hideUsers ? '#ff0000' : '#fff',
+								border: 'none',
+								padding: '0.5rem',
+								borderRadius: '5px',
+								cursor: 'pointer',
+								background: 'none',
+								display: 'flex',
+								alignItems: 'center',
+							}}
+						>
+							{hideUsers ? <EyeClosedIcon /> : <EyeOpenIcon />}
 						</button>
 					</div>
 				</div>
