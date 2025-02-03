@@ -965,7 +965,7 @@ export default function RoomDev() {
 						<button
 							onClick={handleCameraMuteUnmute}
 							style={{
-								color: '#fff',
+								color: cameraMuted ? '#808080' : '#ff0000',
 								border: 'none',
 								padding: '0.5rem',
 								borderRadius: '5px',
@@ -973,7 +973,6 @@ export default function RoomDev() {
 								background: 'none',
 								display: 'flex',
 								alignItems: 'center',
-								position: 'relative',
 							}}
 						>
 							{cameraMuted ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
