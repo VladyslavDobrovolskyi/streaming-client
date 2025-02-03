@@ -469,7 +469,13 @@ export default function RoomDev() {
 						onMouseEnter={() => !draggingClient && setHoveredClient(clientID)}
 						onMouseLeave={() => !draggingClient && setHoveredClient(null)}
 					>
-						{(clientID !== LOCAL_VIDEO || !cameraMuted) && (
+						<div
+							style={{
+								width: '100%',
+								height: '100%',
+								display: clientID === LOCAL_VIDEO && cameraMuted ? 'none' : 'block',
+							}}
+						>
 							<video
 								width='100%'
 								height='100%'
@@ -495,23 +501,7 @@ export default function RoomDev() {
 									borderRadius: '5px',
 								}}
 							/>
-						)}
-						{clientID === LOCAL_VIDEO && cameraMuted && (
-							<div
-								style={{
-									width: '100%',
-									height: '100%',
-									backgroundColor: 'black',
-									borderRadius: '5px',
-									display: 'flex',
-									justifyContent: 'center',
-									alignItems: 'center',
-									color: 'white',
-								}}
-							>
-								Camera Off
-							</div>
-						)}
+						</div>
 						{hoveredClient === clientID && !draggingClient && (
 							<>
 								<div
@@ -659,7 +649,11 @@ export default function RoomDev() {
 				const track = audioTracks[0]
 				track.enabled = !track.enabled
 				setMicMuted(!track.enabled)
+			} else {
+				console.warn('No audio tracks found in the local stream')
 			}
+		} else {
+			console.error('Local stream is not available')
 		}
 	}
 
@@ -670,7 +664,11 @@ export default function RoomDev() {
 				const track = videoTracks[0]
 				track.enabled = !track.enabled
 				setCameraMuted(!track.enabled)
+			} else {
+				console.warn('No video tracks found in the local stream')
 			}
+		} else {
+			console.error('Local stream is not available')
 		}
 	}
 
@@ -680,7 +678,6 @@ export default function RoomDev() {
 
 	const handleMenuOpen = () => {
 		setIsMenuOpen(true)
-		setShowControls(true)
 	}
 
 	const handleMenuClose = () => {
