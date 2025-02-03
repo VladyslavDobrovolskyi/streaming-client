@@ -15,10 +15,12 @@ import {
 	EyeClosedIcon,
 	SquareIcon,
 	MoveIcon,
+	DotsHorizontalIcon,
 } from '@radix-ui/react-icons'
 import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
 import { Slider } from '@radix-ui/themes'
+import { DropdownMenu } from 'radix-ui'
 import ActionIndicator from '../components/ActionIndicator'
 import { useParams } from 'react-router'
 import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
@@ -956,36 +958,90 @@ export default function RoomDev() {
 							justifyContent: 'flex-end',
 						}}
 					>
-						<button
-							onClick={handleMicMuteUnmute}
-							style={{
-								color: micMuted ? '#808080' : '#ffffff',
-								border: 'none',
-								padding: '0.5rem',
-								borderRadius: '5px',
-								cursor: 'pointer',
-								background: 'none',
-								display: 'flex',
-								alignItems: 'center',
-							}}
-						>
-							{micMuted ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
-						</button>
-						<button
-							onClick={handleCameraMuteUnmute}
-							style={{
-								color: cameraMuted ? '#808080' : '#ffffff',
-								border: 'none',
-								padding: '0.5rem',
-								borderRadius: '5px',
-								cursor: 'pointer',
-								background: 'none',
-								display: 'flex',
-								alignItems: 'center',
-							}}
-						>
-							{cameraMuted ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
-						</button>
+						{/* REPLACEMENT START */}
+						<DropdownMenu.Root>
+							<DropdownMenu.Trigger asChild>
+								<button
+									style={{
+										color: '#fff',
+										border: 'none',
+										padding: '0.5rem',
+										borderRadius: '5px',
+										cursor: 'pointer',
+										background: 'none',
+										display: 'flex',
+										alignItems: 'center',
+									}}
+								>
+									<DotsHorizontalIcon />
+								</button>
+							</DropdownMenu.Trigger>
+							<DropdownMenu.Portal>
+								<DropdownMenu.Content
+									style={{
+										minWidth: 220,
+										backgroundColor: 'rgba(0, 0, 0, 0.8)',
+										borderRadius: 6,
+										padding: 5,
+										color: '#fff',
+									}}
+								>
+									<DropdownMenu.Item
+										onSelect={handleMicMuteUnmute}
+										style={{
+											padding: '8px 12px',
+											cursor: 'pointer',
+											display: 'flex',
+											alignItems: 'center',
+											gap: '8px',
+										}}
+									>
+										{micMuted ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
+										{micMuted ? 'Unmute Microphone' : 'Mute Microphone'}
+									</DropdownMenu.Item>
+									<DropdownMenu.Item
+										onSelect={handleCameraMuteUnmute}
+										style={{
+											padding: '8px 12px',
+											cursor: 'pointer',
+											display: 'flex',
+											alignItems: 'center',
+											gap: '8px',
+										}}
+									>
+										{cameraMuted ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
+										{cameraMuted ? 'Turn Camera On' : 'Turn Camera Off'}
+									</DropdownMenu.Item>
+									<DropdownMenu.Item
+										onSelect={handleMovieModeToggle}
+										style={{
+											padding: '8px 12px',
+											cursor: 'pointer',
+											display: 'flex',
+											alignItems: 'center',
+											gap: '8px',
+										}}
+									>
+										<SquareIcon />
+										{isMovieMode ? 'Disable Movie Mode' : 'Enable Movie Mode'}
+									</DropdownMenu.Item>
+									<DropdownMenu.Item
+										onSelect={() => setHideUsers(prev => !prev)}
+										style={{
+											padding: '8px 12px',
+											cursor: 'pointer',
+											display: 'flex',
+											alignItems: 'center',
+											gap: '8px',
+										}}
+									>
+										{hideUsers ? <EyeClosedIcon /> : <EyeOpenIcon />}
+										{hideUsers ? 'Show Users' : 'Hide Users'}
+									</DropdownMenu.Item>
+								</DropdownMenu.Content>
+							</DropdownMenu.Portal>
+						</DropdownMenu.Root>
+						{/* REPLACEMENT END */}
 						<button
 							onClick={handleFullscreenToggle}
 							style={{
@@ -1000,36 +1056,6 @@ export default function RoomDev() {
 							}}
 						>
 							{isFullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
-						</button>
-						<button
-							onClick={handleMovieModeToggle}
-							style={{
-								color: isMovieMode ? '#808080' : '#ffffff',
-								border: 'none',
-								padding: '0.5rem',
-								borderRadius: '5px',
-								cursor: 'pointer',
-								background: 'none',
-								display: 'flex',
-								alignItems: 'center',
-							}}
-						>
-							<SquareIcon />
-						</button>
-						<button
-							onClick={() => setHideUsers(prev => !prev)}
-							style={{
-								color: hideUsers ? '#808080' : '#ffffff',
-								border: 'none',
-								padding: '0.5rem',
-								borderRadius: '5px',
-								cursor: 'pointer',
-								display: 'flex',
-								background: 'none',
-								alignItems: 'center',
-							}}
-						>
-							{hideUsers ? <EyeClosedIcon /> : <EyeOpenIcon />}
 						</button>
 					</div>
 				</div>
