@@ -971,18 +971,14 @@ export default function RoomDev() {
 								>
 									<DotsHorizontalIcon />
 								</button>
-							</DropdownMenu.Trigger>
-							<DropdownMenu.Portal>
-								<DropdownMenu.Content
-									onMouseEnter={() => {
-										setShowControls(true)
-										if (controlsTimeoutRef.current) {
-											clearTimeout(controlsTimeoutRef.current)
-										}
-									}}
-									onMouseLeave={handleMenuClose}
+							</DropdownMenu.Trigger>{' '}
+							{isMenuOpen && (
+								<div
 									style={{
-										zIndex: 9999, // Increase this value
+										position: 'absolute',
+										bottom: '100%',
+										right: 0,
+										zIndex: 9999,
 										minWidth: 220,
 										backgroundColor: 'rgba(0, 0, 0, 0.8)',
 										borderRadius: 6,
@@ -990,72 +986,82 @@ export default function RoomDev() {
 										color: '#fff',
 									}}
 								>
-									<DropdownMenu.Item
-										onSelect={event => {
-											event.preventDefault()
-											handleMicMuteUnmute()
+									<DropdownMenu.Content
+										onMouseEnter={() => {
+											setShowControls(true)
+											if (controlsTimeoutRef.current) {
+												clearTimeout(controlsTimeoutRef.current)
+											}
 										}}
-										style={{
-											padding: '8px 12px',
-											cursor: 'pointer',
-											display: 'flex',
-											alignItems: 'center',
-											gap: '8px',
-										}}
+										onMouseLeave={handleMenuClose}
 									>
-										{micMuted ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
-										{micMuted ? 'Unmute Microphone' : 'Mute Microphone'}
-									</DropdownMenu.Item>
-									<DropdownMenu.Item
-										onSelect={event => {
-											event.preventDefault()
-											handleCameraMuteUnmute()
-										}}
-										style={{
-											padding: '8px 12px',
-											cursor: 'pointer',
-											display: 'flex',
-											alignItems: 'center',
-											gap: '8px',
-										}}
-									>
-										{cameraMuted ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
-										{cameraMuted ? 'Turn Camera On' : 'Turn Camera Off'}
-									</DropdownMenu.Item>
-									<DropdownMenu.Item
-										onSelect={event => {
-											event.preventDefault()
-											handleMovieModeToggle()
-										}}
-										style={{
-											padding: '8px 12px',
-											cursor: 'pointer',
-											display: 'flex',
-											alignItems: 'center',
-											gap: '8px',
-										}}
-									>
-										{isMovieMode ? <SectionIcon /> : <SquareIcon />}
-										{isMovieMode ? 'Disable Movie Mode' : 'Enable Movie Mode'}
-									</DropdownMenu.Item>
-									<DropdownMenu.Item
-										onSelect={event => {
-											event.preventDefault()
-											setHideUsers(prev => !prev)
-										}}
-										style={{
-											padding: '8px 12px',
-											cursor: 'pointer',
-											display: 'flex',
-											alignItems: 'center',
-											gap: '8px',
-										}}
-									>
-										{hideUsers ? <EyeOpenIcon /> : <EyeClosedIcon />}
-										{hideUsers ? 'Show Users' : 'Hide Users'}
-									</DropdownMenu.Item>
-								</DropdownMenu.Content>
-							</DropdownMenu.Portal>
+										<DropdownMenu.Item
+											onSelect={event => {
+												event.preventDefault()
+												handleMicMuteUnmute()
+											}}
+											style={{
+												padding: '8px 12px',
+												cursor: 'pointer',
+												display: 'flex',
+												alignItems: 'center',
+												gap: '8px',
+											}}
+										>
+											{micMuted ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
+											{micMuted ? 'Unmute Microphone' : 'Mute Microphone'}
+										</DropdownMenu.Item>
+										<DropdownMenu.Item
+											onSelect={event => {
+												event.preventDefault()
+												handleCameraMuteUnmute()
+											}}
+											style={{
+												padding: '8px 12px',
+												cursor: 'pointer',
+												display: 'flex',
+												alignItems: 'center',
+												gap: '8px',
+											}}
+										>
+											{cameraMuted ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
+											{cameraMuted ? 'Turn Camera On' : 'Turn Camera Off'}
+										</DropdownMenu.Item>
+										<DropdownMenu.Item
+											onSelect={event => {
+												event.preventDefault()
+												handleMovieModeToggle()
+											}}
+											style={{
+												padding: '8px 12px',
+												cursor: 'pointer',
+												display: 'flex',
+												alignItems: 'center',
+												gap: '8px',
+											}}
+										>
+											{isMovieMode ? <SectionIcon /> : <SquareIcon />}
+											{isMovieMode ? 'Disable Movie Mode' : 'Enable Movie Mode'}
+										</DropdownMenu.Item>
+										<DropdownMenu.Item
+											onSelect={event => {
+												event.preventDefault()
+												setHideUsers(prev => !prev)
+											}}
+											style={{
+												padding: '8px 12px',
+												cursor: 'pointer',
+												display: 'flex',
+												alignItems: 'center',
+												gap: '8px',
+											}}
+										>
+											{hideUsers ? <EyeOpenIcon /> : <EyeClosedIcon />}
+											{hideUsers ? 'Show Users' : 'Hide Users'}
+										</DropdownMenu.Item>
+									</DropdownMenu.Content>
+								</div>
+							)}
 						</DropdownMenu.Root>
 						<button
 							onClick={handleFullscreenToggle}
