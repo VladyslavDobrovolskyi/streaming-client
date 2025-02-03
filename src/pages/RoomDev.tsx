@@ -16,6 +16,7 @@ import {
 	CameraIcon,
 	EyeOpenIcon,
 	EyeClosedIcon,
+	SquareIcon,
 } from '@radix-ui/react-icons'
 import { Slider } from '@radix-ui/themes'
 import ActionIndicator from '../components/ActionIndicator'
@@ -45,6 +46,7 @@ export default function RoomDev() {
 	const [clientVolumes, setClientVolumes] = useState<Record<string, number>>({})
 	const [previousVolumes, setPreviousVolumes] = useState<Record<string, number>>({})
 	const [coveredClients, setCoveredClients] = useState<Record<string, boolean>>({})
+	const [isMovieMode, setIsMovieMode] = useState(false)
 	//const [mutedCameras, setMutedCameras] = useState<Record<string, boolean>>({})
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -323,6 +325,7 @@ export default function RoomDev() {
 	}
 
 	const renderParticipants = () => {
+		if (isMovieMode) return null
 		return (
 			<div
 				style={{
@@ -529,6 +532,10 @@ export default function RoomDev() {
 		}
 	}
 
+	const handleMovieModeToggle = () => {
+		setIsMovieMode(prev => !prev)
+	}
+
 	return (
 		<div
 			ref={playerWrapperRef}
@@ -557,9 +564,16 @@ export default function RoomDev() {
 				onPause={handlePause}
 				onProgress={handleProgress}
 				onDuration={duration => setDuration(duration)}
-				width='100%'
-				height='100%'
-				style={{ backgroundColor: '#1a1a1a', objectFit: 'contain' }}
+				width={isMovieMode ? '100%' : '100%'}
+				height={isMovieMode ? '100%' : '100%'}
+				style={{
+					backgroundColor: '#1a1a1a',
+					objectFit: isMovieMode ? 'contain' : 'cover',
+					position: isMovieMode ? 'absolute' : 'relative',
+					top: 0,
+					left: 0,
+					zIndex: isMovieMode ? 10 : 'auto',
+				}}
 			/>
 			{renderParticipants()}
 			<div
@@ -830,6 +844,21 @@ export default function RoomDev() {
 							}}
 						>
 							{isFullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
+						</button>
+						<button
+							onClick={handleMovieModeToggle}
+							style={{
+								color: isMovieMode ? '#ff0000' : '#fff',
+								border: 'none',
+								padding: '0.5rem',
+								borderRadius: '5px',
+								cursor: 'pointer',
+								background: 'none',
+								display: 'flex',
+								alignItems: 'center',
+							}}
+						>
+							<SquareIcon />
 						</button>
 					</div>
 				</div>
