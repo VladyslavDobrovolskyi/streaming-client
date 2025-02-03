@@ -610,6 +610,7 @@ export default function RoomDev() {
 												}}
 												style={
 													{
+														cursor: 'pointer',
 														width: '100%',
 														marginLeft: '5px',
 														'--slider-thumb-size': '10px',
@@ -1023,8 +1024,8 @@ export default function RoomDev() {
 								padding: '0.5rem',
 								borderRadius: '5px',
 								cursor: 'pointer',
-								background: 'none',
 								display: 'flex',
+								background: 'none',
 								alignItems: 'center',
 							}}
 						>
