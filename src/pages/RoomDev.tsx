@@ -698,7 +698,7 @@ export default function RoomDev() {
 			if (audioTracks.length > 0) {
 				const track = audioTracks[0]
 				const newMutedState = !track.enabled
-				track.enabled = newMutedState
+				track.enabled = !newMutedState
 				setMicMuted(newMutedState)
 				emitMicrophoneSync(newMutedState)
 			} else {
@@ -746,6 +746,7 @@ export default function RoomDev() {
 			const audioTrack = localStream.getAudioTracks()[0]
 			if (audioTrack) {
 				setMicMuted(!audioTrack.enabled)
+				emitMicrophoneSync(!audioTrack.enabled)
 			}
 		}
 	}, [localStream])
