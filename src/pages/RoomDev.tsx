@@ -697,9 +697,10 @@ export default function RoomDev() {
 			const audioTracks = localStream.getAudioTracks()
 			if (audioTracks.length > 0) {
 				const track = audioTracks[0]
-				track.enabled = !track.enabled
-				setMicMuted(!track.enabled)
-				emitMicrophoneSync(!track.enabled)
+				const newMutedState = !track.enabled
+				track.enabled = !newMutedState
+				setMicMuted(newMutedState)
+				emitMicrophoneSync(newMutedState)
 			} else {
 				console.warn('No audio tracks found in the local stream')
 			}
