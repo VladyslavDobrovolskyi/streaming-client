@@ -75,6 +75,7 @@ export default function RoomDev() {
 	const [draggingClient, setDraggingClient] = useState<string | null>(null) // Added draggingClient state
 	const [hideUsers, setHideUsers] = useState(false) // Updated hideUsers state
 	const [isMenuOpen, setIsMenuOpen] = useState(false) // Added isMenuOpen state
+	const [hoveredItem, setHoveredItem] = useState<string | null>(null) // Added hoveredItem state
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -232,6 +233,7 @@ export default function RoomDev() {
 			document.exitFullscreen()
 			setIsFullscreen(false)
 		}
+		setIsMenuOpen(false)
 	}
 
 	useEffect(() => {
@@ -990,13 +992,12 @@ export default function RoomDev() {
 							{isMenuOpen && (
 								<div
 									style={{
-										position: 'absolute',
-										bottom: '100%',
-										right: 0,
+										position: 'fixed',
+										bottom: showControls ? '60px' : '10px',
+										right: '10px',
 										zIndex: 9999,
 										minWidth: 220,
-										padding: 5,
-										color: 'white',
+										transition: 'bottom 0.3s ease',
 									}}
 								>
 									<DropdownMenu.Content
@@ -1007,18 +1008,33 @@ export default function RoomDev() {
 											}
 										}}
 										onMouseLeave={handleMenuClose}
+										style={{
+											backgroundColor: 'rgba(0, 0, 0, 0.8)',
+											borderRadius: '4px',
+											padding: '4px',
+											zIndex: 9999,
+										}}
 									>
 										<DropdownMenu.Item
 											onSelect={event => {
 												event.preventDefault()
 												handleMicMuteUnmute()
 											}}
+											onMouseEnter={() => setHoveredItem('mic')}
+											onMouseLeave={() => setHoveredItem(null)}
 											style={{
 												padding: '8px 12px',
 												cursor: 'pointer',
 												display: 'flex',
 												alignItems: 'center',
 												gap: '8px',
+												backgroundColor:
+													hoveredItem === 'mic' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+												color: 'white',
+												border: 'none',
+												width: '100%',
+												textAlign: 'left',
+												outline: 'none',
 											}}
 										>
 											{micMuted ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
@@ -1029,12 +1045,23 @@ export default function RoomDev() {
 												event.preventDefault()
 												handleCameraMuteUnmute()
 											}}
+											onMouseEnter={() => setHoveredItem('camera')}
+											onMouseLeave={() => setHoveredItem(null)}
 											style={{
 												padding: '8px 12px',
 												cursor: 'pointer',
 												display: 'flex',
 												alignItems: 'center',
 												gap: '8px',
+												backgroundColor:
+													hoveredItem === 'camera'
+														? 'rgba(255, 255, 255, 0.1)'
+														: 'transparent',
+												color: 'white',
+												border: 'none',
+												width: '100%',
+												textAlign: 'left',
+												outline: 'none',
 											}}
 										>
 											{cameraMuted ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
@@ -1045,12 +1072,23 @@ export default function RoomDev() {
 												event.preventDefault()
 												handleMovieModeToggle()
 											}}
+											onMouseEnter={() => setHoveredItem('movieMode')}
+											onMouseLeave={() => setHoveredItem(null)}
 											style={{
 												padding: '8px 12px',
 												cursor: 'pointer',
 												display: 'flex',
 												alignItems: 'center',
 												gap: '8px',
+												backgroundColor:
+													hoveredItem === 'movieMode'
+														? 'rgba(255, 255, 255, 0.1)'
+														: 'transparent',
+												color: 'white',
+												border: 'none',
+												width: '100%',
+												textAlign: 'left',
+												outline: 'none',
 											}}
 										>
 											{isMovieMode ? <SectionIcon /> : <SquareIcon />}
@@ -1061,12 +1099,23 @@ export default function RoomDev() {
 												event.preventDefault()
 												setHideUsers(prev => !prev)
 											}}
+											onMouseEnter={() => setHoveredItem('hideUsers')}
+											onMouseLeave={() => setHoveredItem(null)}
 											style={{
 												padding: '8px 12px',
 												cursor: 'pointer',
 												display: 'flex',
 												alignItems: 'center',
 												gap: '8px',
+												backgroundColor:
+													hoveredItem === 'hideUsers'
+														? 'rgba(255, 255, 255, 0.1)'
+														: 'transparent',
+												color: 'white',
+												border: 'none',
+												width: '100%',
+												textAlign: 'left',
+												outline: 'none',
 											}}
 										>
 											{hideUsers ? <EyeOpenIcon /> : <EyeClosedIcon />}
