@@ -507,7 +507,7 @@ export default function RoomDev() {
 								style={{
 									objectFit: 'cover',
 									borderRadius: '5px',
-									display: participantCameras[clientID] === false ? 'none' : 'block',
+									display: participantCameras[clientID] === true ? 'none' : 'block',
 								}}
 							/>
 							{draggingClient === clientID && (
