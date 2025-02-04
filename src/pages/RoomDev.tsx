@@ -700,6 +700,7 @@ export default function RoomDev() {
 				const newMutedState = !track.enabled
 				track.enabled = !newMutedState
 				setMicMuted(newMutedState)
+				console.log('next step emit microphone sync')
 				emitMicrophoneSync(newMutedState)
 			} else {
 				console.warn('No audio tracks found in the local stream')
