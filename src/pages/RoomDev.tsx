@@ -18,6 +18,7 @@ import {
 	DotsHorizontalIcon,
 	SectionIcon,
 	MoveIcon,
+	ArrowLeftIcon,
 } from '@radix-ui/react-icons'
 import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
@@ -77,6 +78,8 @@ export default function RoomDev() {
 	const [hideUsers, setHideUsers] = useState(false) // Updated hideUsers state
 	const [isMenuOpen, setIsMenuOpen] = useState(false) // Added isMenuOpen state
 	const [hoveredItem, setHoveredItem] = useState<string | null>(null) // Added hoveredItem state
+	const [showUserList, setShowUserList] = useState(false) // Added showUserList state
+	const userListWidth = 250 // Added userListWidth constant
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -723,6 +726,10 @@ export default function RoomDev() {
 		setIsMenuOpen(false)
 	}
 
+	const toggleUserList = () => {
+		setShowUserList(prev => !prev)
+	}
+
 	return (
 		<div
 			ref={playerWrapperRef}
@@ -1172,6 +1179,82 @@ export default function RoomDev() {
 					</div>
 				</div>
 			</div>
+			<div
+				style={{
+					position: 'absolute',
+					top: '50%',
+					right: showUserList ? userListWidth : 0,
+					transform: 'translateY(-50%)',
+					zIndex: 30,
+					transition: 'right 0.3s ease-in-out',
+				}}
+			>
+				<button
+					onClick={toggleUserList}
+					style={{
+						background: 'rgba(0, 0, 0, 0.5)',
+						border: 'none',
+						borderRadius: '50% 0 0 50%',
+						padding: '10px',
+						cursor: 'pointer',
+					}}
+				>
+					<ArrowLeftIcon style={{ color: 'white', transform: `rotate(${showUserList ? 180 : 0}deg)` }} />
+				</button>
+			</div>
+
+			{showUserList && (
+				<div
+					style={{
+						position: 'absolute',
+						top: 0,
+						right: 0,
+						width: `${userListWidth}px`,
+						height: '100%',
+						backgroundColor: 'rgba(0, 0, 0, 0.8)',
+						zIndex: 25,
+						overflowY: 'auto',
+						transition: 'right 0.3s ease-in-out',
+					}}
+				>
+					<h2 style={{ color: 'white', padding: '10px', borderBottom: '1px solid rgba(255, 255, 255, 0.2)' }}>
+						Users
+					</h2>
+					{clients.map(clientID => (
+						<div
+							key={clientID}
+							style={{ padding: '10px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}
+						>
+							<p style={{ color: 'white', marginBottom: '5px' }}>Socket ID: {clientID}</p>
+							<div style={{ display: 'flex', gap: '10px' }}>
+								{clientID === LOCAL_VIDEO ? (
+									<>
+										<span style={{ color: micMuted ? 'red' : 'green' }}>
+											{micMuted ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
+										</span>
+										<span style={{ color: cameraMuted ? 'red' : 'green' }}>
+											{cameraMuted ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
+										</span>
+									</>
+								) : (
+									<>
+										<span style={{ color: 'gray' }}>
+											<FaMicrophoneAlt />
+										</span>
+										<span style={{ color: participantCameras[clientID] ? 'red' : 'green' }}>
+											{participantCameras[clientID] ? (
+												<BsCameraVideoOffFill />
+											) : (
+												<BsCameraVideoFill />
+											)}
+										</span>
+									</>
+								)}
+							</div>
+						</div>
+					))}
+				</div>
+			)}
 		</div>
 	)
 }
