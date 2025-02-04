@@ -731,15 +731,22 @@ export default function RoomDev() {
 				e.preventDefault()
 				const clientID = e.dataTransfer.getData('text/plain')
 				const offsetData = e.dataTransfer.getData('application/json')
-				const { offsetX, offsetY } = JSON.parse(offsetData)
-				const rect = playerWrapperRef.current?.getBoundingClientRect()
-				if (rect) {
-					const x = Math.max(0, Math.min(e.clientX - rect.left - offsetX, rect.width - 150))
-					const y = Math.max(0, Math.min(e.clientY - rect.top - offsetY, rect.height - 100))
-					setClientPositions(prev => ({
-						...prev,
-						[clientID]: { x, y },
-					}))
+
+				if (offsetData) {
+					try {
+						const { offsetX, offsetY } = JSON.parse(offsetData)
+						const rect = playerWrapperRef.current?.getBoundingClientRect()
+						if (rect) {
+							const x = Math.max(0, Math.min(e.clientX - rect.left - offsetX, rect.width - 150))
+							const y = Math.max(0, Math.min(e.clientY - rect.top - offsetY, rect.height - 100))
+							setClientPositions(prev => ({
+								...prev,
+								[clientID]: { x, y },
+							}))
+						}
+					} catch (error) {
+						console.error('Error parsing JSON:', error)
+					}
 				}
 			}}
 		>
