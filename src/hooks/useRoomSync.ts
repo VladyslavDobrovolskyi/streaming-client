@@ -87,7 +87,7 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 		socket.on(ACTIONS.VIDEO_SEEK, handleSeek)
 		socket.on(ACTIONS.REQUEST_SYNC, handleSyncRequest)
 		socket.on(ACTIONS.SYNC_CAMERA, handleCameraSync)
-		socket.off(ACTIONS.SYNC_MICROPHONE, handleMicrophoneSync)
+		socket.on(ACTIONS.SYNC_MICROPHONE, handleMicrophoneSync)
 
 		return () => {
 			socket.off(ACTIONS.VIDEO_PLAY, handlePlay)
