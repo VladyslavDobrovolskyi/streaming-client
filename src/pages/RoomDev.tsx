@@ -84,7 +84,8 @@ export default function RoomDev() {
 
 	const { id: roomID } = useParams()
 	const { clients, provideMediaRef, localStream, reinitializeStream } = useWebRTC(roomID!)
-	const { emitPlay, emitPause, emitSeek, requestSync, lastSeekDirection } = useRoomSync(roomID!, playerRef)
+	const { emitPlay, emitPause, emitSeek, requestSync, lastSeekDirection, emitCameraSync, participantCameras } =
+		useRoomSync(roomID!, playerRef)
 
 	useEffect(() => {}, [hideUsers])
 
@@ -193,6 +194,9 @@ export default function RoomDev() {
 	const handleSeekChange = (value: number[]) => {
 		const newTime = value[0]
 		setPlayed(newTime / duration)
+		const currentTime = playerRef.current?.getCurrentTime() || 0
+		const direction = newTime > currentTime ? 'forward' : 'backward'
+		emitSeek(newTime, direction)
 	}
 
 	const handleSeekStart = () => {
@@ -503,6 +507,7 @@ export default function RoomDev() {
 								style={{
 									objectFit: 'cover',
 									borderRadius: '5px',
+									display: participantCameras[clientID] === false ? 'none' : 'block',
 								}}
 							/>
 							{draggingClient === clientID && (
@@ -681,6 +686,7 @@ export default function RoomDev() {
 				const track = videoTracks[0]
 				track.enabled = !track.enabled
 				setCameraMuted(!track.enabled)
+				emitCameraSync(!track.enabled)
 			} else {
 				console.warn('No video tracks found in the local stream')
 			}

@@ -13,6 +13,7 @@ const ACTIONS = {
 	VIDEO_SEEK: 'video-seek',
 	REQUEST_SYNC: 'request-sync',
 	SYNC_STATE: 'sync-state',
+	SYNC_CAMERA: 'sync-camera',
 }
 
 export default ACTIONS

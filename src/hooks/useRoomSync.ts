@@ -6,6 +6,7 @@ import type ReactPlayer from 'react-player'
 export default function useRoomSync(roomID: string, videoRef: React.RefObject<ReactPlayer>) {
 	const isSyncingRef = useRef(false)
 	const [lastSeekDirection, setLastSeekDirection] = useState<'forward' | 'backward' | null>(null)
+	const [participantCameras, setParticipantCameras] = useState<Record<string, boolean>>({})
 
 	const handlePlay = useCallback(
 		({ time }: { time: number }) => {
@@ -41,10 +42,20 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 
 			setLastSeekDirection(direction)
 
-			// Add a console.log to debug
 			console.log('Received seek event:', { time, direction })
 		},
 		[videoRef]
+	)
+
+	const handleCameraSync = useCallback(
+		({ socketId, isCameraEnabled }: { socketId: string; isCameraEnabled: boolean }) => {
+			console.log('Received camera sync event:', { socketId, isCameraEnabled })
+			setParticipantCameras(prev => ({
+				...prev,
+				[socketId]: isCameraEnabled,
+			}))
+		},
+		[]
 	)
 
 	const handleSyncRequest = useCallback(() => {
@@ -64,14 +75,16 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 		socket.on(ACTIONS.VIDEO_PAUSE, handlePause)
 		socket.on(ACTIONS.VIDEO_SEEK, handleSeek)
 		socket.on(ACTIONS.REQUEST_SYNC, handleSyncRequest)
+		socket.on(ACTIONS.SYNC_CAMERA, handleCameraSync)
 
 		return () => {
 			socket.off(ACTIONS.VIDEO_PLAY, handlePlay)
 			socket.off(ACTIONS.VIDEO_PAUSE, handlePause)
 			socket.off(ACTIONS.VIDEO_SEEK, handleSeek)
 			socket.off(ACTIONS.REQUEST_SYNC, handleSyncRequest)
+			socket.off(ACTIONS.SYNC_CAMERA, handleCameraSync)
 		}
-	}, [handlePlay, handlePause, handleSeek, handleSyncRequest])
+	}, [handlePlay, handlePause, handleSeek, handleSyncRequest, handleCameraSync])
 
 	const emitPlay = useCallback(
 		(time: number) => {
@@ -98,5 +111,20 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 		socket.emit(ACTIONS.REQUEST_SYNC, { roomID })
 	}, [roomID])
 
-	return { emitPlay, emitPause, emitSeek, requestSync, lastSeekDirection }
+	const emitCameraSync = useCallback(
+		(isCameraEnabled: boolean) => {
+			socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isCameraEnabled })
+		},
+		[roomID]
+	)
+
+	return {
+		emitPlay,
+		emitPause,
+		emitSeek,
+		emitCameraSync,
+		requestSync,
+		lastSeekDirection,
+		participantCameras,
+	}
 }
