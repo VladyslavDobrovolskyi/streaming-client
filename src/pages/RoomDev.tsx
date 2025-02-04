@@ -495,6 +495,7 @@ export default function RoomDev() {
 								width: '100%',
 								height: '100%',
 								position: 'relative',
+								display: participantCameras[clientID] === true ? 'none' : 'block',
 							}}
 						>
 							<video
@@ -520,7 +521,6 @@ export default function RoomDev() {
 								style={{
 									objectFit: 'cover',
 									borderRadius: '5px',
-									display: participantCameras[clientID] === true ? 'none' : 'block',
 								}}
 							/>
 							{draggingClient === clientID && (
