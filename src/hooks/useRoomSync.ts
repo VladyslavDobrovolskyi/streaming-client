@@ -34,12 +34,10 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 	const handleSeek = useCallback(
 		({ time, direction }: { time: number; direction: 'forward' | 'backward' }) => {
 			if (!videoRef.current || isSyncingRef.current) return
-
+			setLastSeekDirection(direction)
 			isSyncingRef.current = true
 			videoRef.current.seekTo(time, 'seconds')
 			isSyncingRef.current = false
-
-			setLastSeekDirection(direction)
 
 			// Add a console.log to debug
 			console.log('Received seek event:', { time, direction })
