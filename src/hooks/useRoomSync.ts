@@ -7,6 +7,7 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 	const isSyncingRef = useRef(false)
 	const [lastSeekDirection, setLastSeekDirection] = useState<'forward' | 'backward' | null>(null)
 	const [participantCameras, setParticipantCameras] = useState<Record<string, boolean>>({})
+	const [participantMicrophones, setParticipantMicrophones] = useState<Record<string, boolean>>({})
 
 	const handlePlay = useCallback(
 		({ time }: { time: number }) => {
@@ -57,6 +58,16 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 		},
 		[]
 	)
+	const handleMicrophoneSync = useCallback(
+		({ socketId, isMicrophoneDisabled }: { socketId: string; isMicrophoneDisabled: boolean }) => {
+			console.log('Received microphone sync event:', { socketId, isMicrophoneDisabled })
+			setParticipantMicrophones(prev => ({
+				...prev,
+				[socketId]: isMicrophoneDisabled,
+			}))
+		},
+		[]
+	)
 
 	const handleSyncRequest = useCallback(() => {
 		if (videoRef.current) {
@@ -76,6 +87,7 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 		socket.on(ACTIONS.VIDEO_SEEK, handleSeek)
 		socket.on(ACTIONS.REQUEST_SYNC, handleSyncRequest)
 		socket.on(ACTIONS.SYNC_CAMERA, handleCameraSync)
+		socket.off(ACTIONS.SYNC_MICROPHONE, handleMicrophoneSync)
 
 		return () => {
 			socket.off(ACTIONS.VIDEO_PLAY, handlePlay)
@@ -83,8 +95,9 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 			socket.off(ACTIONS.VIDEO_SEEK, handleSeek)
 			socket.off(ACTIONS.REQUEST_SYNC, handleSyncRequest)
 			socket.off(ACTIONS.SYNC_CAMERA, handleCameraSync)
+			socket.off(ACTIONS.SYNC_MICROPHONE, handleMicrophoneSync)
 		}
-	}, [handlePlay, handlePause, handleSeek, handleSyncRequest, handleCameraSync])
+	}, [handlePlay, handlePause, handleSeek, handleSyncRequest, handleCameraSync, handleMicrophoneSync])
 
 	const emitPlay = useCallback(
 		(time: number) => {
@@ -117,14 +130,22 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 		},
 		[roomID]
 	)
+	const emitMicrophoneSync = useCallback(
+		(isMicrophoneDisabled: boolean) => {
+			socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isMicrophoneDisabled })
+		},
+		[roomID]
+	)
 
 	return {
 		emitPlay,
 		emitPause,
 		emitSeek,
 		emitCameraSync,
+		emitMicrophoneSync,
 		requestSync,
 		lastSeekDirection,
 		participantCameras,
+		participantMicrophones,
 	}
 }
