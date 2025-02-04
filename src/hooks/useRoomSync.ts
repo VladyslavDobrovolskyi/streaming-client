@@ -132,7 +132,7 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 	)
 	const emitMicrophoneSync = useCallback(
 		(isMicrophoneDisabled: boolean) => {
-			socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isMicrophoneDisabled })
+			socket.emit(ACTIONS.SYNC_MICROPHONE, { roomID, socketId: socket.id, isMicrophoneDisabled })
 		},
 		[roomID]
 	)
