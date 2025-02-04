@@ -1271,7 +1271,14 @@ export default function RoomDev() {
 										<FaMicrophoneAlt />
 									)}
 								</span>
-								<span style={{ color: participantCameras[clientID] ? 'red' : 'green' }}>
+								<span
+									style={{
+										color:
+											participantCameras[clientID] || (clientID === LOCAL_VIDEO && cameraMuted)
+												? 'red'
+												: 'green',
+									}}
+								>
 									{participantCameras[clientID] || (clientID === LOCAL_VIDEO && cameraMuted) ? (
 										<BsCameraVideoOffFill />
 									) : (
