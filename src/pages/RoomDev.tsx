@@ -481,7 +481,10 @@ export default function RoomDev() {
 							pointerEvents: 'auto',
 							transition: 'all 0.1s ease-out',
 							cursor: 'move',
-							display: clientID === LOCAL_VIDEO && cameraMuted ? 'none' : 'block',
+							display:
+								(clientID === LOCAL_VIDEO && cameraMuted) || participantCameras[clientID] === true
+									? 'none'
+									: 'block',
 						}}
 						draggable
 						onDragStart={e => handleDragStart(clientID, e)}
@@ -495,7 +498,6 @@ export default function RoomDev() {
 								width: '100%',
 								height: '100%',
 								position: 'relative',
-								display: participantCameras[clientID] === true ? 'none' : 'block',
 							}}
 						>
 							<video
