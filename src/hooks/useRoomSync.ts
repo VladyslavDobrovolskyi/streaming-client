@@ -48,11 +48,11 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 	)
 
 	const handleCameraSync = useCallback(
-		({ socketId, isCameraEnabled }: { socketId: string; isCameraEnabled: boolean }) => {
-			console.log('Received camera sync event:', { socketId, isCameraEnabled })
+		({ socketId, isCameraDisabled }: { socketId: string; isCameraDisabled: boolean }) => {
+			console.log('Received camera sync event:', { socketId, isCameraDisabled })
 			setParticipantCameras(prev => ({
 				...prev,
-				[socketId]: isCameraEnabled,
+				[socketId]: isCameraDisabled,
 			}))
 		},
 		[]
@@ -112,8 +112,8 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 	}, [roomID])
 
 	const emitCameraSync = useCallback(
-		(isCameraEnabled: boolean) => {
-			socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isCameraEnabled })
+		(isCameraDisabled: boolean) => {
+			socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isCameraDisabled })
 		},
 		[roomID]
 	)
