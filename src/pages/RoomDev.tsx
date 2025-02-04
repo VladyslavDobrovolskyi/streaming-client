@@ -88,8 +88,17 @@ export default function RoomDev() {
 
 	const { id: roomID } = useParams()
 	const { clients, provideMediaRef, localStream, reinitializeStream } = useWebRTC(roomID!)
-	const { emitPlay, emitPause, emitSeek, requestSync, lastSeekDirection, emitCameraSync, participantCameras } =
-		useRoomSync(roomID!, playerRef)
+	const {
+		emitPlay,
+		emitPause,
+		emitSeek,
+		requestSync,
+		lastSeekDirection,
+		emitCameraSync,
+		participantCameras,
+		emitMicrophoneSync,
+		participantMicrophones,
+	} = useRoomSync(roomID!, playerRef)
 
 	useEffect(() => {}, [hideUsers])
 
@@ -690,6 +699,7 @@ export default function RoomDev() {
 				const track = audioTracks[0]
 				track.enabled = !track.enabled
 				setMicMuted(!track.enabled)
+				emitMicrophoneSync(!track.enabled)
 			} else {
 				console.warn('No audio tracks found in the local stream')
 			}
@@ -1238,8 +1248,12 @@ export default function RoomDev() {
 									</>
 								) : (
 									<>
-										<span style={{ color: 'gray' }}>
-											<FaMicrophoneAlt />
+										<span style={{ color: participantMicrophones[clientID] ? 'red' : 'green' }}>
+											{participantMicrophones[clientID] ? (
+												<FaMicrophoneAltSlash />
+											) : (
+												<FaMicrophoneAlt />
+											)}
 										</span>
 										<span style={{ color: participantCameras[clientID] ? 'red' : 'green' }}>
 											{participantCameras[clientID] ? (
