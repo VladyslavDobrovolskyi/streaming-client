@@ -995,10 +995,7 @@ export default function RoomDev() {
 										right: 0,
 										zIndex: 9999,
 										minWidth: 220,
-										backgroundColor: 'rgba(0, 0, 0, 0.8)',
-										borderRadius: 6,
 										padding: 5,
-										color: '#fff',
 									}}
 								>
 									<DropdownMenu.Content
