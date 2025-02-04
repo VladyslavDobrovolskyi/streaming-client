@@ -1272,7 +1272,11 @@ export default function RoomDev() {
 									)}
 								</span>
 								<span style={{ color: participantCameras[clientID] ? 'red' : 'green' }}>
-									{participantCameras[clientID] ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
+									{participantCameras[clientID] || (clientID === LOCAL_VIDEO && cameraMuted) ? (
+										<BsCameraVideoOffFill />
+									) : (
+										<BsCameraVideoFill />
+									)}
 								</span>
 							</div>
 						</div>
