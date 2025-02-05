@@ -23,11 +23,12 @@ import {
 import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
 import { Slider } from '@radix-ui/themes'
-import { DropdownMenu } from 'radix-ui'
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import ActionIndicator from '../components/ActionIndicator'
 import { useParams } from 'react-router'
 import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
 import useRoomSync from '../hooks/useRoomSync'
+import ChatComponent from './ChatComponent'
 
 const createDashedSquareDragImage = () => {
 	const dragImage = document.createElement('div')
@@ -80,15 +81,19 @@ export default function RoomDev() {
 	const [hoveredItem, setHoveredItem] = useState<string | null>(null) // Added hoveredItem state
 	const [showUserList, setShowUserList] = useState(false) // Added showUserList state
 	const [highlightedUser, setHighlightedUser] = useState<string | null>(null)
+	const [showChat, setShowChat] = useState(false) // Added showChat state
+	const [chatInput, setChatInput] = useState('') // Added chatInput state
 	const userListWidth = 250 // Added userListWidth constant
 	const playerRef = useRef<ReactPlayer>(null)
-	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+	const controlsTimeoutRef = useRef<number | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
 	const sliderRef = useRef<HTMLDivElement>(null)
 	const previousVolumeRef = useRef(volume)
 
-	const { id: roomID } = useParams()
-	const { clients, provideMediaRef, localStream, reinitializeStream } = useWebRTC(roomID!)
+	const { id: roomID } = useParams<{ id: string }>()
+	const { clients, provideMediaRef, localStream, reinitializeStream, chatMessages, sendChatMessage } = useWebRTC(
+		roomID!
+	) // Updated useWebRTC call
 	const {
 		emitPlay,
 		emitPause,
@@ -239,7 +244,7 @@ export default function RoomDev() {
 		if (!isDragging && !isMenuOpen) {
 			controlsTimeoutRef.current = setTimeout(() => {
 				setShowControls(false)
-			}, 3000)
+			}, 3000) as unknown as number
 		}
 	}, [isDragging, isMenuOpen])
 
@@ -753,6 +758,13 @@ export default function RoomDev() {
 		}
 	}, [localStream])
 
+	const handleSendMessage = () => {
+		if (chatInput.trim()) {
+			sendChatMessage(chatInput.trim())
+			setChatInput('')
+		}
+	}
+
 	return (
 		<div
 			ref={playerWrapperRef}
@@ -858,7 +870,7 @@ export default function RoomDev() {
 					ref={sliderRef}
 					style={{
 						margin: '0 0.5rem',
-						color: '#fff',
+						color: 'white',
 						position: 'relative',
 						height: '20px',
 						cursor: 'pointer',
@@ -868,7 +880,7 @@ export default function RoomDev() {
 						min={0}
 						max={duration}
 						step={0.01}
-						value={[played * duration]}
+						value={[played * duration || 0]}
 						onValueChange={handleSeekChange}
 						onPointerDown={handleSeekStart}
 						onPointerUp={handleSeekEnd}
@@ -905,7 +917,7 @@ export default function RoomDev() {
 								})
 							}
 							style={{
-								color: '#fff',
+								color: 'white',
 								border: 'none',
 								padding: '0.5rem',
 								borderRadius: '5px',
@@ -920,7 +932,7 @@ export default function RoomDev() {
 						<button
 							onClick={handleBackward15}
 							style={{
-								color: '#fff',
+								color: 'white',
 								border: 'none',
 								padding: '0.5rem',
 								borderRadius: '5px',
@@ -935,7 +947,7 @@ export default function RoomDev() {
 						<button
 							onClick={handleForward15}
 							style={{
-								color: '#fff',
+								color: 'white',
 								border: 'none',
 								padding: '0.5rem',
 								borderRadius: '5px',
@@ -963,7 +975,7 @@ export default function RoomDev() {
 							<button
 								onClick={handleToggleMuted}
 								style={{
-									color: '#fff',
+									color: 'white',
 									border: 'none',
 									padding: '0.5rem',
 									borderRadius: '5px',
@@ -1035,7 +1047,7 @@ export default function RoomDev() {
 								<button
 									onClick={handleMenuOpen}
 									style={{
-										color: '#fff',
+										color: 'white',
 										border: 'none',
 										padding: '0.5rem',
 										borderRadius: '5px',
@@ -1187,7 +1199,7 @@ export default function RoomDev() {
 						<button
 							onClick={handleFullscreenToggle}
 							style={{
-								color: '#fff',
+								color: 'white',
 								border: 'none',
 								padding: '0.5rem',
 								borderRadius: '5px',
@@ -1201,6 +1213,21 @@ export default function RoomDev() {
 						</button>
 					</div>
 				</div>
+				<button
+					onClick={() => setShowChat(prev => !prev)}
+					style={{
+						color: 'white',
+						border: 'none',
+						padding: '0.5rem',
+						borderRadius: '5px',
+						cursor: 'pointer',
+						background: 'none',
+						display: 'flex',
+						alignItems: 'center',
+					}}
+				>
+					{showChat ? 'Hide Chat' : 'Show Chat'}
+				</button>
 			</div>
 			<div
 				style={{
@@ -1297,6 +1324,29 @@ export default function RoomDev() {
 							</div>
 						</div>
 					))}
+				</div>
+			)}
+			{showChat && (
+				<div
+					style={{
+						position: 'absolute',
+						bottom: 60,
+						right: 10,
+						width: 300,
+						height: 400,
+						zIndex: 40,
+						backgroundColor: 'rgba(0, 0, 0, 0.8)',
+						borderRadius: '8px',
+						overflow: 'hidden',
+					}}
+				>
+					<ChatComponent
+						clientID={LOCAL_VIDEO}
+						messages={chatMessages}
+						chatInput={chatInput}
+						setChatInput={setChatInput}
+						handleSendMessage={handleSendMessage}
+					/>
 				</div>
 			)}
 		</div>

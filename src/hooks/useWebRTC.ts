@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import useStateWithCallback from './useStateWithCallback'
 import socket from '../socket'
 import ACTIONS from '../socket/actions'
@@ -39,6 +39,7 @@ function createMockMediaStream(): MediaStream {
 
 export default function useWebRTC(roomID: string) {
 	const [clients, updateClients] = useStateWithCallback<string[]>([])
+	const [chatMessages, setChatMessages] = useState<{ sender: string; message: string }[]>([])
 
 	const addNewClient = useCallback(
 		(newClient: string, cb: () => void) => {
@@ -265,10 +266,31 @@ export default function useWebRTC(roomID: string) {
 		peerMediaElements.current[id] = node
 	}, [])
 
+	// New function to send chat messages
+	const sendChatMessage = useCallback(
+		(message: string) => {
+			socket.emit(ACTIONS.SEND_CHAT_MESSAGE, { room: roomID, message })
+		},
+		[roomID]
+	)
+
+	// New effect to handle incoming chat messages
+	useEffect(() => {
+		socket.on(ACTIONS.RECEIVE_CHAT_MESSAGE, ({ sender, message }) => {
+			setChatMessages(prevMessages => [...prevMessages, { sender, message }])
+		})
+
+		return () => {
+			socket.off(ACTIONS.RECEIVE_CHAT_MESSAGE)
+		}
+	}, [])
+
 	return {
 		clients,
 		provideMediaRef,
-		localStream: localMediaStream.current, // Return the local stream
+		localStream: localMediaStream.current,
 		reinitializeStream,
+		chatMessages,
+		sendChatMessage,
 	}
 }

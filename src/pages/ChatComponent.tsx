@@ -1,143 +1,55 @@
 import type React from 'react'
-import { useState, useEffect, useRef } from 'react'
-import { Button } from '@radix-ui/themes'
-import { TextArea } from '@radix-ui/themes'
-
-interface ChatMessage {
-	sender: string
-	content: string
-	timestamp: number
-}
+import { Box, Flex, ScrollArea, Text, TextField, Button } from '@radix-ui/themes'
 
 interface ChatComponentProps {
-	socket: WebSocket
 	clientID: string
+	messages: { sender: string; message: string }[]
+	chatInput: string
+	setChatInput: (input: string) => void
+	handleSendMessage: () => void
 }
 
-const ChatComponent: React.FC<ChatComponentProps> = ({ socket, clientID }) => {
-	const [messages, setMessages] = useState<ChatMessage[]>([])
-	const [inputMessage, setInputMessage] = useState('')
-	const messagesEndRef = useRef<HTMLDivElement>(null)
-
-	useEffect(() => {
-		socket.addEventListener('message', handleIncomingMessage)
-		return () => {
-			socket.removeEventListener('message', handleIncomingMessage)
-		}
-	}, [socket])
-
-	useEffect(() => {
-		scrollToBottom()
-	}, []) // Removed unnecessary dependency 'messages'
-
-	const handleIncomingMessage = (event: MessageEvent) => {
-		const data = JSON.parse(event.data)
-		if (data.type === 'chat') {
-			setMessages(prevMessages => [...prevMessages, data.message])
-		}
-	}
-
-	const sendMessage = () => {
-		if (inputMessage.trim()) {
-			const message: ChatMessage = {
-				sender: clientID,
-				content: inputMessage,
-				timestamp: Date.now(),
-			}
-			socket.send(JSON.stringify({ type: 'chat', message }))
-			setInputMessage('')
-		}
-	}
-
-	const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-		if (event.key === 'Enter' && !event.shiftKey) {
-			event.preventDefault()
-			sendMessage()
-		}
-	}
-
-	const scrollToBottom = () => {
-		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-	}
-
+const ChatComponent: React.FC<ChatComponentProps> = ({
+	clientID,
+	messages,
+	chatInput,
+	setChatInput,
+	handleSendMessage,
+}) => {
 	return (
-		<div
-			style={{
-				display: 'flex',
-				flexDirection: 'column',
-				height: '100%',
-				backgroundColor: 'rgba(0, 0, 0, 0.8)',
-				color: 'white',
-			}}
-		>
-			<div
-				style={{
-					flexGrow: 1,
-					overflowY: 'auto',
-					padding: '16px',
-				}}
-			>
+		<Flex direction='column' style={{ height: '100%' }}>
+			<ScrollArea style={{ flex: 1, padding: '16px' }}>
 				{messages.map((msg, index) => (
-					<div
-						key={index}
-						style={{
-							marginBottom: '16px',
-							textAlign: msg.sender === clientID ? 'right' : 'left',
-						}}
-					>
-						<span
+					<Box key={index} mb='2' style={{ textAlign: msg.sender === clientID ? 'right' : 'left' }}>
+						<Text
+							as='span'
+							size='2'
 							style={{
 								display: 'inline-block',
-								padding: '8px',
-								borderRadius: '8px',
-								backgroundColor: msg.sender === clientID ? '#0084ff' : '#333',
-								color: 'white',
+								backgroundColor: 'var(--gray-3)',
+								borderRadius: 'var(--radius-2)',
+								padding: '4px 8px',
 							}}
 						>
-							<strong>{msg.sender}: </strong>
-							<span>{msg.content}</span>
-						</span>
-					</div>
+							{msg.sender === clientID ? 'You' : msg.sender}: {msg.message}
+						</Text>
+					</Box>
 				))}
-				<div ref={messagesEndRef} />
-			</div>
-			<div
-				style={{
-					padding: '16px',
-					borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-				}}
-			>
-				<TextArea
-					placeholder='Написать сообщение...'
-					value={inputMessage}
-					onChange={e => setInputMessage(e.target.value)}
-					onKeyPress={handleKeyPress}
-					style={{
-						width: '100%',
-						marginBottom: '8px',
-						backgroundColor: 'rgba(255, 255, 255, 0.1)',
-						color: 'white',
-						border: 'none',
-						padding: '8px',
-						borderRadius: '4px',
-					}}
-				/>
-				<Button
-					onClick={sendMessage}
-					style={{
-						width: '100%',
-						backgroundColor: '#0084ff',
-						color: 'white',
-						border: 'none',
-						padding: '8px',
-						borderRadius: '4px',
-						cursor: 'pointer',
-					}}
-				>
-					Отправить
-				</Button>
-			</div>
-		</div>
+			</ScrollArea>
+			<Flex p='3' style={{ borderTop: '1px solid var(--gray-5)' }}>
+				<TextField.Root style={{ flex: 1, marginRight: '8px' }}>
+					<TextField.Slot>
+						<input
+							placeholder='Type a message...'
+							value={chatInput}
+							onChange={e => setChatInput(e.target.value)}
+							onKeyPress={e => e.key === 'Enter' && handleSendMessage()}
+						/>
+					</TextField.Slot>
+				</TextField.Root>
+				<Button onClick={handleSendMessage}>Send</Button>
+			</Flex>
+		</Flex>
 	)
 }
 
