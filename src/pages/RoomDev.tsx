@@ -1249,8 +1249,8 @@ export default function RoomDev() {
 							style={{
 								padding: '10px',
 								borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-								backgroundColor:
-									highlightedUser === clientID ? 'rgba(255, 255, 0, 0.2)' : 'transparent',
+								backgroundColor: highlightedUser === clientID ? 'cyan' : 'transparent',
+								opacity: highlightedUser === clientID ? 0.2 : 1,
 							}}
 							onMouseEnter={() => setHighlightedUser(clientID)}
 							onMouseLeave={() => setHighlightedUser(null)}
