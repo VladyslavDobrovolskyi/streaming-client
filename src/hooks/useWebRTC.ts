@@ -79,10 +79,12 @@ export default function useWebRTC(roomID: string) {
 	}
 
 	const createPeerConnection = (peerID: string) => {
+		console.log(`Creating peer connection for ${peerID}`)
 		const connection = new RTCPeerConnection(configuration)
 
 		connection.onicecandidate = event => {
 			if (event.candidate) {
+				console.log(`ICE candidate for ${peerID}:`, event.candidate)
 				socket.emit(ACTIONS.RELAY_ICE, {
 					peerID,
 					iceCandidate: event.candidate,
@@ -91,6 +93,7 @@ export default function useWebRTC(roomID: string) {
 		}
 
 		connection.ontrack = ({ streams: [remoteStream] }) => {
+			console.log(`Received track from ${peerID}`)
 			addNewClient(peerID, () => {
 				const element = peerMediaElements.current[peerID]
 				if (element) {
@@ -115,15 +118,19 @@ export default function useWebRTC(roomID: string) {
 	}
 
 	const reinitializeStream = async () => {
+		console.log('Reinitializing stream')
 		try {
 			localMediaStream.current = await navigator.mediaDevices.getUserMedia({
 				audio: true,
 				video: true,
 			})
+			console.log('Successfully obtained local media stream')
 		} catch (error) {
-			console.error('Ошибка при получении медиа: ', error)
+			console.error('Error getting media: ', error)
+			console.log('Creating mock media stream')
 			localMediaStream.current = createMockMediaStream()
 		} finally {
+			console.log('Joining room:', roomID)
 			socket.emit(ACTIONS.JOIN, { room: roomID })
 			addNewClient(LOCAL_VIDEO, () => {
 				const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
@@ -137,7 +144,9 @@ export default function useWebRTC(roomID: string) {
 
 	// Handle new peer connection
 	socket.on(ACTIONS.ADD_PEER, async ({ peerID, createOffer }: { peerID: string; createOffer: boolean }) => {
+		console.log(`Received ADD_PEER for ${peerID}, createOffer: ${createOffer}`)
 		if (peerID in peerConnections.current) {
+			console.log(`Peer ${peerID} already exists, ignoring`)
 			return null
 		}
 
@@ -162,8 +171,10 @@ export default function useWebRTC(roomID: string) {
 		}
 
 		if (createOffer) {
+			console.log(`Creating offer for ${peerID}`)
 			const offer = await connection.createOffer()
 			await connection.setLocalDescription(offer)
+			console.log(`Sending offer to ${peerID}`)
 			socket.emit(ACTIONS.RELAY_SDP, {
 				peerID,
 				sessionDescription: offer,
@@ -180,11 +191,14 @@ export default function useWebRTC(roomID: string) {
 			peerID: string
 			sessionDescription: RTCSessionDescriptionInit
 		}) {
+			console.log(`Setting remote description for ${peerID}`, remoteDescription)
 			await peerConnections.current[peerID]?.setRemoteDescription(new RTCSessionDescription(remoteDescription))
 
 			if (remoteDescription.type === 'offer') {
+				console.log(`Creating answer for ${peerID}`)
 				const answer = await peerConnections.current[peerID].createAnswer()
 				await peerConnections.current[peerID].setLocalDescription(answer)
+				console.log(`Sending answer to ${peerID}`)
 				socket.emit(ACTIONS.RELAY_SDP, {
 					peerID,
 					sessionDescription: answer,
@@ -203,6 +217,7 @@ export default function useWebRTC(roomID: string) {
 		socket.on(
 			ACTIONS.ICE_CANDIDATE,
 			({ peerID, iceCandidate }: { peerID: string; iceCandidate: RTCIceCandidateInit }) => {
+				console.log(`Received ICE candidate for ${peerID}:`, iceCandidate)
 				peerConnections.current[peerID]?.addIceCandidate(new RTCIceCandidate(iceCandidate))
 			}
 		)
@@ -215,11 +230,13 @@ export default function useWebRTC(roomID: string) {
 	// Handle peer removal
 	useEffect(() => {
 		const handleRemovePeer = ({ peerID }: { peerID: string }) => {
+			console.log(`Removing peer ${peerID}`)
 			if (peerConnections.current[peerID]) {
 				peerConnections.current[peerID].close()
 				delete peerConnections.current[peerID]
 				delete peerMediaElements.current[peerID]
 				updateClients(list => list.filter(c => c !== peerID))
+				console.log(`Peer ${peerID} removed`)
 			}
 		}
 
@@ -232,16 +249,19 @@ export default function useWebRTC(roomID: string) {
 	// Initialize local media stream and join room
 	useEffect(() => {
 		async function startCapture() {
+			console.log('Starting media capture')
 			try {
-				// Убираем запрос медиаустройств
 				localMediaStream.current = await navigator.mediaDevices.getUserMedia({
 					audio: true,
 					video: true,
-				}) // Инициализируем пустой поток
+				})
+				console.log('Successfully captured local media')
 			} catch (error) {
-				console.error('Error capturing media, connection with mock:', error)
-				localMediaStream.current = createMockMediaStream() // Создаем пустой поток
+				console.error('Error capturing media:', error)
+				console.log('Creating mock media stream')
+				localMediaStream.current = createMockMediaStream()
 			} finally {
+				console.log('Joining room:', roomID)
 				socket.emit(ACTIONS.JOIN, { room: roomID })
 
 				addNewClient(LOCAL_VIDEO, () => {
