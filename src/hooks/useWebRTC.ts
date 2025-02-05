@@ -335,8 +335,8 @@ export default function useWebRTC(roomID: string) {
 
 	// New effect to handle incoming chat messages
 	useEffect(() => {
-		socket.on(ACTIONS.RECEIVE_CHAT_MESSAGE, ({ sender, message }) => {
-			console.log(`Received chat message from ${sender}:`, message)
+		socket.on(ACTIONS.RECEIVE_CHAT_MESSAGE, ({ sender, message, timestamp }) => {
+			console.log(` ${timestamp} - Received chat message from ${sender}:`, message)
 			setChatMessages(prevMessages => [...prevMessages, { sender, message }])
 		})
 
