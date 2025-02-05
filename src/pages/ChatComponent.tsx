@@ -1,8 +1,7 @@
 import type React from 'react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from '@radix-ui/themes'
 import { TextArea } from '@radix-ui/themes'
-import { ScrollArea } from '@radix-ui/themes'
 
 interface ChatMessage {
 	sender: string
@@ -18,6 +17,7 @@ interface ChatComponentProps {
 const ChatComponent: React.FC<ChatComponentProps> = ({ socket, clientID }) => {
 	const [messages, setMessages] = useState<ChatMessage[]>([])
 	const [inputMessage, setInputMessage] = useState('')
+	const messagesEndRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
 		socket.addEventListener('message', handleIncomingMessage)
@@ -25,6 +25,10 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ socket, clientID }) => {
 			socket.removeEventListener('message', handleIncomingMessage)
 		}
 	}, [socket])
+
+	useEffect(() => {
+		scrollToBottom()
+	}, []) // Removed unnecessary dependency 'messages'
 
 	const handleIncomingMessage = (event: MessageEvent) => {
 		const data = JSON.parse(event.data)
@@ -52,32 +56,85 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ socket, clientID }) => {
 		}
 	}
 
+	const scrollToBottom = () => {
+		messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+	}
+
 	return (
-		<div className='chat-component flex flex-col h-full'>
-			<ScrollArea className='flex-grow p-4'>
+		<div
+			style={{
+				display: 'flex',
+				flexDirection: 'column',
+				height: '100%',
+				backgroundColor: 'rgba(0, 0, 0, 0.8)',
+				color: 'white',
+			}}
+		>
+			<div
+				style={{
+					flexGrow: 1,
+					overflowY: 'auto',
+					padding: '16px',
+				}}
+			>
 				{messages.map((msg, index) => (
-					<div key={index} className={`mb-4 ${msg.sender === clientID ? 'text-right' : 'text-left'}`}>
+					<div
+						key={index}
+						style={{
+							marginBottom: '16px',
+							textAlign: msg.sender === clientID ? 'right' : 'left',
+						}}
+					>
 						<span
-							className={`inline-block p-2 rounded-lg ${
-								msg.sender === clientID ? 'bg-blue-500 text-white' : 'bg-gray-200 text-black'
-							}`}
+							style={{
+								display: 'inline-block',
+								padding: '8px',
+								borderRadius: '8px',
+								backgroundColor: msg.sender === clientID ? '#0084ff' : '#333',
+								color: 'white',
+							}}
 						>
-							<span className='font-bold'>{msg.sender}: </span>
+							<strong>{msg.sender}: </strong>
 							<span>{msg.content}</span>
 						</span>
 					</div>
 				))}
-			</ScrollArea>
-			<div className='p-4 border-t border-gray-200'>
+				<div ref={messagesEndRef} />
+			</div>
+			<div
+				style={{
+					padding: '16px',
+					borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+				}}
+			>
 				<TextArea
-					placeholder='Reply to comment…'
+					placeholder='Написать сообщение...'
 					value={inputMessage}
 					onChange={e => setInputMessage(e.target.value)}
 					onKeyPress={handleKeyPress}
-					style={{ width: '100%', marginBottom: '8px' }}
+					style={{
+						width: '100%',
+						marginBottom: '8px',
+						backgroundColor: 'rgba(255, 255, 255, 0.1)',
+						color: 'white',
+						border: 'none',
+						padding: '8px',
+						borderRadius: '4px',
+					}}
 				/>
-				<Button onClick={sendMessage} className='w-full'>
-					Send
+				<Button
+					onClick={sendMessage}
+					style={{
+						width: '100%',
+						backgroundColor: '#0084ff',
+						color: 'white',
+						border: 'none',
+						padding: '8px',
+						borderRadius: '4px',
+						cursor: 'pointer',
+					}}
+				>
+					Отправить
 				</Button>
 			</div>
 		</div>
