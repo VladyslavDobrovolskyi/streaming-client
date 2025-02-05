@@ -328,7 +328,7 @@ export default function useWebRTC(roomID: string) {
 	const sendChatMessage = useCallback(
 		(message: string) => {
 			console.log(`Sending chat message to room ${roomID}:`, message)
-			socket.emit(ACTIONS.SEND_CHAT_MESSAGE, { room: roomID, message })
+			socket.emit(ACTIONS.SEND_CHAT_MESSAGE, { roomID, message })
 		},
 		[roomID]
 	)
