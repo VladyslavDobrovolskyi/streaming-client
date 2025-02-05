@@ -43,10 +43,13 @@ export default function useWebRTC(roomID: string) {
 
 	const addNewClient = useCallback(
 		(newClient: string, cb: () => void) => {
+			console.log(`Attempting to add new client: ${newClient}`)
 			updateClients(list => {
 				if (!list.includes(newClient)) {
+					console.log(`New client ${newClient} added`)
 					return [...list, newClient]
 				}
+				console.log(`Client ${newClient} already exists`)
 				return list
 			}, cb)
 		},
@@ -92,16 +95,27 @@ export default function useWebRTC(roomID: string) {
 			}
 		}
 
+		connection.oniceconnectionstatechange = () => {
+			console.log(`ICE connection state changed for ${peerID}:`, connection.iceConnectionState)
+			if (connection.iceConnectionState === 'connected' || connection.iceConnectionState === 'completed') {
+				console.log(`ICE connection established for ${peerID}`)
+				clearTimeout(iceRetryTimeout)
+			}
+		}
+
 		connection.ontrack = ({ streams: [remoteStream] }) => {
 			console.log(`Received track from ${peerID}`)
 			addNewClient(peerID, () => {
 				const element = peerMediaElements.current[peerID]
 				if (element) {
+					console.log(`Setting srcObject for ${peerID}`)
 					element.srcObject = remoteStream
 				} else {
+					console.log(`Element for ${peerID} not found, setting up interval`)
 					const interval = setInterval(() => {
 						const settledElement = peerMediaElements.current[peerID]
 						if (settledElement) {
+							console.log(`Element for ${peerID} found, setting srcObject`)
 							settledElement.srcObject = remoteStream
 							clearInterval(interval)
 						}
@@ -111,6 +125,7 @@ export default function useWebRTC(roomID: string) {
 		}
 
 		localMediaStream.current?.getTracks().forEach(track => {
+			console.log(`Adding local track to peer connection ${peerID}:`, track.kind)
 			connection.addTrack(track, localMediaStream.current!)
 		})
 
@@ -124,7 +139,7 @@ export default function useWebRTC(roomID: string) {
 				audio: true,
 				video: true,
 			})
-			console.log('Successfully obtained local media stream')
+			console.log('Successfully obtained local media stream:', localMediaStream.current?.getTracks())
 		} catch (error) {
 			console.error('Error getting media: ', error)
 			console.log('Creating mock media stream')
@@ -135,8 +150,11 @@ export default function useWebRTC(roomID: string) {
 			addNewClient(LOCAL_VIDEO, () => {
 				const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
 				if (localVideoElement) {
+					console.log('Setting local video element')
 					localVideoElement.volume = 0
 					localVideoElement.srcObject = localMediaStream.current
+				} else {
+					console.warn('Local video element not found')
 				}
 			})
 		}
@@ -235,13 +253,19 @@ export default function useWebRTC(roomID: string) {
 				peerConnections.current[peerID].close()
 				delete peerConnections.current[peerID]
 				delete peerMediaElements.current[peerID]
-				updateClients(list => list.filter(c => c !== peerID))
+				updateClients(list => {
+					console.log(`Updating client list after removing ${peerID}`)
+					return list.filter(c => c !== peerID)
+				})
 				console.log(`Peer ${peerID} removed`)
+			} else {
+				console.warn(`Peer ${peerID} not found in peerConnections`)
 			}
 		}
 
 		socket.on(ACTIONS.REMOVE_PEER, handleRemovePeer)
 		return () => {
+			console.log('Removing REMOVE_PEER event listener')
 			socket.off(ACTIONS.REMOVE_PEER)
 		}
 	}, [updateClients])
@@ -255,7 +279,7 @@ export default function useWebRTC(roomID: string) {
 					audio: true,
 					video: true,
 				})
-				console.log('Successfully captured local media')
+				console.log('Successfully captured local media:', localMediaStream.current?.getTracks())
 			} catch (error) {
 				console.error('Error capturing media:', error)
 				console.log('Creating mock media stream')
@@ -267,8 +291,11 @@ export default function useWebRTC(roomID: string) {
 				addNewClient(LOCAL_VIDEO, () => {
 					const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
 					if (localVideoElement) {
+						console.log('Setting local video element')
 						localVideoElement.volume = 0
 						localVideoElement.srcObject = localMediaStream.current
+					} else {
+						console.warn('Local video element not found')
 					}
 				})
 			}
@@ -277,18 +304,30 @@ export default function useWebRTC(roomID: string) {
 		startCapture()
 
 		return () => {
-			localMediaStream.current?.getTracks().forEach(track => track.stop())
+			console.log('Cleaning up media stream')
+			localMediaStream.current?.getTracks().forEach(track => {
+				console.log(`Stopping track: ${track.kind}`)
+				track.stop()
+			})
+			console.log('Leaving room:', roomID)
 			socket.emit(ACTIONS.LEAVE)
 		}
 	}, [roomID, addNewClient])
 
 	const provideMediaRef = useCallback(async (id: string, node: HTMLVideoElement | null) => {
+		console.log(`Providing media ref for ${id}`)
 		peerMediaElements.current[id] = node
+		if (node) {
+			console.log(`Media element for ${id} set`)
+		} else {
+			console.log(`Media element for ${id} cleared`)
+		}
 	}, [])
 
 	// New function to send chat messages
 	const sendChatMessage = useCallback(
 		(message: string) => {
+			console.log(`Sending chat message to room ${roomID}:`, message)
 			socket.emit(ACTIONS.SEND_CHAT_MESSAGE, { room: roomID, message })
 		},
 		[roomID]
@@ -297,10 +336,12 @@ export default function useWebRTC(roomID: string) {
 	// New effect to handle incoming chat messages
 	useEffect(() => {
 		socket.on(ACTIONS.RECEIVE_CHAT_MESSAGE, ({ sender, message }) => {
+			console.log(`Received chat message from ${sender}:`, message)
 			setChatMessages(prevMessages => [...prevMessages, { sender, message }])
 		})
 
 		return () => {
+			console.log('Removing RECEIVE_CHAT_MESSAGE event listener')
 			socket.off(ACTIONS.RECEIVE_CHAT_MESSAGE)
 		}
 	}, [])
