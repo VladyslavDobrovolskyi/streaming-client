@@ -79,6 +79,7 @@ export default function RoomDev() {
 	const [isMenuOpen, setIsMenuOpen] = useState(false) // Added isMenuOpen state
 	const [hoveredItem, setHoveredItem] = useState<string | null>(null) // Added hoveredItem state
 	const [showUserList, setShowUserList] = useState(false) // Added showUserList state
+	const [highlightedUser, setHighlightedUser] = useState<string | null>(null)
 	const userListWidth = 250 // Added userListWidth constant
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -498,6 +499,8 @@ export default function RoomDev() {
 								(clientID === LOCAL_VIDEO && cameraMuted) || participantCameras[clientID] === true
 									? 'none'
 									: 'block',
+							border: highlightedUser === clientID ? '3px solid yellow' : 'none',
+							boxShadow: highlightedUser === clientID ? '0 0 10px yellow' : 'none',
 						}}
 						draggable
 						onDragStart={e => handleDragStart(clientID, e)}
@@ -1243,7 +1246,14 @@ export default function RoomDev() {
 					{clients.map(clientID => (
 						<div
 							key={clientID}
-							style={{ padding: '10px', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}
+							style={{
+								padding: '10px',
+								borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+								backgroundColor:
+									highlightedUser === clientID ? 'rgba(255, 255, 0, 0.2)' : 'transparent',
+							}}
+							onMouseEnter={() => setHighlightedUser(clientID)}
+							onMouseLeave={() => setHighlightedUser(null)}
 						>
 							<p style={{ color: 'white', marginBottom: '5px' }}>Socket ID: {clientID}</p>
 							<div style={{ display: 'flex', gap: '10px' }}>
