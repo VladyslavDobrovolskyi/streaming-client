@@ -499,8 +499,8 @@ export default function RoomDev() {
 								(clientID === LOCAL_VIDEO && cameraMuted) || participantCameras[clientID] === true
 									? 'none'
 									: 'block',
-							border: highlightedUser === clientID ? '3px solid yellow' : 'none',
-							boxShadow: highlightedUser === clientID ? '0 0 10px yellow' : 'none',
+							border: highlightedUser === clientID ? '3px solid cyan' : 'none',
+							boxShadow: highlightedUser === clientID ? '0 0 10px cyan' : 'none',
 						}}
 						draggable
 						onDragStart={e => handleDragStart(clientID, e)}
