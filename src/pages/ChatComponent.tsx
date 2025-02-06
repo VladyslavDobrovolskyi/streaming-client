@@ -31,7 +31,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
 								padding: '4px 8px',
 							}}
 						>
-							{msg.username}
+							{msg.username}:{msg.message}
 						</Text>
 					</Box>
 				))}
