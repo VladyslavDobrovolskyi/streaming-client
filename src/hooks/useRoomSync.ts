@@ -5,10 +5,15 @@ import socket from '../socket'
 import ACTIONS from '../socket/actions'
 import type ReactPlayer from 'react-player'
 
-export default function useRoomSync(roomID: string, videoRef: React.RefObject<ReactPlayer>, localUsername: string) {
+export default function useRoomSync(
+	roomID: string,
+	videoRef: React.RefObject<ReactPlayer>,
+	localUsername: string,
+	avatar: string
+) {
 	const isSyncingRef = useRef(false)
 	const [lastSeekDirection, setLastSeekDirection] = useState<'forward' | 'backward' | null>(null)
-	const [participantInfo, setParticipantInfo] = useState<Record<string, { username: string }>>({})
+	const [participantInfo, setParticipantInfo] = useState<Record<string, { username: string; avatar: string }>>({})
 	const [participantCameras, setParticipantCameras] = useState<Record<string, boolean>>({})
 	const [participantMicrophones, setParticipantMicrophones] = useState<Record<string, boolean>>({})
 
@@ -73,13 +78,16 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 		[]
 	)
 
-	const handleInfoSync = useCallback(({ socketId, username }: { socketId: string; username: string }) => {
-		console.log('Received info sync event:', { socketId, username })
-		setParticipantInfo(prev => ({
-			...prev,
-			[socketId]: { username },
-		}))
-	}, [])
+	const handleInfoSync = useCallback(
+		({ socketId, avatar, username }: { socketId: string; username: string; avatar: string }) => {
+			console.log('Received info sync event:', { socketId, avatar, username })
+			setParticipantInfo(prev => ({
+				...prev,
+				[socketId]: { username, avatar },
+			}))
+		},
+		[]
+	)
 
 	const handleSyncRequest = useCallback(() => {
 		if (videoRef.current) {
@@ -101,10 +109,10 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 			socket.emit(ACTIONS.SEND_PARTICIPANT_INFO, {
 				roomID,
 				requesterId,
-				info: { username: participantInfo[socket.id]?.username || localUsername || 'Unknown' },
+				info: { username: participantInfo[socket.id]?.username || localUsername || 'Unknown', avatar },
 			})
 		},
-		[roomID, participantInfo, localUsername]
+		[roomID, participantInfo, localUsername, avatar]
 	)
 
 	useEffect(() => {
@@ -164,8 +172,8 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 	}, [roomID])
 
 	const emitInfoSync = useCallback(
-		(username: string) => {
-			socket.emit(ACTIONS.SYNC_INFO, { roomID, username })
+		(username: string, avatar: string) => {
+			socket.emit(ACTIONS.SYNC_INFO, { roomID, username, avatar })
 		},
 		[roomID]
 	)

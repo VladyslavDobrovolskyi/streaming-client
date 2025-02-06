@@ -87,6 +87,7 @@ export default function RoomDev() {
 	const [showChat, setShowChat] = useState(false) // Added showChat state
 	const [chatInput, setChatInput] = useState('') // Added chatInput state
 	const [localUsername, setLocalUsername] = useState('') // Added localUsername state
+	const [avatar, setAvatar] = useState('') // Added avatar state
 	const userListWidth = 250 // Added userListWidth constant
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<number | null>(null)
@@ -111,7 +112,7 @@ export default function RoomDev() {
 		participantCameras,
 		participantMicrophones,
 		requestParticipantInfo, // Added requestParticipantInfo
-	} = useRoomSync(roomID!, playerRef, localUsername)
+	} = useRoomSync(roomID!, playerRef, localUsername, avatar)
 
 	useEffect(() => {}, []) //Updated useEffect dependency
 
@@ -794,6 +795,19 @@ export default function RoomDev() {
 	}
 
 	useEffect(() => {
+		;(async () => {
+			console.log('Fetching avatar...')
+			const response = await fetch('https://streaming.vladyslavdobrovolskyi.tech/get/emoji/')
+			if (response.ok) {
+				const data = await response.json()
+				console.log('Fetched avatar:', data.url)
+				setAvatar(data.url)
+			} else {
+				console.log('Failed to fetch avatar')
+			}
+		})()
+	}, [])
+	useEffect(() => {
 		const username = prompt('Please enter your username:')
 		if (username) {
 			setLocalUsername(username)
@@ -802,9 +816,9 @@ export default function RoomDev() {
 
 	useEffect(() => {
 		if (roomID && localUsername) {
-			emitInfoSync(localUsername)
+			emitInfoSync(localUsername, avatar)
 		}
-	}, [roomID, localUsername, emitInfoSync])
+	}, [roomID, localUsername, avatar, emitInfoSync])
 
 	return (
 		<div
