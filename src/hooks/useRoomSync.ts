@@ -95,7 +95,8 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 
 	const handleRequestParticipantInfo = useCallback(
 		({ requesterId }) => {
-			// Отправляем нашу информацию всем участникам в комнате
+			console.log('[DEBUG] Received request participant info event:', { requesterId })
+			console.log('[DEBUG] Participant info:', participantInfo)
 			socket.emit(ACTIONS.SEND_PARTICIPANT_INFO, {
 				roomID,
 				requesterId,
