@@ -5,7 +5,7 @@ import socket from '../socket'
 import ACTIONS from '../socket/actions'
 import type ReactPlayer from 'react-player'
 
-export default function useRoomSync(roomID: string, videoRef: React.RefObject<ReactPlayer>) {
+export default function useRoomSync(roomID: string, videoRef: React.RefObject<ReactPlayer>, localUsername: string) {
 	const isSyncingRef = useRef(false)
 	const [lastSeekDirection, setLastSeekDirection] = useState<'forward' | 'backward' | null>(null)
 	const [participantInfo, setParticipantInfo] = useState<Record<string, { username: string }>>({})
@@ -97,13 +97,14 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 		({ requesterId }) => {
 			console.log('[DEBUG] Received request participant info event:', { requesterId })
 			console.log('[DEBUG] Participant info:', participantInfo)
+			console.log(localUsername)
 			socket.emit(ACTIONS.SEND_PARTICIPANT_INFO, {
 				roomID,
 				requesterId,
-				info: { username: participantInfo[socket.id]?.username || 'Unknown' },
+				info: { username: participantInfo[socket.id]?.username || localUsername || 'Unknown' },
 			})
 		},
-		[roomID, participantInfo]
+		[roomID, participantInfo, localUsername]
 	)
 
 	useEffect(() => {

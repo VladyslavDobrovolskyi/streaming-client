@@ -110,7 +110,7 @@ export default function RoomDev() {
 		participantCameras,
 		participantMicrophones,
 		requestParticipantInfo, // Added requestParticipantInfo
-	} = useRoomSync(roomID!, playerRef)
+	} = useRoomSync(roomID!, playerRef, localUsername)
 
 	useEffect(() => {}, []) //Updated useEffect dependency
 
