@@ -31,6 +31,7 @@ import { useParams } from 'react-router'
 import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
 import useRoomSync from '../hooks/useRoomSync'
 import ChatComponent from './ChatComponent'
+import { Avatar } from '@geist-ui/core'
 
 const createDashedSquareDragImage = () => {
 	const dragImage = document.createElement('div')
@@ -1321,6 +1322,7 @@ export default function RoomDev() {
 							onMouseEnter={() => setHighlightedUser(clientID)}
 							onMouseLeave={() => setHighlightedUser(null)}
 						>
+							<Avatar src='https://www.gstatic.com/android/keyboard/emojikitchen/20201001/u1f9d0/u1f9d0_u1f633.png' />
 							<p style={{ color: 'white', marginBottom: '5px' }}>
 								{clientID === LOCAL_VIDEO
 									? localUsername
