@@ -94,11 +94,11 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 	}, [roomID, videoRef])
 
 	const handleRequestParticipantInfo = useCallback(
-		({ requestedID }) => {
+		({ requesterId }) => {
 			// Отправляем нашу информацию всем участникам в комнате
 			socket.emit(ACTIONS.SEND_PARTICIPANT_INFO, {
 				roomID,
-				requestedID,
+				requesterId,
 				info: { username: participantInfo[socket.id]?.username || 'Unknown' },
 			})
 		},
