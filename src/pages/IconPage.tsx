@@ -8,7 +8,7 @@ const IconPage: React.FC = () => {
 
 			<Avatar
 				src='https://www.gstatic.com/android/keyboard/emojikitchen/20201001/u1f9d0/u1f9d0_u1f633.png'
-				fallback='A'
+				fallback='Allure'
 			/>
 		</div>
 	)
