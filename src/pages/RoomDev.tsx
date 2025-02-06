@@ -24,7 +24,7 @@ import {
 } from '@radix-ui/react-icons'
 import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
-import { Slider } from '@radix-ui/themes'
+import { Avatar, Slider } from '@radix-ui/themes'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import ActionIndicator from '../components/ActionIndicator'
 import { useParams } from 'react-router'
@@ -689,6 +689,14 @@ export default function RoomDev() {
 									alignItems: 'center',
 								}}
 							>
+								<Avatar
+									fallback={
+										clientID === LOCAL_VIDEO
+											? localUsername
+											: participantInfo[clientID]?.username || 'Anonymous'
+									}
+								/>
+
 								<EyeClosedIcon style={{ color: 'white', transform: 'scale(1)', cursor: 'pointer' }} />
 							</div>
 						)}
