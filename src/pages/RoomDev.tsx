@@ -83,6 +83,7 @@ export default function RoomDev() {
 	const [highlightedUser, setHighlightedUser] = useState<string | null>(null)
 	const [showChat, setShowChat] = useState(false) // Added showChat state
 	const [chatInput, setChatInput] = useState('') // Added chatInput state
+	const [localUsername, setLocalUsername] = useState('') // Added localUsername state
 	const userListWidth = 250 // Added userListWidth constant
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<number | null>(null)
@@ -99,10 +100,12 @@ export default function RoomDev() {
 		emitPause,
 		emitSeek,
 		requestSync,
-		lastSeekDirection,
+		emitInfoSync,
 		emitCameraSync,
-		participantCameras,
 		emitMicrophoneSync,
+		lastSeekDirection,
+		participantInfo,
+		participantCameras,
 		participantMicrophones,
 	} = useRoomSync(roomID!, playerRef)
 
@@ -765,6 +768,19 @@ export default function RoomDev() {
 		}
 	}
 
+	useEffect(() => {
+		const username = prompt('Please enter your username:')
+		if (username) {
+			setLocalUsername(username)
+		}
+	}, [])
+
+	useEffect(() => {
+		if (roomID && localUsername) {
+			emitInfoSync(localUsername)
+		}
+	}, [roomID, localUsername, emitInfoSync])
+
 	return (
 		<div
 			ref={playerWrapperRef}
@@ -1281,7 +1297,9 @@ export default function RoomDev() {
 							onMouseEnter={() => setHighlightedUser(clientID)}
 							onMouseLeave={() => setHighlightedUser(null)}
 						>
-							<p style={{ color: 'white', marginBottom: '5px' }}>Socket ID: {clientID}</p>
+							<p style={{ color: 'white', marginBottom: '5px' }}>
+								{participantInfo[clientID]?.username || 'Anonymous'}
+							</p>
 							<div style={{ display: 'flex', gap: '10px' }}>
 								<span
 									style={{
