@@ -1326,69 +1326,85 @@ export default function RoomDev() {
 					<h2 style={{ color: 'white', padding: '10px', borderBottom: '1px solid rgba(255, 255, 255, 0.2)' }}>
 						Users
 					</h2>
-					{clients.map(clientID => (
-						<div
-							key={clientID}
-							style={{
-								padding: '10px',
-								borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-								backgroundColor: highlightedUser === clientID ? 'rgba(0, 255, 255,0.2)' : 'transparent',
-								display: 'flex',
-								alignItems: 'center',
-								gap: '10px',
-							}}
-							onMouseEnter={() => setHighlightedUser(clientID)}
-							onMouseLeave={() => setHighlightedUser(null)}
-						>
-							<Avatar
-								src={clientID === LOCAL_VIDEO ? avatar : participantInfo[clientID]?.avatar}
-								fallback='?'
-							/>
-							<p style={{ color: 'white', margin: 0, flexGrow: 1 }}>
-								{clientID === LOCAL_VIDEO
-									? localUsername
-									: participantInfo[clientID]?.username || 'Anonymous'}
-							</p>
-							<span
+					{clients.map(clientID => {
+						const username =
+							clientID === LOCAL_VIDEO
+								? localUsername
+								: participantInfo[clientID]?.username || 'Anonymous'
+						const shortUsername = username.length > 15 ? username.substring(0, 12) + '...' : username
+
+						return (
+							<div
+								key={clientID}
 								style={{
-									color:
-										clientID === LOCAL_VIDEO
-											? micMuted
-												? 'red'
-												: 'green'
-											: participantMicrophones[clientID]
-											? 'red'
-											: 'green',
+									padding: '10px',
+									borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+									backgroundColor:
+										highlightedUser === clientID ? 'rgba(0, 255, 255,0.2)' : 'transparent',
+									display: 'flex',
+									alignItems: 'center',
+									gap: '10px',
 								}}
+								onMouseEnter={() => setHighlightedUser(clientID)}
+								onMouseLeave={() => setHighlightedUser(null)}
 							>
-								{clientID === LOCAL_VIDEO ? (
-									micMuted ? (
+								<Avatar
+									src={clientID === LOCAL_VIDEO ? avatar : participantInfo[clientID]?.avatar}
+									fallback='?'
+								/>
+								<div style={{ position: 'relative', flexGrow: 1 }}>
+									<p
+										style={{
+											color: 'white',
+											margin: 0,
+											cursor: username.length > 15 ? 'pointer' : 'default',
+										}}
+										title={username.length > 15 ? username : ''}
+									>
+										{shortUsername}
+									</p>
+								</div>
+								<span
+									style={{
+										color:
+											clientID === LOCAL_VIDEO
+												? micMuted
+													? 'red'
+													: 'green'
+												: participantMicrophones[clientID]
+												? 'red'
+												: 'green',
+									}}
+								>
+									{clientID === LOCAL_VIDEO ? (
+										micMuted ? (
+											<FaMicrophoneAltSlash />
+										) : (
+											<FaMicrophoneAlt />
+										)
+									) : participantMicrophones[clientID] ? (
 										<FaMicrophoneAltSlash />
 									) : (
 										<FaMicrophoneAlt />
-									)
-								) : participantMicrophones[clientID] ? (
-									<FaMicrophoneAltSlash />
-								) : (
-									<FaMicrophoneAlt />
-								)}
-							</span>
-							<span
-								style={{
-									color:
-										participantCameras[clientID] || (clientID === LOCAL_VIDEO && cameraMuted)
-											? 'red'
-											: 'green',
-								}}
-							>
-								{participantCameras[clientID] || (clientID === LOCAL_VIDEO && cameraMuted) ? (
-									<BsCameraVideoOffFill />
-								) : (
-									<BsCameraVideoFill />
-								)}
-							</span>
-						</div>
-					))}
+									)}
+								</span>
+								<span
+									style={{
+										color:
+											participantCameras[clientID] || (clientID === LOCAL_VIDEO && cameraMuted)
+												? 'red'
+												: 'green',
+									}}
+								>
+									{participantCameras[clientID] || (clientID === LOCAL_VIDEO && cameraMuted) ? (
+										<BsCameraVideoOffFill />
+									) : (
+										<BsCameraVideoFill />
+									)}
+								</span>
+							</div>
+						)
+					})}
 				</div>
 			)}
 			{showChat && (
