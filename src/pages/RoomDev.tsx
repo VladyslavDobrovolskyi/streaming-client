@@ -795,17 +795,18 @@ export default function RoomDev() {
 	}
 
 	useEffect(() => {
-		;(async () => {
-			console.log('Fetching avatar...')
-			const response = await fetch('https://streaming.vladyslavdobrovolskyi.tech/get/emoji/')
-			if (response.ok) {
-				const data = await response.json()
-				console.log('Fetched avatar:', data.url)
-				setAvatar(data.url)
-			} else {
-				console.log('Failed to fetch avatar')
-			}
-		})()
+		console.log('Fetching avatar...')
+		const response = fetch('https://streaming.vladyslavdobrovolskyi.tech/get/emoji/')
+		if (response) {
+			console.log('Avatar fetched')
+			response
+				.then(res => res.json())
+				.then(data => {
+					setAvatar(data.url)
+				})
+		} else {
+			console.log('Failed to fetch avatar')
+		}
 	}, [])
 	useEffect(() => {
 		const username = prompt('Please enter your username:')
