@@ -1320,6 +1320,7 @@ export default function RoomDev() {
 						backgroundColor: 'rgba(0, 0, 0, 0.8)',
 						zIndex: 25,
 						overflowY: 'auto',
+						overflowX: 'hidden',
 						transition: 'right 0.3s ease-in-out',
 					}}
 				>
@@ -1331,7 +1332,7 @@ export default function RoomDev() {
 							clientID === LOCAL_VIDEO
 								? localUsername
 								: participantInfo[clientID]?.username || 'Anonymous'
-						const shortUsername = username.length > 15 ? username.substring(0, 12) + '...' : username
+						const displayUsername = username
 
 						return (
 							<div
@@ -1344,6 +1345,9 @@ export default function RoomDev() {
 									display: 'flex',
 									alignItems: 'center',
 									gap: '10px',
+									whiteSpace: 'nowrap',
+									overflow: 'hidden',
+									textOverflow: 'ellipsis',
 								}}
 								onMouseEnter={() => setHighlightedUser(clientID)}
 								onMouseLeave={() => setHighlightedUser(null)}
@@ -1358,10 +1362,14 @@ export default function RoomDev() {
 											color: 'white',
 											margin: 0,
 											cursor: username.length > 15 ? 'pointer' : 'default',
+											overflow: 'hidden',
+											textOverflow: 'ellipsis',
+											whiteSpace: 'nowrap',
+											maxWidth: '150px',
 										}}
-										title={username.length > 15 ? username : ''}
+										title={username}
 									>
-										{shortUsername}
+										{displayUsername}
 									</p>
 								</div>
 								<span
