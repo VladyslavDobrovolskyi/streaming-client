@@ -31,7 +31,7 @@ import { useParams } from 'react-router'
 import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
 import useRoomSync from '../hooks/useRoomSync'
 import ChatComponent from './ChatComponent'
-import { Avatar } from '@geist-ui/core'
+import { Avatar } from '@radix-ui/themes'
 
 const createDashedSquareDragImage = () => {
 	const dragImage = document.createElement('div')
@@ -1342,7 +1342,7 @@ export default function RoomDev() {
 						>
 							<Avatar
 								src={clientID === LOCAL_VIDEO ? avatar : participantInfo[clientID]?.avatar}
-								alt='?'
+								fallback='?'
 							/>
 							<p style={{ color: 'white', margin: 0, flexGrow: 1 }}>
 								{clientID === LOCAL_VIDEO
