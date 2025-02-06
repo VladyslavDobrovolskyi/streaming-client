@@ -687,6 +687,7 @@ export default function RoomDev() {
 									display: 'flex',
 									justifyContent: 'center',
 									alignItems: 'center',
+									opacity: 0.5,
 								}}
 							>
 								{/* <Avatar
