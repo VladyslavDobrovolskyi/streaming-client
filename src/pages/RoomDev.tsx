@@ -783,7 +783,7 @@ export default function RoomDev() {
 		if (roomID && localUsername) {
 			emitInfoSync(localUsername)
 		}
-	}, [roomID, localUsername, emitInfoSync, participantInfo])
+	}, [roomID, localUsername, emitInfoSync])
 
 	return (
 		<div
