@@ -6,6 +6,7 @@ import LoginForm from './components/LoginForm'
 import RegistrationForm from './components/RegistrationForm'
 import RoomDev from './pages/RoomDev'
 import ARoom from './pages/Aroom'
+import IconPage from './pages/IconPage'
 
 function App() {
 	return (
@@ -19,6 +20,7 @@ function App() {
 					<Route path='/login' element={<LoginForm />} />
 					<Route path='/roomdev' element={<RoomDev />} />
 					<Route path='/aroom' element={<ARoom />} />
+					<Route path='/icons' element={<IconPage />} />
 				</Routes>
 			</BrowserRouter>
 		</GeistProvider>
