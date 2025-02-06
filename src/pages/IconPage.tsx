@@ -1,17 +1,17 @@
 import React from 'react'
-import { Avatar, AvatarImage, AvatarFallback } from '@radix-ui/react-avatar'
+import { Avatar, Flex } from '@radix-ui/themes'
 
 const IconPage: React.FC = () => {
 	return (
 		<div>
 			<h1>Icon Page</h1>
-			<Avatar>
-				<AvatarImage
+			<Flex gap='2'>
+				<Avatar
 					src='https://www.gstatic.com/android/keyboard/emojikitchen/20201001/u1f9d0/u1f9d0_u1f633.png'
-					alt='Avatar'
+					fallback='A'
 				/>
-				<AvatarFallback>AB</AvatarFallback>
-			</Avatar>
+				<Avatar fallback='A' />
+			</Flex>
 		</div>
 	)
 }
