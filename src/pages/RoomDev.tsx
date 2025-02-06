@@ -1340,7 +1340,10 @@ export default function RoomDev() {
 							onMouseEnter={() => setHighlightedUser(clientID)}
 							onMouseLeave={() => setHighlightedUser(null)}
 						>
-							<Avatar src='https://www.gstatic.com/android/keyboard/emojikitchen/20201001/u1f9d0/u1f9d0_u1f633.png' />
+							<Avatar
+								src={clientID === LOCAL_VIDEO ? avatar : participantInfo[clientID]?.avatar}
+								alt='?'
+							/>
 							<p style={{ color: 'white', margin: 0, flexGrow: 1 }}>
 								{clientID === LOCAL_VIDEO
 									? localUsername
