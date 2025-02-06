@@ -138,7 +138,7 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 		(username: string) => {
 			socket.emit(ACTIONS.SYNC_INFO, { roomID, username })
 		},
-		[roomID, participantInfo]
+		[roomID]
 	)
 
 	const emitCameraSync = useCallback(
