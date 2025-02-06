@@ -113,6 +113,7 @@ export default function RoomDev() {
 
 	useEffect(() => {
 		console.log('Participant info:', participantInfo)
+		console.log('LOCAL_VIDEO:', LOCAL_VIDEO)
 	}, [participantInfo])
 	useEffect(() => {
 		if (loaded) {
