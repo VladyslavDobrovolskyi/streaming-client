@@ -3,7 +3,7 @@ import { Box, Flex, ScrollArea, Text, TextField, Button } from '@radix-ui/themes
 
 interface ChatComponentProps {
 	clientID: string
-	messages: { sender: string; message: string }[]
+	messages: { username: string; message: string }[]
 	chatInput: string
 	setChatInput: (input: string) => void
 	handleSendMessage: () => void
@@ -20,7 +20,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
 		<Flex direction='column' style={{ height: '100%' }}>
 			<ScrollArea style={{ flex: 1, padding: '16px' }}>
 				{messages.map((msg, index) => (
-					<Box key={index} mb='2' style={{ textAlign: msg.sender === clientID ? 'right' : 'left' }}>
+					<Box key={index} mb='2' style={{ textAlign: msg.username === clientID ? 'right' : 'left' }}>
 						<Text
 							as='span'
 							size='2'
@@ -31,7 +31,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
 								padding: '4px 8px',
 							}}
 						>
-							{msg.sender === clientID ? 'You' : msg.sender}: {msg.message}
+							{msg.username}
 						</Text>
 					</Box>
 				))}

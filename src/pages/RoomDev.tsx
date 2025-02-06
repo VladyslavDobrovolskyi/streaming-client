@@ -774,7 +774,7 @@ export default function RoomDev() {
 
 	const handleSendMessage = () => {
 		if (chatInput.trim()) {
-			sendChatMessage(chatInput.trim())
+			sendChatMessage({ username: localUsername, message: chatInput.trim() })
 			setChatInput('')
 		}
 	}

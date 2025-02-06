@@ -39,7 +39,7 @@ function createMockMediaStream(): MediaStream {
 
 export default function useWebRTC(roomID: string) {
 	const [clients, updateClients] = useStateWithCallback<string[]>([])
-	const [chatMessages, setChatMessages] = useState<{ sender: string; message: string }[]>([])
+	const [chatMessages, setChatMessages] = useState<{ username: string; message: string }[]>([])
 
 	const addNewClient = useCallback(
 		(newClient: string, cb: () => void) => {
@@ -326,18 +326,21 @@ export default function useWebRTC(roomID: string) {
 
 	// New function to send chat messages
 	const sendChatMessage = useCallback(
-		(message: string) => {
-			console.log(`Sending chat message to room ${roomID}:`, message)
-			socket.emit(ACTIONS.SEND_CHAT_MESSAGE, { roomID, message })
+		({ username, message }: { username: string; message: string }): void => {
+			console.log(
+				`[User: ${username} | SocketId: ${socket.id} ] Sending chat message to room ${roomID}:`,
+				message
+			)
+			socket.emit(ACTIONS.SEND_CHAT_MESSAGE, { roomID, username, message })
 		},
 		[roomID]
 	)
 
 	// New effect to handle incoming chat messages
 	useEffect(() => {
-		socket.on(ACTIONS.RECEIVE_CHAT_MESSAGE, ({ sender, message, timestamp }) => {
-			console.log(` ${timestamp} - Received chat message from ${sender}:`, message)
-			setChatMessages(prevMessages => [...prevMessages, { sender, message }])
+		socket.on(ACTIONS.RECEIVE_CHAT_MESSAGE, ({ sender, username, message, timestamp }) => {
+			console.log(` ${timestamp} - Received chat message from [${sender} | ${username}]:`, message)
+			setChatMessages(prevMessages => [...prevMessages, { username, message }])
 		})
 
 		return () => {
