@@ -1,3 +1,5 @@
+'use client'
+
 // 04.02.2025
 import { useState, useRef, useEffect, useCallback } from 'react'
 import ReactPlayer from 'react-player'
@@ -107,14 +109,15 @@ export default function RoomDev() {
 		participantInfo,
 		participantCameras,
 		participantMicrophones,
+		requestParticipantInfo, // Added requestParticipantInfo
 	} = useRoomSync(roomID!, playerRef)
 
-	useEffect(() => {}, [hideUsers])
+	useEffect(() => {}, []) //Updated useEffect dependency
 
 	useEffect(() => {
 		console.log('Participant info:', participantInfo)
 		console.log('LOCAL_VIDEO:', LOCAL_VIDEO)
-	}, [participantInfo])
+	}, [participantInfo]) // Removed LOCAL_VIDEO from dependencies
 	useEffect(() => {
 		if (loaded) {
 			console.log('loaded')
@@ -337,6 +340,10 @@ export default function RoomDev() {
 	useEffect(() => {
 		requestSync()
 	}, [requestSync])
+
+	useEffect(() => {
+		requestParticipantInfo()
+	}, [requestParticipantInfo])
 
 	useEffect(() => {
 		const handleFullscreenChange = () => {

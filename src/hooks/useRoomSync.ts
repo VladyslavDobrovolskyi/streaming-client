@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useRef, useCallback, useState } from 'react'
 import socket from '../socket'
 import ACTIONS from '../socket/actions'
@@ -59,6 +61,7 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 		},
 		[]
 	)
+
 	const handleMicrophoneSync = useCallback(
 		({ socketId, isMicrophoneDisabled }: { socketId: string; isMicrophoneDisabled: boolean }) => {
 			console.log('Received microphone sync event:', { socketId, isMicrophoneDisabled })
@@ -71,12 +74,13 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 	)
 
 	const handleInfoSync = useCallback(({ socketId, username }: { socketId: string; username: string }) => {
-		console.log('Received info-sync event:', { socketId, username })
+		console.log('Received info sync event:', { socketId, username })
 		setParticipantInfo(prev => ({
 			...prev,
 			[socketId]: { username },
 		}))
 	}, [])
+
 	const handleSyncRequest = useCallback(() => {
 		if (videoRef.current) {
 			const currentTime = videoRef.current.getCurrentTime()
@@ -89,6 +93,14 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 		}
 	}, [roomID, videoRef])
 
+	const handleRequestParticipantInfo = useCallback(() => {
+		// Отправляем нашу информацию всем участникам в комнате
+		socket.emit(ACTIONS.SEND_PARTICIPANT_INFO, {
+			roomID,
+			info: { username: participantInfo[socket.id]?.username || 'Unknown' },
+		})
+	}, [roomID, participantInfo])
+
 	useEffect(() => {
 		socket.on(ACTIONS.VIDEO_PLAY, handlePlay)
 		socket.on(ACTIONS.VIDEO_PAUSE, handlePause)
@@ -97,6 +109,7 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 		socket.on(ACTIONS.SYNC_INFO, handleInfoSync)
 		socket.on(ACTIONS.SYNC_CAMERA, handleCameraSync)
 		socket.on(ACTIONS.SYNC_MICROPHONE, handleMicrophoneSync)
+		socket.on(ACTIONS.REQUEST_PARTICIPANT_INFO, handleRequestParticipantInfo)
 
 		return () => {
 			socket.off(ACTIONS.VIDEO_PLAY, handlePlay)
@@ -106,8 +119,18 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 			socket.off(ACTIONS.SYNC_INFO, handleInfoSync)
 			socket.off(ACTIONS.SYNC_CAMERA, handleCameraSync)
 			socket.off(ACTIONS.SYNC_MICROPHONE, handleMicrophoneSync)
+			socket.off(ACTIONS.REQUEST_PARTICIPANT_INFO, handleRequestParticipantInfo)
 		}
-	}, [handlePlay, handlePause, handleSeek, handleSyncRequest, handleCameraSync, handleMicrophoneSync, handleInfoSync])
+	}, [
+		handlePlay,
+		handlePause,
+		handleSeek,
+		handleSyncRequest,
+		handleCameraSync,
+		handleMicrophoneSync,
+		handleInfoSync,
+		handleRequestParticipantInfo,
+	])
 
 	const emitPlay = useCallback(
 		(time: number) => {
@@ -147,12 +170,17 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 		},
 		[roomID]
 	)
+
 	const emitMicrophoneSync = useCallback(
 		(isMicrophoneDisabled: boolean) => {
 			socket.emit(ACTIONS.SYNC_MICROPHONE, { roomID, socketId: socket.id, isMicrophoneDisabled })
 		},
 		[roomID]
 	)
+
+	const requestParticipantInfo = useCallback(() => {
+		socket.emit(ACTIONS.REQUEST_PARTICIPANT_INFO, { roomID })
+	}, [roomID])
 
 	return {
 		emitPlay,
@@ -162,6 +190,7 @@ export default function useRoomSync(roomID: string, videoRef: React.RefObject<Re
 		emitCameraSync,
 		emitMicrophoneSync,
 		requestSync,
+		requestParticipantInfo,
 		lastSeekDirection,
 		participantInfo,
 		participantCameras,
