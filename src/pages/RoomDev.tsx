@@ -690,6 +690,17 @@ export default function RoomDev() {
 								}}
 							>
 								<Avatar
+									style={
+										{
+											position: 'absolute',
+											width: '48px',
+											height: '48px',
+											backgroundColor: 'white',
+											color: 'black',
+											fontSize: '1.5rem',
+											marginBottom: '8px',
+										} as React.CSSProperties
+									}
 									fallback={
 										clientID === LOCAL_VIDEO
 											? localUsername
