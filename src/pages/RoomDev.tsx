@@ -1302,7 +1302,9 @@ export default function RoomDev() {
 							onMouseLeave={() => setHighlightedUser(null)}
 						>
 							<p style={{ color: 'white', marginBottom: '5px' }}>
-								{participantInfo[clientID]?.username || 'Anonymous'}
+								{clientID === LOCAL_VIDEO
+									? localUsername
+									: participantInfo[clientID]?.username || 'Anonymous'}
 							</p>
 							<div style={{ display: 'flex', gap: '10px' }}>
 								<span
