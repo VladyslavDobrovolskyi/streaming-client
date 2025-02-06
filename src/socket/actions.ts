@@ -12,6 +12,7 @@ const ACTIONS = {
 	VIDEO_PAUSE: 'video-pause',
 	VIDEO_SEEK: 'video-seek',
 	REQUEST_SYNC: 'request-sync',
+	SYNC_INFO: 'sync-info',
 	SYNC_STATE: 'sync-state',
 	SYNC_CAMERA: 'sync-camera',
 	SYNC_MICROPHONE: 'sync-microphone',
