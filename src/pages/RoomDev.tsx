@@ -112,6 +112,9 @@ export default function RoomDev() {
 	useEffect(() => {}, [hideUsers])
 
 	useEffect(() => {
+		console.log('Participant info:', participantInfo)
+	}, [participantInfo])
+	useEffect(() => {
 		if (loaded) {
 			console.log('loaded')
 		}
