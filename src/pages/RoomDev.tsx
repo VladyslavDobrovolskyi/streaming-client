@@ -1341,104 +1341,104 @@ export default function RoomDev() {
 					<h2 style={{ color: 'white', padding: '10px', borderBottom: '1px solid rgba(255, 255, 255, 0.2)' }}>
 						Users
 					</h2>
-					{clients.map(clientID => {
-						const username =
-							clientID === LOCAL_VIDEO
-								? localUsername
-								: participantInfo[clientID]?.username || 'Anonymous'
-						const displayUsername = username
+					{clients
+						.filter(clientID => clientID !== LOCAL_VIDEO)
+						.map(clientID => {
+							const username = participantInfo[clientID]?.username || 'Anonymous'
+							const displayUsername = username
 
-						return (
-							<div
-								key={clientID}
-								style={{
-									padding: '10px',
-									borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-									backgroundColor:
-										highlightedUser === clientID ? 'rgba(0, 255, 255,0.2)' : 'transparent',
-									display: 'flex',
-									alignItems: 'center',
-									gap: '10px',
-									whiteSpace: 'nowrap',
-									overflow: 'hidden',
-									textOverflow: 'ellipsis',
-								}}
-								onMouseEnter={() => setHighlightedUser(clientID)}
-								onMouseLeave={() => setHighlightedUser(null)}
-							>
-								<Avatar
-									src={clientID === LOCAL_VIDEO ? avatar : participantInfo[clientID]?.avatar}
-									fallback='?'
-								/>
-								<div style={{ position: 'relative', flexGrow: 1 }}>
-									<p
-										style={{
-											color: 'white',
-											margin: 0,
-											cursor: username.length > 15 ? 'pointer' : 'default',
-											overflow: 'hidden',
-											textOverflow: 'ellipsis',
-											whiteSpace: 'nowrap',
-											maxWidth: '150px',
-										}}
-										title={username}
-									>
-										{displayUsername}
-									</p>
-								</div>
-								<span
+							return (
+								<div
+									key={clientID}
 									style={{
-										color:
-											clientID === LOCAL_VIDEO
-												? micMuted
-													? 'red'
-													: 'green'
-												: participantMicrophones[clientID]
-												? 'red'
-												: 'green',
+										padding: '10px',
+										borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+										backgroundColor:
+											highlightedUser === clientID ? 'rgba(0, 255, 255,0.2)' : 'transparent',
+										display: 'flex',
+										alignItems: 'center',
+										gap: '10px',
+										whiteSpace: 'nowrap',
+										overflow: 'hidden',
+										textOverflow: 'ellipsis',
 									}}
+									onMouseEnter={() => setHighlightedUser(clientID)}
+									onMouseLeave={() => setHighlightedUser(null)}
 								>
-									{clientID === LOCAL_VIDEO ? (
-										micMuted ? (
+									<Avatar
+										src={clientID === LOCAL_VIDEO ? avatar : participantInfo[clientID]?.avatar}
+										fallback='?'
+									/>
+									<div style={{ position: 'relative', flexGrow: 1 }}>
+										<p
+											style={{
+												color: 'white',
+												margin: 0,
+												cursor: username.length > 15 ? 'pointer' : 'default',
+												overflow: 'hidden',
+												textOverflow: 'ellipsis',
+												whiteSpace: 'nowrap',
+												maxWidth: '150px',
+											}}
+											title={username}
+										>
+											{displayUsername}
+										</p>
+									</div>
+									<span
+										style={{
+											color:
+												clientID === LOCAL_VIDEO
+													? micMuted
+														? 'red'
+														: 'green'
+													: participantMicrophones[clientID]
+													? 'red'
+													: 'green',
+										}}
+									>
+										{clientID === LOCAL_VIDEO ? (
+											micMuted ? (
+												<FaMicrophoneAltSlash />
+											) : (
+												<FaMicrophoneAlt />
+											)
+										) : participantMicrophones[clientID] ? (
 											<FaMicrophoneAltSlash />
 										) : (
 											<FaMicrophoneAlt />
-										)
-									) : participantMicrophones[clientID] ? (
-										<FaMicrophoneAltSlash />
-									) : (
-										<FaMicrophoneAlt />
-									)}
-								</span>
-								<span
-									style={{
-										color:
-											participantCameras[clientID] || (clientID === LOCAL_VIDEO && cameraMuted)
-												? 'red'
-												: 'green',
-									}}
-								>
-									{participantCameras[clientID] || (clientID === LOCAL_VIDEO && cameraMuted) ? (
-										<BsCameraVideoOffFill />
-									) : (
-										<BsCameraVideoFill />
-									)}
-								</span>
-								<button
-									onClick={() => togglePrivateChat(clientID)}
-									style={{
-										background: 'none',
-										border: 'none',
-										cursor: 'pointer',
-										color: 'white',
-										padding: '5px',
-									}}
-								>
-									<ChatBubbleIcon />
-								</button>
-							</div>
-						)
-					})}
+										)}
+									</span>
+									<span
+										style={{
+											color:
+												participantCameras[clientID] ||
+												(clientID === LOCAL_VIDEO && cameraMuted)
+													? 'red'
+													: 'green',
+										}}
+									>
+										{participantCameras[clientID] || (clientID === LOCAL_VIDEO && cameraMuted) ? (
+											<BsCameraVideoOffFill />
+										) : (
+											<BsCameraVideoFill />
+										)}
+									</span>
+									<button
+										onClick={() => togglePrivateChat(clientID)}
+										style={{
+											background: 'none',
+											border: 'none',
+											cursor: 'pointer',
+											color: 'white',
+											padding: '5px',
+										}}
+									>
+										<ChatBubbleIcon />
+									</button>
+								</div>
+							)
+						})}
 				</div>
 			)}
 			{showChat && (
