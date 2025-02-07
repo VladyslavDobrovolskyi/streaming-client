@@ -91,9 +91,6 @@ export default function RoomDev() {
 	const [localUsername, setLocalUsername] = useState('') // Added localUsername state
 	const [avatar, setAvatar] = useState('') // Added avatar state
 	const [privateChats, setPrivateChats] = useState<Record<string, boolean>>({})
-	const [privateMessages, setPrivateMessages] = useState<
-		Record<string, Array<{ from: string; to: string; message: string }>>
-	>({})
 	const userListWidth = 250 // Added userListWidth constant
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<number | null>(null)
@@ -102,9 +99,16 @@ export default function RoomDev() {
 	const previousVolumeRef = useRef(volume)
 
 	const { id: roomID } = useParams<{ id: string }>()
-	const { clients, provideMediaRef, localStream, reinitializeStream, chatMessages, sendChatMessage } = useWebRTC(
-		roomID!
-	) // Updated useWebRTC call
+	const {
+		clients,
+		provideMediaRef,
+		localStream,
+		reinitializeStream,
+		chatMessages,
+		sendChatMessage,
+		privateMessages,
+		sendPrivateMessage,
+	} = useWebRTC(roomID!) // Updated useWebRTC call
 	const {
 		emitPlay,
 		emitPause,
@@ -829,14 +833,6 @@ export default function RoomDev() {
 
 	const togglePrivateChat = (clientID: string) => {
 		setPrivateChats(prev => ({ ...prev, [clientID]: !prev[clientID] }))
-	}
-
-	const sendPrivateMessage = (to: string, message: string) => {
-		setPrivateMessages(prev => ({
-			...prev,
-			[to]: [...(prev[to] || []), { from: LOCAL_VIDEO, to, message }],
-		}))
-		// Here you would typically emit the private message to the server
 	}
 
 	return (

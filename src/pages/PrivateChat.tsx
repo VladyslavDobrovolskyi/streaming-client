@@ -7,7 +7,7 @@ interface PrivateChatProps {
 	recipientName: string
 	recipientAvatar: string
 	onClose: () => void
-	sendPrivateMessage: (to: string, message: string) => void
+	sendPrivateMessage: (params: { to: string; message: string }) => void
 	privateMessages: Array<{ from: string; to: string; message: string }>
 }
 
@@ -34,7 +34,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 		console.log('%c handleSend called', 'background: #222; color: #FF69B4')
 		if (message.trim()) {
 			console.log('%c Sending message', 'background: #222; color: #FF69B4', { to: recipientId, message })
-			sendPrivateMessage(recipientId, message)
+			sendPrivateMessage({ to: recipientId, message })
 			setMessage('')
 		} else {
 			console.log('%c Attempted to send empty message', 'background: #222; color: #FF4500')

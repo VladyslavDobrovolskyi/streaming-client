@@ -356,7 +356,7 @@ export default function useWebRTC(roomID: string) {
 
 	// New function to send private messages
 	const sendPrivateMessage = useCallback(
-		({ to, message }: { to: string; message: string }): void => {
+		({ to, message }: { to: string; message: string }) => {
 			console.log(`Sending private message to ${to}:`, message)
 			socket.emit(ACTIONS.SEND_PRIVATE_MESSAGE, { roomID, to, message })
 
