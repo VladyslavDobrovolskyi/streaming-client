@@ -58,8 +58,11 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 
 	const handleResize = (_: React.SyntheticEvent, { size }: ResizeCallbackData) => {
 		setSize({ width: size.width, height: size.height })
+		setPosition(prev => ({
+			x: prev.x - (size.width - prev.x) / 2,
+			y: prev.y - (size.height - prev.y) / 2,
+		}))
 	}
-
 	return (
 		<Draggable
 			handle='.drag-handle'
