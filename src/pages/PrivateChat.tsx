@@ -107,7 +107,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						className='drag-handle'
 						style={{
 							borderBottom: '1px solid var(--gray-5)',
-							cursor: isDragging ? 'move' : 'grab',
+							cursor: isDragging ? 'grabbing' : 'move',
 							backgroundColor: 'var(--gray-2)',
 							userSelect: 'none',
 						}}
