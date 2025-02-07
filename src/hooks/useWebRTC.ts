@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useRef, useCallback, useState } from 'react'
 import useStateWithCallback from './useStateWithCallback'
 import socket from '../socket'
@@ -40,6 +42,9 @@ function createMockMediaStream(): MediaStream {
 export default function useWebRTC(roomID: string) {
 	const [clients, updateClients] = useStateWithCallback<string[]>([])
 	const [chatMessages, setChatMessages] = useState<{ username: string; message: string }[]>([])
+	const [privateMessages, setPrivateMessages] = useState<
+		Record<string, Array<{ from: string; to: string; message: string }>>
+	>({})
 
 	const addNewClient = useCallback(
 		(newClient: string, cb: () => void) => {
@@ -349,6 +354,37 @@ export default function useWebRTC(roomID: string) {
 		}
 	}, [])
 
+	// New function to send private messages
+	const sendPrivateMessage = useCallback(
+		({ to, message }: { to: string; message: string }): void => {
+			console.log(`Sending private message to ${to}:`, message)
+			socket.emit(ACTIONS.SEND_PRIVATE_MESSAGE, { roomID, to, message })
+
+			// Update local state
+			setPrivateMessages(prevMessages => ({
+				...prevMessages,
+				[to]: [...(prevMessages[to] || []), { from: LOCAL_VIDEO, to, message }],
+			}))
+		},
+		[roomID]
+	)
+
+	// New effect to handle incoming private messages
+	useEffect(() => {
+		socket.on(ACTIONS.RECEIVE_PRIVATE_MESSAGE, ({ from, message }) => {
+			console.log(`Received private message from ${from}:`, message)
+			setPrivateMessages(prevMessages => ({
+				...prevMessages,
+				[from]: [...(prevMessages[from] || []), { from, to: LOCAL_VIDEO, message }],
+			}))
+		})
+
+		return () => {
+			console.log('Removing RECEIVE_PRIVATE_MESSAGE event listener')
+			socket.off(ACTIONS.RECEIVE_PRIVATE_MESSAGE)
+		}
+	}, [])
+
 	return {
 		clients,
 		provideMediaRef,
@@ -356,5 +392,7 @@ export default function useWebRTC(roomID: string) {
 		reinitializeStream,
 		chatMessages,
 		sendChatMessage,
+		privateMessages,
+		sendPrivateMessage,
 	}
 }
