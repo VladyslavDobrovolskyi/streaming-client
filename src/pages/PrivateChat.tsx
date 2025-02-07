@@ -28,12 +28,13 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
 	const [size, setSize] = useState({ width: 300, height: 400 })
 	const [position, setPosition] = useState({ x: window.innerWidth - 620, y: window.innerHeight - 470 })
+	const [isDragging, setIsDragging] = useState(false)
 
 	useEffect(() => {
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
-	}, [privateMessages]) // Updated dependency to only track the length of privateMessages
+	}, [scrollAreaRef]) //Corrected dependency
 
 	const handleSend = () => {
 		if (message.trim()) {
@@ -67,8 +68,16 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 		setPosition({ x: data.x, y: data.y })
 	}
 
+	const onStart = () => {
+		setIsDragging(true)
+	}
+
+	const onStop = () => {
+		setIsDragging(false)
+	}
+
 	return (
-		<Draggable handle='.drag-handle' position={position} onDrag={onDrag}>
+		<Draggable handle='.drag-handle' position={position} onDrag={onDrag} onStart={onStart} onStop={onStop}>
 			<Resizable
 				width={size.width}
 				height={size.height}
@@ -95,8 +104,13 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						align='center'
 						justify='between'
 						p='3'
-						style={{ borderBottom: '1px solid var(--gray-5)' }}
 						className='drag-handle'
+						style={{
+							borderBottom: '1px solid var(--gray-5)',
+							cursor: isDragging ? 'grabbing' : 'grab',
+							backgroundColor: 'var(--gray-2)',
+							userSelect: 'none',
+						}}
 					>
 						<Flex align='center' gap='2'>
 							<Avatar src={recipientAvatar} fallback={recipientName[0]} size='2' />
