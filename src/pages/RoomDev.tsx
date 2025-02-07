@@ -1,6 +1,4 @@
-'use client'
-
-// 04.02.2025
+// 07.02.2025
 import { useState, useRef, useEffect, useCallback } from 'react'
 import ReactPlayer from 'react-player'
 import {
