@@ -81,20 +81,21 @@ export default function RoomDev() {
 	const [coveredClients, setCoveredClients] = useState<Record<string, boolean>>({})
 	const [isMovieMode, setIsMovieMode] = useState(false)
 	const [clientPositions, setClientPositions] = useState<Record<string, { x: number; y: number }>>({})
-	// const [draggingClient, setDraggingClient] = useState<string | null>(null) // Removed draggingClient state
-	const [hideUsers, setHideUsers] = useState(false) // Updated hideUsers state
-	const [isMenuOpen, setIsMenuOpen] = useState(false) // Added isMenuOpen state
-	const [hoveredItem, setHoveredItem] = useState<string | null>(null) // Added hoveredItem state
-	const [showUserList, setShowUserList] = useState(false) // Added showUserList state
+	const [hideUsers, setHideUsers] = useState(false)
+	const [isMenuOpen, setIsMenuOpen] = useState(false)
+	const [hoveredItem, setHoveredItem] = useState<string | null>(null)
+	const [showUserList, setShowUserList] = useState(false)
 	const [highlightedUser, setHighlightedUser] = useState<string | null>(null)
-	const [showChat, setShowChat] = useState(false) // Added showChat state
-	const [chatInput, setChatInput] = useState('') // Added chatInput state
-	const [localUsername, setLocalUsername] = useState('') // Added localUsername state
-	const [avatar, setAvatar] = useState('') // Added avatar state
+	const [showChat, setShowChat] = useState(false)
+	const [chatInput, setChatInput] = useState('')
+	const [localUsername, setLocalUsername] = useState('')
+	const [avatar, setAvatar] = useState('')
 	const [privateChats, setPrivateChats] = useState<Record<string, boolean>>({})
-	const [clientSizes, setClientSizes] = useState<Record<string, { width: number; height: number }>>({})
-	const [scale, setScale] = useState(1) // Added scale state
-	const userListWidth = 250 // Added userListWidth constant
+	const [clientSizes, setClientSizes] = useState<Record<string, { width: number; height: number; scale?: number }>>(
+		{}
+	)
+	const [hoveredClientForZoom, setHoveredClientForZoom] = useState<string | null>(null)
+	const userListWidth = 250
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<number | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
@@ -111,7 +112,7 @@ export default function RoomDev() {
 		sendChatMessage,
 		privateMessages,
 		sendPrivateMessage,
-	} = useWebRTC(roomID!) // Updated useWebRTC call
+	} = useWebRTC(roomID!)
 	const {
 		emitPlay,
 		emitPause,
@@ -124,15 +125,14 @@ export default function RoomDev() {
 		participantInfo,
 		participantCameras,
 		participantMicrophones,
-		requestParticipantInfo, // Added requestParticipantInfo
+		requestParticipantInfo,
 	} = useRoomSync(roomID!, playerRef, localUsername, avatar)
 
-	useEffect(() => {}, []) //Updated useEffect dependency
+	useEffect(() => {}, [])
 
 	useEffect(() => {
 		console.log('Participant info:', participantInfo)
-		console.log('LOCAL_VIDEO:', LOCAL_VIDEO)
-	}, [participantInfo]) // Removed LOCAL_VIDEO from dependencies
+	}, [participantInfo])
 	useEffect(() => {
 		if (loaded) {
 			console.log('loaded')
@@ -345,11 +345,12 @@ export default function RoomDev() {
 		emitPlay,
 		handleForward15,
 		handleBackward15,
+		handleToggleMuted, // Added handleToggleMuted to dependencies
 		muted,
 		localStream,
 		mutedBySlider,
 		previousVolumeRef,
-	]) // Added handleBackward15 and handleForward15 to dependencies, and added missing dependencies for handleToggleMuted
+	])
 
 	useEffect(() => {
 		if (roomID) {
@@ -452,8 +453,6 @@ export default function RoomDev() {
 		return <SpeakerLoudIcon style={IconStyles} />
 	}
 
-	// Removed handleDragStart, handleDrag, handleDragEnd functions
-
 	const renderParticipants = () => {
 		return (
 			<div
@@ -468,10 +467,7 @@ export default function RoomDev() {
 					opacity: hideUsers ? 0 : 1,
 					visibility: hideUsers ? 'hidden' : 'visible',
 					transition: 'opacity 0.3s ease, visibility 0.3s ease',
-					transformOrigin: 'center center', // Added transformOrigin
-					transform: `scale(${scale})`, // Added transform
 				}}
-				onWheel={handleWheel} // Added wheel event handler
 			>
 				{clients.map(clientID => (
 					<Draggable
@@ -491,7 +487,11 @@ export default function RoomDev() {
 							onResize={(e, data: ResizeCallbackData) => {
 								setClientSizes(prev => ({
 									...prev,
-									[clientID]: { width: data.size.width, height: data.size.height },
+									[clientID]: {
+										width: data.size.width,
+										height: data.size.height,
+										scale: prev[clientID]?.scale || 1,
+									},
 								}))
 							}}
 							minConstraints={[100, 75]}
@@ -512,9 +512,18 @@ export default function RoomDev() {
 											: 'block',
 									border: highlightedUser === clientID ? '3px solid cyan' : 'none',
 									boxShadow: highlightedUser === clientID ? '0 0 10px cyan' : 'none',
+									transform: `scale(${clientSizes[clientID]?.scale || 1})`,
+									transformOrigin: 'center center',
 								}}
-								onMouseEnter={() => setHoveredClient(clientID)}
-								onMouseLeave={() => setHoveredClient(null)}
+								onMouseEnter={() => {
+									setHoveredClient(clientID)
+									setHoveredClientForZoom(clientID)
+								}}
+								onMouseLeave={() => {
+									setHoveredClient(null)
+									setHoveredClientForZoom(null)
+								}}
+								onWheel={e => handleWheel(e, clientID)}
 							>
 								<div
 									style={{
@@ -693,8 +702,8 @@ export default function RoomDev() {
 		clients.forEach((clientID, index) => {
 			if (!clientPositions[clientID]) {
 				newPositions[clientID] = {
-					x: containerWidth - 155 * (index + 1), // 155px is the width of each video container
-					y: 10, // 10px from the top
+					x: containerWidth - 155 * (index + 1),
+					y: 10,
 				}
 			}
 		})
@@ -802,40 +811,28 @@ export default function RoomDev() {
 		setShowChat(false)
 	}
 
-	const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+	const handleWheel = (e: React.WheelEvent<HTMLDivElement>, clientID: string) => {
 		e.preventDefault()
+		if (clientID !== hoveredClientForZoom) return
+
 		const scaleFactor = 0.1
-		const newScale = e.deltaY > 0 ? scale * (1 - scaleFactor) : scale * (1 + scaleFactor)
+		const newScale =
+			e.deltaY > 0
+				? (clientSizes[clientID]?.scale || 1) * (1 - scaleFactor)
+				: (clientSizes[clientID]?.scale || 1) * (1 + scaleFactor)
 
 		// Limit the scale to a reasonable range (e.g., 0.5 to 2)
 		const clampedScale = Math.min(Math.max(newScale, 0.5), 2)
 
-		setScale(clampedScale)
-
-		const scaleDiff = clampedScale / scale
-		setClientSizes(prevSizes => {
-			const newSizes: Record<string, { width: number; height: number }> = {}
-			for (const clientID in prevSizes) {
-				newSizes[clientID] = {
-					width: prevSizes[clientID].width * scaleDiff,
-					height: prevSizes[clientID].height * scaleDiff,
-				}
-			}
-			return newSizes
-		})
-
-		// Adjust position to keep the center point fixed
-		setClientPositions(prevPositions => {
-			const newPositions: Record<string, { x: number; y: number }> = {}
-			for (const clientID in prevPositions) {
-				const prevSize = clientSizes[clientID] || { width: 150, height: 100 }
-				newPositions[clientID] = {
-					x: prevPositions[clientID].x - (prevSize.width * (scaleDiff - 1)) / 2,
-					y: prevPositions[clientID].y - (prevSize.height * (scaleDiff - 1)) / 2,
-				}
-			}
-			return newPositions
-		})
+		setClientSizes(prevSizes => ({
+			...prevSizes,
+			[clientID]: {
+				...prevSizes[clientID],
+				width: (prevSizes[clientID]?.width || 150) * (clampedScale / (prevSizes[clientID]?.scale || 1)),
+				height: (prevSizes[clientID]?.height || 100) * (clampedScale / (prevSizes[clientID]?.scale || 1)),
+				scale: clampedScale,
+			},
+		}))
 	}
 
 	return (
@@ -857,29 +854,6 @@ export default function RoomDev() {
 				left: 0,
 				overflow: 'hidden',
 			}}
-			// onDragOver={e => e.preventDefault()}
-			// onDrop={e => {
-			// 	e.preventDefault()
-			// 	const clientID = e.dataTransfer.getData('text/plain')
-			// 	const offsetData = e.dataTransfer.getData('application/json')
-
-			// 	if (offsetData) {
-			// 		try {
-			// 			const { offsetX, offsetY } = JSON.parse(offsetData)
-			// 			const rect = playerWrapperRef.current?.getBoundingClientRect()
-			// 			if (rect) {
-			// 				const x = Math.max(0, Math.min(e.clientX - rect.left - offsetX, rect.width - 150))
-			// 				const y = Math.max(0, Math.min(e.clientY - rect.top - offsetY, rect.height - 100))
-			// 				setClientPositions(prev => ({
-			// 					...prev,
-			// 					[clientID]: { x, y },
-			// 				}))
-			// 			}
-			// 		} catch (error) {
-			// 			console.error('Error parsing JSON:', error)
-			// 		}
-			// 	}
-			// }}
 		>
 			<ReactPlayer
 				ref={playerRef}
