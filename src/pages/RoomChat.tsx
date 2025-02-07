@@ -69,7 +69,14 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	}
 
 	return (
-		<Draggable handle='.drag-handle' position={position} onDrag={onDrag} onStart={onStart} onStop={onStop}>
+		<Draggable
+			handle='.drag-handle'
+			bounds='.react-player'
+			position={position}
+			onDrag={onDrag}
+			onStart={onStart}
+			onStop={onStop}
+		>
 			<Resizable
 				width={size.width}
 				height={size.height}
