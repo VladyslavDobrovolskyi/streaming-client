@@ -4,6 +4,7 @@ import type React from 'react'
 import { useState, useRef, useEffect } from 'react'
 import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar } from '@radix-ui/themes'
 import { Resizable, type ResizeCallbackData } from 'react-resizable'
+import Draggable from 'react-draggable'
 import 'react-resizable/css/styles.css'
 
 interface PrivateChatProps {
@@ -26,13 +27,13 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	const [message, setMessage] = useState('')
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
 	const [size, setSize] = useState({ width: 300, height: 400 })
-	const [position, setPosition] = useState({ top: window.innerHeight - 470, left: window.innerWidth - 620 })
+	const [position, setPosition] = useState({ x: window.innerWidth - 620, y: window.innerHeight - 470 })
 
 	useEffect(() => {
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
-	}, [scrollAreaRef.current]) //Corrected dependency
+	}, [privateMessages]) // Updated dependency to only track the length of privateMessages
 
 	const handleSend = () => {
 		if (message.trim()) {
@@ -48,94 +49,102 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 		setSize(newSize)
 
 		setPosition(prev => {
-			let newTop = prev.top
-			let newLeft = prev.left
+			let newX = prev.x
+			let newY = prev.y
 
-			if (handle.includes('n')) {
-				newTop -= deltaHeight
-			}
 			if (handle.includes('w')) {
-				newLeft -= deltaWidth
+				newX -= deltaWidth
+			}
+			if (handle.includes('n')) {
+				newY -= deltaHeight
 			}
 
-			return { top: newTop, left: newLeft }
+			return { x: newX, y: newY }
 		})
 	}
 
+	const onDrag = (_, data: { x: number; y: number }) => {
+		setPosition({ x: data.x, y: data.y })
+	}
+
 	return (
-		<Resizable
-			width={size.width}
-			height={size.height}
-			onResize={onResize}
-			minConstraints={[200, 300]}
-			maxConstraints={[500, 600]}
-			resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
-			style={{
-				position: 'absolute',
-				top: position.top,
-				left: position.left,
-				zIndex: 40,
-			}}
-		>
-			<Box
-				style={{
-					width: size.width,
-					height: size.height,
-					backgroundColor: 'var(--gray-1)',
-					borderRadius: 'var(--radius-3)',
-					overflow: 'hidden',
-					display: 'flex',
-					flexDirection: 'column',
-					boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-				}}
+		<Draggable handle='.drag-handle' position={position} onDrag={onDrag}>
+			<Resizable
+				width={size.width}
+				height={size.height}
+				onResize={onResize}
+				minConstraints={[200, 300]}
+				maxConstraints={[500, 600]}
+				resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
 			>
-				<Flex align='center' justify='between' p='3' style={{ borderBottom: '1px solid var(--gray-5)' }}>
-					<Flex align='center' gap='2'>
-						<Avatar src={recipientAvatar} fallback={recipientName[0]} size='2' />
-						<Text size='2' weight='bold'>
-							{recipientName}
-						</Text>
-					</Flex>
-					<Button variant='ghost' onClick={onClose}>
-						X
-					</Button>
-				</Flex>
-				<ScrollArea style={{ flex: 1, padding: '16px' }} ref={scrollAreaRef}>
-					{privateMessages.map((msg, index) => (
-						<Box key={index} mb='2' style={{ textAlign: msg.from === recipientId ? 'left' : 'right' }}>
-							<Text
-								as='span'
-								size='2'
-								style={{
-									display: 'inline-block',
-									backgroundColor: msg.from === recipientId ? 'var(--gray-3)' : 'var(--blue-5)',
-									color: msg.from === recipientId ? 'var(--gray-12)' : 'white',
-									borderRadius: 'var(--radius-2)',
-									padding: '4px 8px',
-								}}
-							>
-								{msg.message}
+				<Box
+					style={{
+						width: size.width,
+						height: size.height,
+						backgroundColor: 'var(--gray-1)',
+						borderRadius: 'var(--radius-3)',
+						overflow: 'hidden',
+						display: 'flex',
+						flexDirection: 'column',
+						boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+						position: 'absolute',
+						zIndex: 40,
+					}}
+				>
+					<Flex
+						align='center'
+						justify='between'
+						p='3'
+						style={{ borderBottom: '1px solid var(--gray-5)' }}
+						className='drag-handle'
+					>
+						<Flex align='center' gap='2'>
+							<Avatar src={recipientAvatar} fallback={recipientName[0]} size='2' />
+							<Text size='2' weight='bold'>
+								{recipientName}
 							</Text>
-						</Box>
-					))}
-				</ScrollArea>
-				<Flex p='3' style={{ borderTop: '1px solid var(--gray-5)' }}>
-					<TextArea
-						style={{ flex: 1, marginRight: '8px' }}
-						placeholder='Type a message...'
-						value={message}
-						onChange={e => setMessage(e.target.value)}
-						onKeyPress={e => {
-							if (e.key === 'Enter' && !e.shiftKey) {
-								e.preventDefault()
-								handleSend()
-							}
-						}}
-					/>
-					<Button onClick={handleSend}>Send</Button>
-				</Flex>
-			</Box>
-		</Resizable>
+						</Flex>
+						<Button variant='ghost' onClick={onClose}>
+							X
+						</Button>
+					</Flex>
+					<ScrollArea style={{ flex: 1, padding: '16px' }} ref={scrollAreaRef}>
+						{privateMessages.map((msg, index) => (
+							<Box key={index} mb='2' style={{ textAlign: msg.from === recipientId ? 'left' : 'right' }}>
+								<Text
+									as='span'
+									size='2'
+									style={{
+										display: 'inline-block',
+										backgroundColor: msg.from === recipientId ? 'var(--gray-3)' : 'var(--blue-5)',
+										color: msg.from === recipientId ? 'var(--gray-12)' : 'white',
+										borderRadius: 'var(--radius-2)',
+										padding: '4px 8px',
+									}}
+								>
+									{msg.message}
+								</Text>
+							</Box>
+						))}
+					</ScrollArea>
+					<Flex p='3' style={{ borderTop: '1px solid var(--gray-5)' }}>
+						<TextArea
+							style={{ flex: 1, marginRight: '8px' }}
+							placeholder='Type a message...'
+							value={message}
+							onChange={e => setMessage(e.target.value)}
+							onKeyPress={e => {
+								if (e.key === 'Enter' && !e.shiftKey) {
+									e.preventDefault()
+									handleSend()
+								}
+							}}
+						/>
+						<Button onClick={handleSend}>Send</Button>
+					</Flex>
+				</Box>
+			</Resizable>
+		</Draggable>
 	)
 }
 
