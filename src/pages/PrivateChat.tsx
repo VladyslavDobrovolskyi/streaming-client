@@ -3,7 +3,7 @@
 import type React from 'react'
 import { useState, useRef, useEffect } from 'react'
 import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar } from '@radix-ui/themes'
-import { Resizable, ResizeCallbackData } from 'react-resizable'
+import { Resizable, type ResizeCallbackData } from 'react-resizable'
 import 'react-resizable/css/styles.css'
 
 interface PrivateChatProps {
@@ -32,7 +32,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
-	}, [scrollAreaRef]) //Corrected dependency
+	}, [privateMessages.length]) // Updated dependency to only track the length of privateMessages
 
 	const handleSend = () => {
 		if (message.trim()) {
@@ -43,15 +43,16 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 
 	const onResize = (event: React.SyntheticEvent, { size, handle }: ResizeCallbackData) => {
 		const { width, height } = size
+		const deltaWidth = width - size.width
+		const deltaHeight = height - size.height
+
 		setSize({ width, height })
 
 		// Обновляем позицию в зависимости от направления растягивания
-		if (handle.includes('n')) {
-			setPosition(prev => ({ ...prev, top: prev.top - (height - size.height) }))
-		}
-		if (handle.includes('w')) {
-			setPosition(prev => ({ ...prev, left: prev.left - (width - size.width) }))
-		}
+		setPosition(prev => ({
+			top: handle.includes('n') ? prev.top - deltaHeight : prev.top,
+			left: handle.includes('w') ? prev.left - deltaWidth : prev.left,
+		}))
 	}
 
 	return (
@@ -61,7 +62,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 			onResize={onResize}
 			minConstraints={[200, 300]}
 			maxConstraints={[500, 600]}
-			resizeHandles={['se', 'sw', 'ne', 'nw']}
+			resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
 			style={{
 				position: 'absolute',
 				top: position.top,
