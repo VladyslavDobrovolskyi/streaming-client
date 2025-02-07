@@ -17,7 +17,6 @@ import {
 	SquareIcon,
 	DotsHorizontalIcon,
 	SectionIcon,
-	MoveIcon,
 	ArrowLeftIcon,
 	ChatBubbleIcon,
 } from '@radix-ui/react-icons'
@@ -32,27 +31,28 @@ import useRoomSync from '../hooks/useRoomSync'
 import { Avatar } from '@radix-ui/themes'
 import PrivateChat from './PrivateChat'
 import RoomChat from './RoomChat'
+import Draggable from 'react-draggable'
 
-const createDashedSquareDragImage = () => {
-	const dragImage = document.createElement('div')
-	dragImage.style.width = '150px'
-	dragImage.style.height = '100px'
-	dragImage.style.border = '2px dashed rgba(255, 255, 255, 0.5)'
-	dragImage.style.padding = '5px'
-	dragImage.style.boxSizing = 'border-box'
-	dragImage.style.backgroundColor = 'rgba(0, 0, 0, 0.2)'
-	dragImage.style.position = 'absolute'
-	dragImage.style.top = '-1000px'
-	dragImage.style.left = '-1000px'
-	dragImage.style.zIndex = '1000'
-	document.body.appendChild(dragImage)
+// const createDashedSquareDragImage = () => {
+// 	const dragImage = document.createElement('div')
+// 	dragImage.style.width = '150px'
+// 	dragImage.style.height = '100px'
+// 	dragImage.style.border = '2px dashed rgba(255, 255, 255, 0.5)'
+// 	dragImage.style.padding = '5px'
+// 	dragImage.style.boxSizing = 'border-box'
+// 	dragImage.style.backgroundColor = 'rgba(0, 0, 0, 0.2)'
+// 	dragImage.style.position = 'absolute'
+// 	dragImage.style.top = '-1000px'
+// 	dragImage.style.left = '-1000px'
+// 	dragImage.style.zIndex = '1000'
+// 	document.body.appendChild(dragImage)
 
-	// Принудительно применяем стили
-	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-	window.getComputedStyle(dragImage).opacity
+// 	// Принудительно применяем стили
+// 	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+// 	window.getComputedStyle(dragImage).opacity
 
-	return dragImage
-}
+// 	return dragImage
+// }
 
 export default function RoomDev() {
 	const [isPlaying, setIsPlaying] = useState(false)
@@ -78,7 +78,7 @@ export default function RoomDev() {
 	const [coveredClients, setCoveredClients] = useState<Record<string, boolean>>({})
 	const [isMovieMode, setIsMovieMode] = useState(false)
 	const [clientPositions, setClientPositions] = useState<Record<string, { x: number; y: number }>>({})
-	const [draggingClient, setDraggingClient] = useState<string | null>(null) // Added draggingClient state
+	// const [draggingClient, setDraggingClient] = useState<string | null>(null) // Removed draggingClient state
 	const [hideUsers, setHideUsers] = useState(false) // Updated hideUsers state
 	const [isMenuOpen, setIsMenuOpen] = useState(false) // Added isMenuOpen state
 	const [hoveredItem, setHoveredItem] = useState<string | null>(null) // Added hoveredItem state
@@ -436,65 +436,7 @@ export default function RoomDev() {
 		return <SpeakerLoudIcon style={IconStyles} />
 	}
 
-	const handleDragStart = (clientID: string, e: React.DragEvent<HTMLDivElement>) => {
-		setDraggingClient(clientID)
-		e.dataTransfer.setData('text/plain', clientID)
-		const rect = e.currentTarget.getBoundingClientRect()
-		const offsetX = e.clientX - rect.left
-		const offsetY = e.clientY - rect.top
-		e.dataTransfer.setData('application/json', JSON.stringify({ offsetX, offsetY }))
-
-		const dragImage = createDashedSquareDragImage()
-		e.dataTransfer.setDragImage(dragImage, offsetX, offsetY)
-		requestAnimationFrame(() => {
-			document.body.removeChild(dragImage)
-		})
-	}
-
-	const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
-		e.preventDefault()
-		const rect = playerWrapperRef.current?.getBoundingClientRect()
-		if (rect) {
-			const offsetData = e.dataTransfer.getData('application/json')
-
-			if (offsetData) {
-				try {
-					const { offsetX, offsetY } = JSON.parse(offsetData)
-					const clientID = e.dataTransfer.getData('text/plain')
-					const x = Math.max(0, Math.min(e.clientX - rect.left - offsetX, rect.width - 150))
-					const y = Math.max(0, Math.min(e.clientY - rect.top - offsetY, rect.height - 100))
-					setClientPositions(prev => ({
-						...prev,
-						[clientID]: { x, y },
-					}))
-				} catch (error) {
-					console.error('Error parsing JSON:', error)
-				}
-			}
-		}
-	}
-
-	const handleDragEnd = (clientID: string, e: React.DragEvent<HTMLDivElement>) => {
-		e.preventDefault()
-		setDraggingClient(null)
-		const rect = playerWrapperRef.current?.getBoundingClientRect()
-		if (rect) {
-			const offsetData = e.dataTransfer.getData('application/json')
-			if (offsetData) {
-				try {
-					const { offsetX, offsetY } = JSON.parse(offsetData)
-					const x = Math.max(0, Math.min(e.clientX - rect.left - offsetX, rect.width - 150))
-					const y = Math.max(0, Math.min(e.clientY - rect.top - offsetY, rect.height - 100))
-					setClientPositions(prev => ({
-						...prev,
-						[clientID]: { x, y },
-					}))
-				} catch (error) {
-					console.error('Error parsing JSON:', error)
-				}
-			}
-		}
-	}
+	// Removed handleDragStart, handleDrag, handleDragEnd functions
 
 	const renderParticipants = () => {
 		return (
@@ -513,209 +455,210 @@ export default function RoomDev() {
 				}}
 			>
 				{clients.map(clientID => (
-					<div
+					<Draggable
 						key={clientID}
-						style={{
-							width: '150px',
-							height: '100px',
-							position: 'absolute',
-							top: `${clientPositions[clientID]?.y || 10}px`,
-							left: `${clientPositions[clientID]?.x || 10}px`,
-							pointerEvents: 'auto',
-							transition: 'all 0.1s ease-out',
-							cursor: 'move',
-							display:
-								(clientID === LOCAL_VIDEO && cameraMuted) || participantCameras[clientID] === true
-									? 'none'
-									: 'block',
-							border: highlightedUser === clientID ? '3px solid cyan' : 'none',
-							boxShadow: highlightedUser === clientID ? '0 0 10px cyan' : 'none',
+						defaultPosition={clientPositions[clientID] || { x: 10, y: 10 }}
+						bounds='parent'
+						onStop={(e, data) => {
+							setClientPositions(prev => ({
+								...prev,
+								[clientID]: { x: data.x, y: data.y },
+							}))
 						}}
-						draggable
-						onDragStart={e => handleDragStart(clientID, e)}
-						onDrag={handleDrag}
-						onDragEnd={e => handleDragEnd(clientID, e)}
-						onMouseEnter={() => !draggingClient && setHoveredClient(clientID)}
-						onMouseLeave={() => !draggingClient && setHoveredClient(null)}
 					>
 						<div
 							style={{
-								width: '100%',
-								height: '100%',
-								position: 'relative',
+								width: '150px',
+								height: '100px',
+								position: 'absolute',
+								pointerEvents: 'auto',
+								transition: 'all 0.1s ease-out',
+								cursor: 'move',
+								display:
+									(clientID === LOCAL_VIDEO && cameraMuted) || participantCameras[clientID] === true
+										? 'none'
+										: 'block',
+								border: highlightedUser === clientID ? '3px solid cyan' : 'none',
+								boxShadow: highlightedUser === clientID ? '0 0 10px cyan' : 'none',
 							}}
+							onMouseEnter={() => setHoveredClient(clientID)}
+							onMouseLeave={() => setHoveredClient(null)}
 						>
-							<video
-								width='100%'
-								height='100%'
-								ref={instance => {
-									const videoElement = provideMediaRef(clientID, instance)
-									if (videoElement && clientID !== LOCAL_VIDEO) {
-										videoElement.then(() => {
-											const video = document.querySelector(
-												`video[data-client-id="${clientID}"]`
-											) as HTMLVideoElement
-											if (video) {
-												video.volume = clientVolumes[clientID] || 1
-											}
-										})
-									}
-								}}
-								data-client-id={clientID}
-								autoPlay
-								playsInline
-								muted={clientID === LOCAL_VIDEO}
+							<div
 								style={{
-									objectFit: 'cover',
-									borderRadius: '5px',
+									width: '100%',
+									height: '100%',
+									position: 'relative',
 								}}
-							/>
-							{draggingClient === clientID && (
-								<div
-									style={{
-										position: 'absolute',
-										top: '50%',
-										left: '50%',
-										transform: 'translate(-50%, -50%)',
-										pointerEvents: 'none',
+							>
+								<video
+									width='100%'
+									height='100%'
+									ref={instance => {
+										const videoElement = provideMediaRef(clientID, instance)
+										if (videoElement && clientID !== LOCAL_VIDEO) {
+											videoElement.then(() => {
+												const video = document.querySelector(
+													`video[data-client-id="${clientID}"]`
+												) as HTMLVideoElement
+												if (video) {
+													video.volume = clientVolumes[clientID] || 1
+												}
+											})
+										}
 									}}
-								>
-									<MoveIcon style={{ color: 'white', transform: 'scale(0.75)' }} />
-								</div>
-							)}
-						</div>
-						{hoveredClient === clientID && !draggingClient && (
-							<>
-								<div
+									data-client-id={clientID}
+									autoPlay
+									playsInline
+									muted={clientID === LOCAL_VIDEO}
 									style={{
-										position: 'absolute',
-										top: '50%',
-										left: '50%',
-										transform: 'translate(-50%, -50%)',
-										cursor: 'pointer',
+										objectFit: 'cover',
+										borderRadius: '5px',
 									}}
-									onClick={() =>
-										setCoveredClients(prev => ({ ...prev, [clientID]: !prev[clientID] }))
-									}
-								>
-									<EyeOpenIcon style={{ color: 'white', transform: 'scale(1)' }} />
-								</div>
-								{clientID !== LOCAL_VIDEO && (
+								/>
+								{/* {draggingClient === clientID && (
 									<div
 										style={{
 											position: 'absolute',
-											bottom: '-5px',
-											left: '0px',
-											right: '5px',
-											display: 'flex',
-											alignItems: 'center',
+											top: '50%',
+											left: '50%',
+											transform: 'translate(-50%, -50%)',
+											pointerEvents: 'none',
 										}}
 									>
-										<button
-											onClick={() => {
-												const videoElement = document.querySelector(
-													`video[data-client-id="${clientID}"]`
-												) as HTMLVideoElement | null
-
-												if (!videoElement) return
-
-												setClientVolumes(prev => {
-													const currentVolume = prev[clientID] ?? 1.0
-													const isMuted = currentVolume === 0.0
-
-													const newVolume = isMuted ? previousVolumes[clientID] ?? 1.0 : 0.0
-
-													if (!isMuted) {
-														setPreviousVolumes(pv => ({ ...pv, [clientID]: currentVolume }))
-													}
-
-													videoElement.muted = newVolume === 0.0
-													videoElement.volume = newVolume
-
-													return { ...prev, [clientID]: newVolume }
-												})
-											}}
+										<MoveIcon style={{ color: 'white', transform: 'scale(0.75)' }} />
+									</div>
+								)} */}
+							</div>
+							{hoveredClient === clientID && (
+								<>
+									<div
+										style={{
+											position: 'absolute',
+											top: '50%',
+											left: '50%',
+											transform: 'translate(-50%, -50%)',
+											cursor: 'pointer',
+										}}
+										onClick={() =>
+											setCoveredClients(prev => ({ ...prev, [clientID]: !prev[clientID] }))
+										}
+									>
+										<EyeOpenIcon style={{ color: 'white', transform: 'scale(1)' }} />
+									</div>
+									{clientID !== LOCAL_VIDEO && (
+										<div
 											style={{
-												background: 'none',
-												border: 'none',
-												cursor: 'pointer',
-												padding: 0,
+												position: 'absolute',
+												bottom: '-5px',
+												left: '0px',
+												right: '5px',
 												display: 'flex',
 												alignItems: 'center',
 											}}
 										>
-											{getVolumeIcon(clientVolumes[clientID])}
-										</button>
-
-										{clientVolumes[clientID] !== 0 && (
-											<Slider
-												orientation='horizontal'
-												min={0.0}
-												max={1.0}
-												step={0.01}
-												value={[clientVolumes[clientID] ?? 1.0]}
-												onValueChange={value => {
-													const newVolume = value[0] === 0.01 ? 0.0 : value[0]
-													console.log(clientID, newVolume)
-													setClientVolumes(prev => ({ ...prev, [clientID]: newVolume }))
+											<button
+												onClick={() => {
 													const videoElement = document.querySelector(
 														`video[data-client-id="${clientID}"]`
-													) as HTMLVideoElement
-													if (videoElement) {
-														videoElement.volume = newVolume
-													}
-													if (newVolume === 0) {
-														videoElement.muted = true
-													}
-												}}
-												style={
-													{
-														cursor: 'pointer',
-														width: '100%',
-														marginLeft: '5px',
-														'--slider-thumb-size': '10px',
-														'--slider-track-height': '2px',
-													} as React.CSSProperties
-												}
-											/>
-										)}
-									</div>
-								)}
-							</>
-						)}
-						{coveredClients[clientID] && (
-							<div
-								onClick={() => setCoveredClients(prev => ({ ...prev, [clientID]: !prev[clientID] }))}
-								style={{
-									position: 'absolute',
-									top: 0,
-									left: 0,
-									width: '100%',
-									height: '100%',
-									backgroundColor: 'black',
-									borderRadius: '5px',
-									display: 'flex',
-									justifyContent: 'center',
-									alignItems: 'center',
-								}}
-							>
-								{/* <Avatar
-									style={
-										{
-											position: 'absolute',
-										} as React.CSSProperties
-									}
-									fallback={
-										clientID === LOCAL_VIDEO
-											? localUsername
-											: participantInfo[clientID]?.username || 'Anonymous'
-									}
-								/> */}
+													) as HTMLVideoElement | null
 
-								<EyeClosedIcon style={{ color: 'white', transform: 'scale(1)', cursor: 'pointer' }} />
-							</div>
-						)}
-					</div>
+													if (!videoElement) return
+
+													setClientVolumes(prev => {
+														const currentVolume = prev[clientID] ?? 1.0
+														const isMuted = currentVolume === 0.0
+
+														const newVolume = isMuted
+															? previousVolumes[clientID] ?? 1.0
+															: 0.0
+
+														if (!isMuted) {
+															setPreviousVolumes(pv => ({
+																...pv,
+																[clientID]: currentVolume,
+															}))
+														}
+
+														videoElement.muted = newVolume === 0.0
+														videoElement.volume = newVolume
+
+														return { ...prev, [clientID]: newVolume }
+													})
+												}}
+												style={{
+													background: 'none',
+													border: 'none',
+													cursor: 'pointer',
+													padding: 0,
+													display: 'flex',
+													alignItems: 'center',
+												}}
+											>
+												{getVolumeIcon(clientVolumes[clientID])}
+											</button>
+
+											{clientVolumes[clientID] !== 0 && (
+												<Slider
+													orientation='horizontal'
+													min={0.0}
+													max={1.0}
+													step={0.01}
+													value={[clientVolumes[clientID] ?? 1.0]}
+													onValueChange={value => {
+														const newVolume = value[0] === 0.01 ? 0.0 : value[0]
+														console.log(clientID, newVolume)
+														setClientVolumes(prev => ({ ...prev, [clientID]: newVolume }))
+														const videoElement = document.querySelector(
+															`video[data-client-id="${clientID}"]`
+														) as HTMLVideoElement
+														if (videoElement) {
+															videoElement.volume = newVolume
+														}
+														if (newVolume === 0) {
+															videoElement.muted = true
+														}
+													}}
+													style={
+														{
+															cursor: 'pointer',
+															width: '100%',
+															marginLeft: '5px',
+															'--slider-thumb-size': '10px',
+															'--slider-track-height': '2px',
+														} as React.CSSProperties
+													}
+												/>
+											)}
+										</div>
+									)}
+								</>
+							)}
+							{coveredClients[clientID] && (
+								<div
+									onClick={() =>
+										setCoveredClients(prev => ({ ...prev, [clientID]: !prev[clientID] }))
+									}
+									style={{
+										position: 'absolute',
+										top: 0,
+										left: 0,
+										width: '100%',
+										height: '100%',
+										backgroundColor: 'black',
+										borderRadius: '5px',
+										display: 'flex',
+										justifyContent: 'center',
+										alignItems: 'center',
+									}}
+								>
+									<EyeClosedIcon
+										style={{ color: 'white', transform: 'scale(1)', cursor: 'pointer' }}
+									/>
+								</div>
+							)}
+						</div>
+					</Draggable>
 				))}
 			</div>
 		)
@@ -735,7 +678,7 @@ export default function RoomDev() {
 		if (Object.keys(newPositions).length > 0) {
 			setClientPositions(prev => ({ ...prev, ...newPositions }))
 		}
-	}, [clients, clientPositions])
+	}, [clients])
 
 	const handleMicMuteUnmute = () => {
 		if (localStream) {
@@ -855,29 +798,29 @@ export default function RoomDev() {
 				left: 0,
 				overflow: 'hidden',
 			}}
-			onDragOver={e => e.preventDefault()}
-			onDrop={e => {
-				e.preventDefault()
-				const clientID = e.dataTransfer.getData('text/plain')
-				const offsetData = e.dataTransfer.getData('application/json')
+			// onDragOver={e => e.preventDefault()}
+			// onDrop={e => {
+			// 	e.preventDefault()
+			// 	const clientID = e.dataTransfer.getData('text/plain')
+			// 	const offsetData = e.dataTransfer.getData('application/json')
 
-				if (offsetData) {
-					try {
-						const { offsetX, offsetY } = JSON.parse(offsetData)
-						const rect = playerWrapperRef.current?.getBoundingClientRect()
-						if (rect) {
-							const x = Math.max(0, Math.min(e.clientX - rect.left - offsetX, rect.width - 150))
-							const y = Math.max(0, Math.min(e.clientY - rect.top - offsetY, rect.height - 100))
-							setClientPositions(prev => ({
-								...prev,
-								[clientID]: { x, y },
-							}))
-						}
-					} catch (error) {
-						console.error('Error parsing JSON:', error)
-					}
-				}
-			}}
+			// 	if (offsetData) {
+			// 		try {
+			// 			const { offsetX, offsetY } = JSON.parse(offsetData)
+			// 			const rect = playerWrapperRef.current?.getBoundingClientRect()
+			// 			if (rect) {
+			// 				const x = Math.max(0, Math.min(e.clientX - rect.left - offsetX, rect.width - 150))
+			// 				const y = Math.max(0, Math.min(e.clientY - rect.top - offsetY, rect.height - 100))
+			// 				setClientPositions(prev => ({
+			// 					...prev,
+			// 					[clientID]: { x, y },
+			// 				}))
+			// 			}
+			// 		} catch (error) {
+			// 			console.error('Error parsing JSON:', error)
+			// 		}
+			// 	}
+			// }}
 		>
 			<ReactPlayer
 				ref={playerRef}
