@@ -28,6 +28,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	const [size, setSize] = useState({ width: 300, height: 400 })
 	const [position, setPosition] = useState({ x: window.innerWidth - 620, y: window.innerHeight - 470 })
 	const [isDragging, setIsDragging] = useState(false)
+	const [scale, setScale] = useState(1)
 
 	useEffect(() => {
 		if (scrollAreaRef.current) {
@@ -68,6 +69,29 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		setIsDragging(false)
 	}
 
+	const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+		e.preventDefault()
+		const scaleFactor = 0.1
+		const newScale = e.deltaY > 0 ? scale * (1 - scaleFactor) : scale * (1 + scaleFactor)
+
+		// Limit the scale to a reasonable range (e.g., 0.5 to 2)
+		const clampedScale = Math.min(Math.max(newScale, 0.5), 2)
+
+		setScale(clampedScale)
+
+		const scaleDiff = clampedScale / scale
+		setSize(prevSize => ({
+			width: prevSize.width * scaleDiff,
+			height: prevSize.height * scaleDiff,
+		}))
+
+		// Adjust position to keep the center point fixed
+		setPosition(prevPos => ({
+			x: prevPos.x - (size.width * (scaleDiff - 1)) / 2,
+			y: prevPos.y - (size.height * (scaleDiff - 1)) / 2,
+		}))
+	}
+
 	return (
 		<Draggable
 			handle='.drag-handle'
@@ -86,6 +110,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 				resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
 			>
 				<Box
+					onWheel={handleWheel}
 					style={{
 						width: size.width,
 						height: size.height,
@@ -97,6 +122,8 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
 						position: 'absolute',
 						zIndex: 40,
+						transform: `scale(${scale})`,
+						transformOrigin: 'center',
 					}}
 				>
 					<Flex
