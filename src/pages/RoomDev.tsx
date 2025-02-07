@@ -31,9 +31,9 @@ import ActionIndicator from '../components/ActionIndicator'
 import { useParams } from 'react-router'
 import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
 import useRoomSync from '../hooks/useRoomSync'
-import ChatComponent from './ChatComponent'
 import { Avatar } from '@radix-ui/themes'
 import PrivateChat from './PrivateChat'
+import RoomChat from './RoomChat'
 
 const createDashedSquareDragImage = () => {
 	const dragImage = document.createElement('div')
@@ -834,6 +834,9 @@ export default function RoomDev() {
 	const togglePrivateChat = (clientID: string) => {
 		setPrivateChats(prev => ({ ...prev, [clientID]: !prev[clientID] }))
 	}
+	const closeChat = () => {
+		setShowChat(false)
+	}
 
 	return (
 		<div
@@ -1455,12 +1458,13 @@ export default function RoomDev() {
 						overflow: 'hidden',
 					}}
 				>
-					<ChatComponent
+					<RoomChat
 						clientID={LOCAL_VIDEO}
 						messages={chatMessages}
 						chatInput={chatInput}
 						setChatInput={setChatInput}
 						handleSendMessage={handleSendMessage}
+						onClose={closeChat}
 					/>
 				</div>
 			)}
