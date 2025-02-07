@@ -1,5 +1,3 @@
-'use client'
-
 import type React from 'react'
 import { useState, useRef, useEffect } from 'react'
 import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar } from '@radix-ui/themes'
@@ -24,39 +22,31 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	const [message, setMessage] = useState('')
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
 
-	console.log('PrivateChat rendered', { recipientId, recipientName, privateMessagesCount: privateMessages.length })
+	useEffect(() => {
+		console.log('%c PrivateChat Component Mounted', 'background: #222; color: #bada55')
+	}, [])
+
+	useEffect(() => {
+		console.log('%c Messages updated', 'background: #222; color: #1E90FF', privateMessages)
+	}, [privateMessages])
 
 	const handleSend = () => {
+		console.log('%c handleSend called', 'background: #222; color: #FF69B4')
 		if (message.trim()) {
-			console.log('Sending message', { to: recipientId, message })
+			console.log('%c Sending message', 'background: #222; color: #FF69B4', { to: recipientId, message })
 			sendPrivateMessage(recipientId, message)
 			setMessage('')
 		} else {
-			console.log('Attempted to send empty message')
+			console.log('%c Attempted to send empty message', 'background: #222; color: #FF4500')
 		}
 	}
 
 	useEffect(() => {
-		console.log('useEffect triggered for scroll')
 		if (scrollAreaRef.current) {
 			const scrollArea = scrollAreaRef.current
-			console.log('Scroll heights', {
-				scrollTop: scrollArea.scrollTop,
-				scrollHeight: scrollArea.scrollHeight,
-				clientHeight: scrollArea.clientHeight,
-			})
 			scrollArea.scrollTop = scrollArea.scrollHeight
-		} else {
-			console.log('scrollAreaRef is null')
 		}
-	}, [scrollAreaRef]) // Changed dependency to scrollAreaRef
-
-	useEffect(() => {
-		console.log('Component mounted or updated')
-		return () => {
-			console.log('Component will unmount')
-		}
-	}, [])
+	}, [scrollAreaRef.current])
 
 	return (
 		<Box
@@ -81,37 +71,28 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						{recipientName}
 					</Text>
 				</Flex>
-				<Button
-					variant='ghost'
-					onClick={() => {
-						console.log('Close button clicked')
-						onClose()
-					}}
-				>
+				<Button variant='ghost' onClick={onClose}>
 					X
 				</Button>
 			</Flex>
 			<ScrollArea style={{ flex: 1, padding: '16px' }} ref={scrollAreaRef}>
-				{privateMessages.map((msg, index) => {
-					console.log('Rendering message', { index, from: msg.from, to: msg.to })
-					return (
-						<Box key={index} mb='2' style={{ textAlign: msg.from === recipientId ? 'left' : 'right' }}>
-							<Text
-								as='span'
-								size='2'
-								style={{
-									display: 'inline-block',
-									backgroundColor: msg.from === recipientId ? 'var(--gray-3)' : 'var(--blue-5)',
-									color: msg.from === recipientId ? 'var(--gray-12)' : 'white',
-									borderRadius: 'var(--radius-2)',
-									padding: '4px 8px',
-								}}
-							>
-								{msg.message}
-							</Text>
-						</Box>
-					)
-				})}
+				{privateMessages.map((msg, index) => (
+					<Box key={index} mb='2' style={{ textAlign: msg.from === recipientId ? 'left' : 'right' }}>
+						<Text
+							as='span'
+							size='2'
+							style={{
+								display: 'inline-block',
+								backgroundColor: msg.from === recipientId ? 'var(--gray-3)' : 'var(--blue-5)',
+								color: msg.from === recipientId ? 'var(--gray-12)' : 'white',
+								borderRadius: 'var(--radius-2)',
+								padding: '4px 8px',
+							}}
+						>
+							{msg.message}
+						</Text>
+					</Box>
+				))}
 			</ScrollArea>
 			<Flex p='3' style={{ borderTop: '1px solid var(--gray-5)' }}>
 				<TextArea
@@ -119,12 +100,12 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 					placeholder='Type a message...'
 					value={message}
 					onChange={e => {
-						console.log('Message changed', { newValue: e.target.value })
+						console.log('%c Message changed', 'background: #222; color: #32CD32', e.target.value)
 						setMessage(e.target.value)
 					}}
 					onKeyPress={e => {
 						if (e.key === 'Enter' && !e.shiftKey) {
-							console.log('Enter key pressed')
+							console.log('%c Enter key pressed', 'background: #222; color: #FF69B4')
 							handleSend()
 						}
 					}}
