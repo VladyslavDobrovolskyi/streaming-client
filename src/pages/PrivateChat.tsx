@@ -35,7 +35,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 			const scrollArea = scrollAreaRef.current
 			scrollArea.scrollTop = scrollArea.scrollHeight
 		}
-	}, [scrollAreaRef])
+	}, [privateMessages]) // Only depend on privateMessages
 
 	const handleSend = () => {
 		if (message.trim()) {
@@ -75,15 +75,6 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 				onResize={handleResize}
 				minConstraints={[200, 300]}
 				maxConstraints={[500, 600]}
-				handleClasses={{
-					top: 'pointer-events-none',
-					bottom: 'pointer-events-none',
-					left: 'pointer-events-none',
-					topRight: 'pointer-events-none',
-					bottomRight: 'pointer-events-none',
-					bottomLeft: 'pointer-events-none',
-					topLeft: 'pointer-events-none',
-				}}
 			>
 				<Box
 					style={{
