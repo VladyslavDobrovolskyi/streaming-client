@@ -93,6 +93,7 @@ export default function RoomDev() {
 	const [avatar, setAvatar] = useState('') // Added avatar state
 	const [privateChats, setPrivateChats] = useState<Record<string, boolean>>({})
 	const [clientSizes, setClientSizes] = useState<Record<string, { width: number; height: number }>>({})
+	const [scale, setScale] = useState(1) // Added scale state
 	const userListWidth = 250 // Added userListWidth constant
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<number | null>(null)
@@ -467,7 +468,10 @@ export default function RoomDev() {
 					opacity: hideUsers ? 0 : 1,
 					visibility: hideUsers ? 'hidden' : 'visible',
 					transition: 'opacity 0.3s ease, visibility 0.3s ease',
+					transformOrigin: 'center center', // Added transformOrigin
+					transform: `scale(${scale})`, // Added transform
 				}}
+				onWheel={handleWheel} // Added wheel event handler
 			>
 				{clients.map(clientID => (
 					<Draggable
@@ -796,6 +800,42 @@ export default function RoomDev() {
 	}
 	const closeChat = () => {
 		setShowChat(false)
+	}
+
+	const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+		e.preventDefault()
+		const scaleFactor = 0.1
+		const newScale = e.deltaY > 0 ? scale * (1 - scaleFactor) : scale * (1 + scaleFactor)
+
+		// Limit the scale to a reasonable range (e.g., 0.5 to 2)
+		const clampedScale = Math.min(Math.max(newScale, 0.5), 2)
+
+		setScale(clampedScale)
+
+		const scaleDiff = clampedScale / scale
+		setClientSizes(prevSizes => {
+			const newSizes: Record<string, { width: number; height: number }> = {}
+			for (const clientID in prevSizes) {
+				newSizes[clientID] = {
+					width: prevSizes[clientID].width * scaleDiff,
+					height: prevSizes[clientID].height * scaleDiff,
+				}
+			}
+			return newSizes
+		})
+
+		// Adjust position to keep the center point fixed
+		setClientPositions(prevPositions => {
+			const newPositions: Record<string, { x: number; y: number }> = {}
+			for (const clientID in prevPositions) {
+				const prevSize = clientSizes[clientID] || { width: 150, height: 100 }
+				newPositions[clientID] = {
+					x: prevPositions[clientID].x - (prevSize.width * (scaleDiff - 1)) / 2,
+					y: prevPositions[clientID].y - (prevSize.height * (scaleDiff - 1)) / 2,
+				}
+			}
+			return newPositions
+		})
 	}
 
 	return (
