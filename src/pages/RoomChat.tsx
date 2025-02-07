@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Box, Flex, ScrollArea, Text, TextArea, Button } from '@radix-ui/themes'
 import { Resizable, type ResizeCallbackData } from 'react-resizable'
 import Draggable from 'react-draggable'
+import { Kbd } from '@radix-ui/themes'
 import 'react-resizable/css/styles.css'
 
 interface RoomChatProps {
@@ -173,7 +174,9 @@ const RoomChat: React.FC<RoomChatProps> = ({
 								}
 							}}
 						/>
-						<Button onClick={handleSendMessage}>Send</Button>
+						<Button onClick={handleSendMessage}>
+							<Kbd>Enter</Kbd>
+						</Button>
 					</Flex>
 				</Box>
 			</Resizable>
