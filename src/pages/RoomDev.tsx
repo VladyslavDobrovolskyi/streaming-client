@@ -21,6 +21,7 @@ import {
 	SectionIcon,
 	MoveIcon,
 	ArrowLeftIcon,
+	ChatBubbleIcon,
 } from '@radix-ui/react-icons'
 import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
@@ -32,6 +33,7 @@ import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
 import useRoomSync from '../hooks/useRoomSync'
 import ChatComponent from './ChatComponent'
 import { Avatar } from '@radix-ui/themes'
+import PrivateChat from './PrivateChat'
 
 const createDashedSquareDragImage = () => {
 	const dragImage = document.createElement('div')
@@ -88,6 +90,10 @@ export default function RoomDev() {
 	const [chatInput, setChatInput] = useState('') // Added chatInput state
 	const [localUsername, setLocalUsername] = useState('') // Added localUsername state
 	const [avatar, setAvatar] = useState('') // Added avatar state
+	const [privateChats, setPrivateChats] = useState<Record<string, boolean>>({})
+	const [privateMessages, setPrivateMessages] = useState<
+		Record<string, Array<{ from: string; to: string; message: string }>>
+	>({})
 	const userListWidth = 250 // Added userListWidth constant
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<number | null>(null)
@@ -821,6 +827,18 @@ export default function RoomDev() {
 		}
 	}, [roomID, localUsername, avatar, emitInfoSync])
 
+	const togglePrivateChat = (clientID: string) => {
+		setPrivateChats(prev => ({ ...prev, [clientID]: !prev[clientID] }))
+	}
+
+	const sendPrivateMessage = (to: string, message: string) => {
+		setPrivateMessages(prev => ({
+			...prev,
+			[to]: [...(prev[to] || []), { from: LOCAL_VIDEO, to, message }],
+		}))
+		// Here you would typically emit the private message to the server
+	}
+
 	return (
 		<div
 			ref={playerWrapperRef}
@@ -1410,6 +1428,18 @@ export default function RoomDev() {
 										<BsCameraVideoFill />
 									)}
 								</span>
+								<button
+									onClick={() => togglePrivateChat(clientID)}
+									style={{
+										background: 'none',
+										border: 'none',
+										cursor: 'pointer',
+										color: 'white',
+										padding: '5px',
+									}}
+								>
+									<ChatBubbleIcon />
+								</button>
 							</div>
 						)
 					})}
@@ -1437,6 +1467,26 @@ export default function RoomDev() {
 						handleSendMessage={handleSendMessage}
 					/>
 				</div>
+			)}
+			{Object.entries(privateChats).map(
+				([clientID, isOpen]) =>
+					isOpen && (
+						<PrivateChat
+							key={clientID}
+							recipientId={clientID}
+							recipientName={
+								clientID === LOCAL_VIDEO
+									? localUsername
+									: participantInfo[clientID]?.username || 'Anonymous'
+							}
+							recipientAvatar={
+								clientID === LOCAL_VIDEO ? avatar : participantInfo[clientID]?.avatar || ''
+							}
+							onClose={() => togglePrivateChat(clientID)}
+							sendPrivateMessage={sendPrivateMessage}
+							privateMessages={privateMessages[clientID] || []}
+						/>
+					)
 			)}
 		</div>
 	)
