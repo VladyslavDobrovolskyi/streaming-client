@@ -1445,28 +1445,14 @@ export default function RoomDev() {
 				</div>
 			)}
 			{showChat && (
-				<div
-					style={{
-						position: 'absolute',
-						bottom: 60,
-						right: 10,
-						width: 300,
-						height: 400,
-						zIndex: 40,
-						backgroundColor: 'rgba(0, 0, 0, 0.8)',
-						borderRadius: '8px',
-						overflow: 'hidden',
-					}}
-				>
-					<RoomChat
-						clientID={LOCAL_VIDEO}
-						messages={chatMessages}
-						chatInput={chatInput}
-						setChatInput={setChatInput}
-						handleSendMessage={handleSendMessage}
-						onClose={closeChat}
-					/>
-				</div>
+				<RoomChat
+					clientID={LOCAL_VIDEO}
+					messages={chatMessages}
+					chatInput={chatInput}
+					setChatInput={setChatInput}
+					handleSendMessage={handleSendMessage}
+					onClose={closeChat}
+				/>
 			)}
 			{Object.entries(privateChats).map(
 				([clientID, isOpen]) =>
