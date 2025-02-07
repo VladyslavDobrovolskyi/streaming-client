@@ -32,7 +32,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
-	}, [privateMessages.length]) // Updated dependency to only track the length of privateMessages
+	}, [scrollAreaRef.current]) //Corrected dependency
 
 	const handleSend = () => {
 		if (message.trim()) {
@@ -41,18 +41,25 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 		}
 	}
 
-	const onResize = (event: React.SyntheticEvent, { size, handle }: ResizeCallbackData) => {
-		const { width, height } = size
-		const deltaWidth = width - size.width
-		const deltaHeight = height - size.height
+	const onResize = (event: React.SyntheticEvent, { size: newSize, handle }: ResizeCallbackData) => {
+		const deltaWidth = newSize.width - size.width
+		const deltaHeight = newSize.height - size.height
 
-		setSize({ width, height })
+		setSize(newSize)
 
-		// Обновляем позицию в зависимости от направления растягивания
-		setPosition(prev => ({
-			top: handle.includes('n') ? prev.top - deltaHeight : prev.top,
-			left: handle.includes('w') ? prev.left - deltaWidth : prev.left,
-		}))
+		setPosition(prev => {
+			let newTop = prev.top
+			let newLeft = prev.left
+
+			if (handle.includes('n')) {
+				newTop -= deltaHeight
+			}
+			if (handle.includes('w')) {
+				newLeft -= deltaWidth
+			}
+
+			return { top: newTop, left: newLeft }
+		})
 	}
 
 	return (
