@@ -9,7 +9,7 @@ import store from './redux/store.ts'
 createRoot(document.getElementById('root')!).render(
 	<>
 		<Provider store={store}>
-			<Theme accentColor='cyan' grayColor='slate' radius='small' scaling='110%'>
+			<Theme accentColor='cyan' grayColor='slate' radius='full' scaling='110%'>
 				<App />
 			</Theme>
 		</Provider>
