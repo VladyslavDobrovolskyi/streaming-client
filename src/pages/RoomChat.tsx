@@ -1,6 +1,6 @@
 'use client'
 
-import type React from 'react'
+import { useRef, useEffect } from 'react'
 import { Box, Flex, ScrollArea, Text, TextArea, Button } from '@radix-ui/themes'
 import { Kbd } from '@radix-ui/themes'
 import DraggableResizable from './DraggableResizable'
@@ -22,6 +22,14 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	handleSendMessage,
 	onClose,
 }) => {
+	const scrollAreaRef = useRef<HTMLDivElement>(null)
+
+	useEffect(() => {
+		if (scrollAreaRef.current) {
+			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
+		}
+	}, [scrollAreaRef])
+
 	return (
 		<DraggableResizable
 			initialSize={{ width: 300, height: 400 }}
@@ -58,7 +66,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							X
 						</Button>
 					</Flex>
-					<ScrollArea style={{ flex: 1, padding: '16px' }}>
+					<ScrollArea style={{ flex: 1, padding: '16px' }} ref={scrollAreaRef}>
 						{messages.map((msg, index) => (
 							<Box key={index} mb='2' style={{ textAlign: msg.username === clientID ? 'left' : 'right' }}>
 								<Text
