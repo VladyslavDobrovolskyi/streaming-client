@@ -89,7 +89,6 @@ export default function ClientVideo({
 					onMouseLeave={() => setHoveredClient(null)}
 				>
 					<video
-						className='video-drag-handle'
 						width='100%'
 						height='100%'
 						ref={instance => provideMediaRef(clientID, instance)}
@@ -100,7 +99,19 @@ export default function ClientVideo({
 						style={{
 							objectFit: 'cover',
 							borderRadius: '5px',
+						}}
+					/>
+					{/* Invisible drag handle */}
+					<div
+						className='video-drag-handle'
+						style={{
+							position: 'absolute',
+							top: '20%',
+							left: '20%',
+							width: '60%',
+							height: '60%',
 							cursor: isDragging ? 'grabbing' : 'move',
+							zIndex: 3,
 						}}
 					/>
 					{hoveredClient === clientID && (
