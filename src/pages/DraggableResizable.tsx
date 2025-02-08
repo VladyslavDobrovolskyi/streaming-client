@@ -113,7 +113,6 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 			onDrag={onDrag}
 			onStart={onStart}
 			onStop={onStop}
-			scale={scale}
 		>
 			<Resizable
 				width={size.width}
