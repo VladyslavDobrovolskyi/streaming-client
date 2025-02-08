@@ -119,7 +119,23 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 						zIndex: 12000,
 					}}
 				>
-					<Box onWheel={handleWheel}>{children({ isDragging })}</Box>
+					<Box
+						onWheel={handleWheel}
+						style={{
+							backgroundColor: 'var(--gray-1)',
+							borderRadius: 'var(--radius-3)',
+							overflow: 'hidden',
+							display: 'flex',
+							flexDirection: 'column',
+							boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+							transform: `scale(${scale})`,
+							transformOrigin: 'center',
+							width: '100%',
+							height: '100%',
+						}}
+					>
+						{children({ isDragging })}
+					</Box>
 				</div>
 			</Resizable>
 		</Draggable>
