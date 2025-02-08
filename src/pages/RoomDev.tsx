@@ -32,9 +32,8 @@ import useRoomSync from '../hooks/useRoomSync'
 import { Avatar } from '@radix-ui/themes'
 import PrivateChat from './PrivateChat'
 import RoomChat from './RoomChat'
-import Draggable from 'react-draggable'
-import { Resizable, type ResizeCallbackData } from 'react-resizable'
 import 'react-resizable/css/styles.css'
+import ClientVideo from './ClientVideo'
 
 // const createDashedSquareDragImage = () => {
 // 	const dragImage = document.createElement('div')
@@ -75,9 +74,6 @@ export default function RoomDev() {
 	>(null)
 	const [micMuted, setMicMuted] = useState(false)
 	const [cameraMuted, setCameraMuted] = useState(false)
-	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
-	const [clientVolumes, setClientVolumes] = useState<Record<string, number>>({})
-	const [previousVolumes, setPreviousVolumes] = useState<Record<string, number>>({})
 	const [coveredClients, setCoveredClients] = useState<Record<string, boolean>>({})
 	const [isMovieMode, setIsMovieMode] = useState(false)
 	const [clientPositions, setClientPositions] = useState<Record<string, { x: number; y: number }>>({})
@@ -94,7 +90,7 @@ export default function RoomDev() {
 	const [clientSizes, setClientSizes] = useState<Record<string, { width: number; height: number; scale?: number }>>(
 		{}
 	)
-	const [hoveredClientForZoom, setHoveredClientForZoom] = useState<string | null>(null)
+	const [clientVolumes, setClientVolumes] = useState<Record<string, number>>({})
 	const userListWidth = 250
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<number | null>(null)
@@ -338,19 +334,7 @@ export default function RoomDev() {
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown)
 		}
-	}, [
-		volume,
-		handleVolumeChange,
-		emitPause,
-		emitPlay,
-		handleForward15,
-		handleBackward15,
-		handleToggleMuted, // Added handleToggleMuted to dependencies
-		muted,
-		localStream,
-		mutedBySlider,
-		previousVolumeRef,
-	])
+	}, [volume, handleVolumeChange, emitPause, emitPlay, handleForward15, handleBackward15, handleToggleMuted])
 
 	useEffect(() => {
 		if (roomID) {
@@ -441,18 +425,6 @@ export default function RoomDev() {
 		setTimeout(() => setCurrentAction(null), 1000)
 	}
 
-	const getVolumeIcon = (volume: number) => {
-		const IconStyles = {
-			color: 'white',
-			transform: 'scale(0.5)',
-		}
-
-		if (volume === 0) return <SpeakerOffIcon style={IconStyles} />
-		if (volume < 0.33) return <SpeakerQuietIcon style={IconStyles} />
-		if (volume < 0.66) return <SpeakerModerateIcon style={IconStyles} />
-		return <SpeakerLoudIcon style={IconStyles} />
-	}
-
 	const renderParticipants = () => {
 		return (
 			<div
@@ -470,227 +442,34 @@ export default function RoomDev() {
 				}}
 			>
 				{clients.map(clientID => (
-					<Draggable
+					<ClientVideo
 						key={clientID}
-						defaultPosition={clientPositions[clientID] || { x: 10, y: 10 }}
-						bounds='parent'
-						onStop={(e, data) => {
-							setClientPositions(prev => ({
-								...prev,
-								[clientID]: { x: data.x, y: data.y },
-							}))
+						clientID={clientID}
+						provideMediaRef={provideMediaRef}
+						isLocal={clientID === LOCAL_VIDEO}
+						username={participantInfo[clientID]?.username || 'Anonymous'}
+						isCameraMuted={
+							(clientID === LOCAL_VIDEO && cameraMuted) || participantCameras[clientID] === true
+						}
+						position={clientPositions[clientID] || { x: 10, y: 10 }}
+						size={clientSizes[clientID] || { width: 150, height: 100 }}
+						onPositionChange={(id, pos) => setClientPositions(prev => ({ ...prev, [id]: pos }))}
+						onSizeChange={(id, size) => setClientSizes(prev => ({ ...prev, [id]: size }))}
+						onVolumeChange={(id, vol) => {
+							setClientVolumes(prev => ({ ...prev, [id]: vol }))
+							const videoElement = document.querySelector(
+								`video[data-client-id="${id}"]`
+							) as HTMLVideoElement
+							if (videoElement) {
+								videoElement.volume = vol
+								videoElement.muted = vol === 0
+							}
 						}}
-					>
-						<Resizable
-							width={clientSizes[clientID]?.width || 150}
-							height={clientSizes[clientID]?.height || 100}
-							onResize={(e, data: ResizeCallbackData) => {
-								setClientSizes(prev => ({
-									...prev,
-									[clientID]: {
-										width: data.size.width,
-										height: data.size.height,
-										scale: prev[clientID]?.scale || 1,
-									},
-								}))
-							}}
-							minConstraints={[100, 75]}
-							maxConstraints={[300, 200]}
-						>
-							<div
-								style={{
-									width: clientSizes[clientID]?.width || 150,
-									height: clientSizes[clientID]?.height || 100,
-									position: 'absolute',
-									pointerEvents: 'auto',
-									transition: 'all 0.1s ease-out',
-									cursor: 'move',
-									display:
-										(clientID === LOCAL_VIDEO && cameraMuted) ||
-										participantCameras[clientID] === true
-											? 'none'
-											: 'block',
-									border: highlightedUser === clientID ? '3px solid cyan' : 'none',
-									boxShadow: highlightedUser === clientID ? '0 0 10px cyan' : 'none',
-									transform: `scale(${clientSizes[clientID]?.scale || 1})`,
-									transformOrigin: 'center center',
-								}}
-								onMouseEnter={() => {
-									setHoveredClient(clientID)
-									setHoveredClientForZoom(clientID)
-								}}
-								onMouseLeave={() => {
-									setHoveredClient(null)
-									setHoveredClientForZoom(null)
-								}}
-								onWheel={e => handleWheel(e, clientID)}
-							>
-								<div
-									style={{
-										width: '100%',
-										height: '100%',
-										position: 'relative',
-									}}
-								>
-									<video
-										width='100%'
-										height='100%'
-										ref={instance => {
-											const videoElement = provideMediaRef(clientID, instance)
-											if (videoElement && clientID !== LOCAL_VIDEO) {
-												videoElement.then(() => {
-													const video = document.querySelector(
-														`video[data-client-id="${clientID}"]`
-													) as HTMLVideoElement
-													if (video) {
-														video.volume = clientVolumes[clientID] || 1
-													}
-												})
-											}
-										}}
-										data-client-id={clientID}
-										autoPlay
-										playsInline
-										muted={clientID === LOCAL_VIDEO}
-										style={{
-											objectFit: 'cover',
-											borderRadius: '5px',
-										}}
-									/>
-								</div>
-								{hoveredClient === clientID && (
-									<>
-										<div
-											style={{
-												position: 'absolute',
-												top: '50%',
-												left: '50%',
-												transform: 'translate(-50%, -50%)',
-												cursor: 'pointer',
-											}}
-											onClick={() =>
-												setCoveredClients(prev => ({ ...prev, [clientID]: !prev[clientID] }))
-											}
-										>
-											<EyeOpenIcon style={{ color: 'white', transform: 'scale(1)' }} />
-										</div>
-										{clientID !== LOCAL_VIDEO && (
-											<div
-												style={{
-													position: 'absolute',
-													bottom: '-5px',
-													left: '0px',
-													right: '5px',
-													display: 'flex',
-													alignItems: 'center',
-												}}
-											>
-												<button
-													onClick={() => {
-														const videoElement = document.querySelector(
-															`video[data-client-id="${clientID}"]`
-														) as HTMLVideoElement | null
-
-														if (!videoElement) return
-
-														setClientVolumes(prev => {
-															const currentVolume = prev[clientID] ?? 1.0
-															const isMuted = currentVolume === 0.0
-
-															const newVolume = isMuted
-																? previousVolumes[clientID] ?? 1.0
-																: 0.0
-
-															if (!isMuted) {
-																setPreviousVolumes(pv => ({
-																	...pv,
-																	[clientID]: currentVolume,
-																}))
-															}
-
-															videoElement.muted = newVolume === 0.0
-															videoElement.volume = newVolume
-
-															return { ...prev, [clientID]: newVolume }
-														})
-													}}
-													style={{
-														background: 'none',
-														border: 'none',
-														cursor: 'pointer',
-														padding: 0,
-														display: 'flex',
-														alignItems: 'center',
-													}}
-												>
-													{getVolumeIcon(clientVolumes[clientID])}
-												</button>
-
-												{clientVolumes[clientID] !== 0 && (
-													<Slider
-														orientation='horizontal'
-														min={0.0}
-														max={1.0}
-														step={0.01}
-														value={[clientVolumes[clientID] ?? 1.0]}
-														onValueChange={value => {
-															const newVolume = value[0] === 0.01 ? 0.0 : value[0]
-															console.log(clientID, newVolume)
-															setClientVolumes(prev => ({
-																...prev,
-																[clientID]: newVolume,
-															}))
-															const videoElement = document.querySelector(
-																`video[data-client-id="${clientID}"]`
-															) as HTMLVideoElement
-															if (videoElement) {
-																videoElement.volume = newVolume
-															}
-															if (newVolume === 0) {
-																videoElement.muted = true
-															}
-														}}
-														style={
-															{
-																cursor: 'pointer',
-																width: '100%',
-																marginLeft: '5px',
-																'--slider-thumb-size': '10px',
-																'--slider-track-height': '2px',
-															} as React.CSSProperties
-														}
-													/>
-												)}
-											</div>
-										)}
-									</>
-								)}
-								{coveredClients[clientID] && (
-									<div
-										onClick={() =>
-											setCoveredClients(prev => ({ ...prev, [clientID]: !prev[clientID] }))
-										}
-										style={{
-											position: 'absolute',
-											top: 0,
-											left: 0,
-											width: '100%',
-											height: '100%',
-											backgroundColor: 'black',
-											borderRadius: '5px',
-											display: 'flex',
-											justifyContent: 'center',
-											alignItems: 'center',
-										}}
-									>
-										<EyeClosedIcon
-											style={{ color: 'white', transform: 'scale(1)', cursor: 'pointer' }}
-										/>
-									</div>
-								)}
-							</div>
-						</Resizable>
-					</Draggable>
+						onCoverToggle={id => setCoveredClients(prev => ({ ...prev, [id]: !prev[id] }))}
+						isCovered={coveredClients[clientID]}
+						volume={clientVolumes[clientID] || 1}
+						highlightedUser={highlightedUser}
+					/>
 				))}
 			</div>
 		)
@@ -809,30 +588,6 @@ export default function RoomDev() {
 	}
 	const closeChat = () => {
 		setShowChat(false)
-	}
-
-	const handleWheel = (e: React.WheelEvent<HTMLDivElement>, clientID: string) => {
-		e.preventDefault()
-		if (clientID !== hoveredClientForZoom) return
-
-		const scaleFactor = 0.1
-		const newScale =
-			e.deltaY > 0
-				? (clientSizes[clientID]?.scale || 1) * (1 - scaleFactor)
-				: (clientSizes[clientID]?.scale || 1) * (1 + scaleFactor)
-
-		// Limit the scale to a reasonable range (e.g., 0.5 to 2)
-		const clampedScale = Math.min(Math.max(newScale, 0.5), 2)
-
-		setClientSizes(prevSizes => ({
-			...prevSizes,
-			[clientID]: {
-				...prevSizes[clientID],
-				width: (prevSizes[clientID]?.width || 150) * (clampedScale / (prevSizes[clientID]?.scale || 1)),
-				height: (prevSizes[clientID]?.height || 100) * (clampedScale / (prevSizes[clientID]?.scale || 1)),
-				scale: clampedScale,
-			},
-		}))
 	}
 
 	return (
