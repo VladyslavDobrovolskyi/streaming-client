@@ -69,6 +69,10 @@ export default function ClientVideo({
 			onPositionChange={newPosition => onPositionChange(clientID, newPosition)}
 			onSizeChange={newSize => onSizeChange(clientID, { ...newSize, scale: size.scale || 1 })}
 			dragHandleClassName='video-drag-handle'
+			resizeHandleStyles={{
+				position: 'absolute',
+				zIndex: 10,
+			}}
 		>
 			{({ isDragging }) => (
 				<div
@@ -113,6 +117,7 @@ export default function ClientVideo({
 									transform: 'translate(-50%, -50%)',
 									cursor: 'pointer',
 									pointerEvents: 'auto',
+									zIndex: 5,
 								}}
 								onClick={() => onCoverToggle(clientID)}
 							>
@@ -128,6 +133,7 @@ export default function ClientVideo({
 										display: 'flex',
 										alignItems: 'center',
 										pointerEvents: 'auto',
+										zIndex: 5,
 									}}
 								>
 									<button
@@ -182,6 +188,7 @@ export default function ClientVideo({
 								justifyContent: 'center',
 								alignItems: 'center',
 								pointerEvents: 'auto',
+								zIndex: 4,
 							}}
 						>
 							<EyeClosedIcon style={{ color: 'white', transform: 'scale(1)', cursor: 'pointer' }} />

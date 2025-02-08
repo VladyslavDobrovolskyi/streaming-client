@@ -16,6 +16,7 @@ interface DraggableResizableProps {
 	bounds?: string
 	onPositionChange?: (position: { x: number; y: number }) => void
 	onSizeChange?: (size: { width: number; height: number }) => void
+	resizeHandleStyles?: React.CSSProperties
 }
 
 const DraggableResizable: React.FC<DraggableResizableProps> = ({
@@ -28,6 +29,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 	bounds = 'parent',
 	onPositionChange,
 	onSizeChange,
+	resizeHandleStyles,
 }) => {
 	const [size, setSize] = useState(initialSize)
 	const [position, setPosition] = useState(initialPosition)
@@ -82,6 +84,16 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 				minConstraints={minConstraints}
 				maxConstraints={maxConstraints}
 				resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
+				handle={(h, ref) => (
+					<span
+						ref={ref}
+						className={`react-resizable-handle react-resizable-handle-${h}`}
+						style={{
+							...resizeHandleStyles,
+							zIndex: 50, // Ensure resize handles are above other elements
+						}}
+					/>
+				)}
 			>
 				<div
 					style={{
