@@ -45,7 +45,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 			initialPosition={{ x: window.innerWidth - 620, y: window.innerHeight - 470 }}
 			bounds='.react-player'
 		>
-			{({ isDragging }: { isDragging: boolean }) => (
+			{({ isDragging }) => (
 				<Box
 					onWheel={handleWheel}
 					style={{
