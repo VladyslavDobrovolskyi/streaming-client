@@ -113,6 +113,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 			onDrag={onDrag}
 			onStart={onStart}
 			onStop={onStop}
+			scale={scale}
 		>
 			<Resizable
 				width={size.width}
@@ -138,8 +139,8 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 					}}
 				>
 					<Box
-						ref={contentRef}
 						onWheel={handleWheel}
+						ref={contentRef}
 						style={{
 							backgroundColor: 'var(--gray-1)',
 							borderRadius: 'var(--radius-3)',
