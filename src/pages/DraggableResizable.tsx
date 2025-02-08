@@ -1,10 +1,11 @@
 'use client'
 
 import type React from 'react'
-import { useState, type ReactNode } from 'react'
+import { useState, useEffect, useRef, type ReactNode } from 'react'
 import { Resizable, type ResizeCallbackData } from 'react-resizable'
 import Draggable from 'react-draggable'
 import 'react-resizable/css/styles.css'
+import { Box } from '@radix-ui/themes'
 
 interface DraggableResizableProps {
 	children: (props: { isDragging: boolean }) => ReactNode
@@ -34,6 +35,21 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 	const [size, setSize] = useState(initialSize)
 	const [position, setPosition] = useState(initialPosition)
 	const [isDragging, setIsDragging] = useState(false)
+	const scrollAreaRef = useRef<HTMLDivElement>(null)
+	const [scale, setScale] = useState(1)
+
+	useEffect(() => {
+		if (scrollAreaRef.current) {
+			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
+		}
+	}, [scrollAreaRef]) // Updated dependency
+
+	const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+		e.preventDefault()
+		const scaleFactor = 0.1
+		const newScale = e.deltaY > 0 ? scale * (1 - scaleFactor) : scale * (1 + scaleFactor)
+		setScale(Math.min(Math.max(newScale, 0.5), 2))
+	}
 
 	const onResize = (_: React.SyntheticEvent, { size: newSize, handle }: ResizeCallbackData) => {
 		const deltaWidth = newSize.width - size.width
@@ -103,7 +119,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 						zIndex: 12000,
 					}}
 				>
-					{children({ isDragging })}
+					<Box onWheel={handleWheel}>{children({ isDragging })}</Box>
 				</div>
 			</Resizable>
 		</Draggable>
