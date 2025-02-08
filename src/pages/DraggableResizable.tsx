@@ -1,7 +1,7 @@
 'use client'
 
 import type React from 'react'
-import { useState, useRef, useEffect, type ReactNode } from 'react'
+import { useState, useRef, useCallback, type ReactNode } from 'react'
 import { Resizable, type ResizeCallbackData } from 'react-resizable'
 import Draggable from 'react-draggable'
 import 'react-resizable/css/styles.css'
@@ -40,79 +40,82 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 	const [scale, setScale] = useState(1)
 	const contentRef = useRef<HTMLDivElement>(null)
 
-	const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-		if (disableWheelZoomClass && (e.target as Element).closest(`.${disableWheelZoomClass}`)) {
-			return
-		}
-
-		e.preventDefault()
-		const scaleFactor = 0.1
-		const newScale = e.deltaY > 0 ? scale * (1 - scaleFactor) : scale * (1 + scaleFactor)
-		setScale(Math.min(Math.max(newScale, 0.5), 2))
-	}
-
-	useEffect(() => {
-		const newWidth = Math.round(size.width * scale)
-		const newHeight = Math.round(size.height * scale)
-		setSize({ width: newWidth, height: newHeight })
-		if (onSizeChange) onSizeChange({ width: newWidth, height: newHeight })
-	}, [scale, onSizeChange, size.height]) // Added size.height to dependencies
-
-	const onResize = (_: React.SyntheticEvent, { size: newSize, handle }: ResizeCallbackData) => {
-		const unscaledWidth = Math.round(newSize.width / scale)
-		const unscaledHeight = Math.round(newSize.height / scale)
-		const deltaWidth = unscaledWidth - size.width
-		const deltaHeight = unscaledHeight - size.height
-
-		setSize({ width: unscaledWidth, height: unscaledHeight })
-		if (onSizeChange) onSizeChange({ width: unscaledWidth, height: unscaledHeight })
-
-		setPosition(prev => {
-			let newX = prev.x
-			let newY = prev.y
-
-			if (handle.includes('w')) {
-				newX -= deltaWidth * scale
-			}
-			if (handle.includes('n')) {
-				newY -= deltaHeight * scale
+	const handleWheel = useCallback(
+		(e: React.WheelEvent<HTMLDivElement>) => {
+			if (disableWheelZoomClass && (e.target as Element).closest(`.${disableWheelZoomClass}`)) {
+				return
 			}
 
-			const newPosition = { x: newX, y: newY }
+			e.preventDefault()
+			const scaleFactor = 0.1
+			const newScale = e.deltaY > 0 ? scale * (1 - scaleFactor) : scale * (1 + scaleFactor)
+			setScale(Math.min(Math.max(newScale, 0.5), 2))
+		},
+		[scale, disableWheelZoomClass]
+	)
+
+	const onResize = useCallback(
+		(_: React.SyntheticEvent, { size: newSize, handle }: ResizeCallbackData) => {
+			const unscaledWidth = Math.round(newSize.width / scale)
+			const unscaledHeight = Math.round(newSize.height / scale)
+
+			setSize({ width: unscaledWidth, height: unscaledHeight })
+			if (onSizeChange) onSizeChange({ width: unscaledWidth, height: unscaledHeight })
+
+			setPosition(prev => {
+				let newX = prev.x
+				let newY = prev.y
+
+				if (handle.includes('w')) {
+					newX -= (unscaledWidth - size.width) * scale
+				}
+				if (handle.includes('n')) {
+					newY -= (unscaledHeight - size.height) * scale
+				}
+
+				const newPosition = { x: newX, y: newY }
+				if (onPositionChange) onPositionChange(newPosition)
+				return newPosition
+			})
+		},
+		[scale, size, onSizeChange, onPositionChange]
+	)
+
+	const onDrag = useCallback(
+		(_, data: { x: number; y: number }) => {
+			const newPosition = { x: data.x, y: data.y }
+			setPosition(newPosition)
 			if (onPositionChange) onPositionChange(newPosition)
-			return newPosition
-		})
-	}
+		},
+		[onPositionChange]
+	)
 
-	const onDrag = (_, data: { x: number; y: number }) => {
-		const newPosition = { x: data.x, y: data.y }
-		setPosition(newPosition)
-		if (onPositionChange) onPositionChange(newPosition)
-	}
+	const onStart = useCallback(() => setIsDragging(true), [])
+	const onStop = useCallback(() => setIsDragging(false), [])
 
-	const onStart = () => setIsDragging(true)
-	const onStop = () => setIsDragging(false)
+	const getHandleStyle = useCallback(
+		(position: string) => {
+			const baseStyle: React.CSSProperties = {
+				...resizeHandleStyles,
+				zIndex: 12000,
+				position: 'absolute',
+			}
 
-	const getHandleStyle = (position: string) => {
-		const baseStyle: React.CSSProperties = {
-			...resizeHandleStyles,
-			zIndex: 12000,
-			position: 'absolute',
-		}
-
-		switch (position) {
-			case 'sw':
-				return { ...baseStyle, bottom: 0, left: 0 }
-			case 'nw':
-				return { ...baseStyle, top: 0, left: 0 }
-			case 'se':
-				return { ...baseStyle, bottom: 0, right: 0 }
-			case 'ne':
-				return { ...baseStyle, top: 0, right: 0 }
-			default:
-				return baseStyle
-		}
-	}
+			switch (position) {
+				case 'sw':
+					return { ...baseStyle, bottom: 0, left: 0 }
+				case 'nw':
+					return { ...baseStyle, top: 0, left: 0 }
+				case 'se':
+					return { ...baseStyle, bottom: 0, right: 0 }
+				case 'ne':
+					return { ...baseStyle, top: 0, right: 0 }
+				default:
+					return baseStyle
+			}
+		},
+		[resizeHandleStyles]
+	)
 
 	return (
 		<Draggable
