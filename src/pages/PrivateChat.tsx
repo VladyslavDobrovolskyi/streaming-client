@@ -24,7 +24,6 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 }) => {
 	const [message, setMessage] = useState('')
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
-	const [scale, setScale] = useState(1)
 
 	useEffect(() => {
 		if (scrollAreaRef.current) {
@@ -39,13 +38,6 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 		}
 	}
 
-	const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-		e.preventDefault()
-		const scaleFactor = 0.1
-		const newScale = e.deltaY > 0 ? scale * (1 - scaleFactor) : scale * (1 + scaleFactor)
-		setScale(Math.min(Math.max(newScale, 0.5), 2))
-	}
-
 	return (
 		<DraggableResizable
 			initialSize={{ width: 300, height: 400 }}
@@ -55,7 +47,6 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 		>
 			{({ isDragging }) => (
 				<Box
-					onWheel={handleWheel}
 					style={{
 						backgroundColor: 'var(--gray-1)',
 						borderRadius: 'var(--radius-3)',
@@ -63,7 +54,6 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						display: 'flex',
 						flexDirection: 'column',
 						boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-						transform: `scale(${scale})`,
 						transformOrigin: 'center',
 						width: '100%',
 						height: '100%',
