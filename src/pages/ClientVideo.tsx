@@ -69,10 +69,6 @@ export default function ClientVideo({
 			onPositionChange={newPosition => onPositionChange(clientID, newPosition)}
 			onSizeChange={newSize => onSizeChange(clientID, { ...newSize, scale: size.scale || 1 })}
 			dragHandleClassName='video-drag-handle'
-			resizeHandleStyles={{
-				position: 'absolute',
-				zIndex: 10,
-			}}
 		>
 			{({ isDragging }) => (
 				<div

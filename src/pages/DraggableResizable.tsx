@@ -90,7 +90,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 						className={`react-resizable-handle react-resizable-handle-${h}`}
 						style={{
 							...resizeHandleStyles,
-							zIndex: 50, // Ensure resize handles are above other elements
+							zIndex: 12000, // Ensure resize handles are above other elements
 						}}
 					/>
 				)}
@@ -100,7 +100,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 						width: size.width,
 						height: size.height,
 						position: 'absolute',
-						zIndex: 40,
+						zIndex: 12000,
 					}}
 				>
 					{children({ isDragging })}
