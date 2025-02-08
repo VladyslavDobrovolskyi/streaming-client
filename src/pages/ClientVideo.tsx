@@ -100,16 +100,17 @@ export default function ClientVideo({
 						data-client-id={clientID}
 						autoPlay
 						playsInline
+						className='video-drag-handle'
 						muted={isLocal}
 						style={{
 							objectFit: 'cover',
 							borderRadius: '5px',
 							zIndex: 11001,
+							cursor: isDragging ? 'grabbing' : 'move',
 						}}
 					/>
 					{/* Invisible drag handle */}
-					<div
-						className='video-drag-handle'
+					{/* <div
 						style={{
 							position: 'absolute',
 							top: '20%',
@@ -119,7 +120,7 @@ export default function ClientVideo({
 							cursor: isDragging ? 'grabbing' : 'move',
 							zIndex: 11002,
 						}}
-					/>
+					/> */}
 					{hoveredClient === clientID && (
 						<>
 							<div
