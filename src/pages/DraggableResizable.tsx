@@ -83,7 +83,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 				onResize={onResize}
 				minConstraints={minConstraints}
 				maxConstraints={maxConstraints}
-				resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
+				resizeHandles={['sw', 'nw', 'se', 'ne']}
 				handle={(h, ref) => (
 					<span
 						ref={ref}
