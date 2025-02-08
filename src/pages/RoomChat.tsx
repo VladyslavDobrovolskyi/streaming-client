@@ -35,6 +35,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 			initialSize={{ width: 300, height: 400 }}
 			initialPosition={{ x: window.innerWidth - 620, y: window.innerHeight - 470 }}
 			bounds='.react-player'
+			disableWheelZoomClass='roomChatArea'
 		>
 			{({ isDragging }) => (
 				<Box
@@ -66,7 +67,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							X
 						</Button>
 					</Flex>
-					<ScrollArea style={{ flex: 1, padding: '16px' }} ref={scrollAreaRef}>
+					<ScrollArea style={{ flex: 1, padding: '16px' }} ref={scrollAreaRef} className='roomChatArea'>
 						{messages.map((msg, index) => (
 							<Box key={index} mb='2' style={{ textAlign: msg.username === clientID ? 'left' : 'right' }}>
 								<Text

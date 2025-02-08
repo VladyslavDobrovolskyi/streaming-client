@@ -18,6 +18,7 @@ interface DraggableResizableProps {
 	onPositionChange?: (position: { x: number; y: number }) => void
 	onSizeChange?: (size: { width: number; height: number }) => void
 	resizeHandleStyles?: React.CSSProperties
+	disableWheelZoomClass?: string // New prop for the class that disables wheel zoom
 }
 
 const DraggableResizable: React.FC<DraggableResizableProps> = ({
@@ -31,6 +32,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 	onPositionChange,
 	onSizeChange,
 	resizeHandleStyles,
+	disableWheelZoomClass,
 }) => {
 	const [size, setSize] = useState(initialSize)
 	const [position, setPosition] = useState(initialPosition)
@@ -42,9 +44,14 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
-	}, [scrollAreaRef]) // Updated dependency
+	}, [scrollAreaRef.current]) //Corrected useEffect dependency
 
 	const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+		// Check if the event target or any of its parents have the disableWheelZoomClass
+		if (disableWheelZoomClass && (e.target as Element).closest(`.${disableWheelZoomClass}`)) {
+			return // If the class is found, do nothing and let the default scroll behavior happen
+		}
+
 		e.preventDefault()
 		const scaleFactor = 0.1
 		const newScale = e.deltaY > 0 ? scale * (1 - scaleFactor) : scale * (1 + scaleFactor)
@@ -106,7 +113,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 						className={`react-resizable-handle react-resizable-handle-${h}`}
 						style={{
 							...resizeHandleStyles,
-							zIndex: 12000, // Ensure resize handles are above other elements
+							zIndex: 12000,
 						}}
 					/>
 				)}
