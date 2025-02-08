@@ -50,6 +50,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 		<DraggableResizable
 			initialSize={{ width: 300, height: 400 }}
 			initialPosition={{ x: window.innerWidth - 620, y: window.innerHeight - 470 }}
+			disableWheelZoomClass='scroll-area'
 			bounds='parent'
 		>
 			{({ isDragging }) => (
@@ -90,7 +91,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 							X
 						</Button>
 					</Flex>
-					<ScrollArea style={{ flex: 1, padding: '16px' }} ref={scrollAreaRef}>
+					<ScrollArea style={{ flex: 1, padding: '16px' }} ref={scrollAreaRef} className='scroll-area'>
 						{privateMessages.map((msg, index) => (
 							<Box key={index} mb='2' style={{ textAlign: msg.from === recipientId ? 'left' : 'right' }}>
 								<Text
