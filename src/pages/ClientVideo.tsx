@@ -2,8 +2,7 @@
 
 import type React from 'react'
 import { useState } from 'react'
-import { Resizable, type ResizeCallbackData } from 'react-resizable'
-import Draggable from 'react-draggable'
+import DraggableResizable from './DraggableResizable'
 import {
 	EyeOpenIcon,
 	EyeClosedIcon,
@@ -48,18 +47,6 @@ export default function ClientVideo({
 }: ClientVideoProps) {
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
 
-	const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-		e.preventDefault()
-		const scaleFactor = 0.1
-		const newScale = e.deltaY > 0 ? (size.scale || 1) * (1 - scaleFactor) : (size.scale || 1) * (1 + scaleFactor)
-		const clampedScale = Math.min(Math.max(newScale, 0.5), 2)
-		onSizeChange(clientID, {
-			width: size.width * (clampedScale / (size.scale || 1)),
-			height: size.height * (clampedScale / (size.scale || 1)),
-			scale: clampedScale,
-		})
-	}
-
 	const getVolumeIcon = (volume: number) => {
 		const IconStyles = {
 			color: 'white',
@@ -73,25 +60,16 @@ export default function ClientVideo({
 	}
 
 	return (
-		<Draggable
-			defaultPosition={position}
+		<DraggableResizable
+			initialSize={{ width: size.width, height: size.height }}
+			initialPosition={position}
 			bounds='parent'
-			onStop={(e, data) => onPositionChange(clientID, { x: data.x, y: data.y })}
-			handle='.drag-handle'
+			minConstraints={[100, 75]}
+			maxConstraints={[300, 200]}
+			onPositionChange={newPosition => onPositionChange(clientID, newPosition)}
+			onSizeChange={newSize => onSizeChange(clientID, { ...newSize, scale: size.scale || 1 })}
 		>
-			<Resizable
-				width={size.width}
-				height={size.height}
-				onResize={(e, data: ResizeCallbackData) => {
-					onSizeChange(clientID, {
-						width: data.size.width,
-						height: data.size.height,
-						scale: size.scale || 1,
-					})
-				}}
-				minConstraints={[100, 75]}
-				maxConstraints={[300, 200]}
-			>
+			{({ isDragging }) => (
 				<div
 					style={{
 						width: size.width,
@@ -108,7 +86,6 @@ export default function ClientVideo({
 					}}
 					onMouseEnter={() => setHoveredClient(clientID)}
 					onMouseLeave={() => setHoveredClient(null)}
-					onWheel={handleWheel}
 				>
 					<div style={{ width: '100%', height: '100%', position: 'relative' }}>
 						<video
@@ -120,7 +97,11 @@ export default function ClientVideo({
 							autoPlay
 							playsInline
 							muted={isLocal}
-							style={{ objectFit: 'cover', borderRadius: '5px', cursor: 'move' }}
+							style={{
+								objectFit: 'cover',
+								borderRadius: '5px',
+								cursor: isDragging ? 'grabbing' : 'move',
+							}}
 						/>
 					</div>
 					{hoveredClient === clientID && (
@@ -205,7 +186,7 @@ export default function ClientVideo({
 						</div>
 					)}
 				</div>
-			</Resizable>
-		</Draggable>
+			)}
+		</DraggableResizable>
 	)
 }
