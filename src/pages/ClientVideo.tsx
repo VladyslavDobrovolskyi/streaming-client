@@ -73,9 +73,9 @@ export default function ClientVideo({
 			{({ isDragging }) => (
 				<div
 					style={{
-						width: size.width,
-						height: size.height,
-						position: 'absolute',
+						width: '100%',
+						height: '100%',
+						position: 'relative',
 						pointerEvents: 'auto',
 						transition: 'all 0.1s ease-out',
 						cursor: 'default',
@@ -88,23 +88,21 @@ export default function ClientVideo({
 					onMouseEnter={() => setHoveredClient(clientID)}
 					onMouseLeave={() => setHoveredClient(null)}
 				>
-					<div style={{ width: '100%', height: '100%', position: 'relative' }}>
-						<video
-							className='video-drag-handle'
-							width='100%'
-							height='100%'
-							ref={instance => provideMediaRef(clientID, instance)}
-							data-client-id={clientID}
-							autoPlay
-							playsInline
-							muted={isLocal}
-							style={{
-								objectFit: 'cover',
-								borderRadius: '5px',
-								cursor: isDragging ? 'grabbing' : 'move',
-							}}
-						/>
-					</div>
+					<video
+						className='video-drag-handle'
+						width='100%'
+						height='100%'
+						ref={instance => provideMediaRef(clientID, instance)}
+						data-client-id={clientID}
+						autoPlay
+						playsInline
+						muted={isLocal}
+						style={{
+							objectFit: 'cover',
+							borderRadius: '5px',
+							cursor: isDragging ? 'grabbing' : 'move',
+						}}
+					/>
 					{hoveredClient === clientID && (
 						<>
 							<div
@@ -114,7 +112,7 @@ export default function ClientVideo({
 									left: '50%',
 									transform: 'translate(-50%, -50%)',
 									cursor: 'pointer',
-									pointerEvents: 'none',
+									pointerEvents: 'auto',
 								}}
 								onClick={() => onCoverToggle(clientID)}
 							>
@@ -124,8 +122,8 @@ export default function ClientVideo({
 								<div
 									style={{
 										position: 'absolute',
-										bottom: '-5px',
-										left: '0px',
+										bottom: '5px',
+										left: '5px',
 										right: '5px',
 										display: 'flex',
 										alignItems: 'center',
