@@ -69,6 +69,10 @@ export default function ClientVideo({
 			onPositionChange={newPosition => onPositionChange(clientID, newPosition)}
 			onSizeChange={newSize => onSizeChange(clientID, { ...newSize, scale: size.scale || 1 })}
 			dragHandleClassName='video-drag-handle'
+			resizeHandleStyles={{
+				zIndex: 12000,
+				pointerEvents: 'auto',
+			}}
 		>
 			{({ isDragging }) => (
 				<div
@@ -84,6 +88,7 @@ export default function ClientVideo({
 						boxShadow: highlightedUser === clientID ? '0 0 10px cyan' : 'none',
 						transform: `scale(${size.scale || 1})`,
 						transformOrigin: 'center center',
+						zIndex: 11000,
 					}}
 					onMouseEnter={() => setHoveredClient(clientID)}
 					onMouseLeave={() => setHoveredClient(null)}
@@ -99,6 +104,7 @@ export default function ClientVideo({
 						style={{
 							objectFit: 'cover',
 							borderRadius: '5px',
+							zIndex: 11001,
 						}}
 					/>
 					{/* Invisible drag handle */}
@@ -111,7 +117,7 @@ export default function ClientVideo({
 							width: '60%',
 							height: '60%',
 							cursor: isDragging ? 'grabbing' : 'move',
-							zIndex: 3,
+							zIndex: 11002,
 						}}
 					/>
 					{hoveredClient === clientID && (
@@ -124,7 +130,7 @@ export default function ClientVideo({
 									transform: 'translate(-50%, -50%)',
 									cursor: 'pointer',
 									pointerEvents: 'auto',
-									zIndex: 5,
+									zIndex: 11003,
 								}}
 								onClick={() => onCoverToggle(clientID)}
 							>
@@ -140,7 +146,7 @@ export default function ClientVideo({
 										display: 'flex',
 										alignItems: 'center',
 										pointerEvents: 'auto',
-										zIndex: 5,
+										zIndex: 11003,
 									}}
 								>
 									<button
@@ -195,7 +201,7 @@ export default function ClientVideo({
 								justifyContent: 'center',
 								alignItems: 'center',
 								pointerEvents: 'auto',
-								zIndex: 4,
+								zIndex: 11004,
 							}}
 						>
 							<EyeClosedIcon style={{ color: 'white', transform: 'scale(1)', cursor: 'pointer' }} />
