@@ -68,6 +68,7 @@ export default function ClientVideo({
 			maxConstraints={[300, 200]}
 			onPositionChange={newPosition => onPositionChange(clientID, newPosition)}
 			onSizeChange={newSize => onSizeChange(clientID, { ...newSize, scale: size.scale || 1 })}
+			dragHandleClassName='video-drag-handle'
 		>
 			{({ isDragging }) => (
 				<div
@@ -89,7 +90,7 @@ export default function ClientVideo({
 				>
 					<div style={{ width: '100%', height: '100%', position: 'relative' }}>
 						<video
-							className='drag-handle'
+							className='video-drag-handle'
 							width='100%'
 							height='100%'
 							ref={instance => provideMediaRef(clientID, instance)}
@@ -113,6 +114,7 @@ export default function ClientVideo({
 									left: '50%',
 									transform: 'translate(-50%, -50%)',
 									cursor: 'pointer',
+									pointerEvents: 'none',
 								}}
 								onClick={() => onCoverToggle(clientID)}
 							>
@@ -127,6 +129,7 @@ export default function ClientVideo({
 										right: '5px',
 										display: 'flex',
 										alignItems: 'center',
+										pointerEvents: 'auto',
 									}}
 								>
 									<button
@@ -180,6 +183,7 @@ export default function ClientVideo({
 								display: 'flex',
 								justifyContent: 'center',
 								alignItems: 'center',
+								pointerEvents: 'auto',
 							}}
 						>
 							<EyeClosedIcon style={{ color: 'white', transform: 'scale(1)', cursor: 'pointer' }} />
