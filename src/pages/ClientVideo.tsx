@@ -77,6 +77,7 @@ export default function ClientVideo({
 			defaultPosition={position}
 			bounds='parent'
 			onStop={(e, data) => onPositionChange(clientID, { x: data.x, y: data.y })}
+			handle='.drag-handle'
 		>
 			<Resizable
 				width={size.width}
@@ -98,7 +99,7 @@ export default function ClientVideo({
 						position: 'absolute',
 						pointerEvents: 'auto',
 						transition: 'all 0.1s ease-out',
-						cursor: 'move',
+						cursor: 'default',
 						display: isCameraMuted ? 'none' : 'block',
 						border: highlightedUser === clientID ? '3px solid cyan' : 'none',
 						boxShadow: highlightedUser === clientID ? '0 0 10px cyan' : 'none',
@@ -111,6 +112,7 @@ export default function ClientVideo({
 				>
 					<div style={{ width: '100%', height: '100%', position: 'relative' }}>
 						<video
+							className='drag-handle'
 							width='100%'
 							height='100%'
 							ref={instance => provideMediaRef(clientID, instance)}
@@ -118,7 +120,7 @@ export default function ClientVideo({
 							autoPlay
 							playsInline
 							muted={isLocal}
-							style={{ objectFit: 'cover', borderRadius: '5px' }}
+							style={{ objectFit: 'cover', borderRadius: '5px', cursor: 'move' }}
 						/>
 					</div>
 					{hoveredClient === clientID && (
