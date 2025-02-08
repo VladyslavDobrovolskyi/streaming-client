@@ -1,7 +1,7 @@
 'use client'
 
 import type React from 'react'
-import { useState, useRef, type ReactNode } from 'react'
+import { useState, useRef, useEffect, type ReactNode } from 'react'
 import { Resizable, type ResizeCallbackData } from 'react-resizable'
 import Draggable from 'react-draggable'
 import 'react-resizable/css/styles.css'
@@ -51,22 +51,31 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 		setScale(Math.min(Math.max(newScale, 0.5), 2))
 	}
 
-	const onResize = (_: React.SyntheticEvent, { size: newSize, handle }: ResizeCallbackData) => {
-		const deltaWidth = newSize.width - size.width
-		const deltaHeight = newSize.height - size.height
+	useEffect(() => {
+		const newWidth = Math.round(size.width * scale)
+		const newHeight = Math.round(size.height * scale)
+		setSize({ width: newWidth, height: newHeight })
+		if (onSizeChange) onSizeChange({ width: newWidth, height: newHeight })
+	}, [scale, onSizeChange, size.height]) // Added size.height to dependencies
 
-		setSize(newSize)
-		if (onSizeChange) onSizeChange(newSize)
+	const onResize = (_: React.SyntheticEvent, { size: newSize, handle }: ResizeCallbackData) => {
+		const unscaledWidth = Math.round(newSize.width / scale)
+		const unscaledHeight = Math.round(newSize.height / scale)
+		const deltaWidth = unscaledWidth - size.width
+		const deltaHeight = unscaledHeight - size.height
+
+		setSize({ width: unscaledWidth, height: unscaledHeight })
+		if (onSizeChange) onSizeChange({ width: unscaledWidth, height: unscaledHeight })
 
 		setPosition(prev => {
 			let newX = prev.x
 			let newY = prev.y
 
 			if (handle.includes('w')) {
-				newX -= deltaWidth
+				newX -= deltaWidth * scale
 			}
 			if (handle.includes('n')) {
-				newY -= deltaHeight
+				newY -= deltaHeight * scale
 			}
 
 			const newPosition = { x: newX, y: newY }
@@ -115,11 +124,11 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 			onStop={onStop}
 		>
 			<Resizable
-				width={size.width}
-				height={size.height}
+				width={size.width * scale}
+				height={size.height * scale}
 				onResize={onResize}
-				minConstraints={minConstraints}
-				maxConstraints={maxConstraints}
+				minConstraints={[minConstraints[0] * scale, minConstraints[1] * scale]}
+				maxConstraints={[maxConstraints[0] * scale, maxConstraints[1] * scale]}
 				resizeHandles={['sw', 'nw', 'se', 'ne']}
 				handle={(h, ref) => (
 					<span
@@ -131,8 +140,8 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 			>
 				<div
 					style={{
-						width: size.width,
-						height: size.height,
+						width: size.width * scale,
+						height: size.height * scale,
 						position: 'absolute',
 						zIndex: 12000,
 					}}
@@ -148,9 +157,9 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 							flexDirection: 'column',
 							boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
 							transform: `scale(${scale})`,
-							transformOrigin: 'center',
-							width: '100%',
-							height: '100%',
+							transformOrigin: 'top left',
+							width: size.width,
+							height: size.height,
 						}}
 					>
 						{children({ isDragging })}
