@@ -1,12 +1,10 @@
 'use client'
 
 import type React from 'react'
-import { useState, useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { Box, Flex, ScrollArea, Text, TextArea, Button } from '@radix-ui/themes'
-import { Resizable, type ResizeCallbackData } from 'react-resizable'
-import Draggable from 'react-draggable'
 import { Kbd } from '@radix-ui/themes'
-import 'react-resizable/css/styles.css'
+import DraggableResizable from './DraggableResizable'
 
 interface RoomChatProps {
 	clientID: string
@@ -26,105 +24,41 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	onClose,
 }) => {
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
-	const [size, setSize] = useState({ width: 300, height: 400 })
-	const [position, setPosition] = useState({ x: window.innerWidth - 620, y: window.innerHeight - 470 })
-	const [isDragging, setIsDragging] = useState(false)
 	const [scale, setScale] = useState(1)
 
 	useEffect(() => {
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
-	}, [scrollAreaRef]) //Corrected dependency
-
-	const onResize = (_: React.SyntheticEvent, { size: newSize, handle }: ResizeCallbackData) => {
-		const deltaWidth = newSize.width - size.width
-		const deltaHeight = newSize.height - size.height
-
-		setSize(newSize)
-
-		setPosition(prev => {
-			let newX = prev.x
-			let newY = prev.y
-
-			if (handle.includes('w')) {
-				newX -= deltaWidth
-			}
-			if (handle.includes('n')) {
-				newY -= deltaHeight
-			}
-
-			return { x: newX, y: newY }
-		})
-	}
-
-	const onDrag = (_, data: { x: number; y: number }) => {
-		setPosition({ x: data.x, y: data.y })
-	}
-
-	const onStart = () => {
-		setIsDragging(true)
-	}
-
-	const onStop = () => {
-		setIsDragging(false)
-	}
+	}, [scrollAreaRef]) // Updated dependency
 
 	const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
 		e.preventDefault()
 		const scaleFactor = 0.1
 		const newScale = e.deltaY > 0 ? scale * (1 - scaleFactor) : scale * (1 + scaleFactor)
-
-		// Limit the scale to a reasonable range (e.g., 0.5 to 2)
-		const clampedScale = Math.min(Math.max(newScale, 0.5), 2)
-
-		setScale(clampedScale)
-
-		const scaleDiff = clampedScale / scale
-		setSize(prevSize => ({
-			width: prevSize.width * scaleDiff,
-			height: prevSize.height * scaleDiff,
-		}))
-
-		// Adjust position to keep the center point fixed
-		setPosition(prevPos => ({
-			x: prevPos.x - (size.width * (scaleDiff - 1)) / 2,
-			y: prevPos.y - (size.height * (scaleDiff - 1)) / 2,
-		}))
+		setScale(Math.min(Math.max(newScale, 0.5), 2))
 	}
 
 	return (
-		<Draggable
-			handle='.drag-handle'
+		<DraggableResizable
+			initialSize={{ width: 300, height: 400 }}
+			initialPosition={{ x: window.innerWidth - 620, y: window.innerHeight - 470 }}
 			bounds='.react-player'
-			position={position}
-			onDrag={onDrag}
-			onStart={onStart}
-			onStop={onStop}
 		>
-			<Resizable
-				width={size.width}
-				height={size.height}
-				onResize={onResize}
-				minConstraints={[200, 300]}
-				maxConstraints={[500, 600]}
-				resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
-			>
+			{({ isDragging }: { isDragging: boolean }) => (
 				<Box
 					onWheel={handleWheel}
 					style={{
-						width: size.width,
-						height: size.height,
 						backgroundColor: 'var(--gray-1)',
 						borderRadius: 'var(--radius-3)',
 						overflow: 'hidden',
 						display: 'flex',
 						flexDirection: 'column',
 						boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-						position: 'absolute',
-						zIndex: 40,
 						transform: `scale(${scale})`,
 						transformOrigin: 'center',
+						width: '100%',
+						height: '100%',
 					}}
 				>
 					<Flex
@@ -179,8 +113,8 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						</Button>
 					</Flex>
 				</Box>
-			</Resizable>
-		</Draggable>
+			)}
+		</DraggableResizable>
 	)
 }
 

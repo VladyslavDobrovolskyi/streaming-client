@@ -1,0 +1,101 @@
+'use client'
+
+import type React from 'react'
+import { useState, type ReactNode } from 'react'
+import { Resizable, type ResizeCallbackData } from 'react-resizable'
+import Draggable from 'react-draggable'
+import 'react-resizable/css/styles.css'
+
+interface DraggableResizableProps {
+	children: (props: { isDragging: boolean }) => ReactNode
+	initialSize?: { width: number; height: number }
+	initialPosition?: { x: number; y: number }
+	minConstraints?: [number, number]
+	maxConstraints?: [number, number]
+	dragHandleClassName?: string
+	bounds?: string
+	onPositionChange?: (position: { x: number; y: number }) => void
+	onSizeChange?: (size: { width: number; height: number }) => void
+}
+
+const DraggableResizable: React.FC<DraggableResizableProps> = ({
+	children,
+	initialSize = { width: 300, height: 400 },
+	initialPosition = { x: 0, y: 0 },
+	minConstraints = [200, 300],
+	maxConstraints = [500, 600],
+	dragHandleClassName = 'drag-handle',
+	bounds = 'parent',
+	onPositionChange,
+	onSizeChange,
+}) => {
+	const [size, setSize] = useState(initialSize)
+	const [position, setPosition] = useState(initialPosition)
+	const [isDragging, setIsDragging] = useState(false)
+
+	const onResize = (_: React.SyntheticEvent, { size: newSize, handle }: ResizeCallbackData) => {
+		const deltaWidth = newSize.width - size.width
+		const deltaHeight = newSize.height - size.height
+
+		setSize(newSize)
+		if (onSizeChange) onSizeChange(newSize)
+
+		setPosition(prev => {
+			let newX = prev.x
+			let newY = prev.y
+
+			if (handle.includes('w')) {
+				newX -= deltaWidth
+			}
+			if (handle.includes('n')) {
+				newY -= deltaHeight
+			}
+
+			const newPosition = { x: newX, y: newY }
+			if (onPositionChange) onPositionChange(newPosition)
+			return newPosition
+		})
+	}
+
+	const onDrag = (_, data: { x: number; y: number }) => {
+		const newPosition = { x: data.x, y: data.y }
+		setPosition(newPosition)
+		if (onPositionChange) onPositionChange(newPosition)
+	}
+
+	const onStart = () => setIsDragging(true)
+	const onStop = () => setIsDragging(false)
+
+	return (
+		<Draggable
+			handle={`.${dragHandleClassName}`}
+			bounds={bounds}
+			position={position}
+			onDrag={onDrag}
+			onStart={onStart}
+			onStop={onStop}
+		>
+			<Resizable
+				width={size.width}
+				height={size.height}
+				onResize={onResize}
+				minConstraints={minConstraints}
+				maxConstraints={maxConstraints}
+				resizeHandles={['s', 'w', 'e', 'n', 'sw', 'nw', 'se', 'ne']}
+			>
+				<div
+					style={{
+						width: size.width,
+						height: size.height,
+						position: 'absolute',
+						zIndex: 40,
+					}}
+				>
+					{children({ isDragging })}
+				</div>
+			</Resizable>
+		</Draggable>
+	)
+}
+
+export default DraggableResizable
