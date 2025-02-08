@@ -1,7 +1,7 @@
 'use client'
 
 import type React from 'react'
-import { useState, useEffect, useRef, type ReactNode } from 'react'
+import { useState, useRef, type ReactNode } from 'react'
 import { Resizable, type ResizeCallbackData } from 'react-resizable'
 import Draggable from 'react-draggable'
 import 'react-resizable/css/styles.css'
@@ -18,7 +18,7 @@ interface DraggableResizableProps {
 	onPositionChange?: (position: { x: number; y: number }) => void
 	onSizeChange?: (size: { width: number; height: number }) => void
 	resizeHandleStyles?: React.CSSProperties
-	disableWheelZoomClass?: string // New prop for the class that disables wheel zoom
+	disableWheelZoomClass?: string
 }
 
 const DraggableResizable: React.FC<DraggableResizableProps> = ({
@@ -37,19 +37,12 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 	const [size, setSize] = useState(initialSize)
 	const [position, setPosition] = useState(initialPosition)
 	const [isDragging, setIsDragging] = useState(false)
-	const scrollAreaRef = useRef<HTMLDivElement>(null)
 	const [scale, setScale] = useState(1)
-
-	useEffect(() => {
-		if (scrollAreaRef.current) {
-			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
-		}
-	}, [scrollAreaRef.current]) //Corrected useEffect dependency
+	const contentRef = useRef<HTMLDivElement>(null)
 
 	const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-		// Check if the event target or any of its parents have the disableWheelZoomClass
 		if (disableWheelZoomClass && (e.target as Element).closest(`.${disableWheelZoomClass}`)) {
-			return // If the class is found, do nothing and let the default scroll behavior happen
+			return
 		}
 
 		e.preventDefault()
@@ -91,6 +84,27 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 	const onStart = () => setIsDragging(true)
 	const onStop = () => setIsDragging(false)
 
+	const getHandleStyle = (position: string) => {
+		const baseStyle: React.CSSProperties = {
+			...resizeHandleStyles,
+			zIndex: 12000,
+			position: 'absolute',
+		}
+
+		switch (position) {
+			case 'sw':
+				return { ...baseStyle, bottom: 0, left: 0 }
+			case 'nw':
+				return { ...baseStyle, top: 0, left: 0 }
+			case 'se':
+				return { ...baseStyle, bottom: 0, right: 0 }
+			case 'ne':
+				return { ...baseStyle, top: 0, right: 0 }
+			default:
+				return baseStyle
+		}
+	}
+
 	return (
 		<Draggable
 			handle={`.${dragHandleClassName}`}
@@ -111,10 +125,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 					<span
 						ref={ref}
 						className={`react-resizable-handle react-resizable-handle-${h}`}
-						style={{
-							...resizeHandleStyles,
-							zIndex: 12000,
-						}}
+						style={getHandleStyle(h)}
 					/>
 				)}
 			>
@@ -127,6 +138,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 					}}
 				>
 					<Box
+						ref={contentRef}
 						onWheel={handleWheel}
 						style={{
 							backgroundColor: 'var(--gray-1)',
