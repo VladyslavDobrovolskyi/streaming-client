@@ -496,7 +496,7 @@ export default function RoomDev() {
 				const track = audioTracks[0]
 				track.enabled = !track.enabled // Toggle audio track state
 				setMicMuted(!track.enabled) // Update microphone state
-				emitMicrophoneSync(!track.enabled)
+				emitInfoSync(localUsername, avatar, isCameraDisabled, !track.enabled)
 			}
 		}
 	}
@@ -508,7 +508,7 @@ export default function RoomDev() {
 				const track = videoTracks[0]
 				track.enabled = !track.enabled // Toggle video track state
 				setCameraMuted(!track.enabled) // Update camera state
-				emitCameraSync(!track.enabled)
+				emitInfoSync(localUsername, avatar, !track.enabled, isMicrophoneDisabled)
 			}
 		}
 	}
