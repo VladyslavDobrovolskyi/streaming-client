@@ -495,6 +495,7 @@ export default function RoomDev() {
 				setMicMuted(!track.enabled) // Update microphone state
 				emitMicrophoneSync(!track.enabled)
 			}
+		}
 	}
 
 	const handleCameraMuteUnmute = () => {
