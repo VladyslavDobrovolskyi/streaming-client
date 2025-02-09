@@ -491,11 +491,17 @@ export default function RoomDev() {
 			console.log(audioTracks)
 			if (audioTracks.length > 0) {
 				const track = audioTracks[0]
-				const newState = !track.enabled
-				console.log('Mic state is enabled:', newState)
-				track.enabled = newState
-				setMicMuted(newState)
-				emitMicrophoneSync(newState)
+				const isEnabled = track.enabled
+
+				if (isEnabled) {
+					track.enabled = false
+					setMicMuted(false)
+					emitMicrophoneSync(false)
+				} else {
+					track.enabled = true
+					setMicMuted(true)
+					emitMicrophoneSync(true)
+				}
 			}
 		}
 	}
