@@ -72,8 +72,8 @@ export default function RoomDev() {
 	const [currentAction, setCurrentAction] = useState<
 		'play' | 'pause' | 'mute' | 'unmute' | 'forward' | 'backward' | 'volume' | null
 	>(null)
-	const [micMuted, setMicMuted] = useState(false)
-	const [cameraMuted, setCameraMuted] = useState(false)
+	const [isMicrophoneDisabled, setMicMuted] = useState(false)
+	const [isCameraDisabled, setCameraMuted] = useState(false)
 	const [coveredClients, setCoveredClients] = useState<Record<string, boolean>>({})
 	const [isMovieMode, setIsMovieMode] = useState(false)
 	const [clientPositions, setClientPositions] = useState<Record<string, { x: number; y: number }>>({})
@@ -122,7 +122,7 @@ export default function RoomDev() {
 		// participantCameras,
 		// participantMicrophones,
 		requestParticipantInfo,
-	} = useRoomSync(roomID!, playerRef, localUsername, avatar, cameraMuted, micMuted)
+	} = useRoomSync(roomID!, playerRef, localUsername, avatar, isCameraDisabled, isMicrophoneDisabled)
 
 	useEffect(() => {}, [])
 
@@ -443,7 +443,8 @@ export default function RoomDev() {
 						isLocal={clientID === LOCAL_VIDEO}
 						username={participantInfo[clientID]?.username || 'Anonymous'}
 						isCameraMuted={
-							(clientID === LOCAL_VIDEO && cameraMuted) || participantInfo[clientID].cameraMuted === true
+							(clientID === LOCAL_VIDEO && isCameraDisabled) ||
+							participantInfo[clientID].isCameraDisabled === true
 						}
 						position={clientPositions[clientID] || { x: 10, y: 10 }}
 						size={clientSizes[clientID] || { width: 150, height: 100 }}
@@ -565,10 +566,10 @@ export default function RoomDev() {
 
 	useEffect(() => {
 		if (roomID && localUsername) {
-			console.log('Emitting info sync...', `Camera and mic: ${micMuted} | ${cameraMuted}`)
-			emitInfoSync(localUsername, avatar, cameraMuted, micMuted)
+			console.log('Emitting info sync...', `Camera and mic: ${isMicrophoneDisabled} | ${isCameraDisabled}`)
+			emitInfoSync(localUsername, avatar, isCameraDisabled, isMicrophoneDisabled)
 		}
-	}, [roomID, localUsername, avatar, emitInfoSync, cameraMuted, micMuted])
+	}, [roomID, localUsername, avatar, emitInfoSync, isCameraDisabled, isMicrophoneDisabled])
 
 	const togglePrivateChat = (clientID: string) => {
 		setPrivateChats(prev => ({ ...prev, [clientID]: !prev[clientID] }))
@@ -897,8 +898,8 @@ export default function RoomDev() {
 												outline: 'none',
 											}}
 										>
-											{micMuted ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
-											{micMuted ? 'Unmute Microphone' : 'Mute Microphone'}
+											{isMicrophoneDisabled ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
+											{isMicrophoneDisabled ? 'Unmute Microphone' : 'Mute Microphone'}
 										</DropdownMenu.Item>
 										<DropdownMenu.Item
 											onSelect={event => {
@@ -924,8 +925,8 @@ export default function RoomDev() {
 												outline: 'none',
 											}}
 										>
-											{cameraMuted ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
-											{cameraMuted ? 'Turn Camera On' : 'Turn Camera Off'}
+											{isCameraDisabled ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
+											{isCameraDisabled ? 'Turn Camera On' : 'Turn Camera Off'}
 										</DropdownMenu.Item>
 										<DropdownMenu.Item
 											onSelect={event => {
@@ -1108,21 +1109,21 @@ export default function RoomDev() {
 										style={{
 											color:
 												clientID === LOCAL_VIDEO
-													? micMuted
+													? isMicrophoneDisabled
 														? 'red'
 														: 'green'
-													: participantInfo[clientID].micMuted
+													: participantInfo[clientID].isMicrophoneDisabled
 													? 'red'
 													: 'green',
 										}}
 									>
 										{clientID === LOCAL_VIDEO ? (
-											micMuted ? (
+											isMicrophoneDisabled ? (
 												<FaMicrophoneAltSlash />
 											) : (
 												<FaMicrophoneAlt />
 											)
-										) : participantInfo[clientID].micMuted ? (
+										) : participantInfo[clientID].isMicrophoneDisabled ? (
 											<FaMicrophoneAltSlash />
 										) : (
 											<FaMicrophoneAlt />
@@ -1131,14 +1132,14 @@ export default function RoomDev() {
 									<span
 										style={{
 											color:
-												participantInfo[clientID].cameraMuted ||
-												(clientID === LOCAL_VIDEO && cameraMuted)
+												participantInfo[clientID].isCameraDisabled ||
+												(clientID === LOCAL_VIDEO && isCameraDisabled)
 													? 'red'
 													: 'green',
 										}}
 									>
-										{participantInfo[clientID].cameraMuted ||
-										(clientID === LOCAL_VIDEO && cameraMuted) ? (
+										{participantInfo[clientID].isCameraDisabled ||
+										(clientID === LOCAL_VIDEO && isCameraDisabled) ? (
 											<BsCameraVideoOffFill />
 										) : (
 											<BsCameraVideoFill />
