@@ -565,6 +565,7 @@ export default function RoomDev() {
 
 	useEffect(() => {
 		if (roomID && localUsername) {
+			console.log('Emitting info sync...', `Camera and mic: ${micMuted} | ${cameraMuted}`)
 			emitInfoSync(localUsername, avatar, cameraMuted, micMuted)
 		}
 	}, [roomID, localUsername, avatar, emitInfoSync, cameraMuted, micMuted])
