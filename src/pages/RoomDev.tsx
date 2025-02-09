@@ -490,7 +490,7 @@ export default function RoomDev() {
 			const audioTracks = localStream.getAudioTracks()
 			if (audioTracks.length > 0) {
 				const track = audioTracks[0]
-				const newMutedState = !track.enabled
+				const newMutedState = !micMuted
 				track.enabled = !newMutedState
 				setMicMuted(newMutedState)
 				emitMicrophoneSync(newMutedState)
@@ -501,7 +501,7 @@ export default function RoomDev() {
 		} else {
 			console.error('Local stream is not available')
 		}
-	}, [localStream, emitMicrophoneSync])
+	}, [localStream, micMuted, emitMicrophoneSync])
 
 	const handleCameraMuteUnmute = () => {
 		if (localStream) {
