@@ -435,37 +435,39 @@ export default function RoomDev() {
 					transition: 'opacity 0.3s ease, visibility 0.3s ease',
 				}}
 			>
-				{clients.map(clientID => (
-					<ClientVideo
-						key={clientID}
-						clientID={clientID}
-						provideMediaRef={provideMediaRef}
-						isLocal={clientID === LOCAL_VIDEO}
-						username={participantInfo[clientID]?.username || 'Anonymous'}
-						isCameraMuted={
-							(clientID === LOCAL_VIDEO && isCameraDisabled) ||
-							participantInfo[clientID].isCameraDisabled === true
-						}
-						position={clientPositions[clientID] || { x: 10, y: 10 }}
-						size={clientSizes[clientID] || { width: 150, height: 100 }}
-						onPositionChange={(id, pos) => setClientPositions(prev => ({ ...prev, [id]: pos }))}
-						onSizeChange={(id, size) => setClientSizes(prev => ({ ...prev, [id]: size }))}
-						onVolumeChange={(id, vol) => {
-							setClientVolumes(prev => ({ ...prev, [id]: vol }))
-							const videoElement = document.querySelector(
-								`video[data-client-id="${id}"]`
-							) as HTMLVideoElement
-							if (videoElement) {
-								videoElement.volume = vol
-								videoElement.muted = vol === 0
-							}
-						}}
-						onCoverToggle={id => setCoveredClients(prev => ({ ...prev, [id]: !prev[id] }))}
-						isCovered={coveredClients[clientID]}
-						volume={clientVolumes[clientID] || 1}
-						highlightedUser={highlightedUser}
-					/>
-				))}
+				{clients.map(clientID => {
+					const participantData = participantInfo[clientID] || {}
+					const isCameraMuted = clientID === LOCAL_VIDEO ? isCameraDisabled : participantData.isCameraDisabled
+
+					return (
+						<ClientVideo
+							key={clientID}
+							clientID={clientID}
+							provideMediaRef={provideMediaRef}
+							isLocal={clientID === LOCAL_VIDEO}
+							username={participantData.username || 'Anonymous'}
+							isCameraMuted={isCameraMuted}
+							position={clientPositions[clientID] || { x: 10, y: 10 }}
+							size={clientSizes[clientID] || { width: 150, height: 100 }}
+							onPositionChange={(id, pos) => setClientPositions(prev => ({ ...prev, [id]: pos }))}
+							onSizeChange={(id, size) => setClientSizes(prev => ({ ...prev, [id]: size }))}
+							onVolumeChange={(id, vol) => {
+								setClientVolumes(prev => ({ ...prev, [id]: vol }))
+								const videoElement = document.querySelector(
+									`video[data-client-id="${id}"]`
+								) as HTMLVideoElement
+								if (videoElement) {
+									videoElement.volume = vol
+									videoElement.muted = vol === 0
+								}
+							}}
+							onCoverToggle={id => setCoveredClients(prev => ({ ...prev, [id]: !prev[id] }))}
+							isCovered={coveredClients[clientID]}
+							volume={clientVolumes[clientID] || 1}
+							highlightedUser={highlightedUser}
+						/>
+					)
+				})}
 			</div>
 		)
 	}
