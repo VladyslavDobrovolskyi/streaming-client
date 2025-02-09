@@ -491,19 +491,10 @@ export default function RoomDev() {
 			console.log(audioTracks)
 			if (audioTracks.length > 0) {
 				const track = audioTracks[0]
-				const isEnabled = !track.enabled
-
-				if (isEnabled) {
-					track.enabled = false
-					setMicMuted(false)
-					emitMicrophoneSync(false)
-				} else {
-					track.enabled = true
-					setMicMuted(true)
-					emitMicrophoneSync(true)
-				}
+				track.enabled = !track.enabled // Toggle audio track state
+				setMicMuted(!track.enabled) // Update microphone state
+				emitMicrophoneSync(!track.enabled)
 			}
-		}
 	}
 
 	const handleCameraMuteUnmute = () => {
