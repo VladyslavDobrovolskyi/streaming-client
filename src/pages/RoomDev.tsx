@@ -119,8 +119,8 @@ export default function RoomDev() {
 		emitMicrophoneSync,
 		lastSeekDirection,
 		participantInfo,
-		participantCameras,
-		participantMicrophones,
+		// participantCameras,
+		// participantMicrophones,
 		requestParticipantInfo,
 	} = useRoomSync(roomID!, playerRef, localUsername, avatar, cameraMuted, micMuted)
 
@@ -443,7 +443,7 @@ export default function RoomDev() {
 						isLocal={clientID === LOCAL_VIDEO}
 						username={participantInfo[clientID]?.username || 'Anonymous'}
 						isCameraMuted={
-							(clientID === LOCAL_VIDEO && cameraMuted) || participantCameras[clientID] === true
+							(clientID === LOCAL_VIDEO && cameraMuted) || participantInfo[clientID].cameraMuted === true
 						}
 						position={clientPositions[clientID] || { x: 10, y: 10 }}
 						size={clientSizes[clientID] || { width: 150, height: 100 }}
@@ -1111,7 +1111,7 @@ export default function RoomDev() {
 													? micMuted
 														? 'red'
 														: 'green'
-													: participantMicrophones[clientID]
+													: participantInfo[clientID].micMuted
 													? 'red'
 													: 'green',
 										}}
@@ -1122,7 +1122,7 @@ export default function RoomDev() {
 											) : (
 												<FaMicrophoneAlt />
 											)
-										) : participantMicrophones[clientID] ? (
+										) : participantInfo[clientID].micMuted ? (
 											<FaMicrophoneAltSlash />
 										) : (
 											<FaMicrophoneAlt />
@@ -1131,13 +1131,14 @@ export default function RoomDev() {
 									<span
 										style={{
 											color:
-												participantCameras[clientID] ||
+												participantInfo[clientID].cameraMuted ||
 												(clientID === LOCAL_VIDEO && cameraMuted)
 													? 'red'
 													: 'green',
 										}}
 									>
-										{participantCameras[clientID] || (clientID === LOCAL_VIDEO && cameraMuted) ? (
+										{participantInfo[clientID].cameraMuted ||
+										(clientID === LOCAL_VIDEO && cameraMuted) ? (
 											<BsCameraVideoOffFill />
 										) : (
 											<BsCameraVideoFill />
