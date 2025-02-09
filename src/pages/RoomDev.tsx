@@ -491,7 +491,7 @@ export default function RoomDev() {
 			console.log(audioTracks)
 			if (audioTracks.length > 0) {
 				const track = audioTracks[0]
-				const isEnabled = track.enabled
+				const isEnabled = !track.enabled
 
 				if (isEnabled) {
 					track.enabled = false
