@@ -499,6 +499,7 @@ export default function RoomDev() {
 					track.enabled = !track.enabled
 					setMicMuted(track.enabled)
 					emitMicrophoneSync(track.enabled)
+					console.log('Microphone muted:', track.enabled)
 				})
 			} else {
 				console.warn('No audio tracks found in the local stream')
