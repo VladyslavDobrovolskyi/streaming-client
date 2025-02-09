@@ -142,8 +142,8 @@ export default function useRoomSync(
 				info: {
 					username: participantInfo[socket.id]?.username || localUsername || 'Unknown',
 					avatar,
-					cameraMuted,
-					micMuted,
+					isCameraDisabled: cameraMuted,
+					isMicrophoneDisabled: micMuted,
 				},
 			})
 		},
