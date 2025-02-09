@@ -193,12 +193,6 @@ export default function RoomDev() {
 
 	const handleToggleMuted = () => {
 		setMuted(prevMuted => {
-			const newMutedState = !prevMuted
-			if (localStream) {
-				localStream.getAudioTracks().forEach(track => {
-					track.enabled = !newMutedState
-				})
-			}
 			if (prevMuted) {
 				if (mutedBySlider) {
 					setVolume(0.5)
