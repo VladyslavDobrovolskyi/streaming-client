@@ -488,11 +488,14 @@ export default function RoomDev() {
 	const handleMicMuteUnmute = () => {
 		if (localStream) {
 			const audioTracks = localStream.getAudioTracks()
+			console.log(audioTracks)
 			if (audioTracks.length > 0) {
 				const track = audioTracks[0]
-				track.enabled = !track.enabled
-				setMicMuted(!track.enabled)
-				emitMicrophoneSync(!track.enabled)
+				const newState = !track.enabled
+				console.log('Mic state is enabled:', newState)
+				track.enabled = newState
+				setMicMuted(newState)
+				emitMicrophoneSync(newState)
 			}
 		}
 	}
