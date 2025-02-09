@@ -485,37 +485,27 @@ export default function RoomDev() {
 		}
 	}, [clients, clientPositions])
 
-	const handleMicMuteUnmute = useCallback(() => {
+	const handleMicMuteUnmute = () => {
 		if (localStream) {
 			const audioTracks = localStream.getAudioTracks()
 			if (audioTracks.length > 0) {
 				const track = audioTracks[0]
-				const newMutedState = !micMuted
-				track.enabled = !newMutedState
-				setMicMuted(newMutedState)
-				emitMicrophoneSync(newMutedState)
-				console.log('Microphone muted:', newMutedState)
-			} else {
-				console.warn('No audio tracks found in the local stream')
+				track.enabled = !track.enabled
+				setMicMuted(!track.enabled)
+				emitMicrophoneSync(!track.enabled)
 			}
-		} else {
-			console.error('Local stream is not available')
 		}
-	}, [localStream, micMuted, emitMicrophoneSync])
+	}
 
 	const handleCameraMuteUnmute = () => {
 		if (localStream) {
 			const videoTracks = localStream.getVideoTracks()
 			if (videoTracks.length > 0) {
 				const track = videoTracks[0]
-				track.enabled = !track.enabled
-				setCameraMuted(!track.enabled)
+				track.enabled = !track.enabled // Toggle video track state
+				setCameraMuted(!track.enabled) // Update camera state
 				emitCameraSync(!track.enabled)
-			} else {
-				console.warn('No video tracks found in the local stream')
 			}
-		} else {
-			console.error('Local stream is not available')
 		}
 	}
 
