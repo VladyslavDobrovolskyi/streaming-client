@@ -565,9 +565,9 @@ export default function RoomDev() {
 
 	useEffect(() => {
 		if (roomID && localUsername) {
-			emitInfoSync(localUsername, avatar)
+			emitInfoSync(localUsername, avatar, micMuted, cameraMuted)
 		}
-	}, [roomID, localUsername, avatar, emitInfoSync])
+	}, [roomID, localUsername, avatar, emitInfoSync, cameraMuted, micMuted])
 
 	const togglePrivateChat = (clientID: string) => {
 		setPrivateChats(prev => ({ ...prev, [clientID]: !prev[clientID] }))

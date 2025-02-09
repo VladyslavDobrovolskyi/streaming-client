@@ -79,11 +79,37 @@ export default function useRoomSync(
 	)
 
 	const handleInfoSync = useCallback(
-		({ socketId, avatar, username }: { socketId: string; username: string; avatar: string }) => {
-			console.log('Received info sync event:', { socketId, avatar, username })
+		({
+			socketId,
+			avatar,
+			username,
+			isCameraDisabled,
+			isMicrophoneDisabled,
+		}: {
+			socketId: string
+			username: string
+			avatar: string
+			isCameraDisabled: boolean
+			isMicrophoneDisabled: boolean
+		}) => {
+			console.log('Received info sync event:', {
+				socketId,
+				avatar,
+				username,
+				isCameraDisabled,
+				isMicrophoneDisabled,
+			})
 			setParticipantInfo(prev => ({
 				...prev,
 				[socketId]: { username, avatar },
+			}))
+			setParticipantCameras(prev => ({
+				...prev,
+				[socketId]: isCameraDisabled,
+			}))
+			setParticipantMicrophones(prev => ({
+				...prev,
+				[socketId]: isMicrophoneDisabled,
 			}))
 		},
 		[]
@@ -172,8 +198,8 @@ export default function useRoomSync(
 	}, [roomID])
 
 	const emitInfoSync = useCallback(
-		(username: string, avatar: string) => {
-			socket.emit(ACTIONS.SYNC_INFO, { roomID, username, avatar })
+		(username: string, avatar: string, isCameraDisabled: boolean, isMicrophoneDisabled: boolean) => {
+			socket.emit(ACTIONS.SYNC_INFO, { roomID, username, avatar, isCameraDisabled, isMicrophoneDisabled })
 		},
 		[roomID]
 	)
