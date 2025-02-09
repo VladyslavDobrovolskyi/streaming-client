@@ -496,10 +496,9 @@ export default function RoomDev() {
 			const audioTracks = localStream.getAudioTracks()
 			if (audioTracks.length > 0) {
 				const track = audioTracks[0]
-				const newMutedState = !micMuted
-				track.enabled = !newMutedState
-				setMicMuted(newMutedState)
-				emitMicrophoneSync(newMutedState)
+				track.enabled = !track.enabled
+				setMicMuted(!track.enabled)
+				emitMicrophoneSync(!track.enabled)
 			} else {
 				console.warn('No audio tracks found in the local stream')
 			}
@@ -992,7 +991,7 @@ export default function RoomDev() {
 											}}
 										>
 											{hideUsers ? <EyeOpenIcon /> : <EyeClosedIcon />}
-											{hideUsers ? 'Show Users' : 'Hide Users'}
+											{hideUsers ? 'ShowUsers' : 'Hide Users'}
 										</DropdownMenu.Item>
 									</DropdownMenu.Content>
 								</div>
