@@ -63,9 +63,12 @@ export default function useRoomSync(
 	const handleCameraSync = useCallback(
 		({ socketId, isCameraDisabled }: { socketId: string; isCameraDisabled: boolean }) => {
 			console.log('Received camera sync event:', { socketId, isCameraDisabled })
-			setParticipantCameras(prev => ({
+			setParticipantInfo(prev => ({
 				...prev,
-				[socketId]: isCameraDisabled,
+				[socketId]: {
+					...prev[socketId],
+					isCameraDisabled,
+				},
 			}))
 		},
 		[]
@@ -74,9 +77,12 @@ export default function useRoomSync(
 	const handleMicrophoneSync = useCallback(
 		({ socketId, isMicrophoneDisabled }: { socketId: string; isMicrophoneDisabled: boolean }) => {
 			console.log('Received microphone sync event:', { socketId, isMicrophoneDisabled })
-			setParticipantMicrophones(prev => ({
+			setParticipantInfo(prev => ({
 				...prev,
-				[socketId]: isMicrophoneDisabled,
+				[socketId]: {
+					...prev[socketId],
+					isMicrophoneDisabled,
+				},
 			}))
 		},
 		[]
