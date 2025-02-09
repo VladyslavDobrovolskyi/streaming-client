@@ -328,7 +328,7 @@ export default function RoomDev() {
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown)
 		}
-	}, [volume, handleVolumeChange, emitPause, emitPlay, handleForward15, handleBackward15, handleToggleMuted])
+	})
 
 	useEffect(() => {
 		if (roomID) {
