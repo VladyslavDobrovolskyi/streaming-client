@@ -73,6 +73,7 @@ export default function ClientVideo({
 				zIndex: 12000,
 				pointerEvents: 'auto',
 			}}
+			hide={isCameraMuted}
 		>
 			{({ isDragging }) => (
 				<div
