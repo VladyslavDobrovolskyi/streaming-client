@@ -9,11 +9,15 @@ export default function useRoomSync(
 	roomID: string,
 	videoRef: React.RefObject<ReactPlayer>,
 	localUsername: string,
-	avatar: string
+	avatar: string,
+	cameraMuted: boolean,
+	micMuted: boolean
 ) {
 	const isSyncingRef = useRef(false)
 	const [lastSeekDirection, setLastSeekDirection] = useState<'forward' | 'backward' | null>(null)
-	const [participantInfo, setParticipantInfo] = useState<Record<string, { username: string; avatar: string }>>({})
+	const [participantInfo, setParticipantInfo] = useState<
+		Record<string, { username: string; avatar: string; cameraMuted: boolean; micMuted: boolean }>
+	>({})
 	const [participantCameras, setParticipantCameras] = useState<Record<string, boolean>>({})
 	const [participantMicrophones, setParticipantMicrophones] = useState<Record<string, boolean>>({})
 
@@ -101,7 +105,7 @@ export default function useRoomSync(
 			})
 			setParticipantInfo(prev => ({
 				...prev,
-				[socketId]: { username, avatar },
+				[socketId]: { username, avatar, cameraMuted: isCameraDisabled, micMuted: isMicrophoneDisabled },
 			}))
 			setParticipantCameras(prev => ({
 				...prev,
@@ -135,10 +139,15 @@ export default function useRoomSync(
 			socket.emit(ACTIONS.SEND_PARTICIPANT_INFO, {
 				roomID,
 				requesterId,
-				info: { username: participantInfo[socket.id]?.username || localUsername || 'Unknown', avatar },
+				info: {
+					username: participantInfo[socket.id]?.username || localUsername || 'Unknown',
+					avatar,
+					cameraMuted,
+					micMuted,
+				},
 			})
 		},
-		[roomID, participantInfo, localUsername, avatar]
+		[roomID, participantInfo, localUsername, avatar, cameraMuted, micMuted]
 	)
 
 	useEffect(() => {
