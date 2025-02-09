@@ -139,6 +139,8 @@ export default function useWebRTC(roomID: string) {
 
 	const reinitializeStream = async () => {
 		console.log('Reinitializing stream')
+		let isMocked = false
+
 		try {
 			localMediaStream.current = await navigator.mediaDevices.getUserMedia({
 				audio: true,
@@ -149,9 +151,16 @@ export default function useWebRTC(roomID: string) {
 			console.error('Error getting media: ', error)
 			console.log('Creating mock media stream')
 			localMediaStream.current = createMockMediaStream()
+			isMocked = true
+			// After creating mock streams
 		} finally {
 			console.log('Joining room:', roomID)
 			socket.emit(ACTIONS.JOIN, { room: roomID })
+			if (isMocked) {
+				socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isCameraDisabled: true })
+				socket.emit(ACTIONS.SYNC_MICROPHONE, { roomID, socketId: socket.id, isMicrophoneDisabled: true })
+			}
+
 			addNewClient(LOCAL_VIDEO, () => {
 				const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
 				if (localVideoElement) {
