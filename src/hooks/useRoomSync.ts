@@ -140,8 +140,16 @@ export default function useRoomSync(
 	const handleRequestParticipantInfo = useCallback(
 		({ requesterId }) => {
 			console.log('[DEBUG] Received request participant info event:', { requesterId })
-			console.log('[DEBUG] Participant info:', participantInfo)
-			console.log(localUsername)
+			console.log('Sending participant info:', {
+				roomID,
+				requesterId,
+				info: {
+					username: participantInfo[socket.id]?.username || localUsername || 'Unknown',
+					avatar,
+					isCameraDisabled,
+					isMicrophoneDisabled,
+				},
+			})
 			socket.emit(ACTIONS.SEND_PARTICIPANT_INFO, {
 				roomID,
 				requesterId,
