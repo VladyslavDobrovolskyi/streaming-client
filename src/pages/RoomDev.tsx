@@ -505,7 +505,12 @@ export default function RoomDev() {
 			if (audioTracks.length > 0) {
 				const track = audioTracks[0]
 				track.enabled = !track.enabled // Toggle audio track state
-				setMicMuted(!isMicrophoneDisabled) // Update microphone state
+				if (track.enabled) {
+					setCameraMuted(false)
+				} else {
+					setCameraMuted(true)
+				}
+				console.log('Mic state:', track.enabled, isMicrophoneDisabled)
 				emitInfoSync(localUsername, avatar, isCameraDisabled, isMicrophoneDisabled)
 			}
 		}
@@ -517,7 +522,13 @@ export default function RoomDev() {
 			if (videoTracks.length > 0) {
 				const track = videoTracks[0]
 				track.enabled = !track.enabled // Toggle video track state
-				setCameraMuted(!isCameraDisabled) // Update camera state
+
+				if (track.enabled) {
+					setCameraMuted(false)
+				} else {
+					setCameraMuted(true)
+				}
+				console.log('Camera state:', track.enabled, isCameraDisabled)
 
 				emitInfoSync(localUsername, avatar, isCameraDisabled, isMicrophoneDisabled)
 			}
