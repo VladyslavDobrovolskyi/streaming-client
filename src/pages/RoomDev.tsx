@@ -1,5 +1,4 @@
-'use client'
-
+// 10.02.2025
 import { useState, useRef, useEffect, useCallback } from 'react'
 import ReactPlayer from 'react-player'
 import {
@@ -25,6 +24,7 @@ import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
 import { Slider } from '@radix-ui/themes'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
+import * as Toast from '@radix-ui/react-toast'
 import ActionIndicator from '../components/ActionIndicator'
 import { useParams } from 'react-router'
 import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
@@ -34,6 +34,63 @@ import PrivateChat from './PrivateChat'
 import RoomChat from './RoomChat'
 import 'react-resizable/css/styles.css'
 import ClientVideo from './ClientVideo'
+import { styled, keyframes } from '@stitches/react'
+
+const slideIn = keyframes({
+	from: { transform: `translateX(calc(100% + 1rem))` },
+	to: { transform: 'translateX(0)' },
+})
+
+const StyledToastViewport = styled(Toast.Viewport, {
+	position: 'fixed',
+	bottom: 0,
+	right: 0,
+	display: 'flex',
+	flexDirection: 'column',
+	padding: '1rem',
+	gap: '0.5rem',
+	width: '390px',
+	maxWidth: '100vw',
+	margin: 0,
+	listStyle: 'none',
+	zIndex: 2147483647,
+})
+
+const StyledToastRoot = styled(Toast.Root, {
+	backgroundColor: 'white',
+	borderRadius: '0.5rem',
+	boxShadow: 'hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px',
+	padding: '0.75rem',
+	display: 'flex',
+	flexDirection: 'column',
+	alignItems: 'flex-start',
+	gap: '0.5rem',
+	animation: `${slideIn} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
+})
+
+const StyledToastTitle = styled(Toast.Title, {
+	fontWeight: 500,
+	color: 'black',
+	fontSize: '1rem',
+})
+
+const StyledToastDescription = styled(Toast.Description, {
+	color: 'gray',
+	fontSize: '0.875rem',
+})
+
+const StyledToastClose = styled(Toast.Close, {
+	position: 'absolute',
+	top: '0.5rem',
+	right: '0.5rem',
+	background: 'none',
+	border: 'none',
+	cursor: 'pointer',
+	color: 'gray',
+	'&:hover': {
+		color: 'black',
+	},
+})
 
 // const createDashedSquareDragImage = () => {
 // 	const dragImage = document.createElement('div')
@@ -57,6 +114,7 @@ import ClientVideo from './ClientVideo'
 // }
 
 export default function RoomDev() {
+	const [toasts, setToasts] = useState<Array<{ id: string; title: string; description: string }>>([])
 	const { id: roomID } = useParams<{ id: string }>()
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [volume, setVolume] = useState(0.8)
@@ -110,7 +168,10 @@ export default function RoomDev() {
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
 	const sliderRef = useRef<HTMLDivElement>(null)
 	const previousVolumeRef = useRef(volume)
-
+	const addToast = (title: string, description: string) => {
+		const id = Math.random().toString(36).substr(2, 9)
+		setToasts(prev => [...prev, { id, title, description }])
+	}
 	const {
 		emitPlay,
 		emitPause,
@@ -124,7 +185,7 @@ export default function RoomDev() {
 		// participantCameras,
 		// participantMicrophones,
 		requestParticipantInfo,
-	} = useRoomSync(roomID!, playerRef, localUsername, avatar, isCameraDisabled, isMicrophoneDisabled)
+	} = useRoomSync(roomID!, playerRef, localUsername, avatar, isCameraDisabled, isMicrophoneDisabled, addToast)
 
 	useEffect(() => {
 		console.log('Loaded:', loaded)
@@ -492,16 +553,16 @@ export default function RoomDev() {
 	const handleMicMuteUnmute = () => {
 		if (localStream) {
 			const audioTracks = localStream.getAudioTracks()
-			console.log(audioTracks)
 			if (audioTracks.length > 0) {
 				const track = audioTracks[0]
-				track.enabled = !track.enabled // Toggle audio track state
+				track.enabled = !track.enabled
 				if (track.enabled) {
 					setMicMuted(false)
 				} else {
 					setMicMuted(true)
 				}
 				console.log('Mic state:', track.enabled, isMicrophoneDisabled)
+
 				emitInfoSync(localUsername, avatar, isCameraDisabled, isMicrophoneDisabled)
 			}
 		}
@@ -542,14 +603,15 @@ export default function RoomDev() {
 		setShowUserList(prev => !prev)
 	}
 
-	useEffect(() => {
-		if (localStream) {
-			const audioTrack = localStream.getAudioTracks()[0]
-			if (audioTrack) {
-				setMicMuted(!audioTrack.enabled)
-			}
-		}
-	}, [localStream])
+	// useEffect(() => {
+	// 	if (localStream) {
+	// 		const audioTrack = localStream.getAudioTracks()[0]
+	// 		if (audioTrack) {
+	// 			setMicMuted(!audioTrack.enabled)
+	// 			setIsMicrophoneDisabled(!audioTrack.enabled)
+	// 		}
+	// 	}
+	// }, [localStream])
 
 	const handleSendMessage = () => {
 		if (chatInput.trim()) {
@@ -1228,6 +1290,18 @@ export default function RoomDev() {
 						/>
 					)
 			)}
+			<Toast.Provider swipeDirection='right'>
+				{toasts.map(toast => (
+					<StyledToastRoot key={toast.id} duration={3000}>
+						<StyledToastTitle>{toast.title}</StyledToastTitle>
+						<StyledToastDescription>{toast.description}</StyledToastDescription>
+						<StyledToastClose>
+							<span aria-hidden>×</span>
+						</StyledToastClose>
+					</StyledToastRoot>
+				))}
+				<StyledToastViewport />
+			</Toast.Provider>
 		</div>
 	)
 }

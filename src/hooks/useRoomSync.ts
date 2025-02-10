@@ -11,7 +11,8 @@ export default function useRoomSync(
 	localUsername: string,
 	avatar: string,
 	isCameraDisabled: boolean,
-	isMicrophoneDisabled: boolean
+	isMicrophoneDisabled: boolean,
+	addToast: (title: string, description: string) => void
 ) {
 	const isSyncingRef = useRef(false)
 	const [lastSeekDirection, setLastSeekDirection] = useState<'forward' | 'backward' | null>(null)
@@ -63,33 +64,71 @@ export default function useRoomSync(
 	const handleCameraSync = useCallback(
 		({ socketId, isCameraDisabled }: { socketId: string; isCameraDisabled: boolean }) => {
 			console.log('Received camera sync event:', { socketId, isCameraDisabled })
-
-			setParticipantInfo(prev => ({
+			addToast('Media-info', `User with id ${socketId} : ${isCameraDisabled ? 'muted' : 'unmuted'} his camera`)
+			setParticipantCameras(prev => ({
 				...prev,
-				[socketId]: {
-					...prev[socketId],
-					isCameraDisabled,
-				},
+				[socketId]: isCameraDisabled,
 			}))
 		},
-		[]
+		[addToast]
 	)
 
 	const handleMicrophoneSync = useCallback(
 		({ socketId, isMicrophoneDisabled }: { socketId: string; isMicrophoneDisabled: boolean }) => {
 			console.log('Received microphone sync event:', { socketId, isMicrophoneDisabled })
 
-			setParticipantInfo(prev => ({
+			addToast(
+				'Media-info',
+				`User with id ${socketId} : ${isMicrophoneDisabled ? 'muted' : 'unmuted'} his microphone`
+			)
+
+			setParticipantCameras(prev => ({
 				...prev,
-				[socketId]: {
-					...prev[socketId],
-					isMicrophoneDisabled,
-				},
+				[socketId]: isMicrophoneDisabled,
 			}))
 		},
-		[]
+		[addToast]
 	)
 
+	// type ParticipantInfo = {
+	// 	username: string
+	// 	avatar: string
+	// 	isCameraDisabled: boolean
+	// 	isMicrophoneDisabled: boolean
+	// }
+
+	// // Define the type for the function parameter
+	// type InfoSyncParams = {
+	// 	socketId: string
+	// } & Partial<ParticipantInfo>
+
+	// const handleInfoSync = useCallback((params: InfoSyncParams) => {
+	// 	const { socketId, ...updatedInfo } = params
+
+	// 	console.log('Received info sync event:', params)
+
+	// 	setParticipantInfo(prev => ({
+	// 		...prev,
+	// 		[socketId]: {
+	// 			...prev[socketId],
+	// 			...updatedInfo,
+	// 		},
+	// 	}))
+
+	// 	if ('isCameraDisabled' in updatedInfo) {
+	// 		setParticipantCameras(prev => ({
+	// 			...prev,
+	// 			[socketId]: updatedInfo.isCameraDisabled!,
+	// 		}))
+	// 	}
+
+	// 	if ('isMicrophoneDisabled' in updatedInfo) {
+	// 		setParticipantMicrophones(prev => ({
+	// 			...prev,
+	// 			[socketId]: updatedInfo.isMicrophoneDisabled!,
+	// 		}))
+	// 	}
+	// }, [])
 	const handleInfoSync = useCallback(
 		({
 			socketId,
