@@ -504,8 +504,8 @@ export default function RoomDev() {
 			console.log(audioTracks)
 			if (audioTracks.length > 0) {
 				const track = audioTracks[0]
-				track.enabled = !track.enabled // Toggle audio track state
 				setMicMuted(!track.enabled) // Update microphone state
+				track.enabled = !track.enabled // Toggle audio track state
 				emitInfoSync(localUsername, avatar, isCameraDisabled, isMicrophoneDisabled)
 			}
 		}
@@ -516,8 +516,9 @@ export default function RoomDev() {
 			const videoTracks = localStream.getVideoTracks()
 			if (videoTracks.length > 0) {
 				const track = videoTracks[0]
+				setCameraMuted(!track.enabled) // Update camera state
 				track.enabled = !track.enabled // Toggle video track state
-				setCameraMuted(!isCameraDisabled) // Update camera state
+
 				emitInfoSync(localUsername, avatar, isCameraDisabled, isMicrophoneDisabled)
 			}
 		}
