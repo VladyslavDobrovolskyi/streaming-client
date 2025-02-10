@@ -71,6 +71,9 @@ export default function useWebRTC(roomID: string) {
 		Record<string, Array<{ from: string; to: string; message: string }>>
 	>({})
 
+	const [initialMicrophoneDisabledState, setInitialMicrophoneDisabledState] = useState<boolean>(true)
+	const [initialCameraDisabledState, setInitialCameraDisabledState] = useState<boolean>(true)
+
 	const addNewClient = useCallback(
 		(newClient: string, cb: () => void) => {
 			console.log(`Attempting to add new client: ${newClient}`)
@@ -202,9 +205,11 @@ export default function useWebRTC(roomID: string) {
 			console.log('Joining room:', roomID)
 			socket.emit(ACTIONS.JOIN, { room: roomID })
 			if (isMockedVideo) {
+				setInitialCameraDisabledState(true)
 				socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isCameraDisabled: true })
 			}
 			if (isMockedAudio) {
+				setInitialMicrophoneDisabledState(true)
 				socket.emit(ACTIONS.SYNC_MICROPHONE, { roomID, socketId: socket.id, isMicrophoneDisabled: true })
 			}
 
@@ -375,9 +380,11 @@ export default function useWebRTC(roomID: string) {
 				console.log('Joining room:', roomID)
 				socket.emit(ACTIONS.JOIN, { room: roomID })
 				if (isMockedVideo) {
+					setInitialCameraDisabledState(true)
 					socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isCameraDisabled: true })
 				}
 				if (isMockedAudio) {
+					setInitialMicrophoneDisabledState(true)
 					socket.emit(ACTIONS.SYNC_MICROPHONE, { roomID, socketId: socket.id, isMicrophoneDisabled: true })
 				}
 				if (!isMockedVideo) {
@@ -476,6 +483,8 @@ export default function useWebRTC(roomID: string) {
 
 	return {
 		clients,
+		initialCameraDisabledState,
+		initialMicrophoneDisabledState,
 		provideMediaRef,
 		localStream: localMediaStream.current,
 		reinitializeStream,

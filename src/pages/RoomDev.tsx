@@ -57,6 +57,7 @@ import ClientVideo from './ClientVideo'
 // }
 
 export default function RoomDev() {
+	const { id: roomID } = useParams<{ id: string }>()
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [volume, setVolume] = useState(0.8)
 	const [muted, setMuted] = useState(false)
@@ -72,8 +73,20 @@ export default function RoomDev() {
 	const [currentAction, setCurrentAction] = useState<
 		'play' | 'pause' | 'mute' | 'unmute' | 'forward' | 'backward' | 'volume' | null
 	>(null)
-	const [isMicrophoneDisabled, setMicMuted] = useState(false)
-	const [isCameraDisabled, setCameraMuted] = useState(false)
+	const {
+		clients,
+		provideMediaRef,
+		localStream,
+		reinitializeStream,
+		chatMessages,
+		sendChatMessage,
+		privateMessages,
+		sendPrivateMessage,
+		initialCameraDisabledState,
+		initialMicrophoneDisabledState,
+	} = useWebRTC(roomID!)
+	const [isCameraDisabled, setCameraMuted] = useState(initialCameraDisabledState)
+	const [isMicrophoneDisabled, setMicMuted] = useState(initialMicrophoneDisabledState)
 	const [coveredClients, setCoveredClients] = useState<Record<string, boolean>>({})
 	const [isMovieMode, setIsMovieMode] = useState(false)
 	const [clientPositions, setClientPositions] = useState<Record<string, { x: number; y: number }>>({})
@@ -98,17 +111,6 @@ export default function RoomDev() {
 	const sliderRef = useRef<HTMLDivElement>(null)
 	const previousVolumeRef = useRef(volume)
 
-	const { id: roomID } = useParams<{ id: string }>()
-	const {
-		clients,
-		provideMediaRef,
-		localStream,
-		reinitializeStream,
-		chatMessages,
-		sendChatMessage,
-		privateMessages,
-		sendPrivateMessage,
-	} = useWebRTC(roomID!)
 	const {
 		emitPlay,
 		emitPause,
