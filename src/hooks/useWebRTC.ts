@@ -207,10 +207,16 @@ export default function useWebRTC(roomID: string) {
 			if (isMockedVideo) {
 				setInitialCameraDisabledState(true)
 				socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isCameraDisabled: true })
+			} else {
+				setInitialCameraDisabledState(false)
+				socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isCameraDisabled: false })
 			}
 			if (isMockedAudio) {
 				setInitialMicrophoneDisabledState(true)
 				socket.emit(ACTIONS.SYNC_MICROPHONE, { roomID, socketId: socket.id, isMicrophoneDisabled: true })
+			} else {
+				setInitialMicrophoneDisabledState(false)
+				socket.emit(ACTIONS.SYNC_MICROPHONE, { roomID, socketId: socket.id, isMicrophoneDisabled: false })
 			}
 
 			if (!isMockedVideo) {
@@ -379,13 +385,28 @@ export default function useWebRTC(roomID: string) {
 			} finally {
 				console.log('Joining room:', roomID)
 				socket.emit(ACTIONS.JOIN, { room: roomID })
+
 				if (isMockedVideo) {
 					setInitialCameraDisabledState(true)
 					socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isCameraDisabled: true })
+				} else {
+					setInitialCameraDisabledState(false)
+					socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isCameraDisabled: false })
 				}
 				if (isMockedAudio) {
 					setInitialMicrophoneDisabledState(true)
-					socket.emit(ACTIONS.SYNC_MICROPHONE, { roomID, socketId: socket.id, isMicrophoneDisabled: true })
+					socket.emit(ACTIONS.SYNC_MICROPHONE, {
+						roomID,
+						socketId: socket.id,
+						isMicrophoneDisabled: true,
+					})
+				} else {
+					setInitialMicrophoneDisabledState(false)
+					socket.emit(ACTIONS.SYNC_MICROPHONE, {
+						roomID,
+						socketId: socket.id,
+						isMicrophoneDisabled: false,
+					})
 				}
 				if (!isMockedVideo) {
 					addNewClient(LOCAL_VIDEO, () => {
