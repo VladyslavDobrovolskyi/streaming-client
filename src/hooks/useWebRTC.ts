@@ -71,8 +71,8 @@ export default function useWebRTC(roomID: string) {
 		Record<string, Array<{ from: string; to: string; message: string }>>
 	>({})
 
-	const [initialMicrophoneDisabledState, setInitialMicrophoneDisabledState] = useState<boolean>(true)
-	const [initialCameraDisabledState, setInitialCameraDisabledState] = useState<boolean>(true)
+	const [initialMicrophoneDisabledState, setInitialMicrophoneDisabledState] = useState<boolean>(false)
+	const [initialCameraDisabledState, setInitialCameraDisabledState] = useState<boolean>(false)
 
 	const addNewClient = useCallback(
 		(newClient: string, cb: () => void) => {
