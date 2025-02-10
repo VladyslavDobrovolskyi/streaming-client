@@ -497,9 +497,9 @@ export default function RoomDev() {
 				const track = audioTracks[0]
 				track.enabled = !track.enabled // Toggle audio track state
 				if (track.enabled) {
-					setCameraMuted(false)
+					setMicMuted(false)
 				} else {
-					setCameraMuted(true)
+					setMicMuted(true)
 				}
 				console.log('Mic state:', track.enabled, isMicrophoneDisabled)
 				emitInfoSync(localUsername, avatar, isCameraDisabled, isMicrophoneDisabled)
