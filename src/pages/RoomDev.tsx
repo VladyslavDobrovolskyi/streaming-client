@@ -143,7 +143,7 @@ export default function RoomDev() {
 		)
 		setMicMuted(initialMicrophoneDisabledState)
 		setCameraMuted(initialCameraDisabledState)
-	}, [initialCameraDisabledState, initialMicrophoneDisabledState, loaded])
+	}, [loaded])
 
 	useEffect(() => {
 		if (lastSeekDirection) {
