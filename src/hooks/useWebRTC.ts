@@ -207,16 +207,19 @@ export default function useWebRTC(roomID: string) {
 			if (isMockedAudio) {
 				socket.emit(ACTIONS.SYNC_MICROPHONE, { roomID, socketId: socket.id, isMicrophoneDisabled: true })
 			}
-			addNewClient(LOCAL_VIDEO, () => {
-				const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
-				if (localVideoElement) {
-					console.log('Setting local video element')
-					localVideoElement.volume = 0
-					localVideoElement.srcObject = localMediaStream.current
-				} else {
-					console.warn('Local video element not found')
-				}
-			})
+
+			if (!isMockedVideo) {
+				addNewClient(LOCAL_VIDEO, () => {
+					const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
+					if (localVideoElement) {
+						console.log('Setting local video element')
+						localVideoElement.volume = 0
+						localVideoElement.srcObject = localMediaStream.current
+					} else {
+						console.warn('Local video element not found')
+					}
+				})
+			}
 		}
 	}
 
