@@ -11,7 +11,9 @@ export default function useRoomSync(
 	localUsername: string,
 	avatar: string,
 	isCameraDisabled: boolean,
-	isMicrophoneDisabled: boolean
+	setIsCameraDisabled: React.Dispatch<React.SetStateAction<boolean>>,
+	isMicrophoneDisabled: boolean,
+	setIsMicrophoneDisabled: React.Dispatch<React.SetStateAction<boolean>>
 ) {
 	const isSyncingRef = useRef(false)
 	const [lastSeekDirection, setLastSeekDirection] = useState<'forward' | 'backward' | null>(null)
@@ -63,6 +65,9 @@ export default function useRoomSync(
 	const handleCameraSync = useCallback(
 		({ socketId, isCameraDisabled }: { socketId: string; isCameraDisabled: boolean }) => {
 			console.log('Received camera sync event:', { socketId, isCameraDisabled })
+			if (socketId === socket.id) {
+				setIsCameraDisabled(isCameraDisabled)
+			}
 			setParticipantInfo(prev => ({
 				...prev,
 				[socketId]: {
@@ -71,12 +76,15 @@ export default function useRoomSync(
 				},
 			}))
 		},
-		[]
+		[setIsCameraDisabled]
 	)
 
 	const handleMicrophoneSync = useCallback(
 		({ socketId, isMicrophoneDisabled }: { socketId: string; isMicrophoneDisabled: boolean }) => {
 			console.log('Received microphone sync event:', { socketId, isMicrophoneDisabled })
+			if (socketId === socket.id) {
+				setIsMicrophoneDisabled(isMicrophoneDisabled)
+			}
 			setParticipantInfo(prev => ({
 				...prev,
 				[socketId]: {
@@ -85,7 +93,7 @@ export default function useRoomSync(
 				},
 			}))
 		},
-		[]
+		[setIsMicrophoneDisabled]
 	)
 
 	const handleInfoSync = useCallback(
@@ -140,6 +148,8 @@ export default function useRoomSync(
 	const handleRequestParticipantInfo = useCallback(
 		({ requesterId }) => {
 			console.log('[DEBUG] Received request participant info event:', { requesterId })
+			console.log('current micDis:', isMicrophoneDisabled)
+			console.log('current camDis:', isCameraDisabled)
 			console.log('Sending participant info:', {
 				roomID,
 				requesterId,
@@ -228,17 +238,23 @@ export default function useRoomSync(
 	)
 
 	const emitCameraSync = useCallback(
-		(isCameraDisabled: boolean) => {
-			socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isCameraDisabled })
+		(newIsCameraDisabled: boolean) => {
+			setIsCameraDisabled(newIsCameraDisabled)
+			socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isCameraDisabled: newIsCameraDisabled })
 		},
-		[roomID]
+		[roomID, setIsCameraDisabled]
 	)
 
 	const emitMicrophoneSync = useCallback(
-		(isMicrophoneDisabled: boolean) => {
-			socket.emit(ACTIONS.SYNC_MICROPHONE, { roomID, socketId: socket.id, isMicrophoneDisabled })
+		(newIsMicrophoneDisabled: boolean) => {
+			setIsMicrophoneDisabled(newIsMicrophoneDisabled)
+			socket.emit(ACTIONS.SYNC_MICROPHONE, {
+				roomID,
+				socketId: socket.id,
+				isMicrophoneDisabled: newIsMicrophoneDisabled,
+			})
 		},
-		[roomID]
+		[roomID, setIsMicrophoneDisabled]
 	)
 
 	const requestParticipantInfo = useCallback(() => {
