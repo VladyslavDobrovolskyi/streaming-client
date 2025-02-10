@@ -517,7 +517,7 @@ export default function RoomDev() {
 			if (videoTracks.length > 0) {
 				const track = videoTracks[0]
 				track.enabled = !track.enabled // Toggle video track state
-				setCameraMuted(track.enabled) // Update camera state
+				setCameraMuted(!isCameraDisabled) // Update camera state
 				emitInfoSync(localUsername, avatar, isCameraDisabled, isMicrophoneDisabled)
 			}
 		}
