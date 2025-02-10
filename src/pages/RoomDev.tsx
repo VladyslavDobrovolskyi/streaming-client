@@ -135,16 +135,13 @@ export default function RoomDev() {
 		setMicMuted
 	)
 
-	useEffect(() => {}, [])
-
-	useEffect(() => {
-		console.log('Participant info:', participantInfo)
-	}, [participantInfo])
 	useEffect(() => {
 		if (loaded) {
-			console.log('loaded')
+			console.log('loaded | test')
+			setMicMuted(initialMicrophoneDisabledState)
+			setCameraMuted(initialCameraDisabledState)
 		}
-	}, [loaded])
+	}, [])
 
 	useEffect(() => {
 		if (lastSeekDirection) {
