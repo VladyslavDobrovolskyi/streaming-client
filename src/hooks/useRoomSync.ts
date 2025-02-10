@@ -11,9 +11,7 @@ export default function useRoomSync(
 	localUsername: string,
 	avatar: string,
 	isCameraDisabled: boolean,
-	setIsCameraDisabled: React.Dispatch<React.SetStateAction<boolean>>,
-	isMicrophoneDisabled: boolean,
-	setIsMicrophoneDisabled: React.Dispatch<React.SetStateAction<boolean>>
+	isMicrophoneDisabled: boolean
 ) {
 	const isSyncingRef = useRef(false)
 	const [lastSeekDirection, setLastSeekDirection] = useState<'forward' | 'backward' | null>(null)
@@ -65,9 +63,7 @@ export default function useRoomSync(
 	const handleCameraSync = useCallback(
 		({ socketId, isCameraDisabled }: { socketId: string; isCameraDisabled: boolean }) => {
 			console.log('Received camera sync event:', { socketId, isCameraDisabled })
-			if (socketId === socket.id) {
-				setIsCameraDisabled(isCameraDisabled)
-			}
+
 			setParticipantInfo(prev => ({
 				...prev,
 				[socketId]: {
@@ -76,15 +72,13 @@ export default function useRoomSync(
 				},
 			}))
 		},
-		[setIsCameraDisabled]
+		[]
 	)
 
 	const handleMicrophoneSync = useCallback(
 		({ socketId, isMicrophoneDisabled }: { socketId: string; isMicrophoneDisabled: boolean }) => {
 			console.log('Received microphone sync event:', { socketId, isMicrophoneDisabled })
-			if (socketId === socket.id) {
-				setIsMicrophoneDisabled(isMicrophoneDisabled)
-			}
+
 			setParticipantInfo(prev => ({
 				...prev,
 				[socketId]: {
@@ -93,7 +87,7 @@ export default function useRoomSync(
 				},
 			}))
 		},
-		[setIsMicrophoneDisabled]
+		[]
 	)
 
 	const handleInfoSync = useCallback(
@@ -238,23 +232,21 @@ export default function useRoomSync(
 	)
 
 	const emitCameraSync = useCallback(
-		(newIsCameraDisabled: boolean) => {
-			setIsCameraDisabled(newIsCameraDisabled)
-			socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isCameraDisabled: newIsCameraDisabled })
+		(isCameraDisabled: boolean) => {
+			socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isCameraDisabled })
 		},
-		[roomID, setIsCameraDisabled]
+		[roomID]
 	)
 
 	const emitMicrophoneSync = useCallback(
-		(newIsMicrophoneDisabled: boolean) => {
-			setIsMicrophoneDisabled(newIsMicrophoneDisabled)
+		(isMicrophoneDisabled: boolean) => {
 			socket.emit(ACTIONS.SYNC_MICROPHONE, {
 				roomID,
 				socketId: socket.id,
-				isMicrophoneDisabled: newIsMicrophoneDisabled,
+				isMicrophoneDisabled,
 			})
 		},
-		[roomID, setIsMicrophoneDisabled]
+		[roomID]
 	)
 
 	const requestParticipantInfo = useCallback(() => {

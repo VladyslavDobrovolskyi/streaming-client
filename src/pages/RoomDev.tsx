@@ -124,16 +124,7 @@ export default function RoomDev() {
 		// participantCameras,
 		// participantMicrophones,
 		requestParticipantInfo,
-	} = useRoomSync(
-		roomID!,
-		playerRef,
-		localUsername,
-		avatar,
-		isCameraDisabled,
-		setCameraMuted,
-		isMicrophoneDisabled,
-		setMicMuted
-	)
+	} = useRoomSync(roomID!, playerRef, localUsername, avatar, isCameraDisabled, isMicrophoneDisabled)
 
 	useEffect(() => {
 		console.log('Loaded:', loaded)
