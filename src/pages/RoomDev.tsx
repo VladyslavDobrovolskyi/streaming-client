@@ -585,13 +585,10 @@ export default function RoomDev() {
 
 	useEffect(() => {
 		if (roomID && localUsername) {
-			console.log(
-				'Emitting info sync...',
-				`Camera and mic: ${initialMicrophoneDisabledState} | ${initialCameraDisabledState}`
-			)
-			emitInfoSync(localUsername, avatar, initialCameraDisabledState, initialMicrophoneDisabledState)
+			console.log('Emitting info sync...', `Camera and mic: ${isCameraDisabled} | ${isMicrophoneDisabled}`)
+			emitInfoSync(localUsername, avatar, isCameraDisabled, isMicrophoneDisabled)
 		}
-	}, [roomID, localUsername, avatar, emitInfoSync, initialCameraDisabledState, initialMicrophoneDisabledState])
+	}, [roomID, localUsername, avatar, emitInfoSync, isCameraDisabled, isMicrophoneDisabled])
 
 	const togglePrivateChat = (clientID: string) => {
 		setPrivateChats(prev => ({ ...prev, [clientID]: !prev[clientID] }))
