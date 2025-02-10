@@ -7,10 +7,7 @@ import ACTIONS from '../socket/actions'
 
 export const LOCAL_VIDEO = 'LOCAL_VIDEO'
 
-function createMockMediaStream(): MediaStream {
-	const stream = new MediaStream()
-
-	// Мок аудио (тишина)
+function createMockAudioStream(): MediaStreamTrack {
 	const audioContext = new AudioContext()
 	const silenceBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 1, audioContext.sampleRate)
 	const source = audioContext.createBufferSource()
@@ -18,9 +15,10 @@ function createMockMediaStream(): MediaStream {
 	const destination = audioContext.createMediaStreamDestination()
 	source.connect(destination)
 	source.start()
-	const audioTrack = destination.stream.getAudioTracks()[0]
+	return destination.stream.getAudioTracks()[0]
+}
 
-	// Мок видео
+function createMockVideoStream(): MediaStreamTrack {
 	const canvas = document.createElement('canvas')
 	canvas.width = 1280
 	canvas.height = 720
@@ -31,13 +29,40 @@ function createMockMediaStream(): MediaStream {
 		requestAnimationFrame(draw)
 	}
 	draw()
-	const videoTrack = canvas.captureStream(30).getVideoTracks()[0]
-
-	stream.addTrack(audioTrack)
-	stream.addTrack(videoTrack)
-
-	return stream
+	return canvas.captureStream(30).getVideoTracks()[0]
 }
+
+// function createMockMediaStream(): MediaStream {
+// 	const stream = new MediaStream()
+
+// 	// Мок аудио (тишина)
+// 	const audioContext = new AudioContext()
+// 	const silenceBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 1, audioContext.sampleRate)
+// 	const source = audioContext.createBufferSource()
+// 	source.buffer = silenceBuffer
+// 	const destination = audioContext.createMediaStreamDestination()
+// 	source.connect(destination)
+// 	source.start()
+// 	const audioTrack = destination.stream.getAudioTracks()[0]
+
+// 	// Мок видео
+// 	const canvas = document.createElement('canvas')
+// 	canvas.width = 1280
+// 	canvas.height = 720
+// 	const ctx = canvas.getContext('2d')!
+// 	const draw = () => {
+// 		ctx.fillStyle = 'black'
+// 		ctx.fillRect(0, 0, canvas.width, canvas.height)
+// 		requestAnimationFrame(draw)
+// 	}
+// 	draw()
+// 	const videoTrack = canvas.captureStream(30).getVideoTracks()[0]
+
+// 	stream.addTrack(audioTrack)
+// 	stream.addTrack(videoTrack)
+
+// 	return stream
+// }
 
 export default function useWebRTC(roomID: string) {
 	const [clients, updateClients] = useStateWithCallback<string[]>([])
@@ -139,7 +164,8 @@ export default function useWebRTC(roomID: string) {
 
 	const reinitializeStream = async () => {
 		console.log('Reinitializing stream')
-		let isMocked = false
+		let isMockedVideo = false
+		let isMockedAudio = false
 
 		try {
 			localMediaStream.current = await navigator.mediaDevices.getUserMedia({
@@ -149,28 +175,48 @@ export default function useWebRTC(roomID: string) {
 			console.log('Successfully obtained local media stream:', localMediaStream.current?.getTracks())
 		} catch (error) {
 			console.error('Error getting media: ', error)
-			console.log('Creating mock media stream')
-			localMediaStream.current = createMockMediaStream()
-			isMocked = true
-			// After creating mock streams
+			localMediaStream.current = new MediaStream()
+
+			try {
+				const audioTrack = await navigator.mediaDevices
+					.getUserMedia({ audio: true })
+					.then(stream => stream.getAudioTracks()[0])
+				localMediaStream.current.addTrack(audioTrack)
+			} catch (audioError) {
+				console.error('Error getting audio: ', audioError)
+				localMediaStream.current.addTrack(createMockAudioStream())
+				isMockedAudio = true
+			}
+
+			try {
+				const videoTrack = await navigator.mediaDevices
+					.getUserMedia({ video: true })
+					.then(stream => stream.getVideoTracks()[0])
+				localMediaStream.current.addTrack(videoTrack)
+			} catch (videoError) {
+				console.error('Error getting video: ', videoError)
+				localMediaStream.current.addTrack(createMockVideoStream())
+				isMockedVideo = true
+			}
 		} finally {
 			console.log('Joining room:', roomID)
 			socket.emit(ACTIONS.JOIN, { room: roomID })
-			if (isMocked) {
+			if (isMockedVideo) {
 				socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isCameraDisabled: true })
-				socket.emit(ACTIONS.SYNC_MICROPHONE, { roomID, socketId: socket.id, isMicrophoneDisabled: true })
-			} else {
-				addNewClient(LOCAL_VIDEO, () => {
-					const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
-					if (localVideoElement) {
-						console.log('Setting local video element')
-						localVideoElement.volume = 0
-						localVideoElement.srcObject = localMediaStream.current
-					} else {
-						console.warn('Local video element not found')
-					}
-				})
 			}
+			if (isMockedAudio) {
+				socket.emit(ACTIONS.SYNC_MICROPHONE, { roomID, socketId: socket.id, isMicrophoneDisabled: true })
+			}
+			addNewClient(LOCAL_VIDEO, () => {
+				const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
+				if (localVideoElement) {
+					console.log('Setting local video element')
+					localVideoElement.volume = 0
+					localVideoElement.srcObject = localMediaStream.current
+				} else {
+					console.warn('Local video element not found')
+				}
+			})
 		}
 	}
 
@@ -288,7 +334,8 @@ export default function useWebRTC(roomID: string) {
 	useEffect(() => {
 		async function startCapture() {
 			console.log('Starting media capture')
-			let isMocked = false
+			let isMockedVideo = false
+			let isMockedAudio = false
 
 			try {
 				localMediaStream.current = await navigator.mediaDevices.getUserMedia({
@@ -298,28 +345,48 @@ export default function useWebRTC(roomID: string) {
 				console.log('Successfully obtained local media stream:', localMediaStream.current?.getTracks())
 			} catch (error) {
 				console.error('Error getting media: ', error)
-				console.log('Creating mock media stream')
-				localMediaStream.current = createMockMediaStream()
-				isMocked = true
-				// After creating mock streams
+				localMediaStream.current = new MediaStream()
+
+				try {
+					const audioTrack = await navigator.mediaDevices
+						.getUserMedia({ audio: true })
+						.then(stream => stream.getAudioTracks()[0])
+					localMediaStream.current.addTrack(audioTrack)
+				} catch (audioError) {
+					console.error('Error getting audio: ', audioError)
+					localMediaStream.current.addTrack(createMockAudioStream())
+					isMockedAudio = true
+				}
+
+				try {
+					const videoTrack = await navigator.mediaDevices
+						.getUserMedia({ video: true })
+						.then(stream => stream.getVideoTracks()[0])
+					localMediaStream.current.addTrack(videoTrack)
+				} catch (videoError) {
+					console.error('Error getting video: ', videoError)
+					localMediaStream.current.addTrack(createMockVideoStream())
+					isMockedVideo = true
+				}
 			} finally {
 				console.log('Joining room:', roomID)
 				socket.emit(ACTIONS.JOIN, { room: roomID })
-				if (isMocked) {
+				if (isMockedVideo) {
 					socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isCameraDisabled: true })
-					socket.emit(ACTIONS.SYNC_MICROPHONE, { roomID, socketId: socket.id, isMicrophoneDisabled: true })
-				} else {
-					addNewClient(LOCAL_VIDEO, () => {
-						const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
-						if (localVideoElement) {
-							console.log('Setting local video element')
-							localVideoElement.volume = 0
-							localVideoElement.srcObject = localMediaStream.current
-						} else {
-							console.warn('Local video element not found')
-						}
-					})
 				}
+				if (isMockedAudio) {
+					socket.emit(ACTIONS.SYNC_MICROPHONE, { roomID, socketId: socket.id, isMicrophoneDisabled: true })
+				}
+				addNewClient(LOCAL_VIDEO, () => {
+					const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
+					if (localVideoElement) {
+						console.log('Setting local video element')
+						localVideoElement.volume = 0
+						localVideoElement.srcObject = localMediaStream.current
+					} else {
+						console.warn('Local video element not found')
+					}
+				})
 			}
 		}
 
