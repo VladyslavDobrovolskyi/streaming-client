@@ -498,7 +498,7 @@ export default function RoomDev() {
 				const track = audioTracks[0]
 				track.enabled = !track.enabled // Toggle audio track state
 				setMicMuted(!track.enabled) // Update microphone state
-				emitInfoSync(localUsername, avatar, isCameraDisabled, !track.enabled)
+				emitInfoSync(localUsername, avatar, isCameraDisabled, isMicrophoneDisabled)
 			}
 		}
 	}
@@ -510,7 +510,7 @@ export default function RoomDev() {
 				const track = videoTracks[0]
 				track.enabled = !track.enabled // Toggle video track state
 				setCameraMuted(!track.enabled) // Update camera state
-				emitInfoSync(localUsername, avatar, !track.enabled, isMicrophoneDisabled)
+				emitInfoSync(localUsername, avatar, isCameraDisabled, isMicrophoneDisabled)
 			}
 		}
 	}
@@ -569,11 +569,18 @@ export default function RoomDev() {
 	}, [])
 
 	useEffect(() => {
+		console.log('Initial states:', initialMicrophoneDisabledState, initialCameraDisabledState)
+	}, [initialMicrophoneDisabledState, initialCameraDisabledState])
+
+	useEffect(() => {
 		if (roomID && localUsername) {
-			console.log('Emitting info sync...', `Camera and mic: ${isMicrophoneDisabled} | ${isCameraDisabled}`)
-			emitInfoSync(localUsername, avatar, isCameraDisabled, isMicrophoneDisabled)
+			console.log(
+				'Emitting info sync...',
+				`Camera and mic: ${initialMicrophoneDisabledState} | ${initialCameraDisabledState}`
+			)
+			emitInfoSync(localUsername, avatar, initialCameraDisabledState, initialMicrophoneDisabledState)
 		}
-	}, [roomID, localUsername, avatar, emitInfoSync, isCameraDisabled, isMicrophoneDisabled])
+	}, [roomID, localUsername, avatar, emitInfoSync, initialCameraDisabledState, initialMicrophoneDisabledState])
 
 	const togglePrivateChat = (clientID: string) => {
 		setPrivateChats(prev => ({ ...prev, [clientID]: !prev[clientID] }))
