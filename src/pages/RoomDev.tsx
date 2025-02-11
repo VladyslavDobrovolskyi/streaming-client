@@ -1093,9 +1093,8 @@ export default function RoomDev() {
 					<h2 style={{ color: 'white', padding: '10px', borderBottom: '1px solid rgba(255, 255, 255, 0.2)' }}>
 						Users
 					</h2>
-
-					{clients.length === 1 && (
-						<div style={{ padding: '10px', color: 'white' }}>
+					{clients.length === 1 && clients[0] === LOCAL_VIDEO && (
+						<div style={{ padding: '10px', color: 'white', textAlign: 'center' }}>
 							<p>You're the only one here.</p>
 						</div>
 					)}
