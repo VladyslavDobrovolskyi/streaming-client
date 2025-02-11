@@ -498,11 +498,12 @@ export default function RoomDev() {
 				track.enabled = !track.enabled // Toggle audio track state
 				if (track.enabled) {
 					setMicMuted(false)
+					emitInfoSync(localUsername, avatar, isCameraDisabled, false)
 				} else {
 					setMicMuted(true)
+					emitInfoSync(localUsername, avatar, isCameraDisabled, true)
 				}
 				console.log('Mic state:', track.enabled, isMicrophoneDisabled)
-				emitInfoSync(localUsername, avatar, isCameraDisabled, isMicrophoneDisabled)
 			}
 		}
 	}
