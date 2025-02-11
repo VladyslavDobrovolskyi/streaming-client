@@ -434,7 +434,7 @@ export default function useWebRTC(roomID: string) {
 			console.log('Leaving room:', roomID)
 			socket.emit(ACTIONS.LEAVE)
 		}
-	}, [roomID, addNewClient])
+	}, [roomID, addNewClient, localMediaStream])
 
 	const provideMediaRef = useCallback(async (id: string, node: HTMLVideoElement | null) => {
 		console.log(`Providing media ref for ${id}`)
