@@ -19,6 +19,7 @@ interface ClientVideoProps {
 	isLocal: boolean
 	username: string
 	isCameraMuted: boolean
+	isMicrophoneMuted: boolean
 	position: { x: number; y: number }
 	size: { width: number; height: number; scale?: number }
 	onPositionChange: (clientID: string, position: { x: number; y: number }) => void
@@ -35,6 +36,7 @@ export default function ClientVideo({
 	provideMediaRef,
 	isLocal,
 	isCameraMuted,
+	isMicrophoneMuted,
 	position,
 	size,
 	onPositionChange,
@@ -102,7 +104,7 @@ export default function ClientVideo({
 						autoPlay
 						playsInline
 						className='video-drag-handle'
-						muted={isLocal}
+						muted={isLocal || isMicrophoneMuted}
 						style={{
 							objectFit: 'cover',
 							borderRadius: '5px',

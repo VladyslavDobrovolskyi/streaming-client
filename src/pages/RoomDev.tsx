@@ -448,6 +448,9 @@ export default function RoomDev() {
 							isLocal={clientID === LOCAL_VIDEO}
 							username={participantData.username || 'Anonymous'}
 							isCameraMuted={isCameraMuted}
+							isMicrophoneMuted={
+								clientID === LOCAL_VIDEO ? isMicrophoneDisabled : participantData.isMicrophoneDisabled
+							}
 							position={clientPositions[clientID] || { x: 10, y: 10 }}
 							size={clientSizes[clientID] || { width: 150, height: 100 }}
 							onPositionChange={(id, pos) => setClientPositions(prev => ({ ...prev, [id]: pos }))}
