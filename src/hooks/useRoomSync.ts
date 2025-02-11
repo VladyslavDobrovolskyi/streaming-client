@@ -18,8 +18,8 @@ export default function useRoomSync(
 	const [participantInfo, setParticipantInfo] = useState<
 		Record<string, { username: string; avatar: string; isCameraDisabled: boolean; isMicrophoneDisabled: boolean }>
 	>({})
-	const [participantCameras, setParticipantCameras] = useState<Record<string, boolean>>({})
-	const [participantMicrophones, setParticipantMicrophones] = useState<Record<string, boolean>>({})
+	// const [participantCameras, setParticipantCameras] = useState<Record<string, boolean>>({})
+	// const [participantMicrophones, setParticipantMicrophones] = useState<Record<string, boolean>>({})
 
 	const handlePlay = useCallback(
 		({ time }: { time: number }) => {
@@ -60,35 +60,35 @@ export default function useRoomSync(
 		[videoRef]
 	)
 
-	const handleCameraSync = useCallback(
-		({ socketId, isCameraDisabled }: { socketId: string; isCameraDisabled: boolean }) => {
-			console.log('Received camera sync event:', { socketId, isCameraDisabled })
+	// const handleCameraSync = useCallback(
+	// 	({ socketId, isCameraDisabled }: { socketId: string; isCameraDisabled: boolean }) => {
+	// 		console.log('Received camera sync event:', { socketId, isCameraDisabled })
 
-			setParticipantInfo(prev => ({
-				...prev,
-				[socketId]: {
-					...prev[socketId],
-					isCameraDisabled,
-				},
-			}))
-		},
-		[]
-	)
+	// 		setParticipantInfo(prev => ({
+	// 			...prev,
+	// 			[socketId]: {
+	// 				...prev[socketId],
+	// 				isCameraDisabled,
+	// 			},
+	// 		}))
+	// 	},
+	// 	[]
+	// )
 
-	const handleMicrophoneSync = useCallback(
-		({ socketId, isMicrophoneDisabled }: { socketId: string; isMicrophoneDisabled: boolean }) => {
-			console.log('Received microphone sync event:', { socketId, isMicrophoneDisabled })
+	// const handleMicrophoneSync = useCallback(
+	// 	({ socketId, isMicrophoneDisabled }: { socketId: string; isMicrophoneDisabled: boolean }) => {
+	// 		console.log('Received microphone sync event:', { socketId, isMicrophoneDisabled })
 
-			setParticipantInfo(prev => ({
-				...prev,
-				[socketId]: {
-					...prev[socketId],
-					isMicrophoneDisabled,
-				},
-			}))
-		},
-		[]
-	)
+	// 		setParticipantInfo(prev => ({
+	// 			...prev,
+	// 			[socketId]: {
+	// 				...prev[socketId],
+	// 				isMicrophoneDisabled,
+	// 			},
+	// 		}))
+	// 	},
+	// 	[]
+	// )
 
 	const handleInfoSync = useCallback(
 		({
@@ -111,17 +111,15 @@ export default function useRoomSync(
 				isCameraDisabled,
 				isMicrophoneDisabled,
 			})
+
 			setParticipantInfo(prev => ({
 				...prev,
-				[socketId]: { username, avatar, isCameraDisabled, isMicrophoneDisabled },
-			}))
-			setParticipantCameras(prev => ({
-				...prev,
-				[socketId]: isCameraDisabled,
-			}))
-			setParticipantMicrophones(prev => ({
-				...prev,
-				[socketId]: isMicrophoneDisabled,
+				[socketId]: {
+					username,
+					avatar,
+					isCameraDisabled,
+					isMicrophoneDisabled,
+				},
 			}))
 		},
 		[]
@@ -174,8 +172,8 @@ export default function useRoomSync(
 		socket.on(ACTIONS.VIDEO_SEEK, handleSeek)
 		socket.on(ACTIONS.REQUEST_SYNC, handleSyncRequest)
 		socket.on(ACTIONS.SYNC_INFO, handleInfoSync)
-		socket.on(ACTIONS.SYNC_CAMERA, handleCameraSync)
-		socket.on(ACTIONS.SYNC_MICROPHONE, handleMicrophoneSync)
+		// socket.on(ACTIONS.SYNC_CAMERA, handleCameraSync)
+		// socket.on(ACTIONS.SYNC_MICROPHONE, handleMicrophoneSync)
 		socket.on(ACTIONS.REQUEST_PARTICIPANT_INFO, handleRequestParticipantInfo)
 
 		return () => {
@@ -184,8 +182,8 @@ export default function useRoomSync(
 			socket.off(ACTIONS.VIDEO_SEEK, handleSeek)
 			socket.off(ACTIONS.REQUEST_SYNC, handleSyncRequest)
 			socket.off(ACTIONS.SYNC_INFO, handleInfoSync)
-			socket.off(ACTIONS.SYNC_CAMERA, handleCameraSync)
-			socket.off(ACTIONS.SYNC_MICROPHONE, handleMicrophoneSync)
+			// socket.off(ACTIONS.SYNC_CAMERA, handleCameraSync)
+			// socket.off(ACTIONS.SYNC_MICROPHONE, handleMicrophoneSync)
 			socket.off(ACTIONS.REQUEST_PARTICIPANT_INFO, handleRequestParticipantInfo)
 		}
 	}, [
@@ -193,8 +191,8 @@ export default function useRoomSync(
 		handlePause,
 		handleSeek,
 		handleSyncRequest,
-		handleCameraSync,
-		handleMicrophoneSync,
+		// handleCameraSync,
+		// handleMicrophoneSync,
 		handleInfoSync,
 		handleRequestParticipantInfo,
 	])
@@ -264,7 +262,7 @@ export default function useRoomSync(
 		requestParticipantInfo,
 		lastSeekDirection,
 		participantInfo,
-		participantCameras,
-		participantMicrophones,
+		// participantCameras,
+		// participantMicrophones,
 	}
 }
