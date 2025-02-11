@@ -491,22 +491,20 @@ export default function RoomDev() {
 
 	const handleMicMuteUnmute = () => {
 		if (localStream) {
-			const audioTracks = localStream.getAudioTracks()
-			console.log(audioTracks)
-			if (audioTracks.length > 0) {
-				const track = audioTracks[0]
-				console.log('Before Toggle Audio Track:', track)
-				track.enabled = !track.enabled // Toggle audio track state
-				console.log('After Toggle Audio Track:', track)
-
-				if (track.enabled) {
-					setMicMuted(false)
-					emitInfoSync(localUsername, avatar, isCameraDisabled, false)
-				} else {
+			const audioTrack = localStream.getAudioTracks()[0]
+			console.log('Before Toggle Audio Track:', audioTrack)
+			try {
+				if (audioTrack.enabled) {
+					audioTrack.enabled = false
 					setMicMuted(true)
 					emitInfoSync(localUsername, avatar, isCameraDisabled, true)
+				} else {
+					audioTrack.enabled = true
+					setMicMuted(false)
+					emitInfoSync(localUsername, avatar, isCameraDisabled, false)
 				}
-				console.log('Mic state:', track.enabled, isMicrophoneDisabled)
+			} finally {
+				console.log('After Toggle Audio Track:', audioTrack)
 			}
 		}
 	}
