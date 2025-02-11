@@ -1093,6 +1093,13 @@ export default function RoomDev() {
 					<h2 style={{ color: 'white', padding: '10px', borderBottom: '1px solid rgba(255, 255, 255, 0.2)' }}>
 						Users
 					</h2>
+
+					{clients.length === 1 && (
+						<div style={{ padding: '10px', color: 'white' }}>
+							<p>You're the only one here.</p>
+						</div>
+					)}
+
 					{clients
 						.filter(clientID => clientID !== LOCAL_VIDEO)
 						.map(clientID => {
