@@ -542,14 +542,14 @@ export default function RoomDev() {
 		setShowUserList(prev => !prev)
 	}
 
-	useEffect(() => {
-		if (localStream) {
-			const audioTrack = localStream.getAudioTracks()[0]
-			if (audioTrack) {
-				setMicMuted(!audioTrack.enabled)
-			}
-		}
-	}, [localStream])
+	// useEffect(() => {
+	// 	if (localStream) {
+	// 		const audioTrack = localStream.getAudioTracks()[0]
+	// 		if (audioTrack) {
+	// 			setMicMuted(!audioTrack.enabled)
+	// 		}
+	// 	}
+	// }, [localStream])
 
 	const handleSendMessage = () => {
 		if (chatInput.trim()) {
