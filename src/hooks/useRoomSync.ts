@@ -166,12 +166,20 @@ export default function useRoomSync(
 		[roomID, participantInfo, localUsername, avatar, isCameraDisabled, isMicrophoneDisabled]
 	)
 
+	const handleClientLeave = useCallback(({ peerID }) => {
+		setParticipantInfo(prev => {
+			const newParticipantInfo = Object.fromEntries(Object.entries(prev).filter(([key]) => key !== peerID))
+			return newParticipantInfo
+		})
+	}, [])
+
 	useEffect(() => {
 		socket.on(ACTIONS.VIDEO_PLAY, handlePlay)
 		socket.on(ACTIONS.VIDEO_PAUSE, handlePause)
 		socket.on(ACTIONS.VIDEO_SEEK, handleSeek)
 		socket.on(ACTIONS.REQUEST_SYNC, handleSyncRequest)
 		socket.on(ACTIONS.SYNC_INFO, handleInfoSync)
+		socket.on(ACTIONS.REMOVE_PEER, handleClientLeave)
 		// socket.on(ACTIONS.SYNC_CAMERA, handleCameraSync)
 		// socket.on(ACTIONS.SYNC_MICROPHONE, handleMicrophoneSync)
 		socket.on(ACTIONS.REQUEST_PARTICIPANT_INFO, handleRequestParticipantInfo)
