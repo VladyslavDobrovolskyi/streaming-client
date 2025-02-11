@@ -496,12 +496,12 @@ export default function RoomDev() {
 			try {
 				if (audioTrack.enabled) {
 					audioTrack.enabled = false
-					audioTrack.stop()
+					// audioTrack.stop()
 					setMicMuted(true)
 					emitInfoSync(localUsername, avatar, isCameraDisabled, true)
 				} else {
 					audioTrack.enabled = true
-					navigator.mediaDevices.getUserMedia({ video: true })
+					// navigator.mediaDevices.getUserMedia({ video: true })
 					setMicMuted(false)
 					emitInfoSync(localUsername, avatar, isCameraDisabled, false)
 				}
@@ -518,11 +518,11 @@ export default function RoomDev() {
 			try {
 				if (videoTrack.enabled) {
 					videoTrack.enabled = false
-					videoTrack.stop()
+					// videoTrack.stop()
 					setCameraMuted(true)
 					emitInfoSync(localUsername, avatar, true, isMicrophoneDisabled)
 				} else {
-					navigator.mediaDevices.getUserMedia({ video: true })
+					// navigator.mediaDevices.getUserMedia({ video: true })
 					videoTrack.enabled = true
 					setCameraMuted(false)
 					emitInfoSync(localUsername, avatar, false, isMicrophoneDisabled)
