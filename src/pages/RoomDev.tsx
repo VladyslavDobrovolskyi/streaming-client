@@ -511,19 +511,20 @@ export default function RoomDev() {
 
 	const handleCameraMuteUnmute = () => {
 		if (localStream) {
-			const videoTracks = localStream.getVideoTracks()
-			if (videoTracks.length > 0) {
-				const track = videoTracks[0]
-				track.enabled = !track.enabled // Toggle video track state
-
-				if (track.enabled) {
-					setCameraMuted(false)
-				} else {
+			const videoTrack = localStream.getVideoTracks()[0]
+			console.log('Before Toggle Audio Track:', videoTrack)
+			try {
+				if (videoTrack.enabled) {
+					videoTrack.enabled = false
 					setCameraMuted(true)
+					emitInfoSync(localUsername, avatar, true, isMicrophoneDisabled)
+				} else {
+					videoTrack.enabled = true
+					setCameraMuted(false)
+					emitInfoSync(localUsername, avatar, false, isMicrophoneDisabled)
 				}
-				console.log('Camera state:', track.enabled, isCameraDisabled)
-
-				emitInfoSync(localUsername, avatar, isCameraDisabled, isMicrophoneDisabled)
+			} finally {
+				console.log('After Toggle Video Track:', videoTrack)
 			}
 		}
 	}
