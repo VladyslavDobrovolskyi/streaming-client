@@ -204,6 +204,7 @@ export default function useWebRTC(roomID: string) {
 		} finally {
 			console.log('Joining room:', roomID)
 			socket.emit(ACTIONS.JOIN, { room: roomID })
+			socket.emit(ACTIONS.REQUEST_PARTICIPANT_INFO, { roomID })
 			if (isMockedVideo) {
 				setInitialCameraDisabledState(true)
 				socket.emit(ACTIONS.SYNC_CAMERA, { roomID, socketId: socket.id, isCameraDisabled: true })
@@ -385,6 +386,7 @@ export default function useWebRTC(roomID: string) {
 			} finally {
 				console.log('Joining room:', roomID)
 				socket.emit(ACTIONS.JOIN, { room: roomID })
+				socket.emit(ACTIONS.REQUEST_PARTICIPANT_INFO, { roomID })
 
 				if (isMockedVideo) {
 					setInitialCameraDisabledState(true)
