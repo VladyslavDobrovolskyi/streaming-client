@@ -11,7 +11,8 @@ export default function useRoomSync(
 	localUsername: string,
 	avatar: string,
 	isCameraDisabled: boolean,
-	isMicrophoneDisabled: boolean
+	isMicrophoneDisabled: boolean,
+	addToast: (title: string, description: string) => void
 ) {
 	const isSyncingRef = useRef(false)
 	const [lastSeekDirection, setLastSeekDirection] = useState<'forward' | 'backward' | null>(null)
@@ -25,12 +26,13 @@ export default function useRoomSync(
 		({ time }: { time: number }) => {
 			if (!videoRef.current || isSyncingRef.current) return
 
+			addToast('Syncing', 'Syncing video playback...')
 			isSyncingRef.current = true
 			videoRef.current.seekTo(time, 'seconds')
 			videoRef.current.getInternalPlayer().play()
 			isSyncingRef.current = false
 		},
-		[videoRef]
+		[videoRef, addToast]
 	)
 
 	const handlePause = useCallback(
@@ -90,6 +92,45 @@ export default function useRoomSync(
 	// 	[]
 	// )
 
+	// type ParticipantInfo = {
+	// 	username: string
+	// 	avatar: string
+	// 	isCameraDisabled: boolean
+	// 	isMicrophoneDisabled: boolean
+	// }
+
+	// // Define the type for the function parameter
+	// type InfoSyncParams = {
+	// 	socketId: string
+	// } & Partial<ParticipantInfo>
+
+	// const handleInfoSync = useCallback((params: InfoSyncParams) => {
+	// 	const { socketId, ...updatedInfo } = params
+
+	// 	console.log('Received info sync event:', params)
+
+	// 	setParticipantInfo(prev => ({
+	// 		...prev,
+	// 		[socketId]: {
+	// 			...prev[socketId],
+	// 			...updatedInfo,
+	// 		},
+	// 	}))
+
+	// 	if ('isCameraDisabled' in updatedInfo) {
+	// 		setParticipantCameras(prev => ({
+	// 			...prev,
+	// 			[socketId]: updatedInfo.isCameraDisabled!,
+	// 		}))
+	// 	}
+
+	// 	if ('isMicrophoneDisabled' in updatedInfo) {
+	// 		setParticipantMicrophones(prev => ({
+	// 			...prev,
+	// 			[socketId]: updatedInfo.isMicrophoneDisabled!,
+	// 		}))
+	// 	}
+	// }, [])
 	const handleInfoSync = useCallback(
 		({
 			socketId,
