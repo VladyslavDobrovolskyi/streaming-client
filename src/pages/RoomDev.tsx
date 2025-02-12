@@ -231,10 +231,12 @@ export default function RoomDev() {
 	}
 
 	const handlePlay = () => {
-		setIsPlaying(true)
-		showAction('play')
-		const currentTime = playerRef.current?.getCurrentTime() || 0
-		emitPlay(currentTime)
+		if (!isPlaying) {
+			setIsPlaying(true)
+			showAction('play')
+			const currentTime = playerRef.current?.getCurrentTime() || 0
+			emitPlay(currentTime)
+		}
 	}
 
 	const handlePause = () => {
@@ -363,17 +365,11 @@ export default function RoomDev() {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (e.code === 'Space') {
 				e.preventDefault()
-				setIsPlaying(prev => {
-					const newState = !prev
-					showAction(newState ? 'play' : 'pause')
-					const currentTime = playerRef.current?.getCurrentTime() || 0
-					if (newState) {
-						emitPlay(currentTime)
-					} else {
-						emitPause(currentTime)
-					}
-					return newState
-				})
+				if (!isPlaying) {
+					handlePlay()
+				} else {
+					handlePause()
+				}
 			} else if (e.code === 'ArrowRight') {
 				handleForward15()
 			} else if (e.code === 'ArrowLeft') {
@@ -793,17 +789,13 @@ export default function RoomDev() {
 				>
 					<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: '1 0 auto' }}>
 						<button
-							onClick={() =>
-								setIsPlaying(prev => {
-									const newState = !prev
-									if (newState) {
-										handlePlay()
-									} else {
-										handlePause()
-									}
-									return newState
-								})
-							}
+							onClick={() => {
+								if (isPlaying) {
+									handlePause()
+								} else {
+									handlePlay()
+								}
+							}}
 							style={{
 								color: 'white',
 								border: 'none',
