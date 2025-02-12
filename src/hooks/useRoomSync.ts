@@ -26,6 +26,7 @@ export default function useRoomSync(
 		({ time }: { time: number }) => {
 			if (!videoRef.current || isSyncingRef.current) return
 
+			console.log('Received play event:', { time })
 			addToast('Syncing', 'Syncing video playback...')
 			isSyncingRef.current = true
 			videoRef.current.seekTo(time, 'seconds')
