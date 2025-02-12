@@ -1291,7 +1291,7 @@ export default function RoomDev() {
 				{toasts.map(toast => (
 					<StyledToastRoot key={toast.id} duration={3000}>
 						<StyledToastTitle>
-							{toast.avatar && <Avatar src={avatar} fallback='?' />}
+							{toast.avatar && <Avatar src={toast.avatar} fallback='?' />}
 							{toast.title}
 						</StyledToastTitle>
 						<StyledToastDescription>{toast.description}</StyledToastDescription>
