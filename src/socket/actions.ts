@@ -12,8 +12,8 @@ const ACTIONS = {
 	VIDEO_PAUSE: 'video-pause',
 	VIDEO_SEEK: 'video-seek',
 	REQUEST_SYNC: 'request-sync',
-	SYNC_INFO: 'sync-info',
 	SYNC_STATE: 'sync-state',
+	SYNC_INFO: 'sync-info',
 	SYNC_CAMERA: 'sync-camera',
 	SYNC_MICROPHONE: 'sync-microphone',
 	SEND_CHAT_MESSAGE: 'send-chat-message',
@@ -21,6 +21,8 @@ const ACTIONS = {
 	REQUEST_PARTICIPANT_INFO: 'request_participant_info',
 	SEND_PARTICIPANT_INFO: 'send_participant_info',
 	SEND_PRIVATE_MESSAGE: 'send-private-message',
+	SEND_VIDEO_PLAY: 'send-video-play',
+	RECEIVE_VIDEO_PLAY: 'receive-video-play',
 	RECEIVE_PRIVATE_MESSAGE: 'receive-private-message',
 }
 

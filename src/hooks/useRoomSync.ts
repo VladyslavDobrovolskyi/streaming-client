@@ -220,12 +220,13 @@ export default function useRoomSync(
 	}, [])
 
 	useEffect(() => {
-		socket.on(ACTIONS.VIDEO_PLAY, handlePlay)
+		// socket.on(ACTIONS.VIDEO_PLAY, handlePlay)
 		socket.on(ACTIONS.VIDEO_PAUSE, handlePause)
 		socket.on(ACTIONS.VIDEO_SEEK, handleSeek)
 		socket.on(ACTIONS.REQUEST_SYNC, handleSyncRequest)
 		socket.on(ACTIONS.SYNC_INFO, handleInfoSync)
 		socket.on(ACTIONS.REMOVE_PEER, handleClientLeave)
+		socket.on(ACTIONS.RECEIVE_VIDEO_PLAY, handlePlay)
 		// socket.on(ACTIONS.SYNC_CAMERA, handleCameraSync)
 		// socket.on(ACTIONS.SYNC_MICROPHONE, handleMicrophoneSync)
 		socket.on(ACTIONS.REQUEST_PARTICIPANT_INFO, handleRequestParticipantInfo)
