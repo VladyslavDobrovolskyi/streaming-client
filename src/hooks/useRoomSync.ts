@@ -12,7 +12,7 @@ export default function useRoomSync(
 	avatar: string,
 	isCameraDisabled: boolean,
 	isMicrophoneDisabled: boolean,
-	addToast: (title: string, description: string) => void
+	addToast: (avatar: string, title: string, description: string) => void
 ) {
 	const isSyncingRef = useRef(false)
 	const [lastSeekDirection, setLastSeekDirection] = useState<'forward' | 'backward' | null>(null)
@@ -27,7 +27,11 @@ export default function useRoomSync(
 			if (!videoRef.current || isSyncingRef.current) return
 			console.log(participantInfo[socketID])
 			console.log('Received play event:', { time })
-			addToast('Syncing', `${participantInfo[socketID]?.username || 'Someone'} started playing the video`)
+			addToast(
+				participantInfo[socketID].avatar,
+				'Syncing',
+				`${participantInfo[socketID]?.username || 'Someone'} started playing the video`
+			)
 			isSyncingRef.current = true
 			videoRef.current.seekTo(time, 'seconds')
 			videoRef.current.getInternalPlayer().play()

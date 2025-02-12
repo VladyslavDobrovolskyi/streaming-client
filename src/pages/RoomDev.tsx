@@ -114,7 +114,7 @@ const StyledToastClose = styled(Toast.Close, {
 // }
 
 export default function RoomDev() {
-	const [toasts, setToasts] = useState<Array<{ id: string; title: string; description: string }>>([])
+	const [toasts, setToasts] = useState<Array<{ id: string; avatar: string; title: string; description: string }>>([])
 	const { id: roomID } = useParams<{ id: string }>()
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [volume, setVolume] = useState(0.8)
@@ -168,9 +168,9 @@ export default function RoomDev() {
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
 	const sliderRef = useRef<HTMLDivElement>(null)
 	const previousVolumeRef = useRef(volume)
-	const addToast = (title: string, description: string) => {
+	const addToast = (avatar: string, title: string, description: string) => {
 		const id = Math.random().toString(36).substr(2, 9)
-		setToasts(prev => [...prev, { id, title, description }])
+		setToasts(prev => [...prev, { id, avatar, title, description }])
 	}
 	const {
 		emitPlay,
@@ -1290,7 +1290,10 @@ export default function RoomDev() {
 			<Toast.Provider swipeDirection='right'>
 				{toasts.map(toast => (
 					<StyledToastRoot key={toast.id} duration={3000}>
-						<StyledToastTitle>{toast.title}</StyledToastTitle>
+						<StyledToastTitle>
+							{toast.avatar && <Avatar src={avatar} fallback='?' />}
+							{toast.title}
+						</StyledToastTitle>
 						<StyledToastDescription>{toast.description}</StyledToastDescription>
 						<StyledToastClose>
 							<span aria-hidden>×</span>
