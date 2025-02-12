@@ -240,6 +240,7 @@ export default function useRoomSync(
 			// socket.off(ACTIONS.SYNC_CAMERA, handleCameraSync)
 			// socket.off(ACTIONS.SYNC_MICROPHONE, handleMicrophoneSync)
 			socket.off(ACTIONS.REQUEST_PARTICIPANT_INFO, handleRequestParticipantInfo)
+			socket.off(ACTIONS.RECEIVE_VIDEO_PLAY, handlePlay)
 		}
 	}, [
 		handlePlay,
