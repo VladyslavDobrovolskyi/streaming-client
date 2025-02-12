@@ -23,11 +23,11 @@ export default function useRoomSync(
 	// const [participantMicrophones, setParticipantMicrophones] = useState<Record<string, boolean>>({})
 
 	const handlePlay = useCallback(
-		({ time }: { time: number }) => {
+		({ time }: { socketID: string; time: number }) => {
 			if (!videoRef.current || isSyncingRef.current) return
-			console.log(participantInfo)
+			console.log(participantInfo[socket.id])
 			console.log('Received play event:', { time })
-			addToast('Syncing', 'Syncing video playback...')
+			addToast('Syncing', `${participantInfo[socket.id]?.username || 'Someone'} started playing the video`)
 			isSyncingRef.current = true
 			videoRef.current.seekTo(time, 'seconds')
 			videoRef.current.getInternalPlayer().play()
