@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import socket from '../socket'
+import socket from '../socket/index.ts'
 import Hls from 'hls.js'
 import { v4 } from 'uuid'
 import ACTIONS from '../socket/actions'

@@ -5,7 +5,7 @@ import { useParams } from 'react-router'
 import { useNavigate } from 'react-router-dom'
 import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
 import ACTIONS from '../socket/actions'
-import socket from '../socket'
+import socket from '../socket/index.ts'
 import useRoomSync from '../hooks/useRoomSync'
 
 function layout(clientsNumber = 1) {

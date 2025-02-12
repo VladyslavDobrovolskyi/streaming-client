@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useCallback, useState } from 'react'
 import useStateWithCallback from './useStateWithCallback'
-import socket from '../socket'
+import socket from '../socket/index.ts'
 import ACTIONS from '../socket/actions'
 
 export const LOCAL_VIDEO = 'LOCAL_VIDEO'

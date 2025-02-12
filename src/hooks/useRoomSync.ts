@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useCallback, useState } from 'react'
-import socket from '../socket'
+import socket from '../socket/index.ts'
 import ACTIONS from '../socket/actions'
 import type ReactPlayer from 'react-player'
 
