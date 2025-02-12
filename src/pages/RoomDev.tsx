@@ -188,6 +188,10 @@ export default function RoomDev() {
 	} = useRoomSync(roomID!, playerRef, localUsername, avatar, isCameraDisabled, isMicrophoneDisabled, addToast)
 
 	useEffect(() => {
+		console.log('Toasts:', toasts)
+	}, [toasts])
+
+	useEffect(() => {
 		console.log('Participants:', clients, 'Participant info: ', participantInfo)
 	}, [clients, participantInfo])
 
