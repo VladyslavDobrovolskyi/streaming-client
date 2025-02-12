@@ -25,7 +25,7 @@ export default function useRoomSync(
 	const handlePlay = useCallback(
 		({ time }: { time: number }) => {
 			if (!videoRef.current || isSyncingRef.current) return
-
+			console.log(participantInfo)
 			console.log('Received play event:', { time })
 			addToast('Syncing', 'Syncing video playback...')
 			isSyncingRef.current = true
@@ -33,7 +33,7 @@ export default function useRoomSync(
 			videoRef.current.getInternalPlayer().play()
 			isSyncingRef.current = false
 		},
-		[videoRef, addToast]
+		[videoRef, participantInfo, addToast]
 	)
 
 	const handlePause = useCallback(
