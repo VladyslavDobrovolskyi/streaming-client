@@ -7,7 +7,7 @@ import DraggableResizable from './DraggableResizable'
 
 interface RoomChatProps {
     clientID: string
-    messages: { username: string; message: string; avatar: string }[]
+    messages: { username: string; message: string; avatar: string; emoji: string }[]
     chatInput: string
     setChatInput: (input: string) => void
     handleSendMessage: () => void
@@ -81,8 +81,11 @@ const RoomChat: React.FC<RoomChatProps> = ({
                                 >
                                     {!isCurrentUser && isFirstMessageFromUser && (
                                         <Box mr='2'>
-                                            <Avatar src={msg.avatar} fallback={msg.username[0]} size='2' />
+                                            <Avatar src={msg.avatar} fallback={msg.emoji} size='2' />
                                         </Box>
+                                    )}
+                                    {!isCurrentUser && !isFirstMessageFromUser && (
+                                        <Box mr='2' style={{ width: '32px' }} /> // Space for avatar
                                     )}
                                     <Box
                                         style={{
