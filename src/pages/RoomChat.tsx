@@ -35,6 +35,10 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		}
 	}, [messages])
 
+	useEffect(() => {
+		console.log('participantInfo:', participantInfo)
+		console.log('messages:', messages)
+	})
 	return (
 		<DraggableResizable
 			initialSize={{ width: 300, height: 400 }}
@@ -88,7 +92,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 								>
 									{!isCurrentUser && isFirstMessageFromUser && (
 										<Box mr='2'>
-											<Avatar src={participantInfo[msg.sender].avatar} fallback={'?'} size='2' />
+											<Avatar src={participantInfo[msg.sender]?.avatar} fallback={'?'} size='2' />
 										</Box>
 									)}
 									{!isCurrentUser && !isFirstMessageFromUser && (
