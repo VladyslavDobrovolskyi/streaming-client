@@ -75,7 +75,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							return (
 								<Flex
 									key={index}
-									justify={isCurrentUser ? 'end' : 'start'}
+									// justify={isCurrentUser ? 'end' : 'start'}
 									align='center'
 									mb='2'
 									style={{ textAlign: isCurrentUser ? 'right' : 'left' }}
