@@ -66,7 +66,7 @@ function createMockVideoStream(): MediaStreamTrack {
 
 export default function useWebRTC(roomID: string) {
 	const [clients, updateClients] = useStateWithCallback<string[]>([])
-	const [chatMessages, setChatMessages] = useState<{ username: string; message: string }[]>([])
+	const [chatMessages, setChatMessages] = useState<{ sender: string; username: string; message: string }[]>([])
 	const [privateMessages, setPrivateMessages] = useState<
 		Record<string, Array<{ from: string; to: string; message: string }>>
 	>({})
@@ -464,7 +464,7 @@ export default function useWebRTC(roomID: string) {
 	useEffect(() => {
 		socket.on(ACTIONS.RECEIVE_CHAT_MESSAGE, ({ sender, username, message, timestamp }) => {
 			console.log(` ${timestamp} - Received chat message from [${sender} | ${username}]:`, message)
-			setChatMessages(prevMessages => [...prevMessages, { username, message }])
+			setChatMessages(prevMessages => [...prevMessages, { sender, username, message }])
 		})
 
 		return () => {

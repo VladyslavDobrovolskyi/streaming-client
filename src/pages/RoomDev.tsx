@@ -1260,6 +1260,7 @@ export default function RoomDev() {
 			{showChat && (
 				<RoomChat
 					clientID={LOCAL_VIDEO}
+					participantInfo={participantInfo}
 					messages={chatMessages}
 					chatInput={chatInput}
 					setChatInput={setChatInput}
