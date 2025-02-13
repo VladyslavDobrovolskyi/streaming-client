@@ -69,35 +69,48 @@ const RoomChat: React.FC<RoomChatProps> = ({
                     </Flex>
 
 					<ScrollArea style={{ flex: 1, padding: '16px' }} ref={scrollAreaRef} className='scroll-area'>
-					    {messages.map((msg, index) => {
-					        const isCurrentUser = msg.username === clientID;
-					        const isFirstMessageFromUser = index === 0 || messages[index - 1].username !== msg.username;
-						
-					        return (
-					            <Box key={index} mb='2' style={{ textAlign: isCurrentUser ? 'right' : 'left' }}>
-					                {!isCurrentUser && isFirstMessageFromUser && (
-					                    <Box mb='1'>
-					                        <Avatar fallback={msg.avatar} size='2' />
-					                    </Box>
-					                )}
-					                <Text
-					                    as='span'
-					                    size='2'
-					                    style={{
-					                        display: 'inline-block',
-					                        maxWidth: '70%',
-					                        wordWrap: 'break-word',
-					                        backgroundColor: isCurrentUser ? 'var(--blue-5)' : 'var(--gray-3)',
-					                        color: isCurrentUser ? 'white' : 'var(--gray-12)',
-					                        borderRadius: 'var(--radius-2)',
-					                        padding: '8px 12px',
-					                    }}
-					                >
-					                    {msg.message}
-					                </Text>
-					            </Box>
-					        );
-					    })}
+						{messages.map((msg, index) => {
+							const isCurrentUser = msg.username === clientID;
+							const isFirstMessageFromUser = index === 0 || messages[index - 1].username !== msg.username;
+
+							return (
+								<Flex key={index} mb='2' style={{ justifyContent: isCurrentUser ? 'flex-end' : 'flex-start' }}>
+									{!isCurrentUser && isFirstMessageFromUser && (
+										<Avatar
+											fallback={msg.avatar}
+											size='2'
+											style={{
+												marginRight: '8px',
+												display: 'flex',
+												alignItems: 'center',
+												justifyContent: 'center',
+												backgroundColor: 'var(--gray-4)',
+												borderRadius: '50%',
+											}}
+										>
+											{msg.avatar}
+										</Avatar>
+									)}
+									<Box style={{ textAlign: isCurrentUser ? 'right' : 'left' }}>
+										<Text
+											as='span'
+											size='2'
+											style={{
+												display: 'inline-block',
+												maxWidth: '70%',
+												wordWrap: 'break-word',
+												backgroundColor: isCurrentUser ? 'var(--blue-5)' : 'var(--gray-3)',
+												color: isCurrentUser ? 'white' : 'var(--gray-12)',
+												borderRadius: 'var(--radius-2)',
+												padding: '8px 12px',
+											}}
+										>
+											{msg.message}
+										</Text>
+									</Box>
+								</Flex>
+							);
+						})}
 					</ScrollArea>
 
                     <Flex p='3' style={{ borderTop: '1px solid var(--gray-5)' }}>
