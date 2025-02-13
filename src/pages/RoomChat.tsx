@@ -97,7 +97,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 								>
 									{isFirstMessageFromUser && (
 										<Box mr='2'>
-											<span>{'Anonymous'}</span>
+											<span>{participantInfo[msg.sender].username}</span>
 											<Avatar src={participantInfo[msg.sender]?.avatar} fallback={'?'} size='2' />
 										</Box>
 									)}
