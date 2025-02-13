@@ -6,7 +6,7 @@ import { Kbd } from '@radix-ui/themes'
 import DraggableResizable from './DraggableResizable'
 
 interface RoomChatProps {
-	clientID: string
+	realClientID: string | null
 	participantInfo: Record<
 		string,
 		{ username: string; avatar: string; isCameraDisabled: boolean; isMicrophoneDisabled: boolean }
@@ -19,7 +19,7 @@ interface RoomChatProps {
 }
 
 const RoomChat: React.FC<RoomChatProps> = ({
-	clientID,
+	realClientID,
 	participantInfo,
 	messages,
 	chatInput,
@@ -82,7 +82,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 					<ScrollArea style={{ flex: 1, padding: '16px' }} ref={scrollAreaRef} className='scroll-area'>
 						{messages.map((msg, index) => {
 							const isFirstMessageFromUser = index === 0 || messages[index - 1].username !== msg.username
-							const isCurrentUser = msg.username === clientID
+							const isCurrentUser = msg.sender === realClientID
 							return (
 								<Flex
 									key={index}
@@ -90,7 +90,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 									mb='2'
 									style={{ textAlign: isCurrentUser ? 'right' : 'left' }}
 								>
-									{!isCurrentUser && isFirstMessageFromUser && (
+									{isFirstMessageFromUser && (
 										<Box mr='2'>
 											<span>
 												{' '}

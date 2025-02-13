@@ -182,6 +182,7 @@ export default function RoomDev() {
 		// emitMicrophoneSync,
 		lastSeekDirection,
 		participantInfo,
+		setParticipantInfo,
 		// participantCameras,
 		// participantMicrophones,
 		requestParticipantInfo,
@@ -190,6 +191,18 @@ export default function RoomDev() {
 	useEffect(() => {
 		console.log('Toasts:', toasts)
 	}, [toasts])
+
+	useEffect(() => {
+		setParticipantInfo(prev => ({
+			...prev,
+			[localStream?.id || '']: {
+				username: localUsername,
+				avatar,
+				isCameraDisabled,
+				isMicrophoneDisabled,
+			},
+		}))
+	}, [localUsername, avatar, isCameraDisabled, isMicrophoneDisabled, setParticipantInfo, localStream])
 
 	useEffect(() => {
 		console.log('Participants:', clients, 'Participant info: ', participantInfo)
@@ -1259,7 +1272,7 @@ export default function RoomDev() {
 			)}
 			{showChat && (
 				<RoomChat
-					clientID={LOCAL_VIDEO}
+					realClientID={localStream?.id || ''}
 					participantInfo={participantInfo}
 					messages={chatMessages}
 					chatInput={chatInput}
