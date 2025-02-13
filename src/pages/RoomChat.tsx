@@ -92,6 +92,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 								>
 									{!isCurrentUser && isFirstMessageFromUser && (
 										<Box mr='2'>
+											<span> {participantInfo[msg.sender].username}</span>
 											<Avatar src={participantInfo[msg.sender]?.avatar} fallback={'?'} size='2' />
 										</Box>
 									)}
