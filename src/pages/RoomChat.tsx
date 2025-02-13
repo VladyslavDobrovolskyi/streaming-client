@@ -38,6 +38,11 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	useEffect(() => {
 		console.log('participantInfo:', participantInfo)
 		console.log('messages:', messages)
+		messages.forEach(msg => {
+			if (realClientID === msg.sender) {
+				console.log('You:', msg.message)
+			}
+		})
 	})
 	return (
 		<DraggableResizable
@@ -92,12 +97,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 								>
 									{isFirstMessageFromUser && (
 										<Box mr='2'>
-											<span>
-												{' '}
-												{participantInfo[msg.sender].username
-													? participantInfo[msg.sender].username
-													: 'Anonymous'}
-											</span>
+											<span>{'Anonymous'}</span>
 											<Avatar src={participantInfo[msg.sender]?.avatar} fallback={'?'} size='2' />
 										</Box>
 									)}
