@@ -135,6 +135,7 @@ export default function RoomDev() {
 		clients,
 		provideMediaRef,
 		localStream,
+		localPeerId,
 		reinitializeStream,
 		chatMessages,
 		sendChatMessage,
@@ -195,14 +196,14 @@ export default function RoomDev() {
 	useEffect(() => {
 		setParticipantInfo(prev => ({
 			...prev,
-			[localStream?.id || '']: {
+			[localPeerId]: {
 				username: localUsername,
 				avatar,
 				isCameraDisabled,
 				isMicrophoneDisabled,
 			},
 		}))
-	}, [localUsername, avatar, isCameraDisabled, isMicrophoneDisabled, setParticipantInfo, localStream])
+	}, [localUsername, avatar, isCameraDisabled, isMicrophoneDisabled, setParticipantInfo, localPeerId])
 
 	useEffect(() => {
 		console.log('Participants:', clients, 'Participant info: ', participantInfo)

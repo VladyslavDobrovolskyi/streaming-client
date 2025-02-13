@@ -70,7 +70,7 @@ export default function useWebRTC(roomID: string) {
 	const [privateMessages, setPrivateMessages] = useState<
 		Record<string, Array<{ from: string; to: string; message: string }>>
 	>({})
-
+	const [localPeerId, setLocalPeerId] = useState<string>('')
 	const [initialMicrophoneDisabledState, setInitialMicrophoneDisabledState] = useState<boolean>(false)
 	const [initialCameraDisabledState, setInitialCameraDisabledState] = useState<boolean>(false)
 
@@ -504,12 +504,28 @@ export default function useWebRTC(roomID: string) {
 		}
 	}, [])
 
+	useEffect(() => {
+		setLocalPeerId(socket.id)
+
+		const handleConnect = () => {
+			setLocalPeerId(socket.id)
+			console.log('Local peer ID updated:', socket.id)
+		}
+
+		socket.on('connect', handleConnect)
+
+		return () => {
+			socket.off('connect', handleConnect)
+		}
+	}, [])
+
 	return {
 		clients,
 		initialCameraDisabledState,
 		initialMicrophoneDisabledState,
 		provideMediaRef,
 		localStream: localMediaStream.current,
+		localPeerId,
 		reinitializeStream,
 		chatMessages,
 		sendChatMessage,
