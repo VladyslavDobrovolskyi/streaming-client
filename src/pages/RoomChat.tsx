@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useEffect } from 'react'
-import { Box, Flex, ScrollArea, Text, TextArea, Button } from '@radix-ui/themes'
+import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar } from '@radix-ui/themes'
 import { Kbd } from '@radix-ui/themes'
 import DraggableResizable from './DraggableResizable'
 
@@ -81,7 +81,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
                                 >
                                     {!isCurrentUser && isFirstMessageFromUser && (
                                         <Box mr='2'>
-                                            <Text size='2'>{msg.avatar}</Text>
+                                            <Avatar src={msg.avatar} fallback={msg.username[0]} size='2' />
                                         </Box>
                                     )}
                                     <Box
