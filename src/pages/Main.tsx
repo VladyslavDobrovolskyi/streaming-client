@@ -202,7 +202,7 @@ const Main: React.FC = () => {
 
 	return (
 		<div className='Main'>
-			<h1>Live Stream!!!</h1>
+			<h1> Albert Stream!!!</h1>
 			<video
 				ref={videoRef}
 				width='100%'
