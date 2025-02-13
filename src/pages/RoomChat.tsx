@@ -82,7 +82,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 								>
 									{!isCurrentUser && isFirstMessageFromUser && (
 										<Box mr='2'>
-											<Avatar src={msg.avatar} fallback={msg.message} size='2' />
+											<Avatar src={msg.avatar} fallback={msg.avatar} size='2' />
 										</Box>
 									)}
 									{!isCurrentUser && !isFirstMessageFromUser && (
