@@ -7,7 +7,7 @@ import DraggableResizable from './DraggableResizable'
 
 interface RoomChatProps {
     clientID: string
-    messages: { username: string; message: string; avatar: string; emoji: string }[]
+    messages: { username: string; message: string; avatar: string }[]
     chatInput: string
     setChatInput: (input: string) => void
     handleSendMessage: () => void
@@ -28,7 +28,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
         if (scrollAreaRef.current) {
             scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
         }
-    }, [messages]) // Correct dependency to re-scroll on new messages
+    }, [messages])
 
     return (
         <DraggableResizable
@@ -68,41 +68,43 @@ const RoomChat: React.FC<RoomChatProps> = ({
                         </Button>
                     </Flex>
 
-                    <ScrollArea style={{ flex: 1, padding: '16px' }} ref={scrollAreaRef} className='scroll-area'>
-                        {messages.map((msg, index) => {
-                            const isFirstMessageFromUser = index === 0 || messages[index - 1].username !== msg.username;
-                            const isCurrentUser = msg.username === clientID;
-                            return (
-                                <Flex
-                                    key={index}
-                                    justify={isCurrentUser ? 'end' : 'start'}
-                                    align='center'
-                                    mb='2'
-                                >
-                                    {!isCurrentUser && isFirstMessageFromUser && (
-                                        <Box mr='2'>
-                                            <Avatar src={msg.avatar} fallback={msg.emoji} size='2' />
-                                        </Box>
-                                    )}
-                                    {!isCurrentUser && !isFirstMessageFromUser && (
-                                        <Box mr='2' style={{ width: '32px' }} /> // Space for avatar
-                                    )}
-                                    <Box
-                                        style={{
-                                            maxWidth: '70%',
-                                            wordWrap: 'break-word',
-                                            backgroundColor: isCurrentUser ? 'var(--blue-5)' : 'var(--gray-3)',
-                                            color: isCurrentUser ? 'white' : 'var(--gray-12)',
-                                            borderRadius: 'var(--radius-2)',
-                                            padding: '8px 12px',
-                                        }}
-                                    >
-                                        <Text size='2'>{msg.message}</Text>
-                                    </Box>
-                                </Flex>
-                            )
-                        })}
-                    </ScrollArea>
+					<ScrollArea style={{ flex: 1, padding: '16px' }} ref={scrollAreaRef} className='scroll-area'>
+						{messages.map((msg, index) => {
+							const isFirstMessageFromUser = index === 0 || messages[index - 1].username !== msg.username;
+							const isCurrentUser = msg.username === clientID;
+							return (
+								<Flex
+									key={index}
+									justify={isCurrentUser ? 'end' : 'start'}
+									align='center'
+									mb='2'
+									style={{ textAlign: isCurrentUser ? 'right' : 'left' }}
+								>
+									{!isCurrentUser && isFirstMessageFromUser && (
+										<Box mr='2'>
+											<Avatar src={msg.avatar} fallback={msg.message} size='2' />
+										</Box>
+									)}
+									{!isCurrentUser && !isFirstMessageFromUser && (
+										<Box mr='2' style={{ width: '32px' }} />
+									)}
+									<Box
+										style={{
+											maxWidth: '70%',
+											wordWrap: 'break-word',
+											backgroundColor: isCurrentUser ? 'var(--blue-5)' : 'var(--gray-3)',
+											color: isCurrentUser ? 'white' : 'var(--gray-12)',
+											borderRadius: 'var(--radius-2)',
+											padding: '8px 12px',
+											textAlign: isCurrentUser ? 'right' : 'left',
+										}}
+									>
+										<Text size='2'>{msg.message}</Text>
+									</Box>
+								</Flex>
+							)
+						})}
+					</ScrollArea>
 
                     <Flex p='3' style={{ borderTop: '1px solid var(--gray-5)' }}>
                         <TextArea
