@@ -28,7 +28,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
-	}, [scrollAreaRef])
+	}, [messages]) // Correct dependency to re-scroll on new messages
 
 	return (
 		<DraggableResizable
@@ -62,28 +62,35 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							userSelect: 'none',
 						}}
 					>
-						<Flex align='center' gap='2'></Flex>
+						<Text size='2' weight='bold'>Chat</Text>
 						<Button variant='ghost' onClick={onClose}>
 							X
 						</Button>
 					</Flex>
+
 					<ScrollArea style={{ flex: 1, padding: '16px' }} ref={scrollAreaRef} className='scroll-area'>
 						{messages.map((msg, index) => (
-							<Box key={index} mb='2' style={{ textAlign: msg.username === clientID ? 'left' : 'right' }}>
-								<Text
-									as='span'
-									size='2'
+							<Flex
+								key={index}
+								justify={msg.username === clientID ? 'end' : 'start'}
+								mb='2'
+							>
+								<Box
 									style={{
-										display: 'inline-block',
+										maxWidth: '70%',
+										wordWrap: 'break-word',
+										backgroundColor: msg.username === clientID ? 'var(--blue-5)' : 'var(--gray-3)',
+										color: msg.username === clientID ? 'white' : 'var(--gray-12)',
 										borderRadius: 'var(--radius-2)',
-										padding: '4px 8px',
+										padding: '8px 12px',
 									}}
 								>
-									{msg.message}
-								</Text>
-							</Box>
+									<Text size='2'>{msg.message}</Text>
+								</Box>
+							</Flex>
 						))}
 					</ScrollArea>
+
 					<Flex p='3' style={{ borderTop: '1px solid var(--gray-5)' }}>
 						<TextArea
 							style={{ flex: 1, marginRight: '8px' }}
