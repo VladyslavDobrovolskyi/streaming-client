@@ -33,17 +33,8 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
-	}, [messages])
+	}, [scrollAreaRef]) //Corrected dependency
 
-	useEffect(() => {
-		console.log('participantInfo:', participantInfo)
-		console.log('messages:', messages)
-		messages.forEach(msg => {
-			if (realClientID === msg.sender) {
-				console.log('You:', msg.message)
-			}
-		})
-	})
 	return (
 		<DraggableResizable
 			initialSize={{ width: 300, height: 400 }}
@@ -86,38 +77,38 @@ const RoomChat: React.FC<RoomChatProps> = ({
 
 					<ScrollArea style={{ flex: 1, padding: '16px' }} ref={scrollAreaRef} className='scroll-area'>
 						{messages.map((msg, index) => {
-							const isFirstMessageFromUser = index === 0 || messages[index - 1].username !== msg.username
 							const isCurrentUser = msg.sender === realClientID
+							const isFirstMessageFromUser = index === 0 || messages[index - 1].sender !== msg.sender
 							return (
-								<Flex
-									key={index}
-									align='center'
-									mb='2'
-									style={{ textAlign: isCurrentUser ? 'right' : 'left' }}
-								>
-									{isFirstMessageFromUser && (
-										<Box mr='2'>
-											<span>{participantInfo[msg.sender].username}</span>
-											<Avatar src={participantInfo[msg.sender]?.avatar} fallback={'?'} size='2' />
-										</Box>
+								<Box key={index} mb='2' style={{ textAlign: isCurrentUser ? 'right' : 'left' }}>
+									{isFirstMessageFromUser && !isCurrentUser && (
+										<Flex align='center' mb='1' gap='2'>
+											<Avatar
+												src={participantInfo[msg.sender]?.avatar}
+												fallback={msg.username[0]}
+												size='1'
+											/>
+											<Text size='1' style={{ color: 'var(--gray-11)' }}>
+												{msg.username}
+											</Text>
+										</Flex>
 									)}
-									{!isCurrentUser && !isFirstMessageFromUser && (
-										<Box mr='2' style={{ width: '32px' }} />
-									)}
-									<Box
+									<Text
+										as='span'
+										size='2'
 										style={{
-											maxWidth: '70%',
-											wordWrap: 'break-word',
+											display: 'inline-block',
 											backgroundColor: isCurrentUser ? 'var(--blue-5)' : 'var(--gray-3)',
 											color: isCurrentUser ? 'white' : 'var(--gray-12)',
 											borderRadius: 'var(--radius-2)',
-											padding: '8px 12px',
-											textAlign: isCurrentUser ? 'right' : 'left',
+											padding: '4px 8px',
+											maxWidth: '70%',
+											wordWrap: 'break-word',
 										}}
 									>
-										<Text size='2'>{msg.message}</Text>
-									</Box>
-								</Flex>
+										{msg.message}
+									</Text>
+								</Box>
 							)
 						})}
 					</ScrollArea>
