@@ -11,7 +11,7 @@ interface RoomChatProps {
 		string,
 		{ username: string; avatar: string; isCameraDisabled: boolean; isMicrophoneDisabled: boolean }
 	>
-	messages: { sender: string; username: string; message: string }[]
+	messages: Array<{ sender: string; username: string; message: string }>
 	chatInput: string
 	setChatInput: (input: string) => void
 	handleSendMessage: () => void
@@ -33,7 +33,17 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
-	}, [scrollAreaRef]) //Fixed useEffect dependency
+	}, [scrollAreaRef]) // Changed dependency to scrollAreaRef to ensure scroll on new messages
+
+	const getMessageClasses = (message: { sender: string }, index: number) => {
+		const prevMessage = messages[index - 1]
+		const nextMessage = messages[index + 1]
+
+		const isFirst = !prevMessage || prevMessage.sender !== message.sender
+		const isLast = !nextMessage || nextMessage.sender !== message.sender
+
+		return `message ${isFirst ? 'message-first' : ''} ${isLast ? 'message-last' : ''}`
+	}
 
 	return (
 		<DraggableResizable
@@ -83,7 +93,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						{messages.map((msg, index) => (
 							<Box
 								key={index}
-								mb='3'
+								className={getMessageClasses(msg, index)}
 								style={{ textAlign: msg.sender === realClientID ? 'right' : 'left' }}
 							>
 								<Flex align='end' gap='2' justify={msg.sender === realClientID ? 'end' : 'start'}>
@@ -92,18 +102,27 @@ const RoomChat: React.FC<RoomChatProps> = ({
 											src={participantInfo[msg.sender]?.avatar}
 											fallback={participantInfo[msg.sender]?.username[0]}
 											size='1'
-											style={{ marginBottom: '4px' }}
+											style={{
+												marginBottom: '4px',
+												opacity: getMessageClasses(msg, index).includes('message-first')
+													? 1
+													: 0,
+												visibility: getMessageClasses(msg, index).includes('message-first')
+													? 'visible'
+													: 'hidden',
+											}}
 										/>
 									)}
 									<Box>
-										{msg.sender !== realClientID && (
-											<Text
-												size='1'
-												style={{ opacity: 0.7, marginBottom: '2px', paddingLeft: '4px' }}
-											>
-												{participantInfo[msg.sender]?.username}
-											</Text>
-										)}
+										{msg.sender !== realClientID &&
+											getMessageClasses(msg, index).includes('message-first') && (
+												<Text
+													size='1'
+													style={{ opacity: 0.7, marginBottom: '2px', paddingLeft: '4px' }}
+												>
+													{participantInfo[msg.sender]?.username}
+												</Text>
+											)}
 										<Text
 											as='span'
 											size='2'
@@ -114,11 +133,18 @@ const RoomChat: React.FC<RoomChatProps> = ({
 												color: msg.sender === realClientID ? 'white' : 'var(--gray-12)',
 												borderRadius:
 													msg.sender === realClientID
-														? '18px 18px 0 18px'
-														: '18px 18px 18px 0',
+														? getMessageClasses(msg, index).includes('message-last')
+															? '18px 18px 0 18px'
+															: '18px 18px 4px 18px'
+														: getMessageClasses(msg, index).includes('message-last')
+														? '18px 18px 18px 0'
+														: '18px 18px 18px 4px',
 												padding: '8px 12px',
 												maxWidth: '85%',
 												wordWrap: 'break-word',
+												marginBottom: getMessageClasses(msg, index).includes('message-last')
+													? '8px'
+													: '2px',
 											}}
 										>
 											{msg.message}
