@@ -34,6 +34,11 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		}
 	}, [scrollAreaRef]) // Scroll to bottom when messages change
 
+	useEffect(() => {
+		console.log('Client-ID:', realClientID)
+		console.log('Participant-Info:', participantInfo)
+		console.log('Messages:', messages)
+	}, [realClientID, participantInfo, messages])
 	return (
 		<DraggableResizable
 			initialSize={{ width: 300, height: 400 }}
