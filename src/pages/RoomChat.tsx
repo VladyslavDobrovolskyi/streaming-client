@@ -2,7 +2,6 @@
 
 import { useRef, useEffect } from 'react'
 import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar } from '@radix-ui/themes'
-import { Kbd } from '@radix-ui/themes'
 import DraggableResizable from './DraggableResizable'
 
 interface RoomChatProps {
@@ -33,14 +32,14 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
-	}, [scrollAreaRef]) //Corrected dependency
+	}, [scrollAreaRef]) // Scroll to bottom when messages change
 
 	return (
 		<DraggableResizable
 			initialSize={{ width: 300, height: 400 }}
 			initialPosition={{ x: window.innerWidth - 620, y: window.innerHeight - 470 }}
-			bounds='.react-player'
 			disableWheelZoomClass='scroll-area'
+			bounds='parent'
 		>
 			{({ isDragging }) => (
 				<Box
@@ -51,6 +50,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						display: 'flex',
 						flexDirection: 'column',
 						boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+						transformOrigin: 'center',
 						width: '100%',
 						height: '100%',
 					}}
@@ -68,51 +68,52 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						}}
 					>
 						<Text size='2' weight='bold'>
-							Chat
+							Room Chat
 						</Text>
 						<Button variant='ghost' onClick={onClose}>
 							X
 						</Button>
 					</Flex>
-
 					<ScrollArea style={{ flex: 1, padding: '16px' }} ref={scrollAreaRef} className='scroll-area'>
-						{messages.map((msg, index) => {
-							const isCurrentUser = msg.sender === realClientID
-							const isFirstMessageFromUser = index === 0 || messages[index - 1].sender !== msg.sender
-							return (
-								<Box key={index} mb='2' style={{ textAlign: isCurrentUser ? 'right' : 'left' }}>
-									{isFirstMessageFromUser && !isCurrentUser && (
-										<Flex align='center' mb='1' gap='2'>
-											<Avatar
-												src={participantInfo[msg.sender]?.avatar}
-												fallback={msg.username[0]}
-												size='1'
-											/>
-											<Text size='1' style={{ color: 'var(--gray-11)' }}>
-												{msg.username}
-											</Text>
-										</Flex>
+						{messages.map((msg, index) => (
+							<Box
+								key={index}
+								mb='2'
+								style={{ textAlign: msg.sender === realClientID ? 'right' : 'left' }}
+							>
+								<Flex align='center' gap='2' justify={msg.sender === realClientID ? 'end' : 'start'}>
+									{msg.sender !== realClientID && (
+										<Avatar
+											src={participantInfo[msg.sender]?.avatar}
+											fallback={participantInfo[msg.sender]?.username[0]}
+											size='1'
+										/>
 									)}
-									<Text
-										as='span'
-										size='2'
-										style={{
-											display: 'inline-block',
-											backgroundColor: isCurrentUser ? 'var(--blue-5)' : 'var(--gray-3)',
-											color: isCurrentUser ? 'white' : 'var(--gray-12)',
-											borderRadius: 'var(--radius-2)',
-											padding: '4px 8px',
-											maxWidth: '70%',
-											wordWrap: 'break-word',
-										}}
-									>
-										{msg.message}
-									</Text>
-								</Box>
-							)
-						})}
+									<Box>
+										{msg.sender !== realClientID && (
+											<Text size='1' style={{ opacity: 0.7 }}>
+												{participantInfo[msg.sender]?.username}
+											</Text>
+										)}
+										<Text
+											as='span'
+											size='2'
+											style={{
+												display: 'inline-block',
+												backgroundColor:
+													msg.sender === realClientID ? 'var(--blue-5)' : 'var(--gray-3)',
+												color: msg.sender === realClientID ? 'white' : 'var(--gray-12)',
+												borderRadius: 'var(--radius-2)',
+												padding: '4px 8px',
+											}}
+										>
+											{msg.message}
+										</Text>
+									</Box>
+								</Flex>
+							</Box>
+						))}
 					</ScrollArea>
-
 					<Flex p='3' style={{ borderTop: '1px solid var(--gray-5)' }}>
 						<TextArea
 							style={{ flex: 1, marginRight: '8px' }}
@@ -126,9 +127,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 								}
 							}}
 						/>
-						<Button onClick={handleSendMessage}>
-							<Kbd>Enter</Kbd>
-						</Button>
+						<Button onClick={handleSendMessage}>Send</Button>
 					</Flex>
 				</Box>
 			)}
