@@ -1273,7 +1273,7 @@ export default function RoomDev() {
 			)}
 			{showChat && (
 				<RoomChat
-					realClientID={localStream?.id || ''}
+					realClientID={localPeerId}
 					participantInfo={participantInfo}
 					messages={chatMessages}
 					chatInput={chatInput}
