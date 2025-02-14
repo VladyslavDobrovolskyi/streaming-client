@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useEffect } from 'react'
-import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar } from '@radix-ui/themes'
+import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar, Tooltip } from '@radix-ui/themes'
 import { Send } from 'lucide-react'
 import DraggableResizable from './DraggableResizable'
 
@@ -33,7 +33,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
-	}, [scrollAreaRef]) // Changed dependency to scrollAreaRef to ensure scroll on new messages
+	}, [scrollAreaRef.current]) //Corrected useEffect dependency
 
 	const getMessageClasses = (message: { sender: string }, index: number) => {
 		const prevMessage = messages[index - 1]
@@ -98,31 +98,24 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							>
 								<Flex align='end' gap='2' justify={msg.sender === realClientID ? 'end' : 'start'}>
 									{msg.sender !== realClientID && (
-										<Avatar
-											src={participantInfo[msg.sender]?.avatar}
-											fallback={participantInfo[msg.sender]?.username[0]}
-											size='1'
-											style={{
-												marginBottom: '4px',
-												opacity: getMessageClasses(msg, index).includes('message-first')
-													? 1
-													: 0,
-												visibility: getMessageClasses(msg, index).includes('message-first')
-													? 'visible'
-													: 'hidden',
-											}}
-										/>
+										<Tooltip content={participantInfo[msg.sender]?.username}>
+											<Avatar
+												src={participantInfo[msg.sender]?.avatar}
+												fallback={participantInfo[msg.sender]?.username[0]}
+												size='1'
+												style={{
+													marginBottom: '4px',
+													opacity: getMessageClasses(msg, index).includes('message-first')
+														? 1
+														: 0,
+													visibility: getMessageClasses(msg, index).includes('message-first')
+														? 'visible'
+														: 'hidden',
+												}}
+											/>
+										</Tooltip>
 									)}
 									<Box>
-										{msg.sender !== realClientID &&
-											getMessageClasses(msg, index).includes('message-first') && (
-												<Text
-													size='1'
-													style={{ opacity: 0.7, marginBottom: '2px', paddingLeft: '4px' }}
-												>
-													{participantInfo[msg.sender]?.username}
-												</Text>
-											)}
 										<Text
 											as='span'
 											size='2'
