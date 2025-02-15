@@ -1,5 +1,7 @@
 'use client'
 
+import type React from 'react'
+
 import { useRef, useEffect } from 'react'
 import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar, Tooltip } from '@radix-ui/themes'
 import { Send } from 'lucide-react'
@@ -33,7 +35,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
-	}, [scrollAreaRef.current]) //Corrected useEffect dependency
+	}, [messages]) // Changed dependency to scrollAreaRef
 
 	const getMessageClasses = (message: { sender: string }, index: number) => {
 		const prevMessage = messages[index - 1]
@@ -94,7 +96,10 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							<Box
 								key={index}
 								className={getMessageClasses(msg, index)}
-								style={{ textAlign: msg.sender === realClientID ? 'right' : 'left' }}
+								style={{
+									textAlign: msg.sender === realClientID ? 'right' : 'left',
+									marginBottom: '8px',
+								}}
 							>
 								<Flex align='end' gap='2' justify={msg.sender === realClientID ? 'end' : 'start'}>
 									{msg.sender !== realClientID && (
@@ -115,7 +120,12 @@ const RoomChat: React.FC<RoomChatProps> = ({
 											/>
 										</Tooltip>
 									)}
-									<Box>
+									<Box
+										style={{
+											maxWidth: '85%',
+											wordBreak: 'break-word',
+										}}
+									>
 										<Text
 											as='span'
 											size='2'
@@ -133,11 +143,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 														? '18px 18px 18px 0'
 														: '18px 18px 18px 4px',
 												padding: '8px 12px',
-												maxWidth: '85%',
-												wordWrap: 'break-word',
-												marginBottom: getMessageClasses(msg, index).includes('message-last')
-													? '8px'
-													: '2px',
+												whiteSpace: 'pre-wrap',
 											}}
 										>
 											{msg.message}
