@@ -482,7 +482,7 @@ export default function useWebRTC(roomID: string) {
 			// Update local state
 			setPrivateMessages(prevMessages => ({
 				...prevMessages,
-				[to]: [...(prevMessages[to] || []), { from: LOCAL_VIDEO, to, message }],
+				[to]: [...(prevMessages[to] || []), { from: localPeerId, to, message }],
 			}))
 		},
 		[roomID]
@@ -494,7 +494,7 @@ export default function useWebRTC(roomID: string) {
 			console.log(`Received private message from ${from}:`, message)
 			setPrivateMessages(prevMessages => ({
 				...prevMessages,
-				[from]: [...(prevMessages[from] || []), { from, to: LOCAL_VIDEO, message }],
+				[from]: [...(prevMessages[from] || []), { from, to: localPeerId, message }],
 			}))
 		})
 
