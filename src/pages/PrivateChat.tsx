@@ -34,6 +34,9 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 		}
 	}, [scrollAreaRef.current]) // Updated dependency
 
+	useEffect(() => {
+		console.log(privateMessages)
+	}, [privateMessages])
 	const handleSend = () => {
 		if (message.trim()) {
 			sendPrivateMessage({ to: recipientId, message })
