@@ -1,10 +1,10 @@
 'use client'
 
 import type React from 'react'
-
 import { useRef, useEffect } from 'react'
-import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar, Tooltip } from '@radix-ui/themes'
+import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar } from '@radix-ui/themes'
 import { Send } from 'lucide-react'
+import { Tooltip } from 'react-tooltip'
 import DraggableResizable from './DraggableResizable'
 
 interface RoomChatProps {
@@ -35,7 +35,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
-	}, [messages]) // Changed dependency to scrollAreaRef
+	}, [scrollAreaRef]) //Corrected dependency
 
 	const getMessageClasses = (message: { sender: string }, index: number) => {
 		const prevMessage = messages[index - 1]
@@ -103,7 +103,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							>
 								<Flex align='end' gap='2' justify={msg.sender === realClientID ? 'end' : 'start'}>
 									{msg.sender !== realClientID && (
-										<Tooltip content={participantInfo[msg.sender]?.username}>
+										<>
 											<Avatar
 												src={participantInfo[msg.sender]?.avatar}
 												fallback={participantInfo[msg.sender]?.username[0]}
@@ -117,8 +117,11 @@ const RoomChat: React.FC<RoomChatProps> = ({
 														? 'visible'
 														: 'hidden',
 												}}
+												data-tooltip-id={`avatar-tooltip-${msg.sender}`}
+												data-tooltip-content={participantInfo[msg.sender]?.username}
 											/>
-										</Tooltip>
+											<Tooltip id={`avatar-tooltip-${msg.sender}`} />
+										</>
 									)}
 									<Box
 										style={{
