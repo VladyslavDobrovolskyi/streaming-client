@@ -485,7 +485,7 @@ export default function useWebRTC(roomID: string) {
 				[to]: [...(prevMessages[to] || []), { from: localPeerId, to, message }],
 			}))
 		},
-		[roomID]
+		[roomID, localPeerId]
 	)
 
 	// New effect to handle incoming private messages
@@ -502,7 +502,7 @@ export default function useWebRTC(roomID: string) {
 			console.log('Removing RECEIVE_PRIVATE_MESSAGE event listener')
 			socket.off(ACTIONS.RECEIVE_PRIVATE_MESSAGE)
 		}
-	}, [])
+	}, [localPeerId])
 
 	useEffect(() => {
 		setLocalPeerId(socket.id)
