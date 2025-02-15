@@ -1289,6 +1289,7 @@ export default function RoomDev() {
 						<PrivateChat
 							key={clientID}
 							recipientId={clientID}
+							realClientID={localPeerId}
 							recipientName={
 								clientID === LOCAL_VIDEO
 									? localUsername
