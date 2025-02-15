@@ -3,7 +3,7 @@
 import type React from 'react'
 import { useState, useRef, useCallback, type ReactNode } from 'react'
 import { Resizable, type ResizeCallbackData } from 'react-resizable'
-import Draggable from 'react-draggable'
+import Draggable, { type DraggableData, type DraggableEvent } from 'react-draggable'
 import 'react-resizable/css/styles.css'
 import { Box } from '@radix-ui/themes'
 
@@ -41,6 +41,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 	const [isDragging, setIsDragging] = useState(false)
 	const [scale, setScale] = useState(1)
 	const contentRef = useRef<HTMLDivElement>(null)
+	const dragOffset = useRef({ x: 0, y: 0 })
 
 	const handleWheel = useCallback(
 		(e: React.WheelEvent<HTMLDivElement>) => {
@@ -83,16 +84,28 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 		[scale, size, onSizeChange, onPositionChange]
 	)
 
+	const onStart = useCallback((e: DraggableEvent, data: DraggableData) => {
+		setIsDragging(true)
+		const node = data.node as HTMLElement
+		const rect = node.getBoundingClientRect()
+		dragOffset.current = {
+			x: data.x - rect.left,
+			y: data.y - rect.top,
+		}
+	}, [])
+
 	const onDrag = useCallback(
-		(_, data: { x: number; y: number }) => {
-			const newPosition = { x: data.x, y: data.y }
+		(_: DraggableEvent, data: DraggableData) => {
+			const newPosition = {
+				x: data.x - dragOffset.current.x,
+				y: data.y - dragOffset.current.y,
+			}
 			setPosition(newPosition)
 			if (onPositionChange) onPositionChange(newPosition)
 		},
 		[onPositionChange]
 	)
 
-	const onStart = useCallback(() => setIsDragging(true), [])
 	const onStop = useCallback(() => setIsDragging(false), [])
 
 	const getHandleStyle = useCallback(
@@ -124,8 +137,8 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 			handle={`.${dragHandleClassName}`}
 			bounds={bounds}
 			position={position}
-			onDrag={onDrag}
 			onStart={onStart}
+			onDrag={onDrag}
 			onStop={onStop}
 			defaultClassName={hide ? 'hidden' : 'react-draggable'}
 		>
