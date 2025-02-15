@@ -47,6 +47,17 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		return `message ${isFirst ? 'message-first' : ''} ${isLast ? 'message-last' : ''}`
 	}
 
+	const tooltipStyle = {
+		backgroundColor: 'var(--gray-12)',
+		color: 'var(--gray-1)',
+		borderRadius: '18px',
+		padding: '4px 8px',
+		fontSize: '12px',
+		lineHeight: 1.2,
+		whiteSpace: 'nowrap' as const,
+		boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+	}
+
 	return (
 		<DraggableResizable
 			initialSize={{ width: 320, height: 480 }}
@@ -103,7 +114,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							>
 								<Flex align='end' gap='2' justify={msg.sender === realClientID ? 'end' : 'start'}>
 									{msg.sender !== realClientID && (
-										<>
+										<div style={{ position: 'relative' }}>
 											<Avatar
 												src={participantInfo[msg.sender]?.avatar}
 												fallback={participantInfo[msg.sender]?.username[0]}
@@ -118,10 +129,14 @@ const RoomChat: React.FC<RoomChatProps> = ({
 														: 'hidden',
 												}}
 												data-tooltip-id={`avatar-tooltip-${msg.sender}`}
-												data-tooltip-content={participantInfo[msg.sender]?.username}
 											/>
-											<Tooltip id={`avatar-tooltip-${msg.sender}`} />
-										</>
+											<Tooltip
+												id={`avatar-tooltip-${msg.sender}`}
+												place='top'
+												content={participantInfo[msg.sender]?.username}
+												style={tooltipStyle}
+											/>
+										</div>
 									)}
 									<Box
 										style={{
