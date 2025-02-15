@@ -1273,6 +1273,7 @@ export default function RoomDev() {
 			)}
 			{showChat && (
 				<RoomChat
+					onOpenPrivateChat={togglePrivateChat}
 					realClientID={localPeerId}
 					participantInfo={participantInfo}
 					messages={chatMessages}

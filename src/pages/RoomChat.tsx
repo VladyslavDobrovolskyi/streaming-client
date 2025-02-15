@@ -1,7 +1,7 @@
 'use client'
 
 import type React from 'react'
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar } from '@radix-ui/themes'
 import { Send } from 'lucide-react'
 import { Tooltip } from 'react-tooltip'
@@ -18,6 +18,7 @@ interface RoomChatProps {
 	setChatInput: (input: string) => void
 	handleSendMessage: () => void
 	onClose: () => void
+	onOpenPrivateChat: (clientID: string) => void
 }
 
 const RoomChat: React.FC<RoomChatProps> = ({
@@ -28,14 +29,16 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	setChatInput,
 	handleSendMessage,
 	onClose,
+	onOpenPrivateChat,
 }) => {
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
+	const [hoveredUser, setHoveredUser] = useState<string | null>(null)
 
 	useEffect(() => {
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
-	}, [scrollAreaRef]) // Removed messages from dependencies
+	}, [messages])
 
 	const getMessageClasses = (message: { sender: string }, index: number) => {
 		const prevMessage = messages[index - 1]
@@ -155,6 +158,23 @@ const RoomChat: React.FC<RoomChatProps> = ({
 										>
 											{msg.message}
 										</Text>
+										{msg.sender !== realClientID && (
+											<Text
+												as='span'
+												size='1'
+												style={{
+													display: 'block',
+													color: 'var(--gray-11)',
+													cursor: 'pointer',
+													marginTop: '2px',
+												}}
+												onMouseEnter={() => setHoveredUser(msg.sender)}
+												onMouseLeave={() => setHoveredUser(null)}
+												onClick={() => onOpenPrivateChat(msg.sender)}
+											>
+												{hoveredUser === msg.sender ? '(open private chat)' : ''}
+											</Text>
+										)}
 									</Box>
 								</Flex>
 							</Box>
