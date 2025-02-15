@@ -3,6 +3,7 @@
 import type React from 'react'
 import { useState, useRef, useEffect } from 'react'
 import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar } from '@radix-ui/themes'
+import { Send } from 'lucide-react'
 import DraggableResizable from './DraggableResizable'
 
 interface PrivateChatProps {
@@ -12,6 +13,7 @@ interface PrivateChatProps {
 	onClose: () => void
 	sendPrivateMessage: (params: { to: string; message: string }) => void
 	privateMessages: Array<{ from: string; to: string; message: string }>
+	realClientID: string
 }
 
 const PrivateChat: React.FC<PrivateChatProps> = ({
@@ -21,6 +23,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	onClose,
 	sendPrivateMessage,
 	privateMessages,
+	realClientID,
 }) => {
 	const [message, setMessage] = useState('')
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
@@ -29,7 +32,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
-	}, [scrollAreaRef]) //Corrected dependency
+	}, [scrollAreaRef.current]) // Updated dependency
 
 	const handleSend = () => {
 		if (message.trim()) {
@@ -38,10 +41,20 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 		}
 	}
 
+	const getMessageClasses = (message: { from: string }, index: number) => {
+		const prevMessage = privateMessages[index - 1]
+		const nextMessage = privateMessages[index + 1]
+
+		const isFirst = !prevMessage || prevMessage.from !== message.from
+		const isLast = !nextMessage || nextMessage.from !== message.from
+
+		return `message ${isFirst ? 'message-first' : ''} ${isLast ? 'message-last' : ''}`
+	}
+
 	return (
 		<DraggableResizable
-			initialSize={{ width: 300, height: 400 }}
-			initialPosition={{ x: window.innerWidth - 620, y: window.innerHeight - 470 }}
+			initialSize={{ width: 320, height: 480 }}
+			initialPosition={{ x: window.innerWidth - 620, y: window.innerHeight - 550 }}
 			disableWheelZoomClass='scroll-area'
 			bounds='parent'
 		>
@@ -49,12 +62,11 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 				<Box
 					style={{
 						backgroundColor: 'var(--gray-1)',
-						borderRadius: 'var(--radius-3)',
+						borderRadius: 'var(--radius-4)',
 						overflow: 'hidden',
 						display: 'flex',
 						flexDirection: 'column',
-						boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-						transformOrigin: 'center',
+						boxShadow: '0 8px 30px rgba(0, 0, 0, 0.12)',
 						width: '100%',
 						height: '100%',
 					}}
@@ -65,7 +77,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						p='3'
 						className='drag-handle'
 						style={{
-							borderBottom: '1px solid var(--gray-5)',
+							borderBottom: '1px solid var(--gray-4)',
 							cursor: isDragging ? 'grabbing' : 'move',
 							backgroundColor: 'var(--gray-2)',
 							userSelect: 'none',
@@ -78,31 +90,60 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 							</Text>
 						</Flex>
 						<Button variant='ghost' onClick={onClose}>
-							X
+							✕
 						</Button>
 					</Flex>
-					<ScrollArea style={{ flex: 1, padding: '16px' }} ref={scrollAreaRef} className='scroll-area'>
+					<ScrollArea
+						style={{ flex: 1, padding: '16px' }}
+						ref={scrollAreaRef}
+						className='scroll-area'
+						scrollbars='vertical'
+					>
 						{privateMessages.map((msg, index) => (
-							<Box key={index} mb='2' style={{ textAlign: msg.from === recipientId ? 'left' : 'right' }}>
-								<Text
-									as='span'
-									size='2'
+							<Box
+								key={index}
+								className={getMessageClasses(msg, index)}
+								style={{
+									textAlign: msg.from === realClientID ? 'right' : 'left',
+									marginBottom: '8px',
+								}}
+							>
+								<Box
 									style={{
+										maxWidth: '85%',
+										wordBreak: 'break-word',
 										display: 'inline-block',
-										backgroundColor: msg.from === recipientId ? 'var(--gray-3)' : 'var(--blue-5)',
-										color: msg.from === recipientId ? 'var(--gray-12)' : 'white',
-										borderRadius: 'var(--radius-2)',
-										padding: '4px 8px',
 									}}
 								>
-									{msg.message}
-								</Text>
+									<Text
+										as='span'
+										size='2'
+										style={{
+											display: 'inline-block',
+											backgroundColor:
+												msg.from === realClientID ? 'var(--blue-9)' : 'var(--gray-3)',
+											color: msg.from === realClientID ? 'white' : 'var(--gray-12)',
+											borderRadius:
+												msg.from === realClientID
+													? getMessageClasses(msg, index).includes('message-last')
+														? '18px 18px 0 18px'
+														: '18px 18px 4px 18px'
+													: getMessageClasses(msg, index).includes('message-last')
+													? '18px 18px 18px 0'
+													: '18px 18px 18px 4px',
+											padding: '8px 12px',
+											whiteSpace: 'pre-wrap',
+										}}
+									>
+										{msg.message}
+									</Text>
+								</Box>
 							</Box>
 						))}
 					</ScrollArea>
-					<Flex p='3' style={{ borderTop: '1px solid var(--gray-5)' }}>
+					<Flex p='3' gap='2' style={{ borderTop: '1px solid var(--gray-4)' }}>
 						<TextArea
-							style={{ flex: 1, marginRight: '8px' }}
+							style={{ flex: 1 }}
 							placeholder='Type a message...'
 							value={message}
 							onChange={e => setMessage(e.target.value)}
@@ -113,7 +154,9 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 								}
 							}}
 						/>
-						<Button onClick={handleSend}>Send</Button>
+						<Button onClick={handleSend} size='3' style={{ padding: '0 16px' }}>
+							<Send size={18} />
+						</Button>
 					</Flex>
 				</Box>
 			)}
