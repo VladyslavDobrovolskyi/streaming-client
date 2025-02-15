@@ -1,10 +1,11 @@
 'use client'
 
 import type React from 'react'
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect } from 'react'
 import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar } from '@radix-ui/themes'
 import { Send } from 'lucide-react'
-import { Tooltip } from 'react-tooltip'
+// Удалите эту строку
+//import { Tooltip } from "react-tooltip"
 import DraggableResizable from './DraggableResizable'
 
 interface RoomChatProps {
@@ -32,13 +33,12 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	onOpenPrivateChat,
 }) => {
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
-	const [hoveredUser, setHoveredUser] = useState<string | null>(null)
 
 	useEffect(() => {
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
-	}, [scrollAreaRef]) //Corrected dependency
+	}, [scrollAreaRef])
 
 	const getMessageClasses = (message: { sender: string }, index: number) => {
 		const prevMessage = messages[index - 1]
@@ -119,14 +119,12 @@ const RoomChat: React.FC<RoomChatProps> = ({
 													visibility: getMessageClasses(msg, index).includes('message-first')
 														? 'visible'
 														: 'hidden',
+													cursor: 'pointer', // Добавляем курсор-указатель для обозначения кликабельности
 												}}
-												data-tooltip-id={`avatar-tooltip-${msg.sender}`}
-											/>
-											<Tooltip
-												id={`avatar-tooltip-${msg.sender}`}
-												place='top'
-												content={participantInfo[msg.sender]?.username || ''}
-												wrapper='span'
+												onClick={() => onOpenPrivateChat(msg.sender)} // Добавляем обработчик клика
+												title={`Open private chat with ${
+													participantInfo[msg.sender]?.username
+												}`} // Добавляем подсказку
 											/>
 										</div>
 									)}
@@ -158,23 +156,6 @@ const RoomChat: React.FC<RoomChatProps> = ({
 										>
 											{msg.message}
 										</Text>
-										{msg.sender !== realClientID && (
-											<Text
-												as='span'
-												size='1'
-												style={{
-													display: 'block',
-													color: 'var(--gray-11)',
-													cursor: 'pointer',
-													marginTop: '2px',
-												}}
-												onMouseEnter={() => setHoveredUser(msg.sender)}
-												onMouseLeave={() => setHoveredUser(null)}
-												onClick={() => onOpenPrivateChat(msg.sender)}
-											>
-												{hoveredUser === msg.sender ? '(open private chat)' : ''}
-											</Text>
-										)}
 									</Box>
 								</Flex>
 							</Box>
