@@ -123,7 +123,9 @@ const StyledToastClose = styled(Toast.Close, {
 // }
 
 export default function RoomDev() {
-	const [toasts, setToasts] = useState<Array<{ id: string; avatar: string; title: string; description: string }>>([])
+	const [toasts, setToasts] = useState<
+		Array<{ id: string; avatar: string; title: string; description: string; count: number }>
+	>([])
 	const { id: roomID } = useParams<{ id: string }>()
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [volume, setVolume] = useState(0.8)
@@ -183,8 +185,23 @@ export default function RoomDev() {
 	const { userData, updateUserPosition, updateUserStatus, updateUserVolume } = useLocalStorageSync(roomID!)
 
 	const addToast = (avatar: string, title: string, description: string) => {
-		const id = Math.random().toString(36).substr(2, 9)
-		setToasts(prev => [...prev, { id, avatar, title, description }])
+		setToasts(prev => {
+			const existingToastIndex = prev.findIndex(
+				toast => toast.title === title && toast.description === description
+			)
+
+			if (existingToastIndex > -1) {
+				const updatedToasts = [...prev]
+				updatedToasts[existingToastIndex] = {
+					...updatedToasts[existingToastIndex],
+					count: updatedToasts[existingToastIndex].count + 1,
+				}
+				return updatedToasts
+			} else {
+				const id = Math.random().toString(36).substr(2, 9)
+				return [...prev, { id, avatar, title, description, count: 1 }]
+			}
+		})
 	}
 	const {
 		emitPlay,
@@ -1415,6 +1432,11 @@ export default function RoomDev() {
 						<StyledToastTitle>
 							{toast.avatar && <Avatar src={toast.avatar} fallback='?' />}
 							{toast.title}
+							{toast.count > 1 && (
+								<Badge variant='solid' color='blue'>
+									x{toast.count}
+								</Badge>
+							)}
 						</StyledToastTitle>
 						<StyledToastDescription>{toast.description}</StyledToastDescription>
 						<StyledToastClose>
