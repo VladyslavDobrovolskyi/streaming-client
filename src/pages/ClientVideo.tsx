@@ -239,23 +239,25 @@ export default function ClientVideo({
 													height: '100%',
 												}}
 											>
-												<Slider
-													orientation='horizontal'
-													min={0}
-													max={1}
-													step={0.01}
-													value={[muted ? 0 : volume]}
-													onValueChange={value => handleVolumeChange(value[0])}
-													onPointerDown={handleVolumePointerDown}
-													onPointerUp={handleVolumePointerUp}
-													style={
-														{
-															width: '100px',
-															'--slider-thumb-size': isVolumeActive ? '16px' : '12px',
-															transition: 'all 0.2s ease',
-														} as React.CSSProperties
-													}
-												/>
+												{volume !== 0 && (
+													<Slider
+														orientation='horizontal'
+														min={0}
+														max={1}
+														step={0.01}
+														value={[muted ? 0 : volume]}
+														onValueChange={value => handleVolumeChange(value[0])}
+														onPointerDown={handleVolumePointerDown}
+														onPointerUp={handleVolumePointerUp}
+														style={
+															{
+																width: '100px',
+																'--slider-thumb-size': isVolumeActive ? '16px' : '12px',
+																transition: 'all 0.2s ease',
+															} as React.CSSProperties
+														}
+													/>
+												)}
 											</div>
 										)}
 									</div>
