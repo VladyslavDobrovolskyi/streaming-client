@@ -699,11 +699,11 @@ export default function RoomDev() {
 		const newUnreadMessages: Record<string, number> = {}
 		Object.entries(privateMessages).forEach(([clientID, messages]) => {
 			if (clientID !== LOCAL_VIDEO) {
-				newUnreadMessages[clientID] = messages.filter(msg => msg.from !== LOCAL_VIDEO).length
+				newUnreadMessages[clientID] = messages.filter(msg => !msg.read && msg.from !== localPeerId).length
 			}
 		})
 		setUnreadMessages(newUnreadMessages)
-	}, [privateMessages])
+	}, [privateMessages, localPeerId])
 
 	const togglePrivateChat = (clientID: string) => {
 		setPrivateChats(prev => {

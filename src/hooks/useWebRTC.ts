@@ -68,7 +68,7 @@ export default function useWebRTC(roomID: string) {
 	const [clients, updateClients] = useStateWithCallback<string[]>([])
 	const [chatMessages, setChatMessages] = useState<{ sender: string; username: string; message: string }[]>([])
 	const [privateMessages, setPrivateMessages] = useState<
-		Record<string, Array<{ from: string; to: string; message: string }>>
+		Record<string, Array<{ from: string; to: string; message: string; read?: boolean }>>
 	>({})
 	const [localPeerId, setLocalPeerId] = useState<string>('')
 	const [initialMicrophoneDisabledState, setInitialMicrophoneDisabledState] = useState<boolean>(false)
@@ -494,7 +494,7 @@ export default function useWebRTC(roomID: string) {
 			console.log(`Received private message from ${from}:`, message)
 			setPrivateMessages(prevMessages => ({
 				...prevMessages,
-				[from]: [...(prevMessages[from] || []), { from, to: localPeerId, message }],
+				[from]: [...(prevMessages[from] || []), { from, to: localPeerId, message, read: false }],
 			}))
 		})
 
