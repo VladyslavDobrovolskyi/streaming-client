@@ -98,7 +98,13 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 								{recipientName}
 							</Text>
 						</Flex>
-						<Button variant='ghost' onClick={onClose}>
+						<Button
+							variant='ghost'
+							onClick={() => {
+								onClose()
+								onMouseLeave()
+							}}
+						>
 							✕
 						</Button>
 					</Flex>
