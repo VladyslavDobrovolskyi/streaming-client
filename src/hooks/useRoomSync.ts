@@ -89,19 +89,22 @@ export default function useRoomSync(
 		const newUserIDs = Object.keys(participantInfo).filter(id => !participantInfo[id].notified && id !== socket.id)
 
 		newUserIDs.forEach(id => {
-			if (id === localPeerId) return
-			addToast(
-				participantInfo[id].avatar,
-				'New Participant',
-				`${participantInfo[id].username} has joined the room`
-			)
-			setParticipantInfo(prev => ({
-				...prev,
-				[id]: {
-					...prev[id],
-					notified: true,
-				},
-			}))
+			if (id === localPeerId) {
+				return
+			} else {
+				addToast(
+					participantInfo[id].avatar,
+					'New Participant',
+					`${participantInfo[id].username} has joined the room`
+				)
+				setParticipantInfo(prev => ({
+					...prev,
+					[id]: {
+						...prev[id],
+						notified: true,
+					},
+				}))
+			}
 		})
 	}, [participantInfo, localPeerId, addToast])
 	// const handleCameraSync = useCallback(
