@@ -194,6 +194,7 @@ export default function RoomDev() {
 		emitInfoSync,
 		// emitCameraSync,
 		// emitMicrophoneSync,
+		setLastSeekDirection,
 		lastSeekDirection,
 		participantInfo,
 		setParticipantInfo,
@@ -235,6 +236,7 @@ export default function RoomDev() {
 	useEffect(() => {
 		if (lastSeekDirection) {
 			showAction(lastSeekDirection)
+			setLastSeekDirection(null)
 			console.log('Showing seek action:', lastSeekDirection)
 		}
 	}, [lastSeekDirection])

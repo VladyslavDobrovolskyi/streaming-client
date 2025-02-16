@@ -332,6 +332,7 @@ export default function useRoomSync(
 		requestSync,
 		requestParticipantInfo,
 		lastSeekDirection,
+		setLastSeekDirection,
 		setParticipantInfo,
 		participantInfo,
 		// participantCameras,
