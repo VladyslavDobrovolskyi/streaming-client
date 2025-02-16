@@ -89,7 +89,7 @@ export default function useRoomSync(
 		const newUserIDs = Object.keys(participantInfo).filter(id => !participantInfo[id].notified && id !== socket.id)
 
 		newUserIDs.forEach(id => {
-			if (!participantInfo[localPeerId]) return
+			if (id === localPeerId) return
 			addToast(
 				participantInfo[id].avatar,
 				'New Participant',
