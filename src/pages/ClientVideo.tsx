@@ -248,7 +248,7 @@ export default function ClientVideo({
 								width: '100%',
 								height: '100%',
 								backgroundColor: 'black',
-								cursor: 'move',
+								cursor: isDragging ? 'grabbing' : 'move',
 								borderRadius: '5px',
 								display: 'flex',
 								justifyContent: 'center',
