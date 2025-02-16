@@ -85,13 +85,13 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 		[scale, size, onSizeChange, onPositionChange]
 	)
 
-	const onStart = useCallback((e: DraggableEvent) => {
+	const onStart = useCallback(() => {
 		setIsDragging(true)
-		setActionCursor(getComputedStyle(e.target as Element).cursor)
+		setActionCursor('grabbing')
 	}, [])
 
 	const onDrag = useCallback(
-		(e: DraggableEvent, data: DraggableData) => {
+		(_e: DraggableEvent, data: DraggableData) => {
 			const newPosition = {
 				x: data.x,
 				y: data.y,
@@ -237,7 +237,9 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 							transformOrigin: 'top left',
 							width: size.width,
 							height: size.height,
+							cursor: isDragging ? 'grabbing' : 'grab',
 						}}
+						className={dragHandleClassName}
 					>
 						{children({ isDragging })}
 					</Box>
