@@ -53,7 +53,7 @@ export default function useRoomSync(
 			videoRef.current.getInternalPlayer().pause()
 			isSyncingRef.current = false
 		},
-		[videoRef]
+		[videoRef, participantInfo, addToast]
 	)
 
 	const handleSeek = useCallback(
