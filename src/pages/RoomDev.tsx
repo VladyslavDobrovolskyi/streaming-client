@@ -275,6 +275,11 @@ export default function RoomDev() {
 		emitPause(currentTime)
 	}
 
+	useEffect(() => {
+		if (isPlaying) showAction('play')
+		if (!isPlaying) showAction('pause')
+	}, [isPlaying])
+
 	const handleVolumeChange = (newVolume: number) => {
 		if (newVolume === 0) {
 			setMuted(true)
