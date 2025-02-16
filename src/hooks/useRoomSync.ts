@@ -86,26 +86,23 @@ export default function useRoomSync(
 	)
 
 	useEffect(() => {
-		console.log('localPeerId:', localPeerId)
-		const newUserIDs = Object.keys(participantInfo).filter(id => !participantInfo[id].notified && id !== socket.id)
+		const newUserIDs = Object.keys(participantInfo).filter(
+			id => !participantInfo[id].notified && id !== localPeerId
+		)
 
 		newUserIDs.forEach(id => {
-			if (id === localPeerId) {
-				return
-			} else {
-				addToast(
-					participantInfo[id].avatar,
-					'New Participant',
-					`${participantInfo[id].username} has joined the room`
-				)
-				setParticipantInfo(prev => ({
-					...prev,
-					[id]: {
-						...prev[id],
-						notified: true,
-					},
-				}))
-			}
+			addToast(
+				participantInfo[id].avatar,
+				'New Participant',
+				`${participantInfo[id].username} has joined the room`
+			)
+			setParticipantInfo(prev => ({
+				...prev,
+				[id]: {
+					...prev[id],
+					notified: true,
+				},
+			}))
 		})
 	}, [participantInfo, localPeerId, addToast])
 	// const handleCameraSync = useCallback(
