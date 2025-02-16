@@ -241,6 +241,7 @@ export default function ClientVideo({
 					{isCovered && (
 						<div
 							onClick={() => onCoverToggle(clientID)}
+							className='video-drag-handle'
 							style={{
 								position: 'absolute',
 								top: 0,
