@@ -211,7 +211,7 @@ export default function ClientVideo({
 											<div
 												style={{
 													position: 'absolute',
-													left: '80%',
+													left: '85%',
 													display: 'flex',
 													alignItems: 'center',
 													height: '100%',
@@ -226,7 +226,7 @@ export default function ClientVideo({
 													onValueChange={value => handleVolumeChange(value[0])}
 													style={
 														{
-															width: size.width - 50,
+															width: size.width - 20,
 															'--slider-thumb-size': '12px',
 														} as React.CSSProperties
 													}
