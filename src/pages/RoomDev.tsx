@@ -38,6 +38,7 @@ import 'react-resizable/css/styles.css'
 import ClientVideo from './ClientVideo'
 import { styled, keyframes } from '@stitches/react'
 import useLocalStorageSync from '../hooks/useLocalStorageSync'
+import { Badge } from '@radix-ui/themes'
 
 interface UserPosition {
 	x: number
@@ -171,6 +172,7 @@ export default function RoomDev() {
 		{}
 	)
 	const [clientVolumes, setClientVolumes] = useState<Record<string, number>>({})
+	const [unreadMessages, setUnreadMessages] = useState<Record<string, number>>({})
 	const userListWidth = 380
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<number | null>(null)
@@ -693,8 +695,25 @@ export default function RoomDev() {
 		}
 	}, [roomID, localUsername, avatar, emitInfoSync, isCameraDisabled, isMicrophoneDisabled])
 
+	useEffect(() => {
+		const newUnreadMessages: Record<string, number> = {}
+		Object.entries(privateMessages).forEach(([clientID, messages]) => {
+			if (clientID !== LOCAL_VIDEO) {
+				newUnreadMessages[clientID] = messages.filter(msg => msg.from !== LOCAL_VIDEO).length
+			}
+		})
+		setUnreadMessages(newUnreadMessages)
+	}, [privateMessages])
+
 	const togglePrivateChat = (clientID: string) => {
-		setPrivateChats(prev => ({ ...prev, [clientID]: !prev[clientID] }))
+		setPrivateChats(prev => {
+			const newState = { ...prev, [clientID]: !prev[clientID] }
+			if (newState[clientID]) {
+				// Mark messages as read when opening the chat
+				setUnreadMessages(prev => ({ ...prev, [clientID]: 0 }))
+			}
+			return newState
+		})
 	}
 	const closeChat = () => {
 		setShowChat(false)
@@ -1281,18 +1300,34 @@ export default function RoomDev() {
 											<BsCameraVideoFill />
 										)}
 									</span>
-									<button
-										onClick={() => togglePrivateChat(clientID)}
-										style={{
-											background: 'none',
-											border: 'none',
-											cursor: 'pointer',
-											color: 'white',
-											padding: '5px',
-										}}
-									>
-										<ChatBubbleIcon />
-									</button>
+									<div style={{ display: 'flex', alignItems: 'center' }}>
+										<button
+											onClick={() => togglePrivateChat(clientID)}
+											style={{
+												background: 'none',
+												border: 'none',
+												cursor: 'pointer',
+												color: 'white',
+												padding: '5px',
+												position: 'relative',
+											}}
+										>
+											<ChatBubbleIcon />
+											{unreadMessages[clientID] > 0 && (
+												<Badge
+													style={{
+														position: 'absolute',
+														top: '-5px',
+														right: '-5px',
+														fontSize: '0.7rem',
+														padding: '2px 4px',
+													}}
+												>
+													{unreadMessages[clientID]}
+												</Badge>
+											)}
+										</button>
+									</div>
 								</div>
 							)
 						})}
