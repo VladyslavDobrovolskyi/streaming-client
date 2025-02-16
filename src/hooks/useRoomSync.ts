@@ -219,6 +219,17 @@ export default function useRoomSync(
 		})
 	}, [])
 
+	const handlePrivateMessage = useCallback(
+		({ from, message }) => {
+			addToast(
+				participantInfo[from].avatar,
+				'New message',
+				`New private message from ${participantInfo[from].username}: ${message}`
+			)
+		},
+		[participantInfo, addToast]
+	)
+
 	useEffect(() => {
 		// socket.on(ACTIONS.VIDEO_PLAY, handlePlay)
 		socket.on(ACTIONS.VIDEO_PAUSE, handlePause)
@@ -230,6 +241,7 @@ export default function useRoomSync(
 		// socket.on(ACTIONS.SYNC_CAMERA, handleCameraSync)
 		// socket.on(ACTIONS.SYNC_MICROPHONE, handleMicrophoneSync)
 		socket.on(ACTIONS.REQUEST_PARTICIPANT_INFO, handleRequestParticipantInfo)
+		socket.on(ACTIONS.RECEIVE_PRIVATE_MESSAGE, handlePrivateMessage)
 
 		return () => {
 			socket.off(ACTIONS.VIDEO_PLAY, handlePlay)
@@ -241,12 +253,15 @@ export default function useRoomSync(
 			// socket.off(ACTIONS.SYNC_MICROPHONE, handleMicrophoneSync)
 			socket.off(ACTIONS.REQUEST_PARTICIPANT_INFO, handleRequestParticipantInfo)
 			socket.off(ACTIONS.RECEIVE_VIDEO_PLAY, handlePlay)
+			socket.off(ACTIONS.RECEIVE_PRIVATE_MESSAGE, handlePrivateMessage)
 		}
 	}, [
 		handlePlay,
 		handlePause,
 		handleSeek,
 		handleSyncRequest,
+		handlePrivateMessage,
+		handleClientLeave,
 		// handleCameraSync,
 		// handleMicrophoneSync,
 		handleInfoSync,
