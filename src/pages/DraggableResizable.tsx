@@ -1,7 +1,7 @@
 'use client'
 
 import type React from 'react'
-import { useState, useRef, useCallback, type ReactNode } from 'react'
+import { useState, useRef, useCallback, useEffect, type ReactNode } from 'react'
 import { Resizable, type ResizeCallbackData } from 'react-resizable'
 import Draggable, { type DraggableData, type DraggableEvent } from 'react-draggable'
 import 'react-resizable/css/styles.css'
@@ -14,7 +14,7 @@ interface DraggableResizableProps {
 	minConstraints?: [number, number]
 	maxConstraints?: [number, number]
 	dragHandleClassName?: string
-	bounds?: string
+	bounds?: string | false
 	onPositionChange?: (position: { x: number; y: number }) => void
 	onSizeChange?: (size: { width: number; height: number }) => void
 	resizeHandleStyles?: React.CSSProperties
@@ -91,17 +91,14 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 
 	const onDrag = useCallback(
 		(e: DraggableEvent, data: DraggableData) => {
-			const deltaX = data.x - dragStartPosition.current.x
-			const deltaY = data.y - dragStartPosition.current.y
 			const newPosition = {
-				x: position.x + deltaX,
-				y: position.y + deltaY,
+				x: data.x,
+				y: data.y,
 			}
 			setPosition(newPosition)
 			if (onPositionChange) onPositionChange(newPosition)
-			dragStartPosition.current = { x: data.x, y: data.y }
 		},
-		[onPositionChange, position]
+		[onPositionChange]
 	)
 
 	const onStop = useCallback(() => {
@@ -131,6 +128,19 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 		},
 		[resizeHandleStyles]
 	)
+
+	useEffect(() => {
+		const handleMouseUp = () => {
+			if (isDragging) {
+				setIsDragging(false)
+			}
+		}
+
+		document.addEventListener('mouseup', handleMouseUp)
+		return () => {
+			document.removeEventListener('mouseup', handleMouseUp)
+		}
+	}, [isDragging])
 
 	return (
 		<Draggable
