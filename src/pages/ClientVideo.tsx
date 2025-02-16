@@ -240,7 +240,6 @@ export default function ClientVideo({
 					)}
 					{isCovered && (
 						<div
-							onClick={() => onCoverToggle(clientID)}
 							className='video-drag-handle'
 							style={{
 								position: 'absolute',
@@ -257,7 +256,10 @@ export default function ClientVideo({
 								zIndex: 11004,
 							}}
 						>
-							<EyeClosedIcon style={{ color: 'white', transform: 'scale(1)', cursor: 'pointer' }} />
+							<EyeClosedIcon
+								style={{ color: 'white', transform: 'scale(1)', cursor: 'pointer' }}
+								onClick={() => onCoverToggle(clientID)}
+							/>
 						</div>
 					)}
 				</div>
