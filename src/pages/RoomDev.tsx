@@ -530,8 +530,8 @@ export default function RoomDev() {
 							isMicrophoneMuted={
 								clientID === LOCAL_VIDEO ? isMicrophoneDisabled : participantData.isMicrophoneDisabled
 							}
-							position={clientPositions[clientID] || { x: 5 + index * 50, y: 5 }}
-							size={clientSizes[clientID] || { width: 50, height: 50 }}
+							position={clientPositions[clientID] || { x: 10 + 25 + index * 100, y: 10 }}
+							size={clientSizes[clientID] || { width: 100, height: 50 }}
 							onPositionChange={(id, pos) => setClientPositions(prev => ({ ...prev, [id]: pos }))}
 							onSizeChange={(id, size) => setClientSizes(prev => ({ ...prev, [id]: size }))}
 							onVolumeChange={(id, vol) => {
