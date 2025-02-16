@@ -196,10 +196,18 @@ export default function RoomDev() {
 					...updatedToasts[existingToastIndex],
 					count: updatedToasts[existingToastIndex].count + 1,
 				}
+				const id = updatedToasts[existingToastIndex].id
+				setTimeout(() => {
+					setToasts(currentToasts => currentToasts.filter(toast => toast.id !== id))
+				}, 3000)
 				return updatedToasts
 			} else {
 				const id = Math.random().toString(36).substr(2, 9)
-				return [...prev, { id, avatar, title, description, count: 1 }]
+				const newToasts = [...prev, { id, avatar, title, description, count: 1 }]
+				setTimeout(() => {
+					setToasts(currentToasts => currentToasts.filter(toast => toast.id !== id))
+				}, 3000)
+				return newToasts
 			}
 		})
 	}
