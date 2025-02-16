@@ -90,6 +90,7 @@ export default function useRoomSync(
 			id => !participantInfo[id].notified && id !== localPeerId
 		)
 
+		console.log(newUserIDs)
 		newUserIDs.forEach(id => {
 			addToast(
 				participantInfo[id].avatar,
