@@ -152,7 +152,7 @@ export default function useWebRTC(roomID: string) {
 							settledElement.srcObject = remoteStream
 							clearInterval(interval)
 						}
-					}, 500)
+					}, 10000)
 				}
 			})
 		}
