@@ -239,7 +239,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 							height: size.height,
 							cursor: isDragging || isResizing ? actionCursor : 'grab',
 						}}
-						className={dragHandleClassName}
+						// className={dragHandleClassName}
 					>
 						{children({ isDragging })}
 					</Box>
