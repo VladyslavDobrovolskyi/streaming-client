@@ -1,3 +1,7 @@
+'use client'
+
+import type React from 'react'
+
 // 10.02.2025
 import { useState, useRef, useEffect, useCallback } from 'react'
 import ReactPlayer from 'react-player'
@@ -35,6 +39,12 @@ import RoomChat from './RoomChat'
 import 'react-resizable/css/styles.css'
 import ClientVideo from './ClientVideo'
 import { styled, keyframes } from '@stitches/react'
+import useLocalStorageSync from '../hooks/useLocalStorageSync'
+
+interface UserPosition {
+	x: number
+	y: number
+}
 
 const slideIn = keyframes({
 	from: { transform: `translateX(calc(100% + 1rem))` },
@@ -169,6 +179,8 @@ export default function RoomDev() {
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
 	const sliderRef = useRef<HTMLDivElement>(null)
 	const previousVolumeRef = useRef(volume)
+	const { userData, updateUserPosition, updateUserStatus } = useLocalStorageSync(roomID!)
+
 	const addToast = (avatar: string, title: string, description: string) => {
 		const id = Math.random().toString(36).substr(2, 9)
 		setToasts(prev => [...prev, { id, avatar, title, description }])
@@ -532,7 +544,10 @@ export default function RoomDev() {
 							}
 							position={clientPositions[clientID] || { x: 0, y: 0 + index * 110 }}
 							size={clientSizes[clientID] || { width: 150, height: 100 }}
-							onPositionChange={(id, pos) => setClientPositions(prev => ({ ...prev, [id]: pos }))}
+							onPositionChange={(id, pos) => {
+								setClientPositions(prev => ({ ...prev, [id]: pos }))
+								updateUserPosition(id, pos)
+							}}
 							onSizeChange={(id, size) => setClientSizes(prev => ({ ...prev, [id]: size }))}
 							onVolumeChange={(id, vol) => {
 								setClientVolumes(prev => ({ ...prev, [id]: vol }))
@@ -578,14 +593,14 @@ export default function RoomDev() {
 			try {
 				if (audioTrack.enabled) {
 					audioTrack.enabled = false
-					// audioTrack.stop()
 					setMicMuted(true)
 					emitInfoSync(localUsername, avatar, isCameraDisabled, true)
+					updateUserStatus(LOCAL_VIDEO, { isCameraDisabled, isMicrophoneDisabled: true })
 				} else {
 					audioTrack.enabled = true
-					// navigator.mediaDevices.getUserMedia({ video: true })
 					setMicMuted(false)
 					emitInfoSync(localUsername, avatar, isCameraDisabled, false)
+					updateUserStatus(LOCAL_VIDEO, { isCameraDisabled, isMicrophoneDisabled: false })
 				}
 			} finally {
 				console.log('After Toggle Audio Track:', audioTrack)
@@ -600,14 +615,14 @@ export default function RoomDev() {
 			try {
 				if (videoTrack.enabled) {
 					videoTrack.enabled = false
-					// videoTrack.stop()
 					setCameraMuted(true)
 					emitInfoSync(localUsername, avatar, true, isMicrophoneDisabled)
+					updateUserStatus(LOCAL_VIDEO, { isCameraDisabled: true, isMicrophoneDisabled })
 				} else {
-					// navigator.mediaDevices.getUserMedia({ video: true })
 					videoTrack.enabled = true
 					setCameraMuted(false)
 					emitInfoSync(localUsername, avatar, false, isMicrophoneDisabled)
+					updateUserStatus(LOCAL_VIDEO, { isCameraDisabled: false, isMicrophoneDisabled })
 				}
 			} finally {
 				console.log('After Toggle Video Track:', videoTrack)
@@ -685,6 +700,17 @@ export default function RoomDev() {
 	const closeChat = () => {
 		setShowChat(false)
 	}
+
+	useEffect(() => {
+		const storedPositions = Object.entries(userData).reduce((acc, [clientId, data]) => {
+			if (data.position) {
+				acc[clientId] = data.position
+			}
+			return acc
+		}, {} as Record<string, UserPosition>)
+
+		setClientPositions(prev => ({ ...prev, ...storedPositions }))
+	}, [userData])
 
 	return (
 		<div
