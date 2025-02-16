@@ -530,6 +530,7 @@ export default function useWebRTC(roomID: string) {
 		chatMessages,
 		sendChatMessage,
 		privateMessages,
+		setPrivateMessages,
 		sendPrivateMessage,
 	}
 }

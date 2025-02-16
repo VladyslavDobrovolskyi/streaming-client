@@ -149,6 +149,7 @@ export default function RoomDev() {
 		chatMessages,
 		sendChatMessage,
 		privateMessages,
+		setPrivateMessages,
 		sendPrivateMessage,
 		initialCameraDisabledState,
 		initialMicrophoneDisabledState,
@@ -698,7 +699,7 @@ export default function RoomDev() {
 	useEffect(() => {
 		const newUnreadMessages: Record<string, number> = {}
 		Object.entries(privateMessages).forEach(([clientID, messages]) => {
-			if (clientID !== LOCAL_VIDEO) {
+			if (clientID !== localPeerId) {
 				newUnreadMessages[clientID] = messages.filter(msg => !msg.read && msg.from !== localPeerId).length
 			}
 		})
@@ -710,6 +711,16 @@ export default function RoomDev() {
 			const newState = { ...prev, [clientID]: !prev[clientID] }
 			if (newState[clientID]) {
 				// Mark messages as read when opening the chat
+				setPrivateMessages(prev => {
+					const updatedMessages = { ...prev }
+					if (updatedMessages[clientID]) {
+						updatedMessages[clientID] = updatedMessages[clientID].map(msg => ({
+							...msg,
+							read: true,
+						}))
+					}
+					return updatedMessages
+				})
 				setUnreadMessages(prev => ({ ...prev, [clientID]: 0 }))
 			}
 			return newState
