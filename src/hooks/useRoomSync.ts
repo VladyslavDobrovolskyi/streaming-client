@@ -103,7 +103,7 @@ export default function useRoomSync(
 				},
 			}))
 		})
-	}, [participantInfo])
+	}, [participantInfo, localPeerId, addToast])
 	// const handleCameraSync = useCallback(
 	// 	({ socketId, isCameraDisabled }: { socketId: string; isCameraDisabled: boolean }) => {
 	// 		console.log('Received camera sync event:', { socketId, isCameraDisabled })
