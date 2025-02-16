@@ -122,16 +122,16 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 			switch (position) {
 				case 'sw':
 					cursor = 'sw-resize'
-					return { ...baseStyle, bottom: '-10px', left: '-10px', cursor }
+					return { ...baseStyle, bottom: '-15px', left: '-15px', cursor }
 				case 'nw':
 					cursor = 'nw-resize'
-					return { ...baseStyle, top: '-10px', left: '-10px', cursor }
+					return { ...baseStyle, top: '-15px', left: '-15px', cursor }
 				case 'se':
 					cursor = 'se-resize'
-					return { ...baseStyle, bottom: '-10px', right: '-10px', cursor }
+					return { ...baseStyle, bottom: '-15px', right: '-15px', cursor }
 				case 'ne':
 					cursor = 'ne-resize'
-					return { ...baseStyle, top: '-10px', right: '-10px', cursor }
+					return { ...baseStyle, top: '-15px', right: '-15px', cursor }
 				default:
 					return baseStyle
 			}
@@ -219,8 +219,8 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 						height: size.height * scale,
 						position: 'absolute',
 						zIndex: 12000,
-						top: '10px',
-						left: '10px',
+						top: '15px',
+						left: '15px',
 					}}
 				>
 					<Box
