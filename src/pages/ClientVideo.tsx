@@ -176,9 +176,9 @@ export default function ClientVideo({
 								<div
 									style={{
 										position: 'absolute',
-										bottom: '5px',
-										left: '5px',
-										right: '5px',
+										bottom: '-10px',
+										left: '-11px',
+										right: '0px',
 										display: 'flex',
 										alignItems: 'center',
 										pointerEvents: 'auto',
