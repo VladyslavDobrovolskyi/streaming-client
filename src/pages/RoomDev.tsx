@@ -1361,6 +1361,7 @@ export default function RoomDev() {
 					isOpen && (
 						<PrivateChat
 							onMouseEnter={() => setHighlightedUser(clientID)}
+							onMouseLeave={() => setHighlightedUser(null)}
 							key={clientID}
 							recipientId={clientID}
 							realClientID={localPeerId}

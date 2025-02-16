@@ -8,6 +8,7 @@ import DraggableResizable from './DraggableResizable'
 
 interface PrivateChatProps {
 	onMouseEnter: (id: string) => void
+	onMouseLeave: () => void
 	recipientId: string
 	recipientName: string
 	recipientAvatar: string
@@ -19,6 +20,7 @@ interface PrivateChatProps {
 
 const PrivateChat: React.FC<PrivateChatProps> = ({
 	onMouseEnter,
+	onMouseLeave,
 	recipientId,
 	recipientName,
 	recipientAvatar,
@@ -66,6 +68,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 			{({ isDragging }) => (
 				<Box
 					onMouseEnter={onMouseEnter.bind(null, recipientId)}
+					onMouseLeave={onMouseLeave}
 					style={{
 						backgroundColor: 'var(--gray-1)',
 						borderRadius: 'var(--radius-4)',
