@@ -41,9 +41,13 @@ export default function useRoomSync(
 	)
 
 	const handlePause = useCallback(
-		({ time }: { time: number }) => {
+		({ socketID, time }: { socketID: string; time: number }) => {
 			if (!videoRef.current || isSyncingRef.current) return
-
+			addToast(
+				participantInfo[socketID].avatar,
+				'Syncing',
+				`${participantInfo[socketID]?.username || 'Someone'} stopped the video`
+			)
 			isSyncingRef.current = true
 			videoRef.current.seekTo(time, 'seconds')
 			videoRef.current.getInternalPlayer().pause()
