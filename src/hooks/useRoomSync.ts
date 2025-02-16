@@ -57,18 +57,23 @@ export default function useRoomSync(
 	)
 
 	const handleSeek = useCallback(
-		({ time, direction }: { time: number; direction: 'forward' | 'backward' }) => {
+		({ socketID, time, direction }: { socketID: string; time: number; direction: 'forward' | 'backward' }) => {
 			if (!videoRef.current || isSyncingRef.current) return
 
 			isSyncingRef.current = true
 			videoRef.current.seekTo(time, 'seconds')
 			isSyncingRef.current = false
 
+			addToast(
+				participantInfo[socketID].avatar,
+				'Syncing',
+				`${participantInfo[socketID]?.username || 'Someone'} seeked the video`
+			)
 			setLastSeekDirection(direction)
 
 			console.log('Received seek event:', { time, direction })
 		},
-		[videoRef]
+		[videoRef, participantInfo, addToast]
 	)
 
 	// const handleCameraSync = useCallback(
