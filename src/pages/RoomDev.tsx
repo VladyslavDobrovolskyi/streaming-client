@@ -1,7 +1,5 @@
 'use client'
 
-import type React from 'react'
-
 // 10.02.2025
 import { useState, useRef, useEffect, useCallback } from 'react'
 import ReactPlayer from 'react-player'
@@ -179,7 +177,7 @@ export default function RoomDev() {
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
 	const sliderRef = useRef<HTMLDivElement>(null)
 	const previousVolumeRef = useRef(volume)
-	const { userData, updateUserPosition, updateUserStatus } = useLocalStorageSync(roomID!)
+	const { userData, updateUserPosition, updateUserStatus, updateUserVolume } = useLocalStorageSync(roomID!)
 
 	const addToast = (avatar: string, title: string, description: string) => {
 		const id = Math.random().toString(36).substr(2, 9)
@@ -551,6 +549,7 @@ export default function RoomDev() {
 							onSizeChange={(id, size) => setClientSizes(prev => ({ ...prev, [id]: size }))}
 							onVolumeChange={(id, vol) => {
 								setClientVolumes(prev => ({ ...prev, [id]: vol }))
+								updateUserVolume(id, vol)
 								const videoElement = document.querySelector(
 									`video[data-client-id="${id}"]`
 								) as HTMLVideoElement
@@ -710,6 +709,15 @@ export default function RoomDev() {
 		}, {} as Record<string, UserPosition>)
 
 		setClientPositions(prev => ({ ...prev, ...storedPositions }))
+
+		const storedVolumes = Object.entries(userData).reduce((acc, [clientId, data]) => {
+			if (data.volume !== undefined) {
+				acc[clientId] = data.volume
+			}
+			return acc
+		}, {} as Record<string, number>)
+
+		setClientVolumes(prev => ({ ...prev, ...storedVolumes }))
 	}, [userData])
 
 	return (
@@ -808,14 +816,10 @@ export default function RoomDev() {
 						onValueChange={handleSeekChange}
 						onPointerDown={handleSeekStart}
 						onPointerUp={handleSeekEnd}
-						style={
-							{
-								width: '100%',
-								height: '100%',
-								'--slider-thumb-size': '12px',
-								'--slider-track-height': '4px',
-							} as React.CSSProperties
-						}
+						style={{
+							width: '100%',
+							height: '100%',
+						}}
 					/>
 				</div>
 
@@ -926,13 +930,10 @@ export default function RoomDev() {
 										onValueChange={value => handleVolumeChange(value[0])}
 										onPointerDown={handleVolumePointerDown}
 										onPointerUp={handleVolumePointerUp}
-										style={
-											{
-												width: '100px',
-												'--slider-thumb-size': isVolumeActive ? '16px' : '12px',
-												transition: 'all 0.2s ease',
-											} as React.CSSProperties
-										}
+										style={{
+											width: '100px',
+											transition: 'all 0.2s ease',
+										}}
 									/>
 								</div>
 							)}
