@@ -39,6 +39,8 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 	const [size, setSize] = useState(initialSize)
 	const [position, setPosition] = useState(initialPosition)
 	const [isDragging, setIsDragging] = useState(false)
+	const [isResizing, setIsResizing] = useState(false)
+	const [resizeDirection, setResizeDirection] = useState<string | null>(null)
 	const [scale, setScale] = useState(1)
 	const contentRef = useRef<HTMLDivElement>(null)
 	const dragStartPosition = useRef({ x: 0, y: 0 })
@@ -118,13 +120,13 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 
 			switch (position) {
 				case 'sw':
-					return { ...baseStyle, bottom: '-10px', left: '-10px' }
+					return { ...baseStyle, bottom: '-10px', left: '-10px', cursor: 'sw-resize' }
 				case 'nw':
-					return { ...baseStyle, top: '-10px', left: '-10px' }
+					return { ...baseStyle, top: '-10px', left: '-10px', cursor: 'nw-resize' }
 				case 'se':
-					return { ...baseStyle, bottom: '-10px', right: '-10px' }
+					return { ...baseStyle, bottom: '-10px', right: '-10px', cursor: 'se-resize' }
 				case 'ne':
-					return { ...baseStyle, top: '-10px', right: '-10px' }
+					return { ...baseStyle, top: '-10px', right: '-10px', cursor: 'ne-resize' }
 				default:
 					return baseStyle
 			}
@@ -132,10 +134,24 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 		[resizeHandleStyles]
 	)
 
+	const onResizeStart = useCallback((e: React.MouseEvent, data: ResizeCallbackData) => {
+		setIsResizing(true)
+		setResizeDirection(data.handle)
+	}, [])
+
+	const onResizeStop = useCallback(() => {
+		setIsResizing(false)
+		setResizeDirection(null)
+	}, [])
+
 	useEffect(() => {
 		const handleMouseUp = () => {
 			if (isDragging) {
 				setIsDragging(false)
+			}
+			if (isResizing) {
+				setIsResizing(false)
+				setResizeDirection(null)
 			}
 		}
 
@@ -143,7 +159,27 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 		return () => {
 			document.removeEventListener('mouseup', handleMouseUp)
 		}
-	}, [isDragging])
+	}, [isDragging, isResizing])
+
+	useEffect(() => {
+		if (isResizing) {
+			let cursor = 'default'
+			switch (resizeDirection) {
+				case 'se':
+				case 'nw':
+					cursor = 'nwse-resize'
+					break
+				case 'sw':
+				case 'ne':
+					cursor = 'nesw-resize'
+					break
+			}
+			document.body.style.cursor = cursor
+			return () => {
+				document.body.style.cursor = 'default'
+			}
+		}
+	}, [isResizing, resizeDirection])
 
 	return (
 		<Draggable
@@ -159,6 +195,8 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 				width={size.width * scale + 20}
 				height={size.height * scale + 20}
 				onResize={onResize}
+				onResizeStart={onResizeStart}
+				onResizeStop={onResizeStop}
 				minConstraints={[minConstraints[0] * scale + 20, minConstraints[1] * scale + 20]}
 				maxConstraints={[maxConstraints[0] * scale + 20, maxConstraints[1] * scale + 20]}
 				resizeHandles={['sw', 'nw', 'se', 'ne']}
