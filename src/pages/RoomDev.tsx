@@ -163,7 +163,7 @@ export default function RoomDev() {
 		{}
 	)
 	const [clientVolumes, setClientVolumes] = useState<Record<string, number>>({})
-	const userListWidth = 250
+	const userListWidth = 500
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<number | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
