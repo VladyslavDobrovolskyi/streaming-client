@@ -17,7 +17,16 @@ export default function useRoomSync(
 	const isSyncingRef = useRef(false)
 	const [lastSeekDirection, setLastSeekDirection] = useState<'forward' | 'backward' | null>(null)
 	const [participantInfo, setParticipantInfo] = useState<
-		Record<string, { username: string; avatar: string; isCameraDisabled: boolean; isMicrophoneDisabled: boolean }>
+		Record<
+			string,
+			{
+				username: string
+				avatar: string
+				isCameraDisabled: boolean
+				isMicrophoneDisabled: boolean
+				notified?: boolean
+			}
+		>
 	>({})
 	// const [participantCameras, setParticipantCameras] = useState<Record<string, boolean>>({})
 	// const [participantMicrophones, setParticipantMicrophones] = useState<Record<string, boolean>>({})
@@ -55,7 +64,6 @@ export default function useRoomSync(
 		},
 		[videoRef, participantInfo, addToast]
 	)
-
 	const handleSeek = useCallback(
 		({ socketID, time, direction }: { socketID: string; time: number; direction: 'forward' | 'backward' }) => {
 			if (!videoRef.current || isSyncingRef.current) return
@@ -76,6 +84,24 @@ export default function useRoomSync(
 		[videoRef, participantInfo, addToast]
 	)
 
+	useEffect(() => {
+		const newUserIDs = Object.keys(participantInfo).filter(id => !participantInfo[id].notified && id !== socket.id)
+
+		newUserIDs.forEach(id => {
+			addToast(
+				participantInfo[id].avatar,
+				'New Participant',
+				`${participantInfo[id].username} has joined the room`
+			)
+			setParticipantInfo(prev => ({
+				...prev,
+				[id]: {
+					...prev[id],
+					notified: true,
+				},
+			}))
+		})
+	}, [participantInfo])
 	// const handleCameraSync = useCallback(
 	// 	({ socketId, isCameraDisabled }: { socketId: string; isCameraDisabled: boolean }) => {
 	// 		console.log('Received camera sync event:', { socketId, isCameraDisabled })
@@ -174,6 +200,7 @@ export default function useRoomSync(
 					avatar,
 					isCameraDisabled,
 					isMicrophoneDisabled,
+					notified: false,
 				},
 			}))
 		},
