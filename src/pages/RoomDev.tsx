@@ -781,7 +781,7 @@ export default function RoomDev() {
 				volume={volume}
 				muted={muted}
 				// onPlay={handlePlay}`
-				onPause={handlePause}
+				// onPause={handlePause}
 				onProgress={handleProgress}
 				onDuration={duration => setDuration(duration)}
 				width='100%'
