@@ -48,7 +48,6 @@ export default function ClientVideo({
 	highlightedUser,
 }: ClientVideoProps) {
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
-	const [showVolumeControl, setShowVolumeControl] = useState(false)
 	const [volumeBeforeMute, setVolumeBeforeMute] = useState(0)
 	const [muted, setMuted] = useState(false)
 	const [mutedBySlider, setMutedBySlider] = useState(false)
@@ -136,7 +135,6 @@ export default function ClientVideo({
 					onMouseEnter={() => setHoveredClient(clientID)}
 					onMouseLeave={() => {
 						setHoveredClient(null)
-						setShowVolumeControl(false)
 					}}
 				>
 					<video
@@ -193,8 +191,6 @@ export default function ClientVideo({
 											display: 'flex',
 											alignItems: 'center',
 										}}
-										onMouseEnter={() => setShowVolumeControl(true)}
-										onMouseLeave={() => setShowVolumeControl(false)}
 									>
 										<button
 											onClick={() => handleToggleMuted(volume)}
@@ -211,7 +207,7 @@ export default function ClientVideo({
 										>
 											{getVolumeIcon(volume)}
 										</button>
-										{showVolumeControl && !muted && (
+										{!muted && (
 											<div
 												style={{
 													position: 'absolute',
