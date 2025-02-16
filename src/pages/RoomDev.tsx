@@ -224,6 +224,7 @@ export default function RoomDev() {
 				avatar,
 				isCameraDisabled,
 				isMicrophoneDisabled,
+				notified: true,
 			},
 		}))
 	}, [localUsername, avatar, isCameraDisabled, isMicrophoneDisabled, setParticipantInfo, localPeerId])
