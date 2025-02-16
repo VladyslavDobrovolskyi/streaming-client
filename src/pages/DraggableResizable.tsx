@@ -59,8 +59,8 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 
 	const onResize = useCallback(
 		(_: React.SyntheticEvent, { size: newSize, handle }: ResizeCallbackData) => {
-			const unscaledWidth = Math.round(newSize.width / scale)
-			const unscaledHeight = Math.round(newSize.height / scale)
+			const unscaledWidth = Math.round((newSize.width - 20) / scale)
+			const unscaledHeight = Math.round((newSize.height - 20) / scale)
 
 			setSize({ width: unscaledWidth, height: unscaledHeight })
 			if (onSizeChange) onSizeChange({ width: unscaledWidth, height: unscaledHeight })
@@ -111,17 +111,20 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 				...resizeHandleStyles,
 				zIndex: 12000,
 				position: 'absolute',
+				width: '20px',
+				height: '20px',
+				opacity: 0, // Make handles invisible
 			}
 
 			switch (position) {
 				case 'sw':
-					return { ...baseStyle, bottom: 0, left: 0 }
+					return { ...baseStyle, bottom: '-10px', left: '-10px' }
 				case 'nw':
-					return { ...baseStyle, top: 0, left: 0 }
+					return { ...baseStyle, top: '-10px', left: '-10px' }
 				case 'se':
-					return { ...baseStyle, bottom: 0, right: 0 }
+					return { ...baseStyle, bottom: '-10px', right: '-10px' }
 				case 'ne':
-					return { ...baseStyle, top: 0, right: 0 }
+					return { ...baseStyle, top: '-10px', right: '-10px' }
 				default:
 					return baseStyle
 			}
@@ -153,11 +156,11 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 			defaultClassName={hide ? 'hidden' : 'react-draggable'}
 		>
 			<Resizable
-				width={size.width * scale}
-				height={size.height * scale}
+				width={size.width * scale + 20}
+				height={size.height * scale + 20}
 				onResize={onResize}
-				minConstraints={[minConstraints[0] * scale, minConstraints[1] * scale]}
-				maxConstraints={[maxConstraints[0] * scale, maxConstraints[1] * scale]}
+				minConstraints={[minConstraints[0] * scale + 20, minConstraints[1] * scale + 20]}
+				maxConstraints={[maxConstraints[0] * scale + 20, maxConstraints[1] * scale + 20]}
 				resizeHandles={['sw', 'nw', 'se', 'ne']}
 				handle={(h, ref) => (
 					<span
@@ -173,6 +176,8 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 						height: size.height * scale,
 						position: 'absolute',
 						zIndex: 12000,
+						top: '10px',
+						left: '10px',
 					}}
 				>
 					<Box
