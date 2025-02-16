@@ -211,7 +211,7 @@ export default function ClientVideo({
 											<div
 												style={{
 													position: 'absolute',
-													left: '100%',
+													left: '80%',
 													display: 'flex',
 													alignItems: 'center',
 													height: '100%',
