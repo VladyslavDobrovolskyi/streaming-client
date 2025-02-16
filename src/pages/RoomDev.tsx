@@ -707,7 +707,16 @@ export default function RoomDev() {
 		const newUnreadMessages: Record<string, number> = {}
 		Object.entries(privateMessages).forEach(([clientID, messages]) => {
 			if (privateChats[clientID]) {
-				setUnreadMessages(prev => ({ ...prev, [clientID]: 0 }))
+				setPrivateMessages(prev => {
+					const updatedMessages = { ...prev }
+					if (updatedMessages[clientID]) {
+						updatedMessages[clientID] = updatedMessages[clientID].map(msg => ({
+							...msg,
+							read: true,
+						}))
+					}
+					return updatedMessages
+				})
 			} else {
 				if (clientID !== localPeerId) {
 					newUnreadMessages[clientID] = messages.filter(msg => !msg.read && msg.from !== localPeerId).length
