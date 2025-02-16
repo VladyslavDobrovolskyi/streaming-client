@@ -707,14 +707,14 @@ export default function RoomDev() {
 		const newUnreadMessages: Record<string, number> = {}
 		Object.entries(privateMessages).forEach(([clientID, messages]) => {
 			if (privateChats[clientID]) {
-				newUnreadMessages[clientID] = 0
+				setUnreadMessages(prev => ({ ...prev, [clientID]: 0 }))
 			} else {
 				if (clientID !== localPeerId) {
 					newUnreadMessages[clientID] = messages.filter(msg => !msg.read && msg.from !== localPeerId).length
+					setUnreadMessages(newUnreadMessages)
 				}
 			}
 		})
-		setUnreadMessages(newUnreadMessages)
 	}, [privateMessages, localPeerId, privateChats])
 
 	const togglePrivateChat = (clientID: string) => {
