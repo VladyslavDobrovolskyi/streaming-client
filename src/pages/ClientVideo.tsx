@@ -226,7 +226,7 @@ export default function ClientVideo({
 													onValueChange={value => handleVolumeChange(value[0])}
 													style={
 														{
-															width: size.width - 35,
+															width: size.width - 45,
 															'--slider-thumb-size': '12px',
 														} as React.CSSProperties
 													}
