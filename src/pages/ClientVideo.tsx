@@ -112,18 +112,6 @@ export default function ClientVideo({
 							cursor: isDragging ? 'grabbing' : 'move',
 						}}
 					/>
-					{/* Invisible drag handle */}
-					{/* <div
-						style={{
-							position: 'absolute',
-							top: '20%',
-							left: '20%',
-							width: '60%',
-							height: '60%',
-							cursor: isDragging ? 'grabbing' : 'move',
-							zIndex: 11002,
-						}}
-					/> */}
 					{hoveredClient === clientID && (
 						<>
 							<div
