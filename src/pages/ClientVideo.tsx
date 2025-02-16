@@ -259,7 +259,10 @@ export default function ClientVideo({
 						>
 							<EyeClosedIcon
 								style={{ color: 'white', transform: 'scale(1)', cursor: 'pointer' }}
-								onClick={() => onCoverToggle(clientID)}
+								onClick={() => {
+									onCoverToggle(clientID)
+									handleToggleMuted(volume)
+								}}
 							/>
 						</div>
 					)}
