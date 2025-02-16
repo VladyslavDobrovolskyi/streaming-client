@@ -1,7 +1,7 @@
 'use client'
 
 import type React from 'react'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import DraggableResizable from './DraggableResizable'
 import {
 	EyeOpenIcon,
@@ -48,6 +48,40 @@ export default function ClientVideo({
 	highlightedUser,
 }: ClientVideoProps) {
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
+	const [showVolumeControl, setShowVolumeControl] = useState(false)
+	const [isVolumeActive, setIsVolumeActive] = useState(false)
+	const [muted, setMuted] = useState(false)
+	const videoRef = useRef<HTMLVideoElement>(null)
+
+	useEffect(() => {
+		if (videoRef.current) {
+			videoRef.current.volume = muted ? 0 : volume
+			videoRef.current.muted = muted || isLocal || isMicrophoneMuted
+		}
+	}, [volume, muted, isLocal, isMicrophoneMuted])
+
+	const handleToggleMuted = () => {
+		setMuted(!muted)
+		onVolumeChange(clientID, muted ? (volume > 0 ? volume : 0.5) : 0)
+	}
+
+	const handleVolumeChange = (newVolume: number) => {
+		onVolumeChange(clientID, newVolume)
+		if (newVolume > 0 && muted) {
+			setMuted(false)
+		}
+	}
+
+	const handleVolumePointerDown = () => {
+		setIsVolumeActive(true)
+	}
+
+	const handleVolumePointerUp = () => {
+		setIsVolumeActive(false)
+		if (!hoveredClient) {
+			setShowVolumeControl(false)
+		}
+	}
 
 	const getVolumeIcon = (volume: number) => {
 		const IconStyles = {
@@ -55,7 +89,7 @@ export default function ClientVideo({
 			transform: 'scale(0.5)',
 		}
 
-		if (volume === 0) return <SpeakerOffIcon style={IconStyles} />
+		if (muted || volume === 0) return <SpeakerOffIcon style={IconStyles} />
 		if (volume < 0.33) return <SpeakerQuietIcon style={IconStyles} />
 		if (volume < 0.66) return <SpeakerModerateIcon style={IconStyles} />
 		return <SpeakerLoudIcon style={IconStyles} />
@@ -94,17 +128,23 @@ export default function ClientVideo({
 						zIndex: 11000,
 					}}
 					onMouseEnter={() => setHoveredClient(clientID)}
-					onMouseLeave={() => setHoveredClient(null)}
+					onMouseLeave={() => {
+						setHoveredClient(null)
+						if (!isVolumeActive) {
+							setShowVolumeControl(false)
+						}
+					}}
 				>
 					<video
 						width='100%'
 						height='100%'
-						ref={instance => provideMediaRef(clientID, instance)}
+						ref={instance => {
+							provideMediaRef(clientID, instance)
+						}}
 						data-client-id={clientID}
 						autoPlay
 						playsInline
 						className='video-drag-handle'
-						muted={isLocal || isMicrophoneMuted}
 						style={{
 							objectFit: 'cover',
 							borderRadius: '5px',
@@ -141,39 +181,64 @@ export default function ClientVideo({
 										zIndex: 11003,
 									}}
 								>
-									<button
-										onClick={() => onVolumeChange(clientID, volume === 0 ? 1 : 0)}
+									<div
 										style={{
-											background: 'none',
-											border: 'none',
-											cursor: 'pointer',
-											padding: 0,
+											position: 'relative',
 											display: 'flex',
 											alignItems: 'center',
 										}}
-									>
-										{getVolumeIcon(volume)}
-									</button>
-
-									{volume !== 0 && (
-										<Slider
-											orientation='horizontal'
-											min={0.0}
-											max={1.0}
-											step={0.01}
-											value={[volume]}
-											onValueChange={value => onVolumeChange(clientID, value[0])}
-											style={
-												{
-													cursor: 'pointer',
-													width: '100%',
-													marginLeft: '5px',
-													'--slider-thumb-size': '10px',
-													'--slider-track-height': '2px',
-												} as React.CSSProperties
+										onMouseEnter={() => setShowVolumeControl(true)}
+										onMouseLeave={() => {
+											if (!isVolumeActive) {
+												setShowVolumeControl(false)
 											}
-										/>
-									)}
+										}}
+									>
+										<button
+											onClick={handleToggleMuted}
+											style={{
+												color: 'white',
+												border: 'none',
+												padding: '0.5rem',
+												borderRadius: '5px',
+												cursor: 'pointer',
+												background: 'none',
+												display: 'flex',
+												alignItems: 'center',
+											}}
+										>
+											{getVolumeIcon(volume)}
+										</button>
+										{!muted && (showVolumeControl || isVolumeActive) && (
+											<div
+												style={{
+													position: 'absolute',
+													left: '100%',
+													display: 'flex',
+													alignItems: 'center',
+													height: '100%',
+												}}
+											>
+												<Slider
+													orientation='horizontal'
+													min={0}
+													max={1}
+													step={0.01}
+													value={[muted ? 0 : volume]}
+													onValueChange={value => handleVolumeChange(value[0])}
+													onPointerDown={handleVolumePointerDown}
+													onPointerUp={handleVolumePointerUp}
+													style={
+														{
+															width: '100px',
+															'--slider-thumb-size': isVolumeActive ? '16px' : '12px',
+															transition: 'all 0.2s ease',
+														} as React.CSSProperties
+													}
+												/>
+											</div>
+										)}
+									</div>
 								</div>
 							)}
 						</>
