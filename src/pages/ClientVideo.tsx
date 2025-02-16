@@ -50,7 +50,9 @@ export default function ClientVideo({
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
 	const [showVolumeControl, setShowVolumeControl] = useState(false)
 	const [isVolumeActive, setIsVolumeActive] = useState(false)
+	const [volumeBeforeMute, setVolumeBeforeMute] = useState(0)
 	const [muted, setMuted] = useState(false)
+	const [mutedBySlider, setMutedBySlider] = useState(false)
 	const videoRef = useRef<HTMLVideoElement>(null)
 
 	useEffect(() => {
@@ -60,21 +62,30 @@ export default function ClientVideo({
 		}
 	}, [volume, muted, isLocal, isMicrophoneMuted])
 
-	const handleToggleMuted = () => {
+	const handleToggleMuted = volume => {
+		if (mutedBySlider) {
+			setMuted(false)
+			setMutedBySlider(false)
+			onVolumeChange(clientID, 0.5) // Set volume to 50% when unmuting
+			return
+		}
+
 		if (muted) {
 			setMuted(false)
-			onVolumeChange(clientID, 0.5) // Set volume to 50% when unmuting
+			onVolumeChange(clientID, volumeBeforeMute)
+			return
 		} else {
+			setVolumeBeforeMute(volume)
 			setMuted(true)
 			onVolumeChange(clientID, 0)
+			return
 		}
 	}
 
 	const handleVolumeChange = (newVolume: number) => {
 		if (newVolume === 0) {
 			setMuted(true)
-		} else if (muted) {
-			setMuted(false)
+			setMutedBySlider(true)
 		}
 		onVolumeChange(clientID, newVolume)
 	}
@@ -204,7 +215,7 @@ export default function ClientVideo({
 										}}
 									>
 										<button
-											onClick={handleToggleMuted}
+											onClick={() => handleToggleMuted(volume)}
 											style={{
 												color: 'white',
 												border: 'none',
