@@ -86,6 +86,7 @@ export default function useRoomSync(
 	)
 
 	useEffect(() => {
+		console.log('localPeerId:', localPeerId)
 		const newUserIDs = Object.keys(participantInfo).filter(id => !participantInfo[id].notified && id !== socket.id)
 
 		newUserIDs.forEach(id => {
