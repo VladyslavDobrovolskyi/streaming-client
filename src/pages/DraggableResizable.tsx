@@ -41,7 +41,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 	const [isDragging, setIsDragging] = useState(false)
 	const [scale, setScale] = useState(1)
 	const contentRef = useRef<HTMLDivElement>(null)
-	const dragOffset = useRef({ x: 0, y: 0 })
+	const dragStartPosition = useRef({ x: 0, y: 0 })
 
 	const handleWheel = useCallback(
 		(e: React.WheelEvent<HTMLDivElement>) => {
@@ -86,27 +86,27 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 
 	const onStart = useCallback((e: DraggableEvent, data: DraggableData) => {
 		setIsDragging(true)
-		const node = data.node as HTMLElement
-		const rect = node.getBoundingClientRect()
-		dragOffset.current = {
-			x: data.x - rect.left,
-			y: data.y - rect.top,
-		}
+		dragStartPosition.current = { x: data.x, y: data.y }
 	}, [])
 
 	const onDrag = useCallback(
-		(_: DraggableEvent, data: DraggableData) => {
+		(e: DraggableEvent, data: DraggableData) => {
+			const deltaX = data.x - dragStartPosition.current.x
+			const deltaY = data.y - dragStartPosition.current.y
 			const newPosition = {
-				x: data.x - dragOffset.current.x,
-				y: data.y - dragOffset.current.y,
+				x: position.x + deltaX,
+				y: position.y + deltaY,
 			}
 			setPosition(newPosition)
 			if (onPositionChange) onPositionChange(newPosition)
+			dragStartPosition.current = { x: data.x, y: data.y }
 		},
-		[onPositionChange]
+		[onPositionChange, position]
 	)
 
-	const onStop = useCallback(() => setIsDragging(false), [])
+	const onStop = useCallback(() => {
+		setIsDragging(false)
+	}, [])
 
 	const getHandleStyle = useCallback(
 		(position: string) => {
