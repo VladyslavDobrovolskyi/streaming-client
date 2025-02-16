@@ -40,10 +40,9 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 	const [position, setPosition] = useState(initialPosition)
 	const [isDragging, setIsDragging] = useState(false)
 	const [isResizing, setIsResizing] = useState(false)
-	const [resizeCursor, setResizeCursor] = useState<string>('default')
+	const [actionCursor, setActionCursor] = useState<string>('default')
 	const [scale, setScale] = useState(1)
 	const contentRef = useRef<HTMLDivElement>(null)
-	const dragStartPosition = useRef({ x: 0, y: 0 })
 
 	const handleWheel = useCallback(
 		(e: React.WheelEvent<HTMLDivElement>) => {
@@ -86,9 +85,9 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 		[scale, size, onSizeChange, onPositionChange]
 	)
 
-	const onStart = useCallback((e: DraggableEvent, data: DraggableData) => {
+	const onStart = useCallback((e: DraggableEvent) => {
 		setIsDragging(true)
-		dragStartPosition.current = { x: data.x, y: data.y }
+		setActionCursor(getComputedStyle(e.target as Element).cursor)
 	}, [])
 
 	const onDrag = useCallback(
@@ -105,6 +104,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 
 	const onStop = useCallback(() => {
 		setIsDragging(false)
+		setActionCursor('default')
 	}, [])
 
 	const getHandleStyle = useCallback(
@@ -141,22 +141,23 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 
 	const onResizeStart = useCallback((e: React.MouseEvent) => {
 		setIsResizing(true)
-		setResizeCursor(getComputedStyle(e.target as Element).cursor)
+		setActionCursor(getComputedStyle(e.target as Element).cursor)
 	}, [])
 
 	const onResizeStop = useCallback(() => {
 		setIsResizing(false)
-		setResizeCursor('default')
+		setActionCursor('default')
 	}, [])
 
 	useEffect(() => {
 		const handleMouseUp = () => {
 			if (isDragging) {
 				setIsDragging(false)
+				setActionCursor('default')
 			}
 			if (isResizing) {
 				setIsResizing(false)
-				setResizeCursor('default')
+				setActionCursor('default')
 			}
 		}
 
@@ -167,14 +168,14 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 	}, [isDragging, isResizing])
 
 	useEffect(() => {
-		if (isResizing) {
+		if (isDragging || isResizing) {
 			const style = document.createElement('style')
 			style.innerHTML = `
 				body * {
-					cursor: ${resizeCursor} !important;
+					cursor: ${actionCursor} !important;
 					pointer-events: none;
 				}
-				.react-resizable-handle {
+				.${dragHandleClassName}, .react-resizable-handle {
 					pointer-events: auto;
 				}
 			`
@@ -183,7 +184,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 				document.head.removeChild(style)
 			}
 		}
-	}, [isResizing, resizeCursor])
+	}, [isDragging, isResizing, actionCursor, dragHandleClassName])
 
 	return (
 		<Draggable
