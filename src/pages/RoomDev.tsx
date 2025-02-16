@@ -708,10 +708,10 @@ export default function RoomDev() {
 		Object.entries(privateMessages).forEach(([clientID, messages]) => {
 			if (privateChats[clientID]) {
 				newUnreadMessages[clientID] = 0
-				return
-			}
-			if (clientID !== localPeerId) {
-				newUnreadMessages[clientID] = messages.filter(msg => !msg.read && msg.from !== localPeerId).length
+			} else {
+				if (clientID !== localPeerId) {
+					newUnreadMessages[clientID] = messages.filter(msg => !msg.read && msg.from !== localPeerId).length
+				}
 			}
 		})
 		setUnreadMessages(newUnreadMessages)
