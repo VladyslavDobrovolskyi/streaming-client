@@ -168,9 +168,14 @@ export default function ClientVideo({
 									pointerEvents: 'auto',
 									zIndex: 11003,
 								}}
-								onClick={() => onCoverToggle(clientID)}
 							>
-								<EyeOpenIcon style={{ color: 'white', transform: 'scale(1)' }} />
+								<EyeOpenIcon
+									style={{ color: 'white', transform: 'scale(1)' }}
+									onClick={() => {
+										onCoverToggle(clientID)
+										handleToggleMuted(volume)
+									}}
+								/>
 							</div>
 							{!isLocal && (
 								<div
