@@ -61,15 +61,22 @@ export default function ClientVideo({
 	}, [volume, muted, isLocal, isMicrophoneMuted])
 
 	const handleToggleMuted = () => {
-		setMuted(!muted)
-		onVolumeChange(clientID, muted ? (volume > 0 ? volume : 0.5) : 0)
+		if (muted) {
+			setMuted(false)
+			onVolumeChange(clientID, 0.5) // Set volume to 50% when unmuting
+		} else {
+			setMuted(true)
+			onVolumeChange(clientID, 0)
+		}
 	}
 
 	const handleVolumeChange = (newVolume: number) => {
-		onVolumeChange(clientID, newVolume)
-		if (newVolume > 0 && muted) {
+		if (newVolume === 0) {
+			setMuted(true)
+		} else if (muted) {
 			setMuted(false)
 		}
+		onVolumeChange(clientID, newVolume)
 	}
 
 	const handleVolumePointerDown = () => {
@@ -139,7 +146,9 @@ export default function ClientVideo({
 						width='100%'
 						height='100%'
 						ref={instance => {
-							provideMediaRef(clientID, instance)
+							if (instance) {
+								provideMediaRef(clientID, instance)
+							}
 						}}
 						data-client-id={clientID}
 						autoPlay
@@ -209,7 +218,7 @@ export default function ClientVideo({
 										>
 											{getVolumeIcon(volume)}
 										</button>
-										{!muted && (showVolumeControl || isVolumeActive) && (
+										{(showVolumeControl || isVolumeActive) && (
 											<div
 												style={{
 													position: 'absolute',
