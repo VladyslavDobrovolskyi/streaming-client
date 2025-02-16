@@ -88,7 +88,6 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 	const onStart = useCallback(() => {
 		setIsDragging(true)
 		setActionCursor('grabbing')
-		document.body.style.cursor = 'grabbing'
 	}, [])
 
 	const onDrag = useCallback(
@@ -143,13 +142,11 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 	const onResizeStart = useCallback((e: React.MouseEvent) => {
 		setIsResizing(true)
 		setActionCursor(getComputedStyle(e.target as Element).cursor)
-		document.body.style.cursor = getComputedStyle(e.target as Element).cursor
 	}, [])
 
 	const onResizeStop = useCallback(() => {
 		setIsResizing(false)
 		setActionCursor('default')
-		document.body.style.cursor = 'default'
 	}, [])
 
 	useEffect(() => {
@@ -176,10 +173,10 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 			style.innerHTML = `
         body * {
           cursor: ${actionCursor} !important;
-          pointer-events: none;
+          user-select: none !important;
         }
         .${dragHandleClassName}, .react-resizable-handle {
-          pointer-events: auto;
+          pointer-events: auto !important;
         }
       `
 			document.head.appendChild(style)
@@ -240,7 +237,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 							transformOrigin: 'top left',
 							width: size.width,
 							height: size.height,
-							cursor: isDragging ? 'grabbing' : 'grab',
+							cursor: isDragging || isResizing ? actionCursor : 'grab',
 						}}
 						className={dragHandleClassName}
 					>
