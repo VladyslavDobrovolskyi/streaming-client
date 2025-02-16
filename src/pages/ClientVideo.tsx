@@ -49,7 +49,6 @@ export default function ClientVideo({
 }: ClientVideoProps) {
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
 	const [showVolumeControl, setShowVolumeControl] = useState(false)
-	const [isVolumeActive, setIsVolumeActive] = useState(false)
 	const [volumeBeforeMute, setVolumeBeforeMute] = useState(0)
 	const [muted, setMuted] = useState(false)
 	const [mutedBySlider, setMutedBySlider] = useState(false)
@@ -88,17 +87,6 @@ export default function ClientVideo({
 			setMutedBySlider(true)
 		}
 		onVolumeChange(clientID, newVolume)
-	}
-
-	const handleVolumePointerDown = () => {
-		setIsVolumeActive(true)
-	}
-
-	const handleVolumePointerUp = () => {
-		setIsVolumeActive(false)
-		if (!hoveredClient) {
-			setShowVolumeControl(false)
-		}
 	}
 
 	const getVolumeIcon = (volume: number) => {
@@ -148,9 +136,7 @@ export default function ClientVideo({
 					onMouseEnter={() => setHoveredClient(clientID)}
 					onMouseLeave={() => {
 						setHoveredClient(null)
-						if (!isVolumeActive) {
-							setShowVolumeControl(false)
-						}
+						setShowVolumeControl(false)
 					}}
 				>
 					<video
@@ -208,11 +194,7 @@ export default function ClientVideo({
 											alignItems: 'center',
 										}}
 										onMouseEnter={() => setShowVolumeControl(true)}
-										onMouseLeave={() => {
-											if (!isVolumeActive) {
-												setShowVolumeControl(false)
-											}
-										}}
+										onMouseLeave={() => setShowVolumeControl(false)}
 									>
 										<button
 											onClick={() => handleToggleMuted(volume)}
@@ -229,7 +211,7 @@ export default function ClientVideo({
 										>
 											{getVolumeIcon(volume)}
 										</button>
-										{(showVolumeControl || isVolumeActive) && (
+										{showVolumeControl && !muted && (
 											<div
 												style={{
 													position: 'absolute',
@@ -239,25 +221,20 @@ export default function ClientVideo({
 													height: '100%',
 												}}
 											>
-												{!muted && (
-													<Slider
-														orientation='horizontal'
-														min={0}
-														max={1}
-														step={0.01}
-														value={[muted ? 0 : volume]}
-														onValueChange={value => handleVolumeChange(value[0])}
-														onPointerDown={handleVolumePointerDown}
-														onPointerUp={handleVolumePointerUp}
-														style={
-															{
-																width: '100px',
-																'--slider-thumb-size': isVolumeActive ? '16px' : '12px',
-																transition: 'all 0.2s ease',
-															} as React.CSSProperties
-														}
-													/>
-												)}
+												<Slider
+													orientation='horizontal'
+													min={0}
+													max={1}
+													step={0.01}
+													value={[volume]}
+													onValueChange={value => handleVolumeChange(value[0])}
+													style={
+														{
+															width: '100px',
+															'--slider-thumb-size': '12px',
+														} as React.CSSProperties
+													}
+												/>
 											</div>
 										)}
 									</div>
