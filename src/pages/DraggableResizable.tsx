@@ -237,7 +237,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 							transformOrigin: 'top left',
 							width: size.width,
 							height: size.height,
-							cursor: isDragging || isResizing ? actionCursor : 'grab',
+							cursor: isDragging || isResizing ? actionCursor : 'default',
 						}}
 						// className={dragHandleClassName}
 					>
