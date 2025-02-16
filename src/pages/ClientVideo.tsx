@@ -239,7 +239,7 @@ export default function ClientVideo({
 													height: '100%',
 												}}
 											>
-												{volume !== 0 && (
+												{muted && (
 													<Slider
 														orientation='horizontal'
 														min={0}
