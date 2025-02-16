@@ -201,7 +201,16 @@ export default function RoomDev() {
 		// participantCameras,
 		// participantMicrophones,
 		requestParticipantInfo,
-	} = useRoomSync(roomID!, playerRef, localUsername, avatar, isCameraDisabled, isMicrophoneDisabled, addToast)
+	} = useRoomSync(
+		roomID!,
+		playerRef,
+		localUsername,
+		avatar,
+		isCameraDisabled,
+		isMicrophoneDisabled,
+		addToast,
+		localPeerId
+	)
 
 	useEffect(() => {
 		console.log('Toasts:', toasts)

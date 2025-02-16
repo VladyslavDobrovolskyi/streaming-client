@@ -12,7 +12,8 @@ export default function useRoomSync(
 	avatar: string,
 	isCameraDisabled: boolean,
 	isMicrophoneDisabled: boolean,
-	addToast: (avatar: string, title: string, description: string) => void
+	addToast: (avatar: string, title: string, description: string) => void,
+	localPeerId: string
 ) {
 	const isSyncingRef = useRef(false)
 	const [lastSeekDirection, setLastSeekDirection] = useState<'forward' | 'backward' | null>(null)
@@ -88,6 +89,7 @@ export default function useRoomSync(
 		const newUserIDs = Object.keys(participantInfo).filter(id => !participantInfo[id].notified && id !== socket.id)
 
 		newUserIDs.forEach(id => {
+			if (!participantInfo[localPeerId]) return
 			addToast(
 				participantInfo[id].avatar,
 				'New Participant',
