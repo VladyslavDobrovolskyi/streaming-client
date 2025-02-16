@@ -717,8 +717,6 @@ export default function RoomDev() {
 			.catch(() => {
 				console.log('Failed to fetch avatar')
 			})
-	}, [])
-	useEffect(() => {
 		const username = prompt('Please enter your username:')
 		if (username) {
 			setLocalUsername(username)
