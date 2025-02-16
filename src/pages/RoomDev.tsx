@@ -331,13 +331,13 @@ export default function RoomDev() {
 		}
 	}
 
-	// const handleSeekChange = (value: number[]) => {
-	// 	const newTime = value[0]
-	// 	setPlayed(newTime / duration)
-	// 	const currentTime = playerRef.current?.getCurrentTime() || 0
-	// 	const direction = newTime > currentTime ? 'forward' : 'backward'
-	// 	emitSeek(newTime, direction)
-	// }
+	const handleSeekChange = (value: number[]) => {
+		const newTime = value[0]
+		setPlayed(newTime / duration)
+		// const currentTime = playerRef.current?.getCurrentTime() || 0
+		// const direction = newTime > currentTime ? 'forward' : 'backward'
+		// emitSeek(newTime, direction)
+	}
 
 	const handleSeekStart = () => {
 		setIsDragging(true)
@@ -863,7 +863,7 @@ export default function RoomDev() {
 						max={duration}
 						step={0.01}
 						value={[played * duration || 0]}
-						// onValueChange={handleSeekChange}
+						onValueChange={handleSeekChange}
 						onPointerDown={handleSeekStart}
 						onPointerUp={handleSeekEnd}
 						style={{
