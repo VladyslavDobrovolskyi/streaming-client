@@ -16,6 +16,7 @@ interface PrivateChatProps {
 	sendPrivateMessage: (params: { to: string; message: string }) => void
 	privateMessages: Array<{ from: string; to: string; message: string }>
 	realClientID: string
+	highlight: boolean
 }
 
 const PrivateChat: React.FC<PrivateChatProps> = ({
@@ -28,6 +29,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	sendPrivateMessage,
 	privateMessages,
 	realClientID,
+	highlight,
 }) => {
 	const [message, setMessage] = useState('')
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
@@ -78,6 +80,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						boxShadow: '0 8px 30px rgba(0, 0, 0, 0.12)',
 						width: '100%',
 						height: '100%',
+						border: highlight ? '1px solid cyan' : 'none',
 					}}
 				>
 					<Flex

@@ -1432,6 +1432,7 @@ export default function RoomDev() {
 							onClose={() => togglePrivateChat(clientID)}
 							sendPrivateMessage={sendPrivateMessage}
 							privateMessages={privateMessages[clientID] || []}
+							highlight={clientID === highlightedUser}
 						/>
 					)
 			)}
