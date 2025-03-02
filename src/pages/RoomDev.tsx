@@ -87,7 +87,6 @@ const StyledToastDescription = styled(Toast.Description, {
 	color: 'gray',
 	fontSize: '0.875rem',
 })
-
 const StyledToastClose = styled(Toast.Close, {
 	position: 'absolute',
 	top: '0.5rem',
@@ -1412,6 +1411,8 @@ export default function RoomDev() {
 					setChatInput={setChatInput}
 					handleSendMessage={handleSendMessage}
 					onClose={closeChat}
+					onMouseEnter={setHighlightedUser}
+					onMouseLeave={() => setHighlightedUser(null)}
 				/>
 			)}
 			{Object.entries(privateChats).map(

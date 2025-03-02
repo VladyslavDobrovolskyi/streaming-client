@@ -20,6 +20,8 @@ interface RoomChatProps {
 	handleSendMessage: () => void
 	onClose: () => void
 	onOpenPrivateChat: (clientID: string) => void
+	onMouseEnter: (id: string) => void
+	onMouseLeave: () => void
 }
 
 const RoomChat: React.FC<RoomChatProps> = ({
@@ -31,6 +33,8 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	handleSendMessage,
 	onClose,
 	onOpenPrivateChat,
+	onMouseEnter,
+	onMouseLeave,
 }) => {
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
 
@@ -108,6 +112,8 @@ const RoomChat: React.FC<RoomChatProps> = ({
 									{msg.sender !== realClientID && (
 										<div style={{ position: 'relative' }}>
 											<Avatar
+												onMouseEnter={() => onMouseEnter(msg.sender)}
+												onMouseLeave={onMouseLeave}
 												src={participantInfo[msg.sender]?.avatar}
 												fallback={participantInfo[msg.sender]?.username[0]}
 												size='1'
