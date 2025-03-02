@@ -29,6 +29,8 @@ interface ClientVideoProps {
 	isCovered: boolean
 	volume: number
 	highlightedUser: string | null
+	onMouseEnter: (id: string) => void
+	onMouseLeave: () => void
 }
 
 export default function ClientVideo({
@@ -46,6 +48,8 @@ export default function ClientVideo({
 	isCovered,
 	volume,
 	highlightedUser,
+	onMouseEnter,
+	onMouseLeave,
 }: ClientVideoProps) {
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
 	const [volumeBeforeMute, setVolumeBeforeMute] = useState(0)
@@ -132,9 +136,13 @@ export default function ClientVideo({
 						transformOrigin: 'center center',
 						zIndex: 11000,
 					}}
-					onMouseEnter={() => setHoveredClient(clientID)}
+					onMouseEnter={() => {
+						setHoveredClient(clientID)
+						onMouseEnter(clientID)
+					}}
 					onMouseLeave={() => {
 						setHoveredClient(null)
+						onMouseLeave()
 					}}
 				>
 					<video

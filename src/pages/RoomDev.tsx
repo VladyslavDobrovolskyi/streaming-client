@@ -612,6 +612,8 @@ export default function RoomDev() {
 							isCovered={coveredClients[clientID]}
 							volume={clientVolumes[clientID] || 1}
 							highlightedUser={highlightedUser}
+							onMouseEnter={() => setHighlightedUser(clientID)}
+							onMouseLeave={() => setHighlightedUser(null)}
 						/>
 					)
 				})}
