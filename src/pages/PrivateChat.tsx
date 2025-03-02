@@ -77,7 +77,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						overflow: 'hidden',
 						display: 'flex',
 						flexDirection: 'column',
-						boxShadow: '0 8px 30px rgba(0, 0, 0, 0.12)',
+						boxShadow: highlight ? '0 0 10px cyan' : 'none',
 						width: '100%',
 						height: '100%',
 						border: highlight ? '3px solid cyan' : '3px solid transparent',

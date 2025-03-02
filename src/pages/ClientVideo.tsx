@@ -130,7 +130,7 @@ export default function ClientVideo({
 						transition: 'all 0.1s ease-out',
 						cursor: 'default',
 						display: isCameraMuted ? 'none' : 'block',
-						border: highlightedUser === clientID ? '3px solid cyan' : 'none',
+						border: highlightedUser === clientID ? '3px solid cyan' : '3px solid transparent',
 						boxShadow: highlightedUser === clientID ? '0 0 10px cyan' : 'none',
 						transform: `scale(${size.scale || 1})`,
 						transformOrigin: 'center center',
