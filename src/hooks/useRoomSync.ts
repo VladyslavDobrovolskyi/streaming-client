@@ -252,12 +252,20 @@ export default function useRoomSync(
 		[roomID, participantInfo, localUsername, avatar, isCameraDisabled, isMicrophoneDisabled]
 	)
 
-	const handleClientLeave = useCallback(({ peerID }) => {
-		setParticipantInfo(prev => {
-			const newParticipantInfo = Object.fromEntries(Object.entries(prev).filter(([key]) => key !== peerID))
-			return newParticipantInfo
-		})
-	}, [])
+	const handleClientLeave = useCallback(
+		({ peerID }) => {
+			addToast(
+				participantInfo[peerID]?.avatar || '',
+				'Participant Left',
+				`${participantInfo[peerID]?.username || 'Someone'} has left the room`
+			)
+			setParticipantInfo(prev => {
+				const newParticipantInfo = Object.fromEntries(Object.entries(prev).filter(([key]) => key !== peerID))
+				return newParticipantInfo
+			})
+		},
+		[participantInfo, addToast]
+	)
 
 	const handlePrivateMessage = useCallback(
 		({ from, message }) => {

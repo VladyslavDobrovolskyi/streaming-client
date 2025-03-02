@@ -431,30 +431,35 @@ export default function RoomDev() {
 	}, [showControlsHandler])
 
 	useEffect(() => {
+		const isAnyChatOpen = Object.values(privateChats).some(chat => chat) || showChat
+		const allChatsIsClosed = !isAnyChatOpen
+
 		const handleKeyDown = (e: KeyboardEvent) => {
-			if (e.code === 'Space') {
-				e.preventDefault()
-				if (!isPlaying) {
-					handlePlay()
-				} else {
-					handlePause()
+			if (allChatsIsClosed) {
+				if (e.code === 'Space') {
+					e.preventDefault()
+					if (!isPlaying) {
+						handlePlay()
+					} else {
+						handlePause()
+					}
+				} else if (e.code === 'ArrowRight') {
+					handleForward15()
+				} else if (e.code === 'ArrowLeft') {
+					handleBackward15()
+				} else if (e.code === 'KeyM') {
+					handleToggleMuted()
+				} else if (e.code === 'ArrowUp') {
+					e.preventDefault()
+					const newVolume = Math.min(volume + 0.1, 1)
+					handleVolumeChange(newVolume)
+					showAction('volume')
+				} else if (e.code === 'ArrowDown') {
+					e.preventDefault()
+					const newVolume = Math.max(volume - 0.1, 0)
+					handleVolumeChange(newVolume)
+					showAction('volume')
 				}
-			} else if (e.code === 'ArrowRight') {
-				handleForward15()
-			} else if (e.code === 'ArrowLeft') {
-				handleBackward15()
-			} else if (e.code === 'KeyM') {
-				handleToggleMuted()
-			} else if (e.code === 'ArrowUp') {
-				e.preventDefault()
-				const newVolume = Math.min(volume + 0.1, 1)
-				handleVolumeChange(newVolume)
-				showAction('volume')
-			} else if (e.code === 'ArrowDown') {
-				e.preventDefault()
-				const newVolume = Math.max(volume - 0.1, 0)
-				handleVolumeChange(newVolume)
-				showAction('volume')
 			}
 		}
 
