@@ -1,130 +1,25 @@
 'use client'
 
-// 10.02.2025
 import { useState, useRef, useEffect, useCallback } from 'react'
 import ReactPlayer from 'react-player'
-import {
-	PauseIcon,
-	PlayIcon,
-	SpeakerLoudIcon,
-	SpeakerOffIcon,
-	SpeakerQuietIcon,
-	SpeakerModerateIcon,
-	EnterFullScreenIcon,
-	ExitFullScreenIcon,
-	DoubleArrowLeftIcon,
-	DoubleArrowRightIcon,
-	EyeOpenIcon,
-	EyeClosedIcon,
-	SquareIcon,
-	DotsHorizontalIcon,
-	SectionIcon,
-	ArrowLeftIcon,
-	ChatBubbleIcon,
-} from '@radix-ui/react-icons'
-import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
-import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
-import { Slider } from '@radix-ui/themes'
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import * as Toast from '@radix-ui/react-toast'
-import ActionIndicator from '../components/ActionIndicator'
+import { SpeakerLoudIcon, SpeakerOffIcon, SpeakerQuietIcon, SpeakerModerateIcon } from '@radix-ui/react-icons'
 import { useParams } from 'react-router'
 import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
 import useRoomSync from '../hooks/useRoomSync'
-import { Avatar } from '@radix-ui/themes'
+import ActionIndicator from '../components/ActionIndicator'
 import PrivateChat from './PrivateChat'
 import RoomChat from './RoomChat'
 import 'react-resizable/css/styles.css'
-import ClientVideo from './ClientVideo'
-import { styled, keyframes } from '@stitches/react'
 import useLocalStorageSync from '../hooks/useLocalStorageSync'
-import { Badge } from '@radix-ui/themes'
-
-interface UserPosition {
-	x: number
-	y: number
-}
-
-const slideIn = keyframes({
-	from: { transform: `translateX(calc(100% + 1rem))` },
-	to: { transform: 'translateX(0)' },
-})
-
-const StyledToastViewport = styled(Toast.Viewport, {
-	position: 'fixed',
-	bottom: 0,
-	right: 0,
-	display: 'flex',
-	flexDirection: 'column',
-	padding: '1rem',
-	gap: '0.5rem',
-	width: '390px',
-	maxWidth: '100vw',
-	margin: 0,
-	listStyle: 'none',
-	zIndex: 2147483647,
-})
-
-const StyledToastRoot = styled(Toast.Root, {
-	backgroundColor: 'white',
-	borderRadius: '0.5rem',
-	boxShadow: 'hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px',
-	padding: '0.75rem',
-	display: 'flex',
-	flexDirection: 'column',
-	alignItems: 'flex-start',
-	gap: '0.5rem',
-	animation: `${slideIn} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
-})
-
-const StyledToastTitle = styled(Toast.Title, {
-	fontWeight: 500,
-	color: 'black',
-	fontSize: '1rem',
-})
-
-const StyledToastDescription = styled(Toast.Description, {
-	color: 'gray',
-	fontSize: '0.875rem',
-})
-const StyledToastClose = styled(Toast.Close, {
-	position: 'absolute',
-	top: '0.5rem',
-	right: '0.5rem',
-	background: 'none',
-	border: 'none',
-	cursor: 'pointer',
-	color: 'gray',
-	'&:hover': {
-		color: 'black',
-	},
-})
-
-// const createDashedSquareDragImage = () => {
-// 	const dragImage = document.createElement('div')
-// 	dragImage.style.width = '150px'
-// 	dragImage.style.height = '100px'
-// 	dragImage.style.border = '2px dashed rgba(255, 255, 255, 0.5)'
-// 	dragImage.style.padding = '5px'
-// 	dragImage.style.boxSizing = 'border-box'
-// 	dragImage.style.backgroundColor = 'rgba(0, 0, 0, 0.2)'
-// 	dragImage.style.position = 'absolute'
-// 	dragImage.style.top = '-1000px'
-// 	dragImage.style.left = '-1000px'
-// 	dragImage.style.zIndex = '1000'
-// 	document.body.appendChild(dragImage)
-
-// 	// Принудительно применяем стили
-// 	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-// 	window.getComputedStyle(dragImage).opacity
-
-// 	return dragImage
-// }
+import VideoControls from '../components/video-controls'
+import UserList from '../components/user-list'
+import ParticipantsView from '../components/participants-view'
+import ToastNotifications from '../components/toast-notifications'
+import { formatTime } from '../utils/format-time'
+import type { ToastNotification, UserPosition } from '../types/room-types'
 
 export default function RoomDev() {
-	const [toasts, setToasts] = useState<
-		Array<{ id: string; avatar: string; title: string; description: string; count: number }>
-	>([])
+	const [toasts, setToasts] = useState<ToastNotification[]>([])
 	const { id: roomID } = useParams<{ id: string }>()
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [volume, setVolume] = useState(0.8)
@@ -179,7 +74,6 @@ export default function RoomDev() {
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<number | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
-	const sliderRef = useRef<HTMLDivElement>(null)
 	const previousVolumeRef = useRef(volume)
 	const { userData, updateUserPosition, updateUserStatus, updateUserVolume } = useLocalStorageSync(roomID!)
 
@@ -210,20 +104,17 @@ export default function RoomDev() {
 			}
 		})
 	}
+
 	const {
 		emitPlay,
 		emitPause,
 		emitSeek,
 		requestSync,
 		emitInfoSync,
-		// emitCameraSync,
-		// emitMicrophoneSync,
 		setLastSeekDirection,
 		lastSeekDirection,
 		participantInfo,
 		setParticipantInfo,
-		// participantCameras,
-		// participantMicrophones,
 		requestParticipantInfo,
 	} = useRoomSync(
 		roomID!,
@@ -368,9 +259,6 @@ export default function RoomDev() {
 	const handleSeekChange = (value: number[]) => {
 		const newTime = value[0]
 		setPlayed(newTime / duration)
-		// const currentTime = playerRef.current?.getCurrentTime() || 0
-		// const direction = newTime > currentTime ? 'forward' : 'backward'
-		// emitSeek(newTime, direction)
 	}
 
 	const handleSeekStart = () => {
@@ -527,17 +415,6 @@ export default function RoomDev() {
 		}
 	}, [isMovieMode])
 
-	const formatTime = (seconds: number) => {
-		const date = new Date(seconds * 1000)
-		const hh = date.getUTCHours()
-		const mm = date.getUTCMinutes()
-		const ss = date.getUTCSeconds().toString().padStart(2, '0')
-		if (hh) {
-			return `${hh}:${mm.toString().padStart(2, '0')}:${ss}`
-		}
-		return `${mm}:${ss}`
-	}
-
 	const getSpeakerIcon = () => {
 		if (muted || volume === 0) return <SpeakerOffIcon />
 		if (volume < 0.25) return <SpeakerQuietIcon />
@@ -556,68 +433,6 @@ export default function RoomDev() {
 	const showAction = (action: 'play' | 'pause' | 'mute' | 'unmute' | 'forward' | 'backward' | 'volume') => {
 		setCurrentAction(action)
 		setTimeout(() => setCurrentAction(null), 1000)
-	}
-
-	const renderParticipants = () => {
-		return (
-			<div
-				style={{
-					position: 'absolute',
-					top: '0',
-					left: '0',
-					width: '100%',
-					height: '100%',
-					pointerEvents: 'none',
-					zIndex: 10,
-					opacity: hideUsers ? 0 : 1,
-					visibility: hideUsers ? 'hidden' : 'visible',
-					transition: 'opacity 0.3s ease, visibility 0.3s ease',
-				}}
-			>
-				{clients.map((clientID, index) => {
-					const participantData = participantInfo[clientID] || {}
-					const isCameraMuted = clientID === LOCAL_VIDEO ? isCameraDisabled : participantData.isCameraDisabled
-
-					return (
-						<ClientVideo
-							key={clientID}
-							clientID={clientID}
-							provideMediaRef={provideMediaRef}
-							isLocal={clientID === LOCAL_VIDEO}
-							username={participantData.username || 'Anonymous'}
-							isCameraMuted={isCameraMuted}
-							isMicrophoneMuted={
-								clientID === LOCAL_VIDEO ? isMicrophoneDisabled : participantData.isMicrophoneDisabled
-							}
-							position={clientPositions[clientID] || { x: 0, y: 0 + index * 110 }}
-							size={clientSizes[clientID] || { width: 150, height: 100 }}
-							onPositionChange={(id, pos) => {
-								setClientPositions(prev => ({ ...prev, [id]: pos }))
-								updateUserPosition(id, pos)
-							}}
-							onSizeChange={(id, size) => setClientSizes(prev => ({ ...prev, [id]: size }))}
-							onVolumeChange={(id, vol) => {
-								setClientVolumes(prev => ({ ...prev, [id]: vol }))
-								updateUserVolume(id, vol)
-								const videoElement = document.querySelector(
-									`video[data-client-id="${id}"]`
-								) as HTMLVideoElement
-								if (videoElement) {
-									videoElement.volume = vol
-									videoElement.muted = vol === 0
-								}
-							}}
-							onCoverToggle={id => setCoveredClients(prev => ({ ...prev, [id]: !prev[id] }))}
-							isCovered={coveredClients[clientID]}
-							volume={clientVolumes[clientID] || 1}
-							highlightedUser={highlightedUser}
-							onMouseEnter={() => setHighlightedUser(clientID)}
-							onMouseLeave={() => setHighlightedUser(null)}
-						/>
-					)
-				})}
-			</div>
-		)
 	}
 
 	useEffect(() => {
@@ -695,15 +510,6 @@ export default function RoomDev() {
 	const toggleUserList = () => {
 		setShowUserList(prev => !prev)
 	}
-
-	// useEffect(() => {
-	// 	if (localStream) {
-	// 		const audioTrack = localStream.getAudioTracks()[0]
-	// 		if (audioTrack) {
-	// 			setMicMuted(!audioTrack.enabled)
-	// 		}
-	// 	}
-	// }, [localStream])
 
 	const handleSendMessage = () => {
 		if (chatInput.trim()) {
@@ -783,6 +589,7 @@ export default function RoomDev() {
 			return newState
 		})
 	}
+
 	const closeChat = () => {
 		setShowChat(false)
 	}
@@ -852,7 +659,38 @@ export default function RoomDev() {
 					zIndex: 1,
 				}}
 			/>
-			{renderParticipants()}
+
+			<ParticipantsView
+				clients={clients}
+				participantInfo={participantInfo}
+				provideMediaRef={provideMediaRef}
+				localVideoId={LOCAL_VIDEO}
+				isCameraDisabled={isCameraDisabled}
+				isMicrophoneDisabled={isMicrophoneDisabled}
+				clientPositions={clientPositions}
+				clientSizes={clientSizes}
+				coveredClients={coveredClients}
+				clientVolumes={clientVolumes}
+				highlightedUser={highlightedUser}
+				hideUsers={hideUsers}
+				onPositionChange={(id, pos) => {
+					setClientPositions(prev => ({ ...prev, [id]: pos }))
+					updateUserPosition(id, pos)
+				}}
+				onSizeChange={(id, size) => setClientSizes(prev => ({ ...prev, [id]: size }))}
+				onVolumeChange={(id, vol) => {
+					setClientVolumes(prev => ({ ...prev, [id]: vol }))
+					updateUserVolume(id, vol)
+					const videoElement = document.querySelector(`video[data-client-id="${id}"]`) as HTMLVideoElement
+					if (videoElement) {
+						videoElement.volume = vol
+						videoElement.muted = vol === 0
+					}
+				}}
+				onCoverToggle={id => setCoveredClients(prev => ({ ...prev, [id]: !prev[id] }))}
+				onHighlightChange={setHighlightedUser}
+			/>
+
 			<div
 				style={{
 					position: 'absolute',
@@ -869,538 +707,67 @@ export default function RoomDev() {
 			>
 				<ActionIndicator action={currentAction} volume={volume} />
 			</div>
-			<div
-				className={`controls ${showControls ? 'visible' : 'hidden'}`}
-				style={{
-					position: 'absolute',
-					bottom: '0',
-					left: '0',
-					right: '0',
-					display: 'flex',
-					flexDirection: 'column',
-					padding: '10px',
-					background: 'linear-gradient(transparent, rgba(0,0,0,0.9))',
-					transition: 'opacity 0.3s ease',
-					opacity: showControls ? 1 : 0,
-					zIndex: 20,
-				}}
-			>
-				<div
-					ref={sliderRef}
-					style={{
-						margin: '0 0.5rem',
-						color: 'white',
-						position: 'relative',
-						height: '20px',
-						cursor: 'pointer',
-					}}
-				>
-					<Slider
-						min={0}
-						max={duration}
-						step={0.01}
-						value={[played * duration || 0]}
-						onValueChange={handleSeekChange}
-						onPointerDown={handleSeekStart}
-						onPointerUp={handleSeekEnd}
-						style={{
-							width: '100%',
-							height: '100%',
-						}}
-					/>
-				</div>
 
-				<div
-					style={{
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'space-between',
-						padding: '0 0.5rem',
-					}}
-				>
-					<div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: '1 0 auto' }}>
-						<button
-							onClick={() => {
-								if (isPlaying) {
-									handlePause()
-								} else {
-									handlePlay()
-								}
-							}}
-							style={{
-								color: 'white',
-								border: 'none',
-								padding: '0.5rem',
-								borderRadius: '5px',
-								cursor: 'pointer',
-								background: 'none',
-								display: 'flex',
-								alignItems: 'center',
-							}}
-						>
-							{isPlaying ? <PauseIcon /> : <PlayIcon />}
-						</button>
-						<button
-							onClick={handleBackward15}
-							style={{
-								color: 'white',
-								border: 'none',
-								padding: '0.5rem',
-								borderRadius: '5px',
-								cursor: 'pointer',
-								background: 'none',
-								display: 'flex',
-								alignItems: 'center',
-							}}
-						>
-							<DoubleArrowLeftIcon />
-						</button>
-						<button
-							onClick={handleForward15}
-							style={{
-								color: 'white',
-								border: 'none',
-								padding: '0.5rem',
-								borderRadius: '5px',
-								cursor: 'pointer',
-								background: 'none',
-								display: 'flex',
-								alignItems: 'center',
-							}}
-						>
-							<DoubleArrowRightIcon />
-						</button>
-						<div
-							style={{
-								position: 'relative',
-								display: 'flex',
-								alignItems: 'center',
-							}}
-							onMouseEnter={() => setShowVolumeControl(true)}
-							onMouseLeave={() => {
-								if (!isVolumeActive) {
-									setShowVolumeControl(false)
-								}
-							}}
-						>
-							<button
-								onClick={handleToggleMuted}
-								style={{
-									color: 'white',
-									border: 'none',
-									padding: '0.5rem',
-									borderRadius: '5px',
-									cursor: 'pointer',
-									background: 'none',
-									display: 'flex',
-									alignItems: 'center',
-								}}
-							>
-								{getSpeakerIcon()}
-							</button>
-							{!muted && (showVolumeControl || isVolumeActive) && (
-								<div
-									style={{
-										position: 'absolute',
-										left: '100%',
-										display: 'flex',
-										alignItems: 'center',
-										height: '100%',
-									}}
-								>
-									<Slider
-										orientation='horizontal'
-										min={0}
-										max={1}
-										step={0.01}
-										value={[muted ? 0 : volume]}
-										onValueChange={value => handleVolumeChange(value[0])}
-										onPointerDown={handleVolumePointerDown}
-										onPointerUp={handleVolumePointerUp}
-										style={{
-											width: '100px',
-											transition: 'all 0.2s ease',
-										}}
-									/>
-								</div>
-							)}
-						</div>
-					</div>
+			<VideoControls
+				isPlaying={isPlaying}
+				muted={muted}
+				volume={volume}
+				played={played}
+				loaded={loaded}
+				duration={duration}
+				isFullscreen={isFullscreen}
+				showControls={showControls}
+				setShowControls={setShowControls}
+				showVolumeControl={showVolumeControl}
+				setShowVolumeControl={setShowVolumeControl}
+				isVolumeActive={isVolumeActive}
+				isMenuOpen={isMenuOpen}
+				isMicrophoneDisabled={isMicrophoneDisabled}
+				isCameraDisabled={isCameraDisabled}
+				isMovieMode={isMovieMode}
+				hideUsers={hideUsers}
+				hoveredItem={hoveredItem}
+				showChat={showChat}
+				onPlay={handlePlay}
+				onPause={handlePause}
+				onSeekChange={handleSeekChange}
+				onSeekStart={handleSeekStart}
+				onSeekEnd={handleSeekEnd}
+				onVolumeChange={handleVolumeChange}
+				onToggleMuted={handleToggleMuted}
+				onVolumePointerDown={handleVolumePointerDown}
+				onVolumePointerUp={handleVolumePointerUp}
+				onForward={handleForward15}
+				onBackward={handleBackward15}
+				onFullscreenToggle={handleFullscreenToggle}
+				onMenuOpen={handleMenuOpen}
+				onMenuClose={handleMenuClose}
+				onMicMuteUnmute={handleMicMuteUnmute}
+				onCameraMuteUnmute={handleCameraMuteUnmute}
+				onMovieModeToggle={handleMovieModeToggle}
+				onHideUsersToggle={() => setHideUsers(prev => !prev)}
+				onHoveredItemChange={setHoveredItem}
+				onToggleChat={() => setShowChat(prev => !prev)}
+				formatTime={formatTime}
+				getSpeakerIcon={getSpeakerIcon}
+			/>
 
-					<div
-						style={{
-							position: 'absolute',
-							left: '50%',
-							transform: 'translateX(-50%)',
-							color: 'white',
-							fontSize: '24px',
-							textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
-							fontFamily: 'Roboto, sans-serif',
-						}}
-					>
-						{formatTime(played * duration)} / {formatTime(duration)}
-					</div>
+			<UserList
+				showUserList={showUserList}
+				toggleUserList={toggleUserList}
+				clients={clients}
+				participantInfo={participantInfo}
+				localVideoId={LOCAL_VIDEO}
+				isMicrophoneDisabled={isMicrophoneDisabled}
+				isCameraDisabled={isCameraDisabled}
+				highlightedUser={highlightedUser}
+				setHighlightedUser={setHighlightedUser}
+				togglePrivateChat={togglePrivateChat}
+				unreadMessages={unreadMessages}
+				avatar={avatar}
+				userListWidth={userListWidth}
+			/>
 
-					<div
-						style={{
-							display: 'flex',
-							alignItems: 'center',
-							gap: '0.5rem',
-							flex: '1 0 auto',
-							justifyContent: 'flex-end',
-						}}
-					>
-						<DropdownMenu.Root open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-							<DropdownMenu.Trigger asChild>
-								<button
-									onClick={handleMenuOpen}
-									style={{
-										color: 'white',
-										border: 'none',
-										padding: '0.5rem',
-										borderRadius: '5px',
-										cursor: 'pointer',
-										background: 'none',
-										display: 'flex',
-										alignItems: 'center',
-									}}
-								>
-									<DotsHorizontalIcon />
-								</button>
-							</DropdownMenu.Trigger>{' '}
-							{isMenuOpen && (
-								<div
-									style={{
-										position: 'fixed',
-										bottom: showControls ? '60px' : '10px',
-										right: '10px',
-										zIndex: 9999,
-										minWidth: 220,
-										transition: 'bottom 0.3s ease',
-									}}
-								>
-									<DropdownMenu.Content
-										onMouseEnter={() => {
-											setShowControls(true)
-											if (controlsTimeoutRef.current) {
-												clearTimeout(controlsTimeoutRef.current)
-											}
-										}}
-										onMouseLeave={handleMenuClose}
-										style={{
-											backgroundColor: 'rgba(0, 0, 0, 0.8)',
-											borderRadius: '4px',
-											padding: '4px',
-											zIndex: 9999,
-										}}
-									>
-										<DropdownMenu.Item
-											onSelect={event => {
-												event.preventDefault()
-												handleMicMuteUnmute()
-											}}
-											onMouseEnter={() => setHoveredItem('mic')}
-											onMouseLeave={() => setHoveredItem(null)}
-											style={{
-												padding: '8px 12px',
-												cursor: 'pointer',
-												display: 'flex',
-												alignItems: 'center',
-												gap: '8px',
-												backgroundColor:
-													hoveredItem === 'mic' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
-												color: 'white',
-												border: 'none',
-												width: '100%',
-												textAlign: 'left',
-												outline: 'none',
-											}}
-										>
-											{isMicrophoneDisabled ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
-											{isMicrophoneDisabled ? 'Unmute Microphone' : 'Mute Microphone'}
-										</DropdownMenu.Item>
-										<DropdownMenu.Item
-											onSelect={event => {
-												event.preventDefault()
-												handleCameraMuteUnmute()
-											}}
-											onMouseEnter={() => setHoveredItem('camera')}
-											onMouseLeave={() => setHoveredItem(null)}
-											style={{
-												padding: '8px 12px',
-												cursor: 'pointer',
-												display: 'flex',
-												alignItems: 'center',
-												gap: '8px',
-												backgroundColor:
-													hoveredItem === 'camera'
-														? 'rgba(255, 255, 255, 0.1)'
-														: 'transparent',
-												color: 'white',
-												border: 'none',
-												width: '100%',
-												textAlign: 'left',
-												outline: 'none',
-											}}
-										>
-											{isCameraDisabled ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
-											{isCameraDisabled ? 'Turn Camera On' : 'Turn Camera Off'}
-										</DropdownMenu.Item>
-										<DropdownMenu.Item
-											onSelect={event => {
-												event.preventDefault()
-												handleMovieModeToggle()
-											}}
-											onMouseEnter={() => setHoveredItem('movieMode')}
-											onMouseLeave={() => setHoveredItem(null)}
-											style={{
-												padding: '8px 12px',
-												cursor: 'pointer',
-												display: 'flex',
-												alignItems: 'center',
-												gap: '8px',
-												backgroundColor:
-													hoveredItem === 'movieMode'
-														? 'rgba(255, 255, 255, 0.1)'
-														: 'transparent',
-												color: 'white',
-												border: 'none',
-												width: '100%',
-												textAlign: 'left',
-												outline: 'none',
-											}}
-										>
-											{isMovieMode ? <SectionIcon /> : <SquareIcon />}
-											{isMovieMode ? 'Disable Movie Mode' : 'Enable Movie Mode'}
-										</DropdownMenu.Item>
-										<DropdownMenu.Item
-											onSelect={event => {
-												event.preventDefault()
-												setHideUsers(prev => !prev)
-											}}
-											onMouseEnter={() => setHoveredItem('hideUsers')}
-											onMouseLeave={() => setHoveredItem(null)}
-											style={{
-												padding: '8px 12px',
-												cursor: 'pointer',
-												display: 'flex',
-												alignItems: 'center',
-												gap: '8px',
-												backgroundColor:
-													hoveredItem === 'hideUsers'
-														? 'rgba(255, 255, 255, 0.1)'
-														: 'transparent',
-												color: 'white',
-												border: 'none',
-												width: '100%',
-												textAlign: 'left',
-												outline: 'none',
-											}}
-										>
-											{hideUsers ? <EyeOpenIcon /> : <EyeClosedIcon />}
-											{hideUsers ? 'ShowUsers' : 'Hide Users'}
-										</DropdownMenu.Item>
-									</DropdownMenu.Content>
-								</div>
-							)}
-						</DropdownMenu.Root>
-						<button
-							onClick={handleFullscreenToggle}
-							style={{
-								color: 'white',
-								border: 'none',
-								padding: '0.5rem',
-								borderRadius: '5px',
-								cursor: 'pointer',
-								background: 'none',
-								display: 'flex',
-								alignItems: 'center',
-							}}
-						>
-							{isFullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
-						</button>
-					</div>
-				</div>
-				<button
-					onClick={() => setShowChat(prev => !prev)}
-					style={{
-						color: 'white',
-						border: 'none',
-						padding: '0.5rem',
-						borderRadius: '5px',
-						cursor: 'pointer',
-						background: 'none',
-						display: 'flex',
-						alignItems: 'center',
-					}}
-				>
-					{showChat ? 'Hide Chat' : 'Show Chat'}
-				</button>
-			</div>
-			<div
-				style={{
-					position: 'absolute',
-					top: '50%',
-					right: showUserList ? userListWidth : 0,
-					transform: 'translateY(-50%)',
-					zIndex: 30,
-					transition: 'right 0.3s ease-in-out',
-				}}
-			>
-				<button
-					onClick={toggleUserList}
-					style={{
-						background: 'rgba(0, 0, 0, 0.5)',
-						border: 'none',
-						borderRadius: '50% 0 0 50%',
-						padding: '10px',
-						cursor: 'pointer',
-					}}
-				>
-					<ArrowLeftIcon style={{ color: 'white', transform: `rotate(${showUserList ? 180 : 0}deg)` }} />
-				</button>
-			</div>
-
-			{showUserList && (
-				<div
-					style={{
-						position: 'absolute',
-						top: 0,
-						right: 0,
-						width: `${userListWidth}px`,
-						height: '100%',
-						backgroundColor: 'rgba(0, 0, 0, 0.8)',
-						zIndex: 25,
-						overflowY: 'auto',
-						overflowX: 'hidden',
-						transition: 'right 0.3s ease-in-out',
-					}}
-				>
-					<h2 style={{ color: 'white', padding: '10px', borderBottom: '1px solid rgba(255, 255, 255, 0.2)' }}>
-						Users
-					</h2>
-					{Object.keys(participantInfo).length === 0 && (
-						<div style={{ padding: '10px', color: 'white', textAlign: 'center' }}>
-							<p>No other participants are currently in the room.</p>
-						</div>
-					)}
-					{clients
-						.filter(clientID => clientID !== LOCAL_VIDEO)
-						.map(clientID => {
-							const username = participantInfo[clientID]?.username || 'Anonymous'
-							const displayUsername = username
-
-							return (
-								<div
-									key={clientID}
-									style={{
-										padding: '10px',
-										borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-										backgroundColor:
-											highlightedUser === clientID ? 'rgba(0, 255, 255,0.2)' : 'transparent',
-										display: 'flex',
-										alignItems: 'center',
-										gap: '10px',
-										whiteSpace: 'nowrap',
-										overflow: 'hidden',
-										textOverflow: 'ellipsis',
-									}}
-									onMouseEnter={() => setHighlightedUser(clientID)}
-									onMouseLeave={() => setHighlightedUser(null)}
-								>
-									<Avatar
-										src={clientID === LOCAL_VIDEO ? avatar : participantInfo[clientID]?.avatar}
-										fallback='?'
-									/>
-									<div style={{ position: 'relative', flexGrow: 1 }}>
-										<p
-											style={{
-												color: 'white',
-												margin: 0,
-												cursor: username.length > 15 ? 'pointer' : 'default',
-												overflow: 'hidden',
-												textOverflow: 'ellipsis',
-												whiteSpace: 'nowrap',
-												maxWidth: '150px',
-											}}
-											title={username}
-										>
-											{displayUsername}
-										</p>
-									</div>
-									<span
-										style={{
-											color:
-												clientID === LOCAL_VIDEO
-													? isMicrophoneDisabled
-														? 'red'
-														: 'green'
-													: participantInfo[clientID].isMicrophoneDisabled
-													? 'red'
-													: 'green',
-										}}
-									>
-										{clientID === LOCAL_VIDEO ? (
-											isMicrophoneDisabled ? (
-												<FaMicrophoneAltSlash />
-											) : (
-												<FaMicrophoneAlt />
-											)
-										) : participantInfo[clientID].isMicrophoneDisabled ? (
-											<FaMicrophoneAltSlash />
-										) : (
-											<FaMicrophoneAlt />
-										)}
-									</span>
-									<span
-										style={{
-											color:
-												participantInfo[clientID].isCameraDisabled ||
-												(clientID === LOCAL_VIDEO && isCameraDisabled)
-													? 'red'
-													: 'green',
-										}}
-									>
-										{participantInfo[clientID].isCameraDisabled ||
-										(clientID === LOCAL_VIDEO && isCameraDisabled) ? (
-											<BsCameraVideoOffFill />
-										) : (
-											<BsCameraVideoFill />
-										)}
-									</span>
-									<div style={{ display: 'flex', alignItems: 'center' }}>
-										<button
-											onClick={() => togglePrivateChat(clientID)}
-											style={{
-												background: 'none',
-												border: 'none',
-												cursor: 'pointer',
-												color: 'white',
-												padding: '5px',
-												position: 'relative',
-											}}
-										>
-											<ChatBubbleIcon />
-											{unreadMessages[clientID] > 0 && (
-												<Badge
-													style={{
-														position: 'absolute',
-														top: '-5px',
-														right: '-5px',
-														fontSize: '0.7rem',
-														padding: '2px 4px',
-													}}
-												>
-													{unreadMessages[clientID]}
-												</Badge>
-											)}
-										</button>
-									</div>
-								</div>
-							)
-						})}
-				</div>
-			)}
 			{showChat && (
 				<RoomChat
 					onOpenPrivateChat={togglePrivateChat}
@@ -1415,6 +782,7 @@ export default function RoomDev() {
 					onMouseLeave={() => setHighlightedUser(null)}
 				/>
 			)}
+
 			{Object.entries(privateChats).map(
 				([clientID, isOpen]) =>
 					isOpen && (
@@ -1439,26 +807,8 @@ export default function RoomDev() {
 						/>
 					)
 			)}
-			<Toast.Provider swipeDirection='right'>
-				{toasts.map(toast => (
-					<StyledToastRoot key={toast.id} duration={3000}>
-						<StyledToastTitle>
-							{toast.avatar && <Avatar src={toast.avatar} fallback='?' />}
-							{toast.title}
-							{toast.count > 1 && (
-								<Badge variant='solid' color='blue'>
-									x{toast.count}
-								</Badge>
-							)}
-						</StyledToastTitle>
-						<StyledToastDescription>{toast.description}</StyledToastDescription>
-						<StyledToastClose>
-							<span aria-hidden>×</span>
-						</StyledToastClose>
-					</StyledToastRoot>
-				))}
-				<StyledToastViewport />
-			</Toast.Provider>
+
+			<ToastNotifications toasts={toasts} />
 		</div>
 	)
 }
