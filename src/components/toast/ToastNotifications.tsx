@@ -2,7 +2,7 @@
 
 import * as Toast from '@radix-ui/react-toast'
 import { Avatar, Badge } from '@radix-ui/themes'
-import type { ToastNotification } from '../types/room-types'
+import type { ToastNotification } from '../../types/room-types'
 import {
 	StyledToastRoot,
 	StyledToastTitle,
