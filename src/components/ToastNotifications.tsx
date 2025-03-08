@@ -9,7 +9,7 @@ import {
 	StyledToastDescription,
 	StyledToastClose,
 	StyledToastViewport,
-} from './styled-toast'
+} from './StyledToast'
 
 interface ToastNotificationsProps {
 	toasts: ToastNotification[]

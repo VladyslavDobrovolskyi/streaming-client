@@ -1,8 +1,8 @@
 import 'react-resizable/css/styles.css'
-import { useState, useRef, useEffect, useCallback } from 'react'
 import ReactPlayer from 'react-player'
-import { SpeakerLoudIcon, SpeakerOffIcon, SpeakerQuietIcon, SpeakerModerateIcon } from '@radix-ui/react-icons'
 import { useParams } from 'react-router'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { SpeakerLoudIcon, SpeakerOffIcon, SpeakerQuietIcon, SpeakerModerateIcon } from '@radix-ui/react-icons'
 import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
 import useRoomSync from '../hooks/useRoomSync'
 import ActionIndicator from '../components/player/ActionIndicator'
@@ -12,11 +12,11 @@ import useLocalStorageSync from '../hooks/useLocalStorageSync'
 import VideoControls from '../components/player/VideoControls'
 import UserList from '../components/users/UserList'
 import ParticipantsView from '../components/users/ParticipantsView'
-import ToastNotifications from '../components/toast-notifications'
+import ToastNotifications from '../components/ToastNotifications'
 import { formatTime } from '../utils/format-time'
 import type { ToastNotification, UserPosition } from '../types/room-types'
 
-export default function RoomDev() {
+export default function RoomPage() {
 	const [toasts, setToasts] = useState<ToastNotification[]>([])
 	const { id: roomID } = useParams<{ id: string }>()
 	const [isPlaying, setIsPlaying] = useState(false)

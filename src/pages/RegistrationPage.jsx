@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom'
 import styles from './AuthForm.module.css'
 import { useNavigate } from 'react-router-dom'
 
-const RegistrationForm = () => {
+const RegistrationPage = () => {
 	useEffect(() => {
 		document.title = 'Sign In'
 	}, [])
@@ -103,4 +103,4 @@ const RegistrationForm = () => {
 	)
 }
 
-export default RegistrationForm
+export default RegistrationPage

@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import socket from '../socket/index.ts'
 import Hls from 'hls.js'
 import { v4 } from 'uuid'
-import ACTIONS from '../socket/actions'
+import ACTIONS from '../socket/actions.ts'
 
-const Main: React.FC = () => {
+const MainPage: React.FC = () => {
 	const videoRef = useRef<HTMLVideoElement>(null)
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [isMuted, setIsMuted] = useState(true)
@@ -259,4 +259,4 @@ const Main: React.FC = () => {
 	)
 }
 
-export default Main
+export default MainPage
