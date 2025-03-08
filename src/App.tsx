@@ -5,9 +5,6 @@ import Main from './pages/Main'
 import LoginForm from './components/LoginForm'
 import RegistrationForm from './components/RegistrationForm'
 import RoomDev from './pages/RoomDev'
-import ARoom from './pages/Aroom'
-import IconPage from './pages/IconPage'
-import YoutubePage from './pages/YoutubePage'
 
 function App() {
 	return (
@@ -19,10 +16,6 @@ function App() {
 					<Route path='/' element={<Main />} />
 					<Route path='/registration' element={<RegistrationForm />} />
 					<Route path='/login' element={<LoginForm />} />
-					<Route path='/roomdev' element={<RoomDev />} />
-					<Route path='/aroom' element={<ARoom />} />
-					<Route path='/icons' element={<IconPage />} />
-					<Route path='/youtube' element={<YoutubePage />} />
 				</Routes>
 			</BrowserRouter>
 		</GeistProvider>
