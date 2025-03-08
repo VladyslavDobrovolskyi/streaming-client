@@ -14,7 +14,7 @@ import VideoControls from '../components/player/VideoControls'
 import UserList from '../components/users/UserList'
 import ParticipantsView from '../components/users/ParticipantsView'
 import ToastNotifications from '../components/toast/ToastNotifications'
-import { formatTime } from '../utils/format-time'
+import { formatTime } from '../utils/formatTime'
 import type { ToastNotification, UserPosition } from '../types/room-types'
 
 export default function RoomPage() {
