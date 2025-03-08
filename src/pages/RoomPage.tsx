@@ -163,7 +163,7 @@ export default function RoomPage() {
 			setLastSeekDirection(null)
 			console.log('Showing seek action:', lastSeekDirection)
 		}
-	}, [lastSeekDirection])
+	}, [lastSeekDirection, setLastSeekDirection])
 
 	const handleForward15 = () => {
 		const currentTime = playerRef.current?.getCurrentTime() || 0
@@ -566,7 +566,7 @@ export default function RoomPage() {
 				}
 			}
 		})
-	}, [privateMessages, localPeerId, privateChats])
+	}, [privateMessages, localPeerId, privateChats, setPrivateMessages])
 
 	const togglePrivateChat = (clientID: string) => {
 		setPrivateChats(prev => {
