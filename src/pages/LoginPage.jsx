@@ -4,7 +4,7 @@ import DOMPurify from 'dompurify'
 // import { validatePasswordLength } from '../utils/validation'
 import { login } from '../features/auth/authSlice'
 import { Link } from 'react-router-dom'
-import styles from '..components/modules/AuthForm.module.css'
+import styles from '../components/modules/AuthForm.module.css'
 import { useNavigate } from 'react-router-dom'
 
 const LoginPage = () => {
