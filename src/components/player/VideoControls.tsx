@@ -17,6 +17,7 @@ import {
 } from '@radix-ui/react-icons'
 import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
+import { IoMdChatboxes } from 'react-icons/io'
 import { useRef } from 'react'
 import type { VideoControlsProps } from '../../types/room-types'
 
@@ -246,6 +247,21 @@ export default function VideoControls({
 						justifyContent: 'flex-end',
 					}}
 				>
+					<button
+						onClick={onToggleChat}
+						style={{
+							color: 'white',
+							border: 'none',
+							padding: '0.5rem',
+							borderRadius: '5px',
+							cursor: 'pointer',
+							background: 'none',
+							display: 'flex',
+							alignItems: 'center',
+						}}
+					>
+						<IoMdChatboxes />
+					</button>
 					<DropdownMenu.Root open={isMenuOpen} onOpenChange={onMenuOpen}>
 						<DropdownMenu.Trigger asChild>
 							<button
