@@ -258,7 +258,8 @@ export default function VideoControls({
 							background: 'none',
 							display: 'flex',
 							alignItems: 'center',
-							opacity: isRoomChatIsActive ? 1 : 0.5,
+							opacity: isRoomChatIsActive ? 0.5 : 1,
+							scale: 1.1,
 						}}
 					>
 						<IoMdChatboxes />
