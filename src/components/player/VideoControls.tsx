@@ -39,7 +39,6 @@ export default function VideoControls({
 	isMovieMode,
 	hideUsers,
 	hoveredItem,
-	showChat,
 	onPlay,
 	onPause,
 	onSeekChange,
@@ -440,9 +439,7 @@ export default function VideoControls({
 					display: 'flex',
 					alignItems: 'center',
 				}}
-			>
-				{showChat ? 'Hide Chat' : 'Show Chat'}
-			</button>
+			></button>
 		</div>
 	)
 }
