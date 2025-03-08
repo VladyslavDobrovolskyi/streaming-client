@@ -254,6 +254,7 @@ export default function useRoomSync(
 
 	const handleClientLeave = useCallback(
 		({ peerID }) => {
+			if (!participantInfo[peerID]) return
 			addToast(
 				participantInfo[peerID]?.avatar || '',
 				'Participant Left',
