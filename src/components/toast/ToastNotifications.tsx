@@ -1,7 +1,8 @@
 'use client'
 
 import * as Toast from '@radix-ui/react-toast'
-import { Avatar, Badge } from '@radix-ui/themes'
+import { Avatar } from '@radix-ui/themes'
+// import { Badge } from '@radix-ui/themes'
 import type { ToastNotification } from '../../types/room-types'
 import {
 	StyledToastRoot,
@@ -23,11 +24,11 @@ export default function ToastNotifications({ toasts }: ToastNotificationsProps) 
 					<StyledToastTitle>
 						{toast.avatar && <Avatar src={toast.avatar} fallback='?' />}
 						{toast.title}
-						{toast.count > 1 && (
+						{/* {toast.count > 1 && (
 							<Badge variant='solid' color='blue'>
 								x{toast.count}
 							</Badge>
-						)}
+						)} */}
 					</StyledToastTitle>
 					<StyledToastDescription>{toast.description}</StyledToastDescription>
 					<StyledToastClose>
