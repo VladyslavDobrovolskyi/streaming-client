@@ -173,7 +173,7 @@ export default function VideoControls({
 							display: 'flex',
 							alignItems: 'center',
 						}}
-						onMouseEnter={() => showVolumeControl}
+						onMouseEnter={() => setShowVolumeControl(true)}
 						onMouseLeave={() => {
 							if (!isVolumeActive) {
 								setShowVolumeControl(false)
