@@ -1,7 +1,7 @@
 'use client'
 
-import type { ParticipantsViewProps } from '../types/room-types'
-import ClientVideo from './client-video'
+import type { ParticipantsViewProps } from '../../types/room-types'
+import ClientVideo from './ClientVideo'
 
 export default function ParticipantsView({
 	clients,

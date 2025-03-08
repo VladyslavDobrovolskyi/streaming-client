@@ -2,7 +2,7 @@
 
 import type React from 'react'
 import { useState, useEffect, useRef } from 'react'
-import DraggableResizable from './DraggableResizable'
+import DraggableResizable from '../DraggableResizable'
 import {
 	EyeOpenIcon,
 	EyeClosedIcon,

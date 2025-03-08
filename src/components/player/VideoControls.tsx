@@ -18,7 +18,7 @@ import {
 import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
 import { useRef } from 'react'
-import type { VideoControlsProps } from '../types/room-types'
+import type { VideoControlsProps } from '../../types/room-types'
 
 export default function VideoControls({
 	isPlaying,
