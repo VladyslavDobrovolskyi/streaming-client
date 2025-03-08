@@ -59,13 +59,13 @@ export interface VideoControlsProps {
 	showVolumeControl: boolean
 	setShowVolumeControl: (value: boolean) => void
 	isVolumeActive: boolean
+	isRoomChatIsActive: boolean
 	isMenuOpen: boolean
 	isMicrophoneDisabled: boolean
 	isCameraDisabled: boolean
 	isMovieMode: boolean
 	hideUsers: boolean
 	hoveredItem: string | null
-	showChat: boolean
 	onPlay: () => void
 	onPause: () => void
 	onSeekChange: (value: number[]) => void

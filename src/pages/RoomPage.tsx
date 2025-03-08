@@ -726,7 +726,7 @@ export default function RoomPage() {
 				isMovieMode={isMovieMode}
 				hideUsers={hideUsers}
 				hoveredItem={hoveredItem}
-				showChat={showChat}
+				isRoomChatIsActive={showChat}
 				onPlay={handlePlay}
 				onPause={handlePause}
 				onSeekChange={handleSeekChange}

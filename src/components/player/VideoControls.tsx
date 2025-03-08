@@ -31,6 +31,7 @@ export default function VideoControls({
 	showControls,
 	setShowControls,
 	showVolumeControl,
+	isRoomChatIsActive,
 	setShowVolumeControl,
 	isVolumeActive,
 	isMenuOpen,
@@ -257,6 +258,7 @@ export default function VideoControls({
 							background: 'none',
 							display: 'flex',
 							alignItems: 'center',
+							opacity: isRoomChatIsActive ? 1 : 0.5,
 						}}
 					>
 						<IoMdChatboxes />
