@@ -1,9 +1,11 @@
 'use client'
 
 import { Avatar, Badge } from '@radix-ui/themes'
-import { ArrowLeftIcon, ChatBubbleIcon } from '@radix-ui/react-icons'
+import { ArrowLeftIcon } from '@radix-ui/react-icons'
 import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
+import { IoChatbubbleOutline } from 'react-icons/io5'
+import { IoChatbubbleSharp } from 'react-icons/io5'
 // import type { UserListProps } from '../../types/room-types'
 
 export default function UserList({
@@ -173,12 +175,21 @@ export default function UserList({
 												position: 'relative',
 											}}
 										>
-											<ChatBubbleIcon
-												style={{
-													fill: unreadMessages[clientID] > 0 ? 'white' : 'none',
-													position: 'relative',
-												}}
-											/>
+											{unreadMessages[clientID] > 0 ? (
+												<IoChatbubbleSharp
+													style={{
+														fill: 'white',
+														position: 'relative',
+													}}
+												/>
+											) : (
+												<IoChatbubbleOutline
+													style={{
+														fill: 'none',
+														position: 'relative',
+													}}
+												/>
+											)}
 											{unreadMessages[clientID] > 0 && (
 												<Badge
 													style={{
