@@ -46,12 +46,9 @@ export default function UserList({
 						borderRadius: '50% 0 0 50%',
 						padding: '10px',
 						cursor: 'pointer',
-						transform: 'scaleX(-1)',
 					}}
 				>
-					<LiaUsersCogSolid
-						style={{ color: 'white', transform: `rotate(${showUserList ? 180 : 0}deg) scaleX(-1)` }}
-					/>
+					<LiaUsersCogSolid style={{ color: 'white' }} />
 				</button>
 			</div>
 
