@@ -94,7 +94,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						style={{
 							borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
 							cursor: isDragging ? 'grabbing' : 'move',
-							backgroundColor: 'rgba(0, 0, 0, 0.5)',
+							backgroundColor: 'rgba(0, 255, 255,0.4)',
 							userSelect: 'none',
 							position: 'relative',
 							zIndex: 1,
