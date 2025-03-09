@@ -231,6 +231,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 							display: 'flex',
 							flexDirection: 'column',
 							boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+							borderRadius: 'var(--radius-4)',
 							transform: `scale(${scale})`,
 							transformOrigin: 'top left',
 							width: size.width,
