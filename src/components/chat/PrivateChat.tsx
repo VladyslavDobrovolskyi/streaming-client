@@ -101,7 +101,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						</Flex>
 						<Button
 							variant='ghost'
-							onClick={() => {
+							onMouseDown={() => {
 								onClose()
 								onMouseLeave()
 							}}
