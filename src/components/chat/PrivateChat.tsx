@@ -77,10 +77,10 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						overflow: 'hidden',
 						display: 'flex',
 						flexDirection: 'column',
-						boxShadow: highlight ? '0 0 10px cyan' : 'none',
+						boxShadow: highlight ? '0 0 10px rgba(0, 255, 255,0.4)' : 'none',
 						width: '100%',
 						height: '100%',
-						border: highlight ? '3px solid cyan' : '3px solid transparent',
+						border: highlight ? '4px solid rgba(0, 255, 255,0.4)' : '3px solid transparent',
 					}}
 				>
 					<Flex
