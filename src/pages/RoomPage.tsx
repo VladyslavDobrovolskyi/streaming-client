@@ -6,7 +6,7 @@ import ReactPlayer from 'react-player'
 import { useParams } from 'react-router'
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { SpeakerLoudIcon, SpeakerOffIcon, SpeakerQuietIcon, SpeakerModerateIcon } from '@radix-ui/react-icons'
-import { Loader2 } from 'lucide-react'
+import { LoaderCircle } from 'lucide-react'
 import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
 import useRoomSync from '../hooks/useRoomSync'
 import ActionIndicator from '../components/player/ActionIndicator'
@@ -729,7 +729,7 @@ export default function RoomPage() {
 					}}
 				>
 					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
-						<Loader2
+						<LoaderCircle
 							style={{
 								width: '3rem',
 								height: '3rem',
