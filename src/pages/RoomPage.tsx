@@ -707,7 +707,6 @@ export default function RoomPage() {
 					zIndex: 1,
 				}}
 			/>
-			/* Loading Overlay */
 			{(isLoading || isBuffering) && (
 				<div
 					style={{
@@ -722,11 +721,11 @@ export default function RoomPage() {
 				>
 					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
 						<Loader2
+							className='animate-spin'
 							style={{
 								width: '3rem',
 								height: '3rem',
 								color: 'white',
-								animation: 'spin 1s linear infinite',
 							}}
 						/>
 						<p style={{ color: 'white', fontWeight: '500' }}>{isLoading ? 'Loading...' : 'Buffering...'}</p>
