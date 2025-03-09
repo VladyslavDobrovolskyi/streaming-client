@@ -35,12 +35,12 @@ export const StyledToastRoot = styled(Toast.Root, {
 	flexDirection: 'column',
 	alignItems: 'flex-start',
 	gap: '0.5rem',
-	animation: `${slideIn} 150ms cubic-bezier(0.16, 1, 0.3, 1), ${fadeOut} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
+	// Don't apply both animations at once
 	'&[data-state="open"]': {
 		animation: `${slideIn} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
 	},
 	'&[data-state="closed"]': {
-		animation: `${fadeOut} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
+		animation: `${fadeOut} 300ms cubic-bezier(0.16, 1, 0.3, 1)`, // Increased duration for smoother fade
 	},
 })
 
