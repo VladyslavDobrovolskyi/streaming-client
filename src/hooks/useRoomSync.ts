@@ -259,15 +259,23 @@ export default function useRoomSync(
 	const handleClientLeave = useCallback(
 		({ peerID }) => {
 			if (!participantInfo[peerID]) return
-			addToast(
-				participantInfo[peerID]?.avatar || '',
-				'Participant Left',
-				`${participantInfo[peerID]?.username || 'Someone'} has left the room`
-			)
-			setParticipantInfo(prev => {
-				const newParticipantInfo = Object.fromEntries(Object.entries(prev).filter(([key]) => key !== peerID))
-				return newParticipantInfo
-			})
+
+			const interval = setInterval(() => {
+				if (participantInfo[peerID]?.avatar) {
+					addToast(
+						participantInfo[peerID].avatar,
+						'Participant Left',
+						`${participantInfo[peerID]?.username || 'Someone'} has left the room`
+					)
+					setParticipantInfo(prev => {
+						const newParticipantInfo = Object.fromEntries(
+							Object.entries(prev).filter(([key]) => key !== peerID)
+						)
+						return newParticipantInfo
+					})
+					clearInterval(interval)
+				}
+			}, 100)
 		},
 		[participantInfo, addToast]
 	)
