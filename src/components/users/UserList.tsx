@@ -173,15 +173,24 @@ export default function UserList({
 												position: 'relative',
 											}}
 										>
-											<ChatBubbleIcon />
+											<ChatBubbleIcon
+												style={{
+													fill: unreadMessages[clientID] > 0 ? 'white' : 'none',
+													position: 'relative',
+												}}
+											/>
 											{unreadMessages[clientID] > 0 && (
 												<Badge
 													style={{
 														position: 'absolute',
-														top: '-5px',
-														right: '-5px',
+														top: '50%',
+														left: '50%',
+														transform: 'translate(-50%, -50%)',
 														fontSize: '0.7rem',
 														padding: '2px 4px',
+														backgroundColor: 'red',
+														color: 'white',
+														borderRadius: '50%',
 													}}
 												>
 													{unreadMessages[clientID]}
