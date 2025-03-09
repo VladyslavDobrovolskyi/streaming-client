@@ -24,12 +24,14 @@ export default function UserList({
 	unreadMessages,
 	avatar,
 	userListWidth,
+	showUserListButton,
 	hideUsers,
 }) {
 	return (
 		<>
 			<div
 				style={{
+					display: showUserListButton ? 'block' : 'none',
 					position: 'absolute',
 					top: '50%',
 					right: showUserList ? userListWidth : 0,

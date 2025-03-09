@@ -49,6 +49,7 @@ export default function RoomPage() {
 		initialCameraDisabledState,
 		initialMicrophoneDisabledState,
 	} = useWebRTC(roomID!)
+	const [showUserListButton, setShowUserListButton] = useState(false)
 	const [isCameraDisabled, setCameraMuted] = useState(initialCameraDisabledState)
 	const [isMicrophoneDisabled, setMicMuted] = useState(initialMicrophoneDisabledState)
 	const [coveredClients, setCoveredClients] = useState<Record<string, boolean>>({})
@@ -160,6 +161,10 @@ export default function RoomPage() {
 			},
 		}))
 	}, [localUsername, avatar, isCameraDisabled, isMicrophoneDisabled, setParticipantInfo, localPeerId])
+
+	useEffect(() => {
+		setShowUserListButton(showControls)
+	}, [showControls])
 
 	useEffect(() => {
 		console.log('Participant info: ', participantInfo)
@@ -784,6 +789,7 @@ export default function RoomPage() {
 				toggleRemoteMic={toggleRemoteMic}
 				avatar={avatar}
 				userListWidth={userListWidth}
+				showUserListButton={showUserListButton}
 				parcipantVolume={clientVolumes}
 				hideUsers={hideUsers}
 			/>
