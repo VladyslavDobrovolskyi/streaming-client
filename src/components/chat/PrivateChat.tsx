@@ -77,7 +77,6 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						overflow: 'hidden',
 						display: 'flex',
 						flexDirection: 'column',
-						boxShadow: highlight ? '10px 10px 10px rgba(0, 255, 255,0.4)' : 'none',
 						width: '100%',
 						height: '100%',
 					}}
@@ -90,7 +89,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						style={{
 							borderBottom: '1px solid var(--gray-4)',
 							cursor: isDragging ? 'grabbing' : 'move',
-							backgroundColor: 'var(--gray-2)',
+							backgroundColor: highlight ? 'rgba(0, 255, 255,0.4)' : 'var(--gray-2)',
 							userSelect: 'none',
 						}}
 					>
