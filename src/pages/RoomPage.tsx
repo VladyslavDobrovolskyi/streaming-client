@@ -433,7 +433,7 @@ export default function RoomPage() {
 	}, [isMovieMode])
 
 	const getSpeakerIcon = () => {
-		if (muted || volume === 0) return <SpeakerOffIcon />
+		if (muted || volume === 0) return <SpeakerOffIcon style={{ opacity: 0.5 }} />
 		if (volume < 0.25) return <SpeakerQuietIcon />
 		if (volume < 0.75) return <SpeakerModerateIcon />
 		return <SpeakerLoudIcon />
