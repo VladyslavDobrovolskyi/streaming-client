@@ -1,9 +1,12 @@
+'use client'
+
 // 03.08
 import 'react-resizable/css/styles.css'
 import ReactPlayer from 'react-player'
 import { useParams } from 'react-router'
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { SpeakerLoudIcon, SpeakerOffIcon, SpeakerQuietIcon, SpeakerModerateIcon } from '@radix-ui/react-icons'
+import { Loader2 } from 'lucide-react'
 import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
 import useRoomSync from '../hooks/useRoomSync'
 import ActionIndicator from '../components/player/ActionIndicator'
@@ -32,6 +35,9 @@ export default function RoomPage() {
 	const [isDragging, setIsDragging] = useState(false)
 	const [isVolumeActive, setIsVolumeActive] = useState(false)
 	const [mutedBySlider, setMutedBySlider] = useState(false)
+	// Add loading state variables
+	const [isLoading, setIsLoading] = useState(true)
+	const [isBuffering, setIsBuffering] = useState(false)
 	const [currentAction, setCurrentAction] = useState<
 		'play' | 'pause' | 'mute' | 'unmute' | 'forward' | 'backward' | 'volume' | null
 	>(null)
@@ -76,6 +82,19 @@ export default function RoomPage() {
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
 	const previousVolumeRef = useRef(volume)
 	const { userData, updateUserPosition, updateUserStatus, updateUserVolume } = useLocalStorageSync(roomID!)
+
+	// Add handlers for video loading states
+	const handleReady = () => {
+		setIsLoading(false)
+	}
+
+	const handleBuffer = () => {
+		setIsBuffering(true)
+	}
+
+	const handleBufferEnd = () => {
+		setIsBuffering(false)
+	}
 
 	const addToast = (avatar: string, title: string, description: string) => {
 		setToasts(prev => {
@@ -672,6 +691,9 @@ export default function RoomPage() {
 				onPause={() => setIsPlaying(false)}
 				onProgress={handleProgress}
 				onDuration={duration => setDuration(duration)}
+				onReady={handleReady}
+				onBuffer={handleBuffer}
+				onBufferEnd={handleBufferEnd}
 				width='100%'
 				height='100%'
 				style={{
@@ -684,8 +706,17 @@ export default function RoomPage() {
 					height: '100%',
 					zIndex: 1,
 				}}
-				fallback={<div>Loading...</div>}
 			/>
+
+			{/* Loading Overlay */}
+			{(isLoading || isBuffering) && (
+				<div className='absolute inset-0 flex items-center justify-center bg-black/70 z-40'>
+					<div className='flex flex-col items-center gap-3'>
+						<Loader2 className='w-12 h-12 text-white animate-spin' />
+						<p className='text-white font-medium'>{isLoading ? 'Загрузка видео...' : 'Буферизация...'}</p>
+					</div>
+				</div>
+			)}
 
 			<ParticipantsView
 				clients={clients}
