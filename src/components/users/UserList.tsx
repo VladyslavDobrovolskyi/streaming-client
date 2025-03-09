@@ -1,11 +1,11 @@
 'use client'
 
 import { Avatar } from '@radix-ui/themes'
-import { ArrowLeftIcon } from '@radix-ui/react-icons'
 import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
 import { IoChatbubbleOutline } from 'react-icons/io5'
 import { IoChatbubbleSharp } from 'react-icons/io5'
+import { LiaUsersCogSolid } from 'react-icons/lia'
 // import type { UserListProps } from '../../types/room-types'
 
 export default function UserList({
@@ -48,7 +48,7 @@ export default function UserList({
 						cursor: 'pointer',
 					}}
 				>
-					<ArrowLeftIcon style={{ color: 'white', transform: `rotate(${showUserList ? 180 : 0}deg)` }} />
+					<LiaUsersCogSolid style={{ color: 'white', transform: `rotate(${showUserList ? 180 : 0}deg)` }} />
 				</button>
 			</div>
 
