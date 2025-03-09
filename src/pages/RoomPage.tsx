@@ -164,6 +164,7 @@ export default function RoomPage() {
 
 	useEffect(() => {
 		setShowUserListButton(showControls)
+		setShowUserList(showControls)
 	}, [showControls])
 
 	useEffect(() => {
