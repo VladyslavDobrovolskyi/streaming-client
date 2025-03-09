@@ -86,10 +86,8 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 	)
 
 	const onStart = useCallback(() => {
-		setTimeout(() => {
-			setIsDragging(true)
-			setActionCursor('grabbing')
-		}, 100) // 100ms delay
+		setIsDragging(true)
+		setActionCursor('grabbing')
 	}, [])
 
 	const onDrag = useCallback(
