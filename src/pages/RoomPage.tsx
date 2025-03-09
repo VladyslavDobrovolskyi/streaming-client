@@ -716,7 +716,7 @@ export default function RoomPage() {
 						display: 'flex',
 						alignItems: 'center',
 						justifyContent: 'center',
-						backgroundColor: 'rgba(0, 0, 0, 0.7)',
+						backgroundColor: 'rgba(0, 0, 0, 0.2)',
 						zIndex: 40,
 					}}
 				>
@@ -729,9 +729,7 @@ export default function RoomPage() {
 								animation: 'spin 1s linear infinite',
 							}}
 						/>
-						<p style={{ color: 'white', fontWeight: '500' }}>
-							{isLoading ? 'Загрузка видео...' : 'Буферизация...'}
-						</p>
+						<p style={{ color: 'white', fontWeight: '500' }}>{isLoading ? 'Loading...' : 'Buffering...'}</p>
 					</div>
 				</div>
 			)}
