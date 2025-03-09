@@ -32,17 +32,15 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	highlight,
 }) => {
 	const [message, setMessage] = useState('')
+	const [isActive, setIsActive] = useState(true)
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
-	}, [scrollAreaRef.current]) // Updated dependency
+	}, [privateMessages]) // Changed dependency to privateMessages
 
-	useEffect(() => {
-		console.log(privateMessages)
-	}, [privateMessages])
 	const handleSend = () => {
 		if (message.trim()) {
 			sendPrivateMessage({ to: recipientId, message })
@@ -69,8 +67,14 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 		>
 			{({ isDragging }) => (
 				<Box
-					onMouseEnter={onMouseEnter.bind(null, recipientId)}
-					onMouseLeave={onMouseLeave}
+					onMouseEnter={() => {
+						setIsActive(true)
+						onMouseEnter(recipientId)
+					}}
+					onMouseLeave={() => {
+						setIsActive(false)
+						onMouseLeave()
+					}}
 					style={{
 						backgroundColor: 'var(--gray-1)',
 						borderRadius: 'var(--radius-4)',
@@ -79,6 +83,12 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						flexDirection: 'column',
 						width: '100%',
 						height: '100%',
+						boxShadow: isActive ? '0 8px 30px rgba(0, 0, 0, 0.12)' : '0 5px 15px rgba(0, 0, 0, 0.08)',
+						transition: 'box-shadow 0.3s ease, transform 0.2s ease, opacity 0.3s ease',
+						transform: isActive ? 'translateY(-2px)' : 'translateY(0)',
+						opacity: isActive ? 1 : 0.85,
+						border: '1px solid',
+						borderColor: isActive ? 'var(--gray-5)' : 'var(--gray-4)',
 					}}
 				>
 					<Flex
@@ -89,13 +99,33 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						style={{
 							borderBottom: '1px solid var(--gray-4)',
 							cursor: isDragging ? 'grabbing' : 'move',
-							backgroundColor: highlight ? 'rgba(0, 255, 255,0.2)' : 'var(--gray-2)',
+							backgroundColor: highlight
+								? 'rgba(0, 255, 255, 0.2)'
+								: isActive
+								? 'var(--gray-2)'
+								: 'rgba(245, 245, 245, 0.9)',
 							userSelect: 'none',
+							transition: 'background-color 0.3s ease',
 						}}
 					>
 						<Flex align='center' gap='2'>
-							<Avatar src={recipientAvatar} fallback={recipientName[0]} size='2' />
-							<Text size='2' weight='bold'>
+							<Avatar
+								src={recipientAvatar}
+								fallback={recipientName[0]}
+								size='2'
+								style={{
+									opacity: isActive ? 1 : 0.8,
+									transition: 'opacity 0.3s ease',
+								}}
+							/>
+							<Text
+								size='2'
+								weight='bold'
+								style={{
+									opacity: isActive ? 1 : 0.9,
+									transition: 'opacity 0.3s ease',
+								}}
+							>
 								{recipientName}
 							</Text>
 						</Flex>
@@ -109,15 +139,34 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 								color: 'black',
 								fontWeight: 'bold',
 								cursor: 'pointer',
+								opacity: isActive ? 0.8 : 0.5,
+								transition: 'opacity 0.2s ease, background-color 0.2s ease',
+								borderRadius: '50%',
+								width: '28px',
+								height: '28px',
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+								padding: 0,
 							}}
-							onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(247, 65, 101, 0.7)')}
-							onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+							onMouseEnter={e => {
+								e.currentTarget.style.backgroundColor = 'rgba(247, 65, 101, 0.7)'
+								e.currentTarget.style.opacity = '1'
+							}}
+							onMouseLeave={e => {
+								e.currentTarget.style.backgroundColor = 'transparent'
+								e.currentTarget.style.opacity = isActive ? '0.8' : '0.5'
+							}}
 						>
 							✕
 						</Button>
 					</Flex>
 					<ScrollArea
-						style={{ flex: 1, padding: '16px' }}
+						style={{
+							flex: 1,
+							padding: '16px',
+							background: 'linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(250,250,250,0.98))',
+						}}
 						ref={scrollAreaRef}
 						className='scroll-area'
 						scrollbars='vertical'
@@ -129,6 +178,8 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 								style={{
 									textAlign: msg.from === realClientID ? 'right' : 'left',
 									marginBottom: '8px',
+									opacity: 0,
+									animation: `fadeIn 0.3s forwards ${index * 0.05}s`,
 								}}
 							>
 								<Box
@@ -156,6 +207,11 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 													: '18px 18px 18px 4px',
 											padding: '8px 12px',
 											whiteSpace: 'pre-wrap',
+											boxShadow:
+												msg.from === realClientID
+													? '0 2px 5px rgba(0, 0, 0, 0.1)'
+													: '0 2px 5px rgba(0, 0, 0, 0.05)',
+											transition: 'transform 0.2s ease, opacity 0.2s ease',
 										}}
 									>
 										{msg.message}
@@ -164,9 +220,22 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 							</Box>
 						))}
 					</ScrollArea>
-					<Flex p='3' gap='2' style={{ borderTop: '1px solid var(--gray-4)' }}>
+					<Flex
+						p='3'
+						gap='2'
+						style={{
+							borderTop: '1px solid var(--gray-4)',
+							backgroundColor: isActive ? 'var(--gray-1)' : 'rgba(245, 245, 245, 0.9)',
+							transition: 'background-color 0.3s ease',
+						}}
+					>
 						<TextArea
-							style={{ flex: 1 }}
+							style={{
+								flex: 1,
+								transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
+								borderColor: isActive ? 'var(--gray-6)' : 'var(--gray-5)',
+								boxShadow: isActive ? '0 0 0 1px rgba(0, 0, 0, 0.05)' : 'none',
+							}}
 							placeholder='Type a message...'
 							value={message}
 							onChange={e => setMessage(e.target.value)}
@@ -177,7 +246,16 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 								}
 							}}
 						/>
-						<Button onClick={handleSend} size='3' style={{ padding: '30px 12px' }}>
+						<Button
+							onClick={handleSend}
+							size='3'
+							style={{
+								padding: '30px 12px',
+								opacity: message.trim() ? 1 : 0.7,
+								transition: 'opacity 0.3s ease, transform 0.2s ease',
+								transform: message.trim() ? 'scale(1)' : 'scale(0.98)',
+							}}
+						>
 							<Send size={18} />
 						</Button>
 					</Flex>
