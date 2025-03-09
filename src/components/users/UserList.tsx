@@ -4,7 +4,7 @@ import { Avatar, Badge } from '@radix-ui/themes'
 import { ArrowLeftIcon, ChatBubbleIcon } from '@radix-ui/react-icons'
 import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
-import type { UserListProps } from '../../types/room-types'
+// import type { UserListProps } from '../../types/room-types'
 
 export default function UserList({
 	showUserList,
@@ -17,10 +17,11 @@ export default function UserList({
 	highlightedUser,
 	setHighlightedUser,
 	togglePrivateChat,
+	toggleRemoteMic,
 	unreadMessages,
 	avatar,
 	userListWidth,
-}: UserListProps) {
+}) {
 	return (
 		<>
 			<div
@@ -115,6 +116,7 @@ export default function UserList({
 										</p>
 									</div>
 									<span
+										onClick={() => toggleRemoteMic(clientID)}
 										style={{
 											color:
 												clientID === localVideoId

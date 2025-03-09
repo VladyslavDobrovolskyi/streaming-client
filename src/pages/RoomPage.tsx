@@ -104,6 +104,24 @@ export default function RoomPage() {
 		})
 	}
 
+	const toggleRemoteMic = (clientID: string) => {
+		const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
+		if (videoElement) {
+			const currentVolume = videoElement.volume
+			if (currentVolume > 0) {
+				setClientVolumes(prev => ({ ...prev, [clientID]: 0 }))
+				videoElement.volume = 0
+				videoElement.muted = true
+			} else {
+				const previousVolume = clientVolumes[clientID] || 0.5
+				setClientVolumes(prev => ({ ...prev, [clientID]: previousVolume }))
+				videoElement.volume = previousVolume
+				videoElement.muted = previousVolume === 0
+			}
+			updateUserVolume(clientID, videoElement.volume)
+		}
+	}
+
 	const {
 		emitPlay,
 		emitPause,
@@ -763,6 +781,7 @@ export default function RoomPage() {
 				setHighlightedUser={setHighlightedUser}
 				togglePrivateChat={togglePrivateChat}
 				unreadMessages={unreadMessages}
+				toggleRemoteMic={toggleRemoteMic}
 				avatar={avatar}
 				userListWidth={userListWidth}
 			/>
