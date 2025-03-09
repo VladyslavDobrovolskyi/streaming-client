@@ -91,7 +91,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						</Text>
 						<Button
 							variant='ghost'
-							onClick={onClose}
+							onMouseDown={onClose}
 							style={{
 								color: 'black',
 								fontWeight: 'bold',
@@ -190,7 +190,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 								}
 							}}
 						/>
-						<Button onMouseDown={handleSendMessage} size='3' style={{ padding: '30px 12px' }}>
+						<Button onClick={handleSendMessage} size='3' style={{ padding: '30px 12px' }}>
 							<Send size={18} />
 						</Button>
 					</Flex>
