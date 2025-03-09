@@ -20,9 +20,18 @@ import ToastNotifications from '../components/toast/ToastNotifications'
 import { formatTime } from '../utils/formatTime'
 import type { ToastNotification, UserPosition } from '../types/room-types'
 
+// Add this after your imports
+const spinKeyframes = `
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`
+
 export default function RoomPage() {
 	const [toasts, setToasts] = useState<ToastNotification[]>([])
 	const { id: roomID } = useParams<{ id: string }>()
+	const [isDragging, setIsDragging] = useState(false)
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [volume, setVolume] = useState(0.8)
 	const [muted, setMuted] = useState(false)
@@ -32,7 +41,6 @@ export default function RoomPage() {
 	const [showVolumeControl, setShowVolumeControl] = useState(false)
 	const [isFullscreen, setIsFullscreen] = useState(false)
 	const [duration, setDuration] = useState(0)
-	const [isDragging, setIsDragging] = useState(false)
 	const [isVolumeActive, setIsVolumeActive] = useState(false)
 	const [mutedBySlider, setMutedBySlider] = useState(false)
 	// Add loading state variables
@@ -679,6 +687,7 @@ export default function RoomPage() {
 				overflow: 'hidden',
 			}}
 		>
+			<style>{spinKeyframes}</style>
 			<ReactPlayer
 				ref={playerRef}
 				className='react-player'
@@ -721,11 +730,11 @@ export default function RoomPage() {
 				>
 					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
 						<Loader2
-							className='animate-spin'
 							style={{
 								width: '3rem',
 								height: '3rem',
 								color: 'white',
+								animation: 'spin 1s linear infinite',
 							}}
 						/>
 						<p style={{ color: 'white', fontWeight: '500' }}>{isLoading ? 'Loading...' : 'Buffering...'}</p>
