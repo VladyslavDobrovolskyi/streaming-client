@@ -224,19 +224,21 @@ export default function VideoControls({
 					</div>
 				</div>
 
-				<div
-					style={{
-						position: 'absolute',
-						left: '50%',
-						transform: 'translateX(-50%)',
-						color: 'white',
-						fontSize: '24px',
-						textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
-						fontFamily: 'Roboto, sans-serif',
-					}}
-				>
-					{formatTime(played * duration)} / {formatTime(duration)}
-				</div>
+				{duration > 0 && (
+					<div
+						style={{
+							position: 'absolute',
+							left: '50%',
+							transform: 'translateX(-50%)',
+							color: 'white',
+							fontSize: '24px',
+							textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
+							fontFamily: 'Roboto, sans-serif',
+						}}
+					>
+						{formatTime(played * duration)} / {formatTime(duration)}
+					</div>
+				)}
 
 				<div
 					style={{

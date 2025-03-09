@@ -31,7 +31,7 @@ export default function RoomPage() {
 	const [showControls, setShowControls] = useState(false)
 	const [showVolumeControl, setShowVolumeControl] = useState(false)
 	const [isFullscreen, setIsFullscreen] = useState(false)
-	const [duration, setDuration] = useState(300)
+	const [duration, setDuration] = useState(0)
 	const [isDragging, setIsDragging] = useState(false)
 	const [isVolumeActive, setIsVolumeActive] = useState(false)
 	const [mutedBySlider, setMutedBySlider] = useState(false)
