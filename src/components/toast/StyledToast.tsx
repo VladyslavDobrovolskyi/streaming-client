@@ -35,12 +35,21 @@ export const StyledToastRoot = styled(Toast.Root, {
 	flexDirection: 'column',
 	alignItems: 'flex-start',
 	gap: '0.5rem',
-	// Don't apply both animations at once
 	'&[data-state="open"]': {
 		animation: `${slideIn} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
 	},
 	'&[data-state="closed"]': {
-		animation: `${fadeOut} 300ms cubic-bezier(0.16, 1, 0.3, 1)`, // Increased duration for smoother fade
+		animation: `${fadeOut} 100ms ease-in`,
+	},
+	'&[data-swipe="move"]': {
+		transform: 'translateX(var(--radix-toast-swipe-move-x))',
+	},
+	'&[data-swipe="cancel"]': {
+		transform: 'translateX(0)',
+		transition: 'transform 200ms ease-out',
+	},
+	'&[data-swipe="end"]': {
+		animation: 'swipeOut 100ms ease-out',
 	},
 })
 
