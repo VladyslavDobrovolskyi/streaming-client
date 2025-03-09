@@ -199,7 +199,7 @@ export default function UserList({
 														transform: 'translate(-50%, -50%)',
 														fontSize: '0.8rem',
 														backgroundColor: 'transparent',
-														color: 'white',
+														color: 'black',
 														borderRadius: '50%',
 													}}
 												>
