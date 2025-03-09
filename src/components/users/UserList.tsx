@@ -35,7 +35,7 @@ export default function UserList({
 					right: showUserList ? userListWidth : 0,
 					transform: 'translateY(-50%)',
 					zIndex: 30,
-					transition: 'right 0.3s ease-in-out',
+					transition: 'right 0.6s ease-in-out',
 				}}
 			>
 				<button
