@@ -4,8 +4,6 @@ import type React from 'react'
 import { useRef, useEffect } from 'react'
 import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar } from '@radix-ui/themes'
 import { Send } from 'lucide-react'
-// Удалите эту строку
-//import { Tooltip } from "react-tooltip"
 import DraggableResizable from '../DraggableResizable'
 
 interface RoomChatProps {
@@ -42,7 +40,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
-	}, [scrollAreaRef])
+	}, [messages])
 
 	const getMessageClasses = (message: { sender: string }, index: number) => {
 		const prevMessage = messages[index - 1]
@@ -64,12 +62,12 @@ const RoomChat: React.FC<RoomChatProps> = ({
 			{({ isDragging }) => (
 				<Box
 					style={{
-						backgroundColor: 'var(--gray-1)',
-						borderRadius: 'var(--radius-4)',
+						backgroundColor: 'rgba(0, 0, 0, 0.8)',
+						borderRadius: '8px',
 						overflow: 'hidden',
 						display: 'flex',
 						flexDirection: 'column',
-						boxShadow: '0 8px 30px rgba(0, 0, 0, 0.12)',
+						boxShadow: '0 8px 30px rgba(0, 0, 0, 0.3)',
 						width: '100%',
 						height: '100%',
 					}}
@@ -80,22 +78,23 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						p='3'
 						className='drag-handle'
 						style={{
-							borderBottom: '1px solid var(--gray-4)',
+							borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
 							cursor: isDragging ? 'grabbing' : 'move',
-							backgroundColor: 'var(--gray-2)',
+							backgroundColor: 'rgba(0, 0, 0, 0.9)',
 							userSelect: 'none',
 						}}
 					>
-						<Text size='2' weight='bold'>
+						<Text size='2' weight='bold' style={{ color: 'white' }}>
 							Room Chat
 						</Text>
 						<Button
 							variant='ghost'
 							onMouseDown={onClose}
 							style={{
-								color: 'black',
+								color: 'white',
 								fontWeight: 'bold',
 								cursor: 'pointer',
+								background: 'transparent',
 							}}
 							onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(247, 65, 101, 0.7)')}
 							onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
@@ -104,7 +103,11 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						</Button>
 					</Flex>
 					<ScrollArea
-						style={{ flex: 1, padding: '16px' }}
+						style={{
+							flex: 1,
+							padding: '16px',
+							backgroundColor: 'rgba(0, 0, 0, 0.7)',
+						}}
 						ref={scrollAreaRef}
 						className='scroll-area'
 						scrollbars='vertical'
@@ -135,12 +138,13 @@ const RoomChat: React.FC<RoomChatProps> = ({
 													visibility: getMessageClasses(msg, index).includes('message-first')
 														? 'visible'
 														: 'hidden',
-													cursor: 'pointer', // Добавляем курсор-указатель для обозначения кликабельности
+													cursor: 'pointer',
+													borderRadius: '0%',
 												}}
-												onClick={() => onOpenPrivateChat(msg.sender)} // Добавляем обработчик клика
+												onClick={() => onOpenPrivateChat(msg.sender)}
 												title={`Open private chat with ${
 													participantInfo[msg.sender]?.username
-												}`} // Добавляем подсказку
+												}`}
 											/>
 										</div>
 									)}
@@ -156,8 +160,10 @@ const RoomChat: React.FC<RoomChatProps> = ({
 											style={{
 												display: 'inline-block',
 												backgroundColor:
-													msg.sender === realClientID ? 'var(--blue-9)' : 'var(--gray-3)',
-												color: msg.sender === realClientID ? 'white' : 'var(--gray-12)',
+													msg.sender === realClientID
+														? 'rgba(0, 132, 255, 0.8)'
+														: 'rgba(255, 255, 255, 0.1)',
+												color: 'white',
 												borderRadius:
 													msg.sender === realClientID
 														? getMessageClasses(msg, index).includes('message-last')
@@ -177,9 +183,21 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							</Box>
 						))}
 					</ScrollArea>
-					<Flex p='3' gap='2' style={{ borderTop: '1px solid var(--gray-4)' }}>
+					<Flex
+						p='3'
+						gap='2'
+						style={{
+							borderTop: '1px solid rgba(255, 255, 255, 0.2)',
+							backgroundColor: 'rgba(0, 0, 0, 0.9)',
+						}}
+					>
 						<TextArea
-							style={{ flex: 1 }}
+							style={{
+								flex: 1,
+								backgroundColor: 'rgba(255, 255, 255, 0.1)',
+								color: 'white',
+								border: '1px solid rgba(255, 255, 255, 0.2)',
+							}}
 							placeholder='Type a message...'
 							value={chatInput}
 							onChange={e => setChatInput(e.target.value)}
@@ -190,7 +208,16 @@ const RoomChat: React.FC<RoomChatProps> = ({
 								}
 							}}
 						/>
-						<Button onClick={handleSendMessage} size='3' style={{ padding: '30px 12px' }}>
+						<Button
+							onClick={handleSendMessage}
+							size='3'
+							style={{
+								padding: '30px 12px',
+								backgroundColor: 'rgba(0, 132, 255, 0.8)',
+								color: 'white',
+								border: 'none',
+							}}
+						>
 							<Send size={18} />
 						</Button>
 					</Flex>
