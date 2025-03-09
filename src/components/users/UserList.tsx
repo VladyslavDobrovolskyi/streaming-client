@@ -102,6 +102,7 @@ export default function UserList({
 									<Avatar
 										src={clientID === localVideoId ? avatar : participantInfo[clientID]?.avatar}
 										fallback='?'
+										style={{ borderRadius: '0%' }}
 									/>
 									<div style={{ position: 'relative', flexGrow: 1 }}>
 										<p
