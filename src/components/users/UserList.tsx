@@ -64,7 +64,7 @@ export default function UserList({
 						zIndex: 25,
 						overflowY: 'auto',
 						overflowX: 'hidden',
-						transition: 'right 0.3s ease-in-out',
+						transition: 'right 0.5s ease-in-out',
 					}}
 				>
 					<h2 style={{ color: 'white', padding: '10px', borderBottom: '1px solid rgba(255, 255, 255, 0.2)' }}>
