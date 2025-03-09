@@ -89,7 +89,15 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						<Text size='2' weight='bold'>
 							Room Chat
 						</Text>
-						<Button variant='ghost' onClick={onClose}>
+						<Button
+							variant='ghost'
+							onClick={onClose}
+							style={{
+								transition: 'background-color 0.3s',
+							}}
+							onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(247, 65, 101, 0.7)')}
+							onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+						>
 							✕
 						</Button>
 					</Flex>

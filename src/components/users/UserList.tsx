@@ -125,11 +125,11 @@ export default function UserList({
 											color:
 												clientID === localVideoId
 													? isMicrophoneDisabled
-														? 'rgba(247, 65, 153, 0.59)'
-														: 'rgba(165, 247, 65, 0.59)'
+														? 'rgba(247, 65, 101, 0.7)'
+														: 'rgba(165, 247, 65, 0.7)'
 													: participantInfo[clientID].isMicrophoneDisabled
-													? 'rgba(247, 65, 153, 0.59)'
-													: 'rgba(165, 247, 65, 0.59)',
+													? 'rgba(247, 65, 101, 0.7)'
+													: 'rgba(165, 247, 65, 0.7)',
 											opacity: parcipantVolume[clientID] === 0 ? 0.3 : 1,
 											cursor: 'pointer',
 										}}
@@ -151,8 +151,8 @@ export default function UserList({
 											color:
 												participantInfo[clientID].isCameraDisabled ||
 												(clientID === localVideoId && isCameraDisabled)
-													? 'rgba(247, 65, 153, 0.59)'
-													: 'rgba(165, 247, 65, 0.59)',
+													? 'rgba(247, 65, 101, 0.7)'
+													: 'rgba(165, 247, 65, 0.7)',
 											opacity: hideUsers ? 0.3 : 1,
 										}}
 									>
