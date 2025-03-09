@@ -177,7 +177,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 								}
 							}}
 						/>
-						<Button onClick={handleSend} size='3' style={{ padding: '0 16px' }}>
+						<Button onClick={handleSend} size='3' style={{ padding: '30px 12px' }}>
 							<Send size={18} />
 						</Button>
 					</Flex>
