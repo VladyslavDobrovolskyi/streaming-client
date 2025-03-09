@@ -144,8 +144,8 @@ export default function RoomPage() {
 	}, [localUsername, avatar, isCameraDisabled, isMicrophoneDisabled, setParticipantInfo, localPeerId])
 
 	useEffect(() => {
-		console.log('Participants:', clients, 'Participant info: ', participantInfo)
-	}, [clients, participantInfo])
+		console.log('Participant info: ', participantInfo)
+	}, [participantInfo])
 
 	useEffect(() => {
 		console.log('Loaded:', loaded)
