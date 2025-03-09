@@ -89,7 +89,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						style={{
 							borderBottom: '1px solid var(--gray-4)',
 							cursor: isDragging ? 'grabbing' : 'move',
-							backgroundColor: highlight ? 'rgba(0, 255, 255,0.4)' : 'var(--gray-2)',
+							backgroundColor: highlight ? 'rgba(0, 255, 255,0.2)' : 'var(--gray-2)',
 							userSelect: 'none',
 						}}
 					>
