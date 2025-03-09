@@ -160,7 +160,7 @@ export default function ClientVideo({
 						className='video-drag-handle'
 						style={{
 							objectFit: 'cover',
-							borderRadius: '5px',
+							borderRadius: 'var(--radius-4)',
 							zIndex: 11001,
 							cursor: isDragging ? 'grabbing' : 'move',
 						}}
