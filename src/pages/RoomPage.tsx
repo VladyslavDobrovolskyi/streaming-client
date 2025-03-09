@@ -784,6 +784,7 @@ export default function RoomPage() {
 				toggleRemoteMic={toggleRemoteMic}
 				avatar={avatar}
 				userListWidth={userListWidth}
+				parcipantVolume={clientVolumes}
 			/>
 
 			{showChat && (

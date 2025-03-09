@@ -16,6 +16,7 @@ export default function UserList({
 	isCameraDisabled,
 	highlightedUser,
 	setHighlightedUser,
+	parcipantVolume,
 	togglePrivateChat,
 	toggleRemoteMic,
 	unreadMessages,
@@ -126,6 +127,8 @@ export default function UserList({
 													: participantInfo[clientID].isMicrophoneDisabled
 													? 'red'
 													: 'green',
+											opacity: parcipantVolume[clientID] === 0 ? 0.5 : 1,
+											cursor: 'pointer',
 										}}
 									>
 										{clientID === localVideoId ? (
