@@ -250,6 +250,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 								padding: '30px 12px',
 								opacity: message.trim() ? 1 : 0.7,
 								transition: 'opacity 0.3s ease',
+								backgroundColor: 'rgba(0, 255, 255, 0.2',
 							}}
 						>
 							<Send size={18} />
