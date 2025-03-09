@@ -6,7 +6,6 @@ import ReactPlayer from 'react-player'
 import { useParams } from 'react-router'
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { SpeakerLoudIcon, SpeakerOffIcon, SpeakerQuietIcon, SpeakerModerateIcon } from '@radix-ui/react-icons'
-import { GearIcon } from '@radix-ui/react-icons'
 import useWebRTC, { LOCAL_VIDEO } from '../hooks/useWebRTC'
 import useRoomSync from '../hooks/useRoomSync'
 import ActionIndicator from '../components/player/ActionIndicator'
@@ -19,6 +18,7 @@ import ParticipantsView from '../components/users/ParticipantsView'
 import ToastNotifications from '../components/toast/ToastNotifications'
 import { formatTime } from '../utils/formatTime'
 import type { ToastNotification, UserPosition } from '../types/room-types'
+import Loader from '../components/player/Loader'
 
 // Add this after your imports
 const spinKeyframes = `
@@ -716,32 +716,7 @@ export default function RoomPage() {
 					zIndex: 1,
 				}}
 			/>
-			{(isLoading || isBuffering) && (
-				<div
-					style={{
-						position: 'absolute',
-						inset: 0,
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'center',
-						backgroundColor: 'rgba(0, 0, 0, 0.2)',
-						zIndex: 40,
-					}}
-				>
-					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
-						<GearIcon
-							style={{
-								width: '3rem',
-								height: '3rem',
-								animation: 'spin 1s linear infinite',
-								transform: 'scale(1.5)',
-								color: 'white',
-							}}
-						/>
-						<p style={{ color: 'white', fontWeight: '500' }}>{isLoading ? 'Loading...' : 'Buffering...'}</p>
-					</div>
-				</div>
-			)}
+			{(isLoading || isBuffering) && <Loader isLoading />}
 			<ParticipantsView
 				clients={clients}
 				participantInfo={participantInfo}
