@@ -73,7 +73,6 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 					onMouseLeave={onMouseLeave}
 					style={{
 						backgroundColor: 'var(--gray-1)',
-						opacity: 0.4,
 						borderRadius: 'var(--radius-4)',
 						overflow: 'hidden',
 						display: 'flex',

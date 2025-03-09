@@ -38,7 +38,3 @@ svg {
 .hidden {
 	display: none;
 }
-
-.react-draggable {
-	opacity: 0 !important;
-}
