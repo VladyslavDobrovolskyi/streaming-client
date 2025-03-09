@@ -1,6 +1,6 @@
 'use client'
 
-import { Avatar, Badge } from '@radix-ui/themes'
+import { Avatar } from '@radix-ui/themes'
 import { ArrowLeftIcon } from '@radix-ui/react-icons'
 import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
@@ -191,7 +191,7 @@ export default function UserList({
 												/>
 											)}
 											{unreadMessages[clientID] > 0 && (
-												<Badge
+												<span
 													style={{
 														position: 'absolute',
 														top: '50%',
@@ -204,7 +204,7 @@ export default function UserList({
 													}}
 												>
 													{unreadMessages[clientID]}
-												</Badge>
+												</span>
 											)}
 										</button>
 									</div>
