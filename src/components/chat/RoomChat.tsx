@@ -190,7 +190,11 @@ const RoomChat: React.FC<RoomChatProps> = ({
 								}
 							}}
 						/>
-						<Button onClick={handleSendMessage} size='3' style={{ padding: '30px 12px' }}>
+						<Button
+							onClick={handleSendMessage}
+							size='3'
+							style={{ padding: '30px 12px', backgroundColor: 'rgba(0, 255, 255, 0.4)' }}
+						>
 							<Send size={18} />
 						</Button>
 					</Flex>
