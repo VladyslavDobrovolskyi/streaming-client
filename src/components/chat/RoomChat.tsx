@@ -62,16 +62,30 @@ const RoomChat: React.FC<RoomChatProps> = ({
 			{({ isDragging }) => (
 				<Box
 					style={{
-						backgroundColor: 'rgba(0, 0, 0, 0.8)',
-						borderRadius: '8px',
+						// The Box already has a background color from DraggableResizable
+						// We'll use a dark overlay instead
+						position: 'relative',
+						borderRadius: 'var(--radius-4)',
 						overflow: 'hidden',
 						display: 'flex',
 						flexDirection: 'column',
-						boxShadow: '0 8px 30px rgba(0, 0, 0, 0.3)',
 						width: '100%',
 						height: '100%',
 					}}
 				>
+					{/* Dark overlay to simulate the dark background */}
+					<div
+						style={{
+							position: 'absolute',
+							top: 0,
+							left: 0,
+							right: 0,
+							bottom: 0,
+							backgroundColor: 'rgba(0, 0, 0, 0.85)',
+							zIndex: 0,
+						}}
+					/>
+
 					<Flex
 						align='center'
 						justify='between'
@@ -80,8 +94,10 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						style={{
 							borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
 							cursor: isDragging ? 'grabbing' : 'move',
-							backgroundColor: 'rgba(0, 0, 0, 0.9)',
+							backgroundColor: 'rgba(0, 0, 0, 0.5)',
 							userSelect: 'none',
+							position: 'relative',
+							zIndex: 1,
 						}}
 					>
 						<Text size='2' weight='bold' style={{ color: 'white' }}>
@@ -102,11 +118,13 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							✕
 						</Button>
 					</Flex>
+
 					<ScrollArea
 						style={{
 							flex: 1,
 							padding: '16px',
-							backgroundColor: 'rgba(0, 0, 0, 0.7)',
+							position: 'relative',
+							zIndex: 1,
 						}}
 						ref={scrollAreaRef}
 						className='scroll-area'
@@ -183,12 +201,14 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							</Box>
 						))}
 					</ScrollArea>
+
 					<Flex
 						p='3'
 						gap='2'
 						style={{
 							borderTop: '1px solid rgba(255, 255, 255, 0.2)',
-							backgroundColor: 'rgba(0, 0, 0, 0.9)',
+							position: 'relative',
+							zIndex: 1,
 						}}
 					>
 						<TextArea
