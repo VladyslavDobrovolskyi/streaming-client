@@ -22,7 +22,7 @@ export default function ToastNotifications({ toasts }: ToastNotificationsProps) 
 			{toasts.map(toast => (
 				<StyledToastRoot key={toast.id} duration={3000}>
 					<StyledToastTitle>
-						{toast.avatar && <Avatar src={toast.avatar} fallback='?' />}
+						{toast.avatar && <Avatar src={toast.avatar} fallback='?' style={{ borderRadius: '0%' }} />}
 						{toast.title}
 						{/* {toast.count > 1 && (
 							<Badge variant='solid' color='blue'>

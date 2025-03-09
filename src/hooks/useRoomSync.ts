@@ -91,18 +91,23 @@ export default function useRoomSync(
 		)
 
 		newUserIDs.forEach(id => {
-			addToast(
-				participantInfo[id].avatar,
-				'New Participant',
-				`${participantInfo[id].username} has joined the room`
-			)
-			setParticipantInfo(prev => ({
-				...prev,
-				[id]: {
-					...prev[id],
-					notified: true,
-				},
-			}))
+			const interval = setInterval(() => {
+				if (participantInfo[id].avatar) {
+					addToast(
+						participantInfo[id].avatar,
+						'New Participant',
+						`${participantInfo[id].username} has joined the room`
+					)
+					setParticipantInfo(prev => ({
+						...prev,
+						[id]: {
+							...prev[id],
+							notified: true,
+						},
+					}))
+					clearInterval(interval)
+				}
+			}, 100)
 		})
 	}, [participantInfo, localPeerId, addToast])
 	// const handleCameraSync = useCallback(
@@ -268,11 +273,11 @@ export default function useRoomSync(
 	)
 
 	const handlePrivateMessage = useCallback(
-		({ from, message }) => {
+		({ from }) => {
 			addToast(
 				participantInfo[from].avatar,
 				'New message',
-				`New private message from ${participantInfo[from].username}: ${message}`
+				`New private message from ${participantInfo[from].username}`
 			)
 		},
 		[participantInfo, addToast]
