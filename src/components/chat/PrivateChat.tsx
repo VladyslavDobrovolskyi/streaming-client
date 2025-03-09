@@ -108,6 +108,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 							style={{
 								color: 'black',
 								fontWeight: 'bold',
+								cursor: 'pointer',
 							}}
 							onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(247, 65, 101, 0.7)')}
 							onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
