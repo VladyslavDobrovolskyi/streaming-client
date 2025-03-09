@@ -65,16 +65,6 @@ export default function VideoControls({
 }: VideoControlsProps) {
 	const sliderRef = useRef<HTMLDivElement>(null)
 
-	const handleMenuOpenChange = (isMenuOpen: boolean) => {
-		if (isMenuOpen) {
-			onMenuClose()
-			isMenuOpen = false
-		} else {
-			onMenuOpen()
-			isMenuOpen = true
-		}
-	}
-
 	return (
 		<div
 			className={`controls ${showControls ? 'visible' : 'hidden'}`}
@@ -277,7 +267,13 @@ export default function VideoControls({
 					<DropdownMenu.Root open={isMenuOpen} onOpenChange={onMenuOpen}>
 						<DropdownMenu.Trigger asChild>
 							<button
-								onClick={() => handleMenuOpenChange(isMenuOpen)}
+								onClick={() => {
+									if (isMenuOpen) {
+										onMenuClose()
+									} else {
+										onMenuOpen()
+									}
+								}}
 								style={{
 									color: 'white',
 									border: 'none',
