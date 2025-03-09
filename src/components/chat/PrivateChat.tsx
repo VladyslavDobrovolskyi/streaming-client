@@ -84,8 +84,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						width: '100%',
 						height: '100%',
 						boxShadow: isActive ? '0 8px 30px rgba(0, 0, 0, 0.12)' : '0 5px 15px rgba(0, 0, 0, 0.08)',
-						transition: 'box-shadow 0.3s ease, transform 0.2s ease, opacity 0.3s ease',
-						transform: isActive ? 'translateY(-2px)' : 'translateY(0)',
+						transition: 'box-shadow 0.3s ease, opacity 0.3s ease',
 						opacity: isActive ? 1 : 0.85,
 						border: '1px solid',
 						borderColor: isActive ? 'var(--gray-5)' : 'var(--gray-4)',
@@ -178,8 +177,6 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 								style={{
 									textAlign: msg.from === realClientID ? 'right' : 'left',
 									marginBottom: '8px',
-									opacity: 0,
-									animation: `fadeIn 0.3s forwards ${index * 0.05}s`,
 								}}
 							>
 								<Box
@@ -252,8 +249,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 							style={{
 								padding: '30px 12px',
 								opacity: message.trim() ? 1 : 0.7,
-								transition: 'opacity 0.3s ease, transform 0.2s ease',
-								transform: message.trim() ? 'scale(1)' : 'scale(0.98)',
+								transition: 'opacity 0.3s ease',
 							}}
 						>
 							<Send size={18} />
