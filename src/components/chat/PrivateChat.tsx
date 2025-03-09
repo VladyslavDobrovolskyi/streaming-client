@@ -121,7 +121,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 								size='2'
 								weight='bold'
 								style={{
-									opacity: isActive ? 1 : 0.9,
+									opacity: isActive ? 0.8 : 0.8,
 									transition: 'opacity 0.3s ease',
 								}}
 							>
@@ -138,7 +138,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 								color: 'black',
 								fontWeight: 'bold',
 								cursor: 'pointer',
-								opacity: isActive ? 0.8 : 0.5,
+								opacity: isActive ? 0.8 : 0.8,
 								transition: 'opacity 0.2s ease, background-color 0.2s ease',
 								borderRadius: '50%',
 								width: '28px',
