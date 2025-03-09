@@ -133,6 +133,7 @@ export default function ClientVideo({
 						border:
 							highlightedUser === clientID ? '3px solid rgba(0, 255, 255,0.4)' : '3px solid transparent',
 						boxShadow: highlightedUser === clientID ? '0 0 10px cyan' : 'none',
+						borderRadius: 'var(--radius-4)',
 						transform: `scale(${size.scale || 1})`,
 						transformOrigin: 'center center',
 						zIndex: 11000,
