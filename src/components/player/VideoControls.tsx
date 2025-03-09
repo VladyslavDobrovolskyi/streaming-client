@@ -264,16 +264,9 @@ export default function VideoControls({
 					>
 						<IoMdChatboxes />
 					</button>
-					<DropdownMenu.Root open={isMenuOpen} onOpenChange={onMenuOpen}>
+					<DropdownMenu.Root open={isMenuOpen} onOpenChange={open => (open ? onMenuOpen() : onMenuClose())}>
 						<DropdownMenu.Trigger asChild>
 							<button
-								onClick={() => {
-									if (isMenuOpen) {
-										onMenuClose()
-									} else {
-										onMenuOpen()
-									}
-								}}
 								style={{
 									color: 'white',
 									border: 'none',
@@ -287,7 +280,7 @@ export default function VideoControls({
 							>
 								<DotsHorizontalIcon />
 							</button>
-						</DropdownMenu.Trigger>{' '}
+						</DropdownMenu.Trigger>
 						{isMenuOpen && (
 							<div
 								style={{
