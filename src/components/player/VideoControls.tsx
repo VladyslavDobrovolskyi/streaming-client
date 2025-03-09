@@ -68,8 +68,10 @@ export default function VideoControls({
 	const handleMenuOpenChange = (isMenuOpen: boolean) => {
 		if (isMenuOpen) {
 			onMenuClose()
+			isMenuOpen = false
 		} else {
 			onMenuOpen()
+			isMenuOpen = true
 		}
 	}
 
