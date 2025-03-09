@@ -197,9 +197,8 @@ export default function UserList({
 														top: '50%',
 														left: '50%',
 														transform: 'translate(-50%, -50%)',
-														fontSize: '0.7rem',
-														padding: '2px 4px',
-														backgroundColor: 'red',
+														fontSize: '0.8rem',
+														backgroundColor: 'transparent',
 														color: 'white',
 														borderRadius: '50%',
 													}}
