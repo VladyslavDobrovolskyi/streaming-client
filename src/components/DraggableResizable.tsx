@@ -227,8 +227,6 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 						onWheel={handleWheel}
 						ref={contentRef}
 						style={{
-							backgroundColor: 'var(--gray-1)',
-							borderRadius: 'var(--radius-3)',
 							overflow: 'hidden',
 							display: 'flex',
 							flexDirection: 'column',
