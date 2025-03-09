@@ -684,6 +684,7 @@ export default function RoomPage() {
 					height: '100%',
 					zIndex: 1,
 				}}
+				fallback={<div>Loading...</div>}
 			/>
 
 			<ParticipantsView
