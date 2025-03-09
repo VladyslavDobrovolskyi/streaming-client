@@ -58,6 +58,12 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 		return `message ${isFirst ? 'message-first' : ''} ${isLast ? 'message-last' : ''}`
 	}
 
+	useEffect(() => {
+		if (highlight) {
+			setIsActive(true)
+		}
+	}, [highlight])
+
 	return (
 		<DraggableResizable
 			initialSize={{ width: 320, height: 480 }}
