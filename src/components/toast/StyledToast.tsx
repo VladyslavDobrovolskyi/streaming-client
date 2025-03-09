@@ -6,6 +6,11 @@ const slideIn = keyframes({
 	to: { transform: 'translateX(0)' },
 })
 
+const fadeOut = keyframes({
+	from: { opacity: 1 },
+	to: { opacity: 0 },
+})
+
 export const StyledToastViewport = styled(Toast.Viewport, {
 	position: 'fixed',
 	bottom: 0,
@@ -30,7 +35,13 @@ export const StyledToastRoot = styled(Toast.Root, {
 	flexDirection: 'column',
 	alignItems: 'flex-start',
 	gap: '0.5rem',
-	animation: `${slideIn} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
+	animation: `${slideIn} 150ms cubic-bezier(0.16, 1, 0.3, 1), ${fadeOut} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
+	'&[data-state="open"]': {
+		animation: `${slideIn} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
+	},
+	'&[data-state="closed"]': {
+		animation: `${fadeOut} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
+	},
 })
 
 export const StyledToastTitle = styled(Toast.Title, {

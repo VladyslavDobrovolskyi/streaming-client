@@ -4,13 +4,7 @@ import * as Toast from '@radix-ui/react-toast'
 import { Avatar } from '@radix-ui/themes'
 // import { Badge } from '@radix-ui/themes'
 import type { ToastNotification } from '../../types/room-types'
-import {
-	StyledToastRoot,
-	StyledToastTitle,
-	StyledToastDescription,
-	StyledToastClose,
-	StyledToastViewport,
-} from './StyledToast'
+import { StyledToastRoot, StyledToastTitle, StyledToastDescription, StyledToastViewport } from './StyledToast'
 
 interface ToastNotificationsProps {
 	toasts: ToastNotification[]
@@ -31,9 +25,6 @@ export default function ToastNotifications({ toasts }: ToastNotificationsProps) 
 						)} */}
 					</StyledToastTitle>
 					<StyledToastDescription>{toast.description}</StyledToastDescription>
-					<StyledToastClose>
-						<span aria-hidden>×</span>
-					</StyledToastClose>
 				</StyledToastRoot>
 			))}
 			<StyledToastViewport />
