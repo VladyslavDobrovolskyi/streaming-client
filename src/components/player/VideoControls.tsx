@@ -20,7 +20,6 @@ import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
 import { IoMdChatboxes } from 'react-icons/io'
 import { useRef } from 'react'
 import type { VideoControlsProps } from '../../types/room-types'
-import { useState } from 'react'
 
 export default function VideoControls({
 	isPlaying,
@@ -66,15 +65,11 @@ export default function VideoControls({
 }: VideoControlsProps) {
 	const sliderRef = useRef<HTMLDivElement>(null)
 
-	const [menuOpen, setMenuOpen] = useState(false)
-
-	const handleMenuOpenChange = (open: boolean) => {
-		if (!open) {
-			onMenuOpen()
-			setMenuOpen(true)
-		} else {
+	const handleMenuOpenChange = (isMenuOpen: boolean) => {
+		if (isMenuOpen) {
 			onMenuClose()
-			setMenuOpen(false)
+		} else {
+			onMenuOpen()
 		}
 	}
 
@@ -280,7 +275,7 @@ export default function VideoControls({
 					<DropdownMenu.Root open={isMenuOpen} onOpenChange={onMenuOpen}>
 						<DropdownMenu.Trigger asChild>
 							<button
-								onClick={() => handleMenuOpenChange(menuOpen)}
+								onClick={() => handleMenuOpenChange(isMenuOpen)}
 								style={{
 									color: 'white',
 									border: 'none',
