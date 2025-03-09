@@ -707,17 +707,34 @@ export default function RoomPage() {
 					zIndex: 1,
 				}}
 			/>
-
-			{/* Loading Overlay */}
+			/* Loading Overlay */
 			{(isLoading || isBuffering) && (
-				<div className='absolute inset-0 flex items-center justify-center bg-black/70 z-40'>
-					<div className='flex flex-col items-center gap-3'>
-						<Loader2 className='w-12 h-12 text-white animate-spin' />
-						<p className='text-white font-medium'>{isLoading ? 'Загрузка видео...' : 'Буферизация...'}</p>
+				<div
+					style={{
+						position: 'absolute',
+						inset: 0,
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						backgroundColor: 'rgba(0, 0, 0, 0.7)',
+						zIndex: 40,
+					}}
+				>
+					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
+						<Loader2
+							style={{
+								width: '3rem',
+								height: '3rem',
+								color: 'white',
+								animation: 'spin 1s linear infinite',
+							}}
+						/>
+						<p style={{ color: 'white', fontWeight: '500' }}>
+							{isLoading ? 'Загрузка видео...' : 'Буферизация...'}
+						</p>
 					</div>
 				</div>
 			)}
-
 			<ParticipantsView
 				clients={clients}
 				participantInfo={participantInfo}
@@ -748,7 +765,6 @@ export default function RoomPage() {
 				onCoverToggle={id => setCoveredClients(prev => ({ ...prev, [id]: !prev[id] }))}
 				onHighlightChange={setHighlightedUser}
 			/>
-
 			<div
 				style={{
 					position: 'absolute',
@@ -765,7 +781,6 @@ export default function RoomPage() {
 			>
 				<ActionIndicator action={currentAction} volume={volume} />
 			</div>
-
 			<VideoControls
 				isPlaying={isPlaying}
 				muted={muted}
@@ -809,7 +824,6 @@ export default function RoomPage() {
 				formatTime={formatTime}
 				getSpeakerIcon={getSpeakerIcon}
 			/>
-
 			<UserList
 				showUserList={showUserList}
 				toggleUserList={toggleUserList}
@@ -829,7 +843,6 @@ export default function RoomPage() {
 				parcipantVolume={clientVolumes}
 				hideUsers={hideUsers}
 			/>
-
 			{showChat && (
 				<RoomChat
 					onOpenPrivateChat={togglePrivateChat}
@@ -844,7 +857,6 @@ export default function RoomPage() {
 					onMouseLeave={() => setHighlightedUser(null)}
 				/>
 			)}
-
 			{Object.entries(privateChats).map(
 				([clientID, isOpen]) =>
 					isOpen && (
@@ -869,7 +881,6 @@ export default function RoomPage() {
 						/>
 					)
 			)}
-
 			<ToastNotifications toasts={toasts} />
 		</div>
 	)
