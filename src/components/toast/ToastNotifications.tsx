@@ -14,7 +14,7 @@ export default function ToastNotifications({ toasts }: ToastNotificationsProps) 
 	return (
 		<Toast.Provider swipeDirection='right'>
 			{toasts.map(toast => (
-				<StyledToastRoot key={toast.id} duration={3000}>
+				<StyledToastRoot key={toast.id} duration={3000} style={{ animation: 'fadeOut 1s' }}>
 					<StyledToastTitle>
 						{toast.avatar && <Avatar src={toast.avatar} fallback='?' style={{ borderRadius: '0%' }} />}
 						{toast.title}
