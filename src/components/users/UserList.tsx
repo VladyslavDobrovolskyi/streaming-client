@@ -22,6 +22,7 @@ export default function UserList({
 	unreadMessages,
 	avatar,
 	userListWidth,
+	hideUsers,
 }) {
 	return (
 		<>
@@ -127,7 +128,7 @@ export default function UserList({
 													: participantInfo[clientID].isMicrophoneDisabled
 													? 'red'
 													: 'green',
-											opacity: parcipantVolume[clientID] === 0 ? 0.5 : 1,
+											opacity: parcipantVolume[clientID] === 0 ? 0.3 : 1,
 											cursor: 'pointer',
 										}}
 									>
@@ -150,6 +151,7 @@ export default function UserList({
 												(clientID === localVideoId && isCameraDisabled)
 													? 'red'
 													: 'green',
+											opacity: hideUsers ? 0.3 : 1,
 										}}
 									>
 										{participantInfo[clientID].isCameraDisabled ||

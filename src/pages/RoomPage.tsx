@@ -785,6 +785,7 @@ export default function RoomPage() {
 				avatar={avatar}
 				userListWidth={userListWidth}
 				parcipantVolume={clientVolumes}
+				hideUsers={hideUsers}
 			/>
 
 			{showChat && (
