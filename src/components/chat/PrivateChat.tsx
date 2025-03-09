@@ -3,7 +3,7 @@
 import type React from 'react'
 import { useState, useRef, useEffect } from 'react'
 import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar } from '@radix-ui/themes'
-import { Send } from 'lucide-react'
+import { MdKeyboardReturn } from 'react-icons/md'
 import DraggableResizable from '../DraggableResizable'
 
 interface PrivateChatProps {
@@ -253,10 +253,11 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 								backgroundColor: 'transparent',
 							}}
 						>
-							<Send
+							<MdKeyboardReturn
 								size={18}
 								style={{
-									color: 'rgba(0, 255, 255, 0.2)',
+									color: 'black',
+									opacity: '0.8',
 								}}
 							/>
 						</Button>
