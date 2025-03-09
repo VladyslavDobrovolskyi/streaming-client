@@ -212,7 +212,7 @@ export default function ClientVideo({
 												color: 'white',
 												border: 'none',
 												padding: '0.5rem',
-												borderRadius: '5px',
+												borderRadius: 'var(--radius-4)',
 												cursor: 'pointer',
 												background: 'none',
 												display: 'flex',
