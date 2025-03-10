@@ -41,6 +41,17 @@ export default function ClientVideo({
 	const [mutedBySlider, setMutedBySlider] = useState(false)
 	const videoRef = useRef<HTMLVideoElement>(null)
 
+	// Helper function to get effective volume
+	const getEffectiveVolume = () => {
+		if (participantVolume && clientID in participantVolume) {
+			return participantVolume[clientID]
+		}
+		if (volume !== undefined && volume !== null) {
+			return volume
+		}
+		return 0.5 // Default fallback
+	}
+
 	// This effect runs once when the component mounts to connect the videoRef to provideMediaRef
 	useEffect(() => {
 		if (videoRef.current) {
@@ -54,11 +65,20 @@ export default function ClientVideo({
 	}, [clientID, provideMediaRef])
 
 	useEffect(() => {
-		if (videoRef.current) {
-			// Always prioritize participantVolume as the source of truth
-			const effectiveVolume = participantVolume[clientID] !== undefined ? participantVolume[clientID] : volume
+		// If this client doesn't have a volume set in participantVolume, initialize it
+		if (participantVolume && !(clientID in participantVolume)) {
+			const initialVolume = volume !== undefined && volume !== null ? volume : 0.5
+			console.log(`Initializing volume for ${clientID} to ${initialVolume}`)
+			onVolumeChange(clientID, initialVolume)
+		}
+	}, [clientID, participantVolume, onVolumeChange, volume])
 
-			// Set muted state based on participantVolume
+	useEffect(() => {
+		if (videoRef.current) {
+			// Get effective volume
+			const effectiveVolume = getEffectiveVolume()
+
+			// Set muted state based on volume
 			setMuted(effectiveVolume === 0)
 
 			// Apply volume and muted state to video element
@@ -107,8 +127,8 @@ export default function ClientVideo({
 		}
 	}, [isCovered, clientID, onVolumeChange])
 
-	const handleToggleMuted = volume => {
-		console.log(`handleToggleMuted called with volume ${volume}, current muted state: ${muted}`)
+	const handleToggleMuted = () => {
+		console.log(`handleToggleMuted called, current muted state: ${muted}`)
 
 		if (mutedBySlider) {
 			setMuted(false)
@@ -137,7 +157,7 @@ export default function ClientVideo({
 			}
 		} else {
 			// Muting - save current volume and update participantVolume
-			const currentVolume = participantVolume[clientID] !== undefined ? participantVolume[clientID] : volume
+			const currentVolume = getEffectiveVolume()
 			setVolumeBeforeMute(currentVolume > 0 ? currentVolume : 0.5)
 			console.log(`Muting: saving volume ${currentVolume > 0 ? currentVolume : 0.5} and setting to 0`)
 			onVolumeChange(clientID, 0) // This updates participantVolume
@@ -171,14 +191,14 @@ export default function ClientVideo({
 		onVolumeChange(clientID, newVolume) // This updates participantVolume
 	}
 
-	const getVolumeIcon = (volume: number) => {
+	const getVolumeIcon = () => {
 		const IconStyles = {
 			color: 'white',
 			transform: 'scale(0.5)',
 		}
 
-		// Get effective volume from participantVolume
-		const effectiveVolume = participantVolume[clientID] !== undefined ? participantVolume[clientID] : volume
+		// Get effective volume
+		const effectiveVolume = getEffectiveVolume()
 
 		if (muted || effectiveVolume === 0) return <SpeakerOffIcon style={IconStyles} />
 		if (effectiveVolume < 0.33) return <SpeakerQuietIcon style={IconStyles} />
@@ -298,7 +318,7 @@ export default function ClientVideo({
 										}}
 									>
 										<button
-											onClick={() => handleToggleMuted(volume)}
+											onClick={handleToggleMuted}
 											style={{
 												color: 'white',
 												border: 'none',
@@ -310,7 +330,7 @@ export default function ClientVideo({
 												alignItems: 'center',
 											}}
 										>
-											{getVolumeIcon(volume)}
+											{getVolumeIcon()}
 										</button>
 										{!muted && (
 											<div
@@ -327,7 +347,7 @@ export default function ClientVideo({
 													min={0}
 													max={1}
 													step={0.01}
-													value={[volume]}
+													value={[getEffectiveVolume()]}
 													onValueChange={value => handleVolumeChange(value[0])}
 													style={
 														{
@@ -378,7 +398,7 @@ export default function ClientVideo({
 										style={{ color: 'white', transform: 'scale(1)', cursor: 'pointer' }}
 										onClick={() => {
 											onCoverToggle(clientID)
-											handleToggleMuted(volume)
+											handleToggleMuted()
 										}}
 									/>
 								</motion.div>
