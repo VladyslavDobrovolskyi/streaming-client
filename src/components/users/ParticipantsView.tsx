@@ -21,6 +21,7 @@ export default function ParticipantsView({
 	onVolumeChange,
 	onCoverToggle,
 	onHighlightChange,
+	setHideMe,
 }) {
 	// This effect ensures that when clientVolumes changes, all video elements are updated
 	useEffect(() => {
@@ -85,6 +86,7 @@ export default function ParticipantsView({
 						highlightedUser={highlightedUser}
 						onMouseEnter={() => onHighlightChange(clientID)}
 						onMouseLeave={() => onHighlightChange(null)}
+						setHideMe={setHideMe}
 					/>
 				)
 			})}

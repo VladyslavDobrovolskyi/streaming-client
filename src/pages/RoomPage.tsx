@@ -752,6 +752,7 @@ export default function RoomPage() {
 			{(isLoading || isBuffering) && <Loader isLoading />}
 			<ParticipantsView
 				clients={clients}
+				setHideMe={setHideMe}
 				participantInfo={participantInfo}
 				provideMediaRef={provideMediaRef}
 				localVideoId={LOCAL_VIDEO}

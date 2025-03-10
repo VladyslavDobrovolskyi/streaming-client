@@ -52,6 +52,7 @@ export default function ClientVideo({
 	onMouseEnter,
 	onMouseLeave,
 	toggleCamera,
+	setHideMe,
 }) {
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
 	const [volumeBeforeMute, setVolumeBeforeMute] = useState(0)
@@ -224,6 +225,9 @@ export default function ClientVideo({
 									style={{ color: 'white', transform: 'scale(1)' }}
 									onClick={() => {
 										toggleCamera(clientID)
+										if (isLocal) {
+											setHideMe(true)
+										}
 									}}
 								/>
 							</div>
