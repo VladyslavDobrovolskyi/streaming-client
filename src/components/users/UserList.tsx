@@ -135,7 +135,13 @@ export default function UserList({
 											console.log(
 												`UserList: Toggling mic for ${clientID}, current volume: ${participantVolume[clientID]}`
 											)
+											// Force the toggle to work on first click by checking the current state
+											const currentVolume = participantVolume[clientID] ?? 0
+											console.log(`Current volume before toggle: ${currentVolume}`)
+
+											// Call toggleRemoteMic with the current state
 											toggleRemoteMic(clientID)
+
 											// Add a visual feedback for the click
 											const element = event.currentTarget
 											element.style.transform = 'scale(0.9)'
