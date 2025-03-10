@@ -45,7 +45,6 @@ export default function RoomPage() {
 	const [mutedBySlider, setMutedBySlider] = useState(false)
 	// Add loading state variables
 	const [isLoading, setIsLoading] = useState(true)
-	const [isBuffering, setIsBuffering] = useState(false)
 	const [currentAction, setCurrentAction] = useState<
 		'play' | 'pause' | 'mute' | 'unmute' | 'forward' | 'backward' | 'volume' | null
 	>(null)
@@ -95,14 +94,6 @@ export default function RoomPage() {
 	// Add handlers for video loading states
 	const handleReady = () => {
 		setIsLoading(false)
-	}
-
-	const handleBuffer = () => {
-		setIsBuffering(true)
-	}
-
-	const handleBufferEnd = () => {
-		setIsBuffering(false)
 	}
 
 	const addToast = (avatar: string, title: string, description: string) => {
@@ -733,8 +724,6 @@ export default function RoomPage() {
 				onProgress={handleProgress}
 				onDuration={duration => setDuration(duration)}
 				onReady={handleReady}
-				onBuffer={handleBuffer}
-				onBufferEnd={handleBufferEnd}
 				width='100%'
 				height='100%'
 				style={{
@@ -748,7 +737,7 @@ export default function RoomPage() {
 					zIndex: 1,
 				}}
 			/>
-			{(isLoading || isBuffering) && <Loader isLoading />}
+			{isLoading && <Loader />}
 			<ParticipantsView
 				clients={clients}
 				setHideMe={setHideMe}
