@@ -137,7 +137,6 @@ export default function RoomPage() {
 		setClientVolumes(prev => {
 			const currentVolume = prev[clientID] || 0.5
 			const newVolume = currentVolume > 0 ? 0 : 0.5
-			updateUserVolume(clientID, newVolume)
 			return { ...prev, [clientID]: newVolume }
 		})
 	}
