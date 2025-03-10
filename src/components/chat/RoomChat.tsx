@@ -189,9 +189,14 @@ const RoomChat: React.FC<RoomChatProps> = ({
 											style={{
 												display: 'inline-block',
 												backgroundColor:
-													msg.sender === realClientID ? 'transparent' : 'var(--gray-3)',
+													msg.sender === realClientID
+														? 'rgba(65, 147, 247, 0.7)'
+														: 'var(--gray-3)',
 												color: msg.sender === realClientID ? 'white' : 'var(--gray-12)',
-												border: '3px solid rgba(0, 0, 0, 0.8)',
+												border:
+													msg.sender === realClientID
+														? '3px solid rgba(0, 0, 0, 0.8)'
+														: 'none',
 												borderRadius:
 													msg.sender === realClientID
 														? getMessageClasses(msg, index).includes('message-last')
