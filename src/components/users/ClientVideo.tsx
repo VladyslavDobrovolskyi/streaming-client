@@ -65,6 +65,9 @@ export default function ClientVideo({
 		if (videoRef.current) {
 			const effectiveVolume = participantVolume[clientID] !== undefined ? participantVolume[clientID] : volume
 
+			if (volume === 0) {
+				setMuted(true)
+			}
 			videoRef.current.volume = muted ? 0 : effectiveVolume
 			videoRef.current.muted = muted || isLocal || isMicrophoneMuted
 			onVolumeChange(clientID, effectiveVolume)
