@@ -20,7 +20,7 @@ const Loader: React.FC = () => {
 					flexDirection: 'column',
 					alignItems: 'center',
 					gap: '0.75rem',
-					transform: 'scale(2)',
+					transform: 'scale(1.5)',
 				}}
 			>
 				<GearIcon
