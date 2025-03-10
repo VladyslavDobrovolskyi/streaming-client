@@ -152,25 +152,20 @@ export default function RoomPage() {
 	}
 
 	const toggleRemoteCamera = (clientID: string) => {
-		if (clientCameras[clientID] === undefined) {
-			setClientCameras(prev => ({ ...prev, [clientID]: true }))
-		}
-		const currentVisibility = clientCameras[clientID]
+		setClientCameras(prev => {
+			const currentVisibility = prev[clientID] ?? true
+			const newVisibility = !currentVisibility
 
-		const waitForVideoElement = () => {
 			const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
 			if (videoElement) {
-				setClientCameras(prev => ({ ...prev, [clientID]: !currentVisibility }))
 				const parentElement = videoElement.parentElement as HTMLElement
 				if (parentElement) {
-					parentElement.style.display = currentVisibility ? 'none' : 'block'
+					parentElement.style.display = newVisibility ? 'block' : 'none'
 				}
-			} else {
-				requestAnimationFrame(waitForVideoElement)
 			}
-		}
 
-		waitForVideoElement()
+			return { ...prev, [clientID]: newVisibility }
+		})
 	}
 
 	const {
