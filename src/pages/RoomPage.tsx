@@ -156,7 +156,10 @@ export default function RoomPage() {
 		if (videoElement) {
 			const currentVisibility = clientCameras[clientID]
 			setClientCameras(prev => ({ ...prev, [clientID]: !currentVisibility }))
-			videoElement.style.display = currentVisibility ? 'none' : 'block'
+			const parentElement = videoElement.parentElement as HTMLElement
+			if (parentElement) {
+				parentElement.style.display = currentVisibility ? 'none' : 'block'
+			}
 		}
 	}
 
