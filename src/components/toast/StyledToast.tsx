@@ -6,9 +6,15 @@ const slideIn = keyframes({
 	to: { transform: 'translateX(0)' },
 })
 
-const fadeOut = keyframes({
-	from: { opacity: 1 },
-	to: { opacity: 0 },
+const slideOut = keyframes({
+	from: {
+		transform: 'translateX(0)',
+		opacity: 1,
+	},
+	to: {
+		transform: 'translateX(calc(100% + 1rem))',
+		opacity: 0,
+	},
 })
 
 export const StyledToastViewport = styled(Toast.Viewport, {
@@ -39,7 +45,7 @@ export const StyledToastRoot = styled(Toast.Root, {
 		animation: `${slideIn} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
 	},
 	'&[data-state="closed"]': {
-		animation: `${fadeOut} 500ms ease-out`,
+		animation: `${slideOut} 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
 	},
 	'&[data-swipe="move"]': {
 		transform: 'translateX(var(--radix-toast-swipe-move-x))',
@@ -49,7 +55,7 @@ export const StyledToastRoot = styled(Toast.Root, {
 		transition: 'transform 200ms ease-out',
 	},
 	'&[data-swipe="end"]': {
-		animation: 'swipeOut 100ms ease-out',
+		animation: `${slideOut} 100ms ease-out forwards`,
 	},
 })
 
@@ -57,6 +63,9 @@ export const StyledToastTitle = styled(Toast.Title, {
 	fontWeight: 500,
 	color: 'black',
 	fontSize: '1rem',
+	display: 'flex',
+	alignItems: 'center',
+	gap: '0.5rem',
 })
 
 export const StyledToastDescription = styled(Toast.Description, {
