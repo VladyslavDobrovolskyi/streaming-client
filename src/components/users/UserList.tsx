@@ -190,7 +190,7 @@ export default function UserList({
 												(clientID === localVideoId && isCameraDisabled)
 													? 'rgba(247, 65, 101, 0.7)'
 													: 'rgba(165, 247, 65, 0.7)',
-											opacity: hideUsers ? 0.3 : 1,
+											opacity: participantCameras[clientID] === false ? 0.3 : hideUsers ? 0.3 : 1,
 											position: 'relative', // Add position relative for absolute positioning of overlay
 										}}
 									>
