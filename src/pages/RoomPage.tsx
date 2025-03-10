@@ -157,14 +157,20 @@ export default function RoomPage() {
 		}
 		const currentVisibility = clientCameras[clientID]
 
-		const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
-		if (videoElement) {
-			setClientCameras(prev => ({ ...prev, [clientID]: !currentVisibility }))
-			const parentElement = videoElement.parentElement as HTMLElement
-			if (parentElement) {
-				parentElement.style.display = currentVisibility ? 'none' : 'block'
+		const waitForVideoElement = () => {
+			const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
+			if (videoElement) {
+				setClientCameras(prev => ({ ...prev, [clientID]: !currentVisibility }))
+				const parentElement = videoElement.parentElement as HTMLElement
+				if (parentElement) {
+					parentElement.style.display = currentVisibility ? 'none' : 'block'
+				}
+			} else {
+				requestAnimationFrame(waitForVideoElement)
 			}
 		}
+
+		waitForVideoElement()
 	}
 
 	const {
