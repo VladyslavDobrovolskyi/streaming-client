@@ -195,7 +195,15 @@ export default function UserList({
 										)}
 									</span>
 									<span
-										onClick={() => toggleRemoteCamera(clientID)}
+										onClick={event => {
+											toggleRemoteCamera(clientID)
+											// Add a visual feedback for the click
+											const element = event.currentTarget
+											element.style.transform = 'scale(0.9)'
+											setTimeout(() => {
+												element.style.transform = 'scale(1)'
+											}, 100)
+										}}
 										style={{
 											cursor: 'pointer',
 											color:
@@ -204,7 +212,8 @@ export default function UserList({
 													? 'rgba(247, 65, 101, 0.7)'
 													: 'rgba(165, 247, 65, 0.7)',
 											opacity: participantCameras[clientID] === false ? 0.3 : hideUsers ? 0.3 : 1,
-											position: 'relative', // Add position relative for absolute positioning of overlay
+											position: 'relative',
+											transition: 'transform 0.1s ease',
 										}}
 									>
 										{participantCameras[clientID] === false && (
@@ -227,7 +236,15 @@ export default function UserList({
 									</span>
 									<div style={{ display: 'flex', alignItems: 'center' }}>
 										<button
-											onClick={() => togglePrivateChat(clientID)}
+											onClick={event => {
+												togglePrivateChat(clientID)
+												// Add a visual feedback for the click
+												const element = event.currentTarget
+												element.style.transform = 'scale(0.9)'
+												setTimeout(() => {
+													element.style.transform = 'scale(1)'
+												}, 100)
+											}}
 											style={{
 												background: 'none',
 												border: 'none',
@@ -236,6 +253,7 @@ export default function UserList({
 												padding: '5px',
 												position: 'relative',
 												opacity: privateChats[clientID] ? 1 : 0.5,
+												transition: 'transform 0.1s ease',
 											}}
 										>
 											{unreadMessages[clientID] > 0 ? (
