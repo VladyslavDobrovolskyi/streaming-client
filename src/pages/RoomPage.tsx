@@ -133,6 +133,24 @@ export default function RoomPage() {
 		})
 	}
 
+	const hideAllUsers = () => {
+		if (hideUsers) {
+			Object.keys(participantInfo).forEach(clientID => {
+				if (clientID !== localPeerId) {
+					setClientCameras(prev => ({ ...prev, [clientID]: false }))
+				}
+			})
+			setHideUsers(true)
+		} else {
+			Object.keys(participantInfo).forEach(clientID => {
+				if (clientID !== localPeerId) {
+					setClientCameras(prev => ({ ...prev, [clientID]: true }))
+				}
+			})
+			setHideUsers(false)
+		}
+	}
+
 	const toggleRemoteMic = (clientID: string) => {
 		console.log(`Before toggle: clientVolumes[${clientID}] =`, clientVolumes[clientID])
 
@@ -833,7 +851,7 @@ export default function RoomPage() {
 				onMicMuteUnmute={handleMicMuteUnmute}
 				onCameraMuteUnmute={handleCameraMuteUnmute}
 				onMovieModeToggle={handleMovieModeToggle}
-				onHideUsersToggle={() => setHideUsers(prev => !prev)}
+				onHideUsersToggle={() => hideAllUsers}
 				onHoveredItemChange={setHoveredItem}
 				onToggleChat={() => setShowChat(prev => !prev)}
 				formatTime={formatTime}
