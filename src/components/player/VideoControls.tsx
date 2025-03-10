@@ -385,27 +385,32 @@ export default function VideoControls({
 									<DropdownMenu.Item
 										onSelect={event => {
 											event.preventDefault()
-											hideMeToggle()
+											if (!isCameraDisabled) {
+												hideMeToggle()
+											}
 										}}
 										onMouseEnter={() => onHoveredItemChange('hideMe')}
 										onMouseLeave={() => onHoveredItemChange(null)}
 										style={{
 											padding: '8px 12px',
-											cursor: 'pointer',
+											cursor: isCameraDisabled ? 'not-allowed' : 'pointer',
 											display: 'flex',
 											alignItems: 'center',
 											gap: '8px',
 											backgroundColor:
 												hoveredItem === 'hideMe' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
-											color: 'white',
+											color: isCameraDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
 											border: 'none',
 											width: '100%',
 											textAlign: 'left',
 											outline: 'none',
+											opacity: isCameraDisabled ? 0.5 : 1,
 										}}
+										disabled={isCameraDisabled}
 									>
 										{hideMe ? <EyeOpenIcon /> : <EyeClosedIcon />}
 										{hideMe ? 'Show me' : 'Hide me'}
+										{isCameraDisabled && ' (Camera Off)'}
 									</DropdownMenu.Item>
 								</DropdownMenu.Content>
 							</div>
