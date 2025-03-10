@@ -876,7 +876,6 @@ export default function RoomPage() {
 				showUserListButton={showUserListButton}
 				participantVolume={clientVolumes}
 				participantCameras={clientCameras}
-				hideUsers={hideUsers}
 				privateChats={privateChats}
 			/>
 			{showChat && (
