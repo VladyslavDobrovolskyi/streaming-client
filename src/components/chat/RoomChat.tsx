@@ -193,10 +193,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 														? 'rgba(65, 150, 247, 0.75)'
 														: 'var(--gray-3)',
 												color: msg.sender === realClientID ? 'white' : 'var(--gray-12)',
-												border:
-													msg.sender === realClientID
-														? '2px solid rgba(0, 0, 0, 0.5)'
-														: 'none',
+												border: '3px solid rgba(0, 0, 0, 0.1)',
 												borderRadius:
 													msg.sender === realClientID
 														? getMessageClasses(msg, index).includes('message-last')
