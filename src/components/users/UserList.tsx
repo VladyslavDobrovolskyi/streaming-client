@@ -89,7 +89,9 @@ export default function UserList({
 									style={{
 										padding: '10px',
 										border:
-											highlightedUser == clientID ? '3px solid rgba(255, 255, 255, 1)' : 'none',
+											highlightedUser == clientID
+												? '3px solid rgba(255, 255, 255, 1)'
+												: '3px solid transparent',
 										borderRadius: '5px',
 										backgroundColor:
 											highlightedUser === clientID ? 'rgba(255,255,255,0.2)' : 'transparent',
