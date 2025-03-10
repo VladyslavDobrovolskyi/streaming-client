@@ -181,7 +181,7 @@ export default function UserList({
 												color: 'white',
 												padding: '5px',
 												position: 'relative',
-												opacity: privateChats[clientID] ? 0.5 : 1,
+												opacity: privateChats[clientID] ? 1 : 0.5,
 											}}
 										>
 											{unreadMessages[clientID] > 0 ? (
