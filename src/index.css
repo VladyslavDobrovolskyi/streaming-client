@@ -1,7 +1,7 @@
 @import 'react-tooltip/dist/react-tooltip.css';
 
 :root {
-	--accent-color-main: rgba(0, 255, 255, 0.35);
+	--accent-color-main: rgba(255, 255, 255, 1);
 }
 * {
 	box-sizing: border-box;
