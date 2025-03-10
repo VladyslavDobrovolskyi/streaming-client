@@ -249,8 +249,8 @@ const RoomChat: React.FC<RoomChatProps> = ({
 								opacity: chatInput.trim() ? 1 : 0.7,
 								transition: 'opacity 0.3s ease',
 								backgroundColor: 'transparent',
-								cursor: 'pointer',
-								transform: 'scale(1.5)',
+								cursor: chatInput.trim() ? 'pointer' : 'default',
+								transform: 'scale(1.25)',
 							}}
 						>
 							<MdKeyboardReturn
