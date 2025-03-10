@@ -260,6 +260,8 @@ export default function useRoomSync(
 		({ time, isPlaying }: { time: number; isPlaying: boolean }) => {
 			if (!videoRef.current || isSyncingRef.current) return
 
+			console.log('Received sync state event:', { time, isPlaying })
+
 			isSyncingRef.current = true
 			videoRef.current.seekTo(time, 'seconds')
 			if (isPlaying) {
