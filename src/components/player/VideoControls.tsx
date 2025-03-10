@@ -328,9 +328,11 @@ export default function VideoControls({
 											textAlign: 'left',
 											outline: 'none',
 											boxSizing: 'border-box', // Add this to include padding in width calculation
+											justifyContent: 'flex-start',
 										}}
 									>
 										{isMicrophoneDisabled ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
+										<span style={{ marginLeft: '8px' }}>Microphone</span>
 									</DropdownMenu.Item>
 									<DropdownMenu.Item
 										onSelect={event => {
@@ -353,9 +355,11 @@ export default function VideoControls({
 											textAlign: 'left',
 											outline: 'none',
 											boxSizing: 'border-box', // Add this to include padding in width calculation
+											justifyContent: 'flex-start',
 										}}
 									>
 										{isCameraDisabled ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
+										<span style={{ marginLeft: '8px' }}>Camera</span>
 									</DropdownMenu.Item>
 									<DropdownMenu.Item
 										onSelect={event => {
@@ -380,9 +384,11 @@ export default function VideoControls({
 											textAlign: 'left',
 											outline: 'none',
 											boxSizing: 'border-box', // Add this to include padding in width calculation
+											justifyContent: 'flex-start',
 										}}
 									>
 										{isMovieMode ? <SectionIcon /> : <SquareIcon />}
+										<span style={{ marginLeft: '8px' }}>Movie Mode</span>
 									</DropdownMenu.Item>
 									<DropdownMenu.Item
 										onSelect={event => {
@@ -408,10 +414,12 @@ export default function VideoControls({
 											outline: 'none',
 											opacity: isCameraDisabled ? 0.5 : 1,
 											boxSizing: 'border-box', // Add this to include padding in width calculation
+											justifyContent: 'flex-start',
 										}}
 										disabled={isCameraDisabled}
 									>
 										{hideMe ? <EyeOpenIcon /> : <EyeClosedIcon />}
+										<span style={{ marginLeft: '8px' }}>Hide Me</span>
 									</DropdownMenu.Item>
 								</DropdownMenu.Content>
 							</div>
