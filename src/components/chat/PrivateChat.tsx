@@ -119,6 +119,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 								style={{
 									opacity: isActive ? 1 : 0.8,
 									transition: 'opacity 0.3s ease',
+									borderRadius: '0%',
 								}}
 							/>
 							<Text
