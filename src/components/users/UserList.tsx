@@ -153,15 +153,17 @@ export default function UserList({
 										) : participantInfo[clientID].isMicrophoneDisabled ? (
 											<>
 												<FaMicrophoneAltSlash />
-												<ImCross
-													style={{
-														position: 'absolute',
-														top: '-5px',
-														right: '-5px',
-														color: 'rgba(247, 65, 101, 1)',
-														fontSize: '10px',
-													}}
-												/>
+												{parcipantVolume[clientID] === 0 && (
+													<ImCross
+														style={{
+															position: 'absolute',
+															top: '-5px',
+															right: '-5px',
+															color: 'white',
+															fontSize: '10px',
+														}}
+													/>
+												)}
 											</>
 										) : (
 											<FaMicrophoneAlt />
