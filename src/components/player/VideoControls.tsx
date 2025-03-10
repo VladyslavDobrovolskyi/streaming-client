@@ -350,7 +350,7 @@ export default function VideoControls({
 											}}
 											onMouseEnter={() => {
 												onHoveredItemChange('mic')
-												showTooltip('Microphone', 'mic')
+												showTooltip(isMicrophoneDisabled ? 'Enable' : 'Disable', 'mic')
 											}}
 											onMouseLeave={() => {
 												onHoveredItemChange(null)
