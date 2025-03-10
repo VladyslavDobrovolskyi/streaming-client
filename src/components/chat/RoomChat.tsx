@@ -3,7 +3,7 @@
 import type React from 'react'
 import { useState, useRef, useEffect } from 'react'
 import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar } from '@radix-ui/themes'
-import { Send } from 'lucide-react'
+import { MdKeyboardReturn } from 'react-icons/md'
 import DraggableResizable from '../DraggableResizable'
 
 interface RoomChatProps {
@@ -251,7 +251,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 								backgroundColor: 'transparent',
 							}}
 						>
-							<Send
+							<MdKeyboardReturn
 								size={18}
 								style={{
 									color: 'black',
