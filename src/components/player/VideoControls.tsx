@@ -403,7 +403,7 @@ export default function VideoControls({
 												onHoveredItemChange('mic')
 												showTooltip(
 													initialMicrophoneDisabledState
-														? 'Not allowed'
+														? 'Permission denied'
 														: isMicrophoneDisabled
 														? 'Enable Microphone'
 														: 'Disable Microphone',
@@ -475,7 +475,7 @@ export default function VideoControls({
 												onHoveredItemChange('camera')
 												showTooltip(
 													initialCameraDisabledState
-														? 'Not allowed'
+														? 'Permission denied'
 														: isCameraDisabled
 														? 'Enable Camera'
 														: 'Disable Camera',
