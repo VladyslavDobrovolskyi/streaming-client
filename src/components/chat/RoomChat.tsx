@@ -1,7 +1,7 @@
 'use client'
 
 import type React from 'react'
-import { useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar } from '@radix-ui/themes'
 import { Send } from 'lucide-react'
 import DraggableResizable from '../DraggableResizable'
@@ -34,6 +34,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	onMouseEnter,
 	onMouseLeave,
 }) => {
+	const [isActive, setIsActive] = useState(true)
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
@@ -61,70 +62,80 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		>
 			{({ isDragging }) => (
 				<Box
+					onMouseEnter={() => setIsActive(true)}
+					onMouseLeave={() => setIsActive(false)}
 					style={{
-						// The Box already has a background color from DraggableResizable
-						// We'll use a dark overlay instead
-						position: 'relative',
+						backgroundColor: 'var(--gray-1)',
 						borderRadius: 'var(--radius-4)',
 						overflow: 'hidden',
 						display: 'flex',
 						flexDirection: 'column',
 						width: '100%',
 						height: '100%',
+						boxShadow: isActive ? '0 8px 30px rgba(0, 0, 0, 0.12)' : '0 5px 15px rgba(0, 0, 0, 0.08)',
+						transition: 'box-shadow 0.3s ease, opacity 0.3s ease',
+						opacity: isActive ? 1 : 0.85,
+						border: '1px solid',
+						borderColor: isActive ? 'var(--gray-5)' : 'var(--gray-4)',
 					}}
 				>
-					{/* Dark overlay to simulate the dark background */}
-					<div
-						style={{
-							position: 'absolute',
-							top: 0,
-							left: 0,
-							right: 0,
-							bottom: 0,
-							backgroundColor: 'rgba(0, 0, 0, 0.85)',
-							zIndex: 0,
-						}}
-					/>
-
 					<Flex
 						align='center'
 						justify='between'
 						p='3'
 						className='drag-handle'
 						style={{
-							borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+							borderBottom: '1px solid var(--gray-4)',
 							cursor: isDragging ? 'grabbing' : 'move',
-							backgroundColor: 'rgba(0, 255, 255,0.4)',
+							backgroundColor: isActive ? 'var(--gray-2)' : 'rgba(245, 245, 245, 0.9)',
 							userSelect: 'none',
-							position: 'relative',
-							zIndex: 1,
+							transition: 'background-color 0.3s ease',
 						}}
 					>
-						<Text size='2' weight='bold' style={{ color: 'white' }}>
+						<Text
+							size='2'
+							weight='bold'
+							style={{
+								opacity: isActive ? 0.8 : 0.8,
+								transition: 'opacity 0.3s ease',
+							}}
+						>
 							Room Chat
 						</Text>
 						<Button
 							variant='ghost'
 							onMouseDown={onClose}
 							style={{
-								color: 'white',
+								color: 'black',
 								fontWeight: 'bold',
 								cursor: 'pointer',
-								background: 'transparent',
+								opacity: isActive ? 0.8 : 0.8,
+								transition: 'opacity 0.2s ease, background-color 0.2s ease',
+								borderRadius: '50%',
+								width: '28px',
+								height: '28px',
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+								padding: 0,
 							}}
-							onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(247, 65, 101, 0.7)')}
-							onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+							onMouseEnter={e => {
+								e.currentTarget.style.backgroundColor = 'rgba(247, 65, 101, 0.7)'
+								e.currentTarget.style.opacity = '1'
+							}}
+							onMouseLeave={e => {
+								e.currentTarget.style.backgroundColor = 'transparent'
+								e.currentTarget.style.opacity = isActive ? '0.8' : '0.5'
+							}}
 						>
 							✕
 						</Button>
 					</Flex>
-
 					<ScrollArea
 						style={{
 							flex: 1,
 							padding: '16px',
-							position: 'relative',
-							zIndex: 1,
+							background: 'linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(250,250,250,0.98))',
 						}}
 						ref={scrollAreaRef}
 						className='scroll-area'
@@ -157,7 +168,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 														? 'visible'
 														: 'hidden',
 													cursor: 'pointer',
-													borderRadius: '0%',
+													transition: 'opacity 0.3s ease',
 												}}
 												onClick={() => onOpenPrivateChat(msg.sender)}
 												title={`Open private chat with ${
@@ -178,10 +189,8 @@ const RoomChat: React.FC<RoomChatProps> = ({
 											style={{
 												display: 'inline-block',
 												backgroundColor:
-													msg.sender === realClientID
-														? 'rgba(0, 132, 255, 0.8)'
-														: 'rgba(255, 255, 255, 0.1)',
-												color: 'white',
+													msg.sender === realClientID ? 'var(--blue-9)' : 'var(--gray-3)',
+												color: msg.sender === realClientID ? 'white' : 'var(--gray-12)',
 												borderRadius:
 													msg.sender === realClientID
 														? getMessageClasses(msg, index).includes('message-last')
@@ -192,6 +201,11 @@ const RoomChat: React.FC<RoomChatProps> = ({
 														: '18px 18px 18px 4px',
 												padding: '8px 12px',
 												whiteSpace: 'pre-wrap',
+												boxShadow:
+													msg.sender === realClientID
+														? '0 2px 5px rgba(0, 0, 0, 0.1)'
+														: '0 2px 5px rgba(0, 0, 0, 0.05)',
+												transition: 'transform 0.2s ease, opacity 0.2s ease',
 											}}
 										>
 											{msg.message}
@@ -201,22 +215,21 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							</Box>
 						))}
 					</ScrollArea>
-
 					<Flex
 						p='3'
 						gap='2'
 						style={{
-							borderTop: '1px solid rgba(255, 255, 255, 0.2)',
-							position: 'relative',
-							zIndex: 1,
+							borderTop: '1px solid var(--gray-4)',
+							backgroundColor: isActive ? 'var(--gray-1)' : 'rgba(245, 245, 245, 0.9)',
+							transition: 'background-color 0.3s ease',
 						}}
 					>
 						<TextArea
 							style={{
 								flex: 1,
-								backgroundColor: 'rgba(255, 255, 255, 0.1)',
-								color: 'white',
-								border: '1px solid rgba(255, 255, 255, 0.2)',
+								transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
+								borderColor: isActive ? 'var(--gray-6)' : 'var(--gray-5)',
+								boxShadow: isActive ? '0 0 0 1px rgba(0, 0, 0, 0.05)' : 'none',
 							}}
 							placeholder='Type a message...'
 							value={chatInput}
@@ -233,12 +246,18 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							size='3'
 							style={{
 								padding: '30px 12px',
-								backgroundColor: 'rgba(0, 132, 255, 0.8)',
-								color: 'white',
-								border: 'none',
+								opacity: chatInput.trim() ? 1 : 0.7,
+								transition: 'opacity 0.3s ease',
+								backgroundColor: 'transparent',
 							}}
 						>
-							<Send size={18} />
+							<Send
+								size={18}
+								style={{
+									color: 'black',
+									opacity: '0.8',
+								}}
+							/>
 						</Button>
 					</Flex>
 				</Box>
