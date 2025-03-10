@@ -81,7 +81,7 @@ export default function ParticipantsView({
 						onVolumeChange={(id, vol) => onVolumeChange(id, vol)}
 						onCoverToggle={id => onCoverToggle(id)}
 						isCovered={coveredClients[clientID]}
-						volume={clientVolumes[clientID] || 0.5} // Default to 0.5 instead of 1
+						volume={clientVolumes[clientID] || 0} // Default to 0.5 instead of 1
 						highlightedUser={highlightedUser}
 						onMouseEnter={() => onHighlightChange(clientID)}
 						onMouseLeave={() => onHighlightChange(null)}
