@@ -330,19 +330,28 @@ export default function VideoControls({
 									background: 'none',
 									display: 'flex',
 									alignItems: 'center',
-									transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+									transform: isMenuOpen ? 'scale(1.2) rotate(90deg)' : 'scale(1) rotate(0deg)',
+									transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
 								}}
 								onMouseOver={e => {
-									e.currentTarget.style.transform = 'scale(1.2) rotate(15deg)'
+									if (!isMenuOpen) {
+										e.currentTarget.style.transform = 'scale(1.2) rotate(15deg)'
+									}
 								}}
 								onMouseOut={e => {
-									e.currentTarget.style.transform = 'scale(1) rotate(0deg)'
+									if (!isMenuOpen) {
+										e.currentTarget.style.transform = 'scale(1) rotate(0deg)'
+									}
 								}}
 								onMouseDown={e => {
-									e.currentTarget.style.transform = 'scale(0.9) rotate(0deg)'
+									if (!isMenuOpen) {
+										e.currentTarget.style.transform = 'scale(0.9) rotate(0deg)'
+									}
 								}}
 								onMouseUp={e => {
-									e.currentTarget.style.transform = 'scale(1.2) rotate(15deg)'
+									if (!isMenuOpen) {
+										e.currentTarget.style.transform = 'scale(1.2) rotate(15deg)'
+									}
 								}}
 							>
 								<GearIcon />
