@@ -12,13 +12,14 @@ import {
 	EyeOpenIcon,
 	EyeClosedIcon,
 	SquareIcon,
-	DotsHorizontalIcon,
+	// DotsHorizontalIcon,
 	SectionIcon,
 } from '@radix-ui/react-icons'
 import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
 import { IoMdChatboxes } from 'react-icons/io'
 import { useRef } from 'react'
+import { TbHttpOptions } from 'react-icons/tb'
 
 export default function VideoControls({
 	isPlaying,
@@ -279,7 +280,7 @@ export default function VideoControls({
 									alignItems: 'center',
 								}}
 							>
-								<DotsHorizontalIcon />
+								<TbHttpOptions />
 							</button>
 						</DropdownMenu.Trigger>
 						{isMenuOpen && (
