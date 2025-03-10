@@ -256,7 +256,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							<MdKeyboardReturn
 								size={18}
 								style={{
-									color: chatInput.trim() ? 'black' : 'rgba(0, 255, 255, 0.2)',
+									color: 'black',
 									opacity: '0.8',
 								}}
 							/>
