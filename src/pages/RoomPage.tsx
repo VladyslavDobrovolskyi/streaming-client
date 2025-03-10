@@ -165,7 +165,6 @@ export default function RoomPage() {
 		// Ensure the volume change is persisted
 		updateUserVolume(clientID, newVolume)
 	}
-
 	const toggleRemoteCamera = (clientID: string) => {
 		setClientCameras(prev => {
 			const currentVisibility = prev[clientID] ?? true
@@ -173,9 +172,9 @@ export default function RoomPage() {
 
 			const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
 			if (videoElement) {
-				const parentElement = videoElement.parentElement as HTMLElement
-				if (parentElement) {
-					parentElement.style.display = newVisibility ? 'block' : 'none'
+				const grandParentElement = videoElement.parentElement?.parentElement as HTMLElement
+				if (grandParentElement) {
+					grandParentElement.style.display = newVisibility ? 'block' : 'none'
 				}
 			}
 
