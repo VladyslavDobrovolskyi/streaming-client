@@ -252,9 +252,11 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 							size='3'
 							style={{
 								padding: '30px 12px',
-								opacity: message.trim() ? 1 : 0.7,
+								opacity: message.trim() ? 0.8 : 0.5,
 								transition: 'opacity 0.3s ease',
 								backgroundColor: 'transparent',
+								cursor: message.trim() ? 'pointer' : 'default',
+								transform: 'scale(1.25)',
 							}}
 						>
 							<MdKeyboardReturn

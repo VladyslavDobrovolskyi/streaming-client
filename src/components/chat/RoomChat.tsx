@@ -246,7 +246,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							size='3'
 							style={{
 								padding: '30px 12px',
-								opacity: chatInput.trim() ? 1 : 0.7,
+								opacity: chatInput.trim() ? 0.8 : 0.5,
 								transition: 'opacity 0.3s ease',
 								backgroundColor: 'transparent',
 								cursor: chatInput.trim() ? 'pointer' : 'default',
