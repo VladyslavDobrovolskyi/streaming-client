@@ -151,7 +151,7 @@ export default function RoomPage() {
 			console.log('Updated clientVolumes:', updatedVolumes)
 			return updatedVolumes
 		})
-
+		updateUserVolume(clientID, newVolume)
 		// Update the video element directly for immediate effect
 		const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
 		if (videoElement) {
