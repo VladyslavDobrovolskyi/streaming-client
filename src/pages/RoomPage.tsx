@@ -851,7 +851,7 @@ export default function RoomPage() {
 				onMicMuteUnmute={handleMicMuteUnmute}
 				onCameraMuteUnmute={handleCameraMuteUnmute}
 				onMovieModeToggle={handleMovieModeToggle}
-				onHideUsersToggle={() => hideAllUsers}
+				onHideUsersToggle={hideAllUsers}
 				onHoveredItemChange={setHoveredItem}
 				onToggleChat={() => setShowChat(prev => !prev)}
 				formatTime={formatTime}
