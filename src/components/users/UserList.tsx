@@ -144,6 +144,17 @@ export default function UserList({
 											position: 'relative', // Add position relative for absolute positioning of overlay
 										}}
 									>
+										{parcipantVolume[clientID] === 0 && (
+											<ImCross
+												style={{
+													position: 'absolute',
+													top: '0px',
+													right: '0px',
+													color: 'white',
+													transform: 'scale(0.7)',
+												}}
+											/>
+										)}
 										{clientID === localVideoId ? (
 											isMicrophoneDisabled ? (
 												<FaMicrophoneAltSlash />
