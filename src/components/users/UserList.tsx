@@ -132,6 +132,9 @@ export default function UserList({
 									</div>
 									<span
 										onClick={event => {
+											console.log(
+												`UserList: Toggling mic for ${clientID}, current volume: ${participantVolume[clientID]}`
+											)
 											toggleRemoteMic(clientID)
 											// Add a visual feedback for the click
 											const element = event.currentTarget
@@ -146,7 +149,7 @@ export default function UserList({
 													? isMicrophoneDisabled
 														? 'rgba(247, 65, 101, 0.7)'
 														: 'rgba(165, 247, 65, 0.7)'
-													: participantInfo[clientID].isMicrophoneDisabled
+													: participantInfo[clientID]?.isMicrophoneDisabled
 													? 'rgba(247, 65, 101, 0.7)'
 													: 'rgba(165, 247, 65, 0.7)',
 											opacity: participantVolume[clientID] === 0 ? 0.3 : 1,
@@ -172,7 +175,7 @@ export default function UserList({
 											) : (
 												<FaMicrophoneAlt />
 											)
-										) : participantInfo[clientID].isMicrophoneDisabled ? (
+										) : participantInfo[clientID]?.isMicrophoneDisabled ? (
 											<>
 												<FaMicrophoneAltSlash />
 												{participantVolume[clientID] === 0 && (
