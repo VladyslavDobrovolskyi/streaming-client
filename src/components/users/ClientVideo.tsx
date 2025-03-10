@@ -2,6 +2,7 @@
 
 import type React from 'react'
 import { useState, useEffect, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import DraggableResizable from '../DraggableResizable'
 import {
 	EyeOpenIcon,
@@ -167,7 +168,7 @@ export default function ClientVideo({
 						height: '100%',
 						position: 'relative',
 						pointerEvents: 'auto',
-						transition: 'all 0.1s ease-out',
+						transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
 						cursor: 'default',
 						display: isCameraMuted ? 'none' : 'block',
 						border:
@@ -221,15 +222,23 @@ export default function ClientVideo({
 									zIndex: 11003,
 								}}
 							>
-								<EyeOpenIcon
-									style={{ color: 'white', transform: 'scale(1)' }}
-									onClick={() => {
-										toggleCamera(clientID)
-										if (isLocal) {
-											setHideMe(true)
-										}
-									}}
-								/>
+								<motion.div
+									initial={{ scale: 0.8, opacity: 0 }}
+									animate={{ scale: 1, opacity: 1 }}
+									whileHover={{ scale: 1.2 }}
+									whileTap={{ scale: 0.9 }}
+									transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+								>
+									<EyeOpenIcon
+										style={{ color: 'white', transform: 'scale(1)' }}
+										onClick={() => {
+											toggleCamera(clientID)
+											if (isLocal) {
+												setHideMe(true)
+											}
+										}}
+									/>
+								</motion.div>
 							</div>
 							{!isLocal && (
 								<div
@@ -298,32 +307,46 @@ export default function ClientVideo({
 						</>
 					)}
 					{isCovered && (
-						<div
-							className='video-drag-handle'
-							style={{
-								position: 'absolute',
-								top: 0,
-								left: 0,
-								width: '100%',
-								height: '100%',
-								backgroundColor: 'black',
-								cursor: isDragging ? 'grabbing' : 'move',
-								borderRadius: 'var(--radius-4)',
-								display: 'flex',
-								justifyContent: 'center',
-								alignItems: 'center',
-								pointerEvents: 'auto',
-								zIndex: 11004,
-							}}
-						>
-							<EyeClosedIcon
-								style={{ color: 'white', transform: 'scale(1)', cursor: 'pointer' }}
-								onClick={() => {
-									onCoverToggle(clientID)
-									handleToggleMuted(volume)
+						<AnimatePresence>
+							<motion.div
+								className='video-drag-handle'
+								initial={{ opacity: 0, scale: 0.8 }}
+								animate={{ opacity: 1, scale: 1 }}
+								exit={{ opacity: 0, scale: 0.8 }}
+								transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+								style={{
+									position: 'absolute',
+									top: 0,
+									left: 0,
+									width: '100%',
+									height: '100%',
+									backgroundColor: 'rgba(0, 0, 0, 0.85)',
+									cursor: isDragging ? 'grabbing' : 'move',
+									borderRadius: 'var(--radius-4)',
+									display: 'flex',
+									justifyContent: 'center',
+									alignItems: 'center',
+									pointerEvents: 'auto',
+									zIndex: 11004,
 								}}
-							/>
-						</div>
+							>
+								<motion.div
+									initial={{ rotate: -180, opacity: 0 }}
+									animate={{ rotate: 0, opacity: 1 }}
+									whileHover={{ scale: 1.2 }}
+									whileTap={{ scale: 0.9 }}
+									transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+								>
+									<EyeClosedIcon
+										style={{ color: 'white', transform: 'scale(1)', cursor: 'pointer' }}
+										onClick={() => {
+											onCoverToggle(clientID)
+											handleToggleMuted(volume)
+										}}
+									/>
+								</motion.div>
+							</motion.div>
+						</AnimatePresence>
 					)}
 				</div>
 			)}
