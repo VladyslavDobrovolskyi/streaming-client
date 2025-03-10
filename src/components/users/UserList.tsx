@@ -33,30 +33,32 @@ export default function UserList({
 }) {
 	return (
 		<>
-			<div
-				style={{
-					display: showUserListButton ? 'block' : 'none',
-					position: 'absolute',
-					top: '50%',
-					right: showUserList ? userListWidth : 0,
-					transform: 'translateY(-50%)',
-					zIndex: 30,
-					transition: 'right 0.3s ease-in-out',
-				}}
-			>
-				<button
-					onClick={toggleUserList}
+			{clients.length > 1 && (
+				<div
 					style={{
-						background: 'rgba(0, 0, 0, 0.5)',
-						border: 'none',
-						borderRadius: '50% 0 0 50%',
-						padding: '10px',
-						cursor: 'pointer',
+						display: showUserListButton ? 'block' : 'none',
+						position: 'absolute',
+						top: '50%',
+						right: showUserList ? userListWidth : 0,
+						transform: 'translateY(-50%)',
+						zIndex: 30,
+						transition: 'right 0.3s ease-in-out',
 					}}
 				>
-					<LiaUsersCogSolid style={{ color: 'white' }} />
-				</button>
-			</div>
+					<button
+						onClick={toggleUserList}
+						style={{
+							background: 'rgba(0, 0, 0, 0.5)',
+							border: 'none',
+							borderRadius: '50% 0 0 50%',
+							padding: '10px',
+							cursor: 'pointer',
+						}}
+					>
+						<LiaUsersCogSolid style={{ color: 'white' }} />
+					</button>
+				</div>
+			)}
 
 			{showUserList && (
 				<div
@@ -66,7 +68,7 @@ export default function UserList({
 						right: 0,
 						width: `${userListWidth}px`,
 						height: '100%',
-						backgroundColor: 'rgba(0, 0, 0, 0.8)',
+						backgroundColor: 'rgba(0, 0, 0, 0.5)',
 						zIndex: 25,
 						overflowY: 'auto',
 						overflowX: 'hidden',
