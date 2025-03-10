@@ -60,12 +60,9 @@ export default function ClientVideo({
 
 	useEffect(() => {
 		if (videoRef.current) {
-			const effectiveVolume = participantVolume[clientID] !== undefined ? participantVolume[clientID] : volume
-			videoRef.current.volume = muted ? 0 : effectiveVolume
-			videoRef.current.muted = muted || isLocal || isMicrophoneMuted
-			onVolumeChange(clientID, effectiveVolume)
+			videoRef.current.volume = volume
 		}
-	}, []) // Empty dependency array to run only on first render
+	}, [volume]) // Empty dependency array to run only on first render
 
 	useEffect(() => {
 		if (videoRef.current) {
