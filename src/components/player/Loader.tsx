@@ -20,7 +20,7 @@ const Loader: React.FC = () => {
 						width: '3rem',
 						height: '3rem',
 						animation: 'spin 1s linear infinite',
-						transform: 'scale(2)',
+						transform: 'scale(4)',
 						color: 'white',
 					}}
 				/>
