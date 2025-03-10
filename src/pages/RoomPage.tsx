@@ -136,12 +136,11 @@ export default function RoomPage() {
 	const toggleRemoteMic = (clientID: string) => {
 		console.log(`Before toggle: clientVolumes[${clientID}] =`, clientVolumes[clientID])
 
-		// Get current volume, default to 0.5 if not set
-		const currentVolume = clientVolumes[clientID]
+		// Get current volume, default to 0 if not set
+		const currentVolume = clientVolumes[clientID] !== undefined ? clientVolumes[clientID] : 0
 
 		// Toggle between muted (0) and unmuted (0.5)
-		// If currentVolume is 0 or undefined, set to 0.5, otherwise set to 0
-		const newVolume = currentVolume === 0 || currentVolume === undefined ? 0.5 : 0
+		const newVolume = currentVolume === 0 ? 0.5 : 0
 
 		console.log(`Toggling mic for ${clientID}: ${currentVolume} -> ${newVolume}`)
 
@@ -162,6 +161,8 @@ export default function RoomPage() {
 
 			return updatedVolumes
 		})
+
+		// Ensure the volume change is persisted
 		updateUserVolume(clientID, newVolume)
 	}
 
