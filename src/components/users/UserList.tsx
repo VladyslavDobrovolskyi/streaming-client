@@ -202,7 +202,7 @@ export default function UserList({
 														position: 'absolute',
 														top: '40%',
 														left: '50%',
-														transform: 'translate(-50%, -50%)',
+														transform: 'translate(-50%, -50%) scale(1.1)',
 														fontSize: '1.2rem',
 														backgroundColor: 'transparent',
 														color: 'black',
