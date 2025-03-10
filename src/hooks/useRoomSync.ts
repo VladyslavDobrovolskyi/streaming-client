@@ -298,7 +298,7 @@ export default function useRoomSync(
 		[participantInfo, addToast]
 	)
 	const handleTimeAndStateRequest = useCallback(
-		socketID => {
+		(socketID: string) => {
 			if (videoRef.current) {
 				const currentTime = videoRef.current.getCurrentTime()
 				const isPlaying = !videoRef.current.getInternalPlayer().paused
