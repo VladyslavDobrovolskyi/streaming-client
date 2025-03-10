@@ -196,8 +196,11 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 										style={{
 											display: 'inline-block',
 											backgroundColor:
-												msg.from === realClientID ? 'var(--blue-9)' : 'var(--gray-3)',
+												msg.from === realClientID
+													? 'rgba(65, 150, 247, 0.75)'
+													: 'var(--gray-3)',
 											color: msg.from === realClientID ? 'white' : 'var(--gray-12)',
+											border: '3px solid rgba(0, 0, 0, 0.1)',
 											borderRadius:
 												msg.from === realClientID
 													? getMessageClasses(msg, index).includes('message-last')
