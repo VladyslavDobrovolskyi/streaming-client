@@ -7,6 +7,7 @@ import { IoChatboxEllipsesOutline } from 'react-icons/io5'
 import { IoChatbox } from 'react-icons/io5'
 import { ImCross } from 'react-icons/im'
 import { LiaUsersCogSolid } from 'react-icons/lia'
+import { FaUsers } from 'react-icons/fa'
 // import type { UserListProps } from '../../types/room-types'
 
 export default function UserList({
@@ -72,9 +73,8 @@ export default function UserList({
 						transition: 'right 0.5s ease-in-out',
 					}}
 				>
-					<h2 style={{ color: 'white', padding: '10px', borderBottom: '1px solid rgba(255, 255, 255, 0.2)' }}>
-						Users
-					</h2>
+					<FaUsers />
+
 					{Object.keys(participantInfo).length === 0 && (
 						<div style={{ padding: '10px', color: 'white', textAlign: 'center' }}>
 							<p>No other participants are currently in the room.</p>
