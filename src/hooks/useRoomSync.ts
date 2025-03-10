@@ -308,7 +308,7 @@ export default function useRoomSync(
 					isPlaying,
 				})
 			}
-			console.log('Received time and state request. Sending time and state')
+			console.log(`Received time and state request. Sending time and state to `, socketID)
 		},
 		[videoRef]
 	)
