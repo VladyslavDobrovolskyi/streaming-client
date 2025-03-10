@@ -160,7 +160,12 @@ export default function VideoControls({
 							background: 'none',
 							display: 'flex',
 							alignItems: 'center',
+							transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 						}}
+						onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.2)')}
+						onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
+						onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
+						onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.2)')}
 					>
 						{isPlaying ? <PauseIcon /> : <PlayIcon />}
 					</button>
@@ -175,7 +180,12 @@ export default function VideoControls({
 							background: 'none',
 							display: 'flex',
 							alignItems: 'center',
+							transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 						}}
+						onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.2)')}
+						onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
+						onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
+						onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.2)')}
 					>
 						<DoubleArrowLeftIcon />
 					</button>
@@ -190,7 +200,12 @@ export default function VideoControls({
 							background: 'none',
 							display: 'flex',
 							alignItems: 'center',
+							transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 						}}
+						onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.2)')}
+						onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
+						onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
+						onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.2)')}
 					>
 						<DoubleArrowRightIcon />
 					</button>
@@ -218,7 +233,12 @@ export default function VideoControls({
 								background: 'none',
 								display: 'flex',
 								alignItems: 'center',
+								transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 							}}
+							onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.2)')}
+							onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
+							onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
+							onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.2)')}
 						>
 							{getSpeakerIcon()}
 						</button>
@@ -289,7 +309,12 @@ export default function VideoControls({
 							alignItems: 'center',
 							opacity: isRoomChatIsActive ? 0.5 : 1,
 							scale: 1.1,
+							transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 						}}
+						onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.2)')}
+						onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
+						onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
+						onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.2)')}
 					>
 						<IoMdChatboxes />
 					</button>
@@ -305,6 +330,19 @@ export default function VideoControls({
 									background: 'none',
 									display: 'flex',
 									alignItems: 'center',
+									transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+								}}
+								onMouseOver={e => {
+									e.currentTarget.style.transform = 'scale(1.2) rotate(15deg)'
+								}}
+								onMouseOut={e => {
+									e.currentTarget.style.transform = 'scale(1) rotate(0deg)'
+								}}
+								onMouseDown={e => {
+									e.currentTarget.style.transform = 'scale(0.9) rotate(0deg)'
+								}}
+								onMouseUp={e => {
+									e.currentTarget.style.transform = 'scale(1.2) rotate(15deg)'
 								}}
 							>
 								<GearIcon />
@@ -373,7 +411,12 @@ export default function VideoControls({
 												textAlign: 'center',
 												outline: 'none',
 												boxSizing: 'border-box',
+												transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 											}}
+											onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.1)')}
+											onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
+											onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
+											onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.1)')}
 										>
 											{isMicrophoneDisabled ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
 										</DropdownMenu.Item>
@@ -418,7 +461,12 @@ export default function VideoControls({
 												textAlign: 'center',
 												outline: 'none',
 												boxSizing: 'border-box',
+												transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 											}}
+											onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.1)')}
+											onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
+											onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
+											onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.1)')}
 										>
 											{isCameraDisabled ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
 										</DropdownMenu.Item>
@@ -463,7 +511,12 @@ export default function VideoControls({
 												textAlign: 'center',
 												outline: 'none',
 												boxSizing: 'border-box',
+												transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 											}}
+											onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.1)')}
+											onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
+											onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
+											onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.1)')}
 										>
 											{isMovieMode ? <SectionIcon /> : <SquareIcon />}
 										</DropdownMenu.Item>
@@ -515,10 +568,33 @@ export default function VideoControls({
 												outline: 'none',
 												opacity: isCameraDisabled ? 0.5 : 1,
 												boxSizing: 'border-box',
+												transition: isCameraDisabled
+													? 'none'
+													: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+											}}
+											onMouseOver={e => {
+												if (!isCameraDisabled) e.currentTarget.style.transform = 'scale(1.1)'
+											}}
+											onMouseOut={e => {
+												if (!isCameraDisabled) e.currentTarget.style.transform = 'scale(1)'
+											}}
+											onMouseDown={e => {
+												if (!isCameraDisabled) e.currentTarget.style.transform = 'scale(0.9)'
+											}}
+											onMouseUp={e => {
+												if (!isCameraDisabled) e.currentTarget.style.transform = 'scale(1.1)'
 											}}
 											disabled={isCameraDisabled}
 										>
-											{hideMe ? <EyeOpenIcon /> : <EyeClosedIcon />}
+											<div
+												className='eye-icon-container'
+												style={{
+													transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+													transform: hideMe ? 'rotate(0deg)' : 'rotate(0deg)',
+												}}
+											>
+												{hideMe ? <EyeOpenIcon /> : <EyeClosedIcon />}
+											</div>
 										</DropdownMenu.Item>
 									</div>
 								</DropdownMenu.Content>
@@ -536,7 +612,12 @@ export default function VideoControls({
 							background: 'none',
 							display: 'flex',
 							alignItems: 'center',
+							transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 						}}
+						onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.2)')}
+						onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
+						onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
+						onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.2)')}
 					>
 						{isFullscreen ? <ExitFullScreenIcon /> : <EnterFullScreenIcon />}
 					</button>
@@ -556,7 +637,6 @@ export default function VideoControls({
 				}}
 			></button>
 
-			{/* Custom tooltip */}
 			{tooltipVisible && (
 				<div
 					style={{
@@ -572,8 +652,18 @@ export default function VideoControls({
 						pointerEvents: 'none',
 						transform: 'translateX(-100%) translateY(-50%)', // Move it to the left and center vertically
 						whiteSpace: 'nowrap',
+						opacity: 0,
+						animation: 'fadeIn 0.2s forwards',
 					}}
 				>
+					<style>
+						{`
+							@keyframes fadeIn {
+								from { opacity: 0; transform: translateX(-100%) translateY(-40%); }
+								to { opacity: 1; transform: translateX(-100%) translateY(-50%); }
+							}
+						`}
+					</style>
 					{tooltipText}
 				</div>
 			)}
