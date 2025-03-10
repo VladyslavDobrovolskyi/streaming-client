@@ -89,7 +89,8 @@ export default function RoomPage() {
 	const controlsTimeoutRef = useRef<number | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
 	const previousVolumeRef = useRef(volume)
-	const { userData, updateUserPosition, updateUserStatus, updateUserVolume } = useLocalStorageSync(roomID!)
+	const { userData, updateUserPosition, updateUserStatus, updateUserVolume, updateUserCameraVisibility } =
+		useLocalStorageSync(roomID!)
 
 	// Add handlers for video loading states
 	const handleReady = () => {
@@ -168,6 +169,7 @@ export default function RoomPage() {
 					grandParentElement.style.display = newVisibility ? 'block' : 'none'
 				}
 			}
+			updateUserCameraVisibility(clientID, newVisibility)
 
 			return { ...prev, [clientID]: newVisibility }
 		})
@@ -688,6 +690,14 @@ export default function RoomPage() {
 		}, {} as Record<string, number>)
 
 		setClientVolumes(prev => ({ ...prev, ...storedVolumes }))
+
+		const storedCameraVisibility = Object.entries(userData).reduce((acc, [clientId, data]) => {
+			if (data.cameraVisible !== undefined) {
+				acc[clientId] = data.cameraVisible
+			}
+			return acc
+		}, {} as Record<string, boolean>)
+		setClientCameras(prev => ({ ...prev, ...storedCameraVisibility }))
 	}, [userData])
 
 	return (
