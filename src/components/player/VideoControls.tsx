@@ -329,7 +329,6 @@ export default function VideoControls({
 										}}
 									>
 										{isMicrophoneDisabled ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
-										{isMicrophoneDisabled ? 'Unmute Microphone' : 'Mute Microphone'}
 									</DropdownMenu.Item>
 									<DropdownMenu.Item
 										onSelect={event => {
@@ -354,7 +353,6 @@ export default function VideoControls({
 										}}
 									>
 										{isCameraDisabled ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
-										{isCameraDisabled ? 'Turn Camera On' : 'Turn Camera Off'}
 									</DropdownMenu.Item>
 									<DropdownMenu.Item
 										onSelect={event => {
@@ -381,7 +379,6 @@ export default function VideoControls({
 										}}
 									>
 										{isMovieMode ? <SectionIcon /> : <SquareIcon />}
-										{isMovieMode ? 'Disable Movie Mode' : 'Enable Movie Mode'}
 									</DropdownMenu.Item>
 									<DropdownMenu.Item
 										onSelect={event => {
@@ -410,8 +407,6 @@ export default function VideoControls({
 										disabled={isCameraDisabled}
 									>
 										{hideMe ? <EyeOpenIcon /> : <EyeClosedIcon />}
-										{hideMe ? 'Show me' : 'Hide me'}
-										{isCameraDisabled && ' (Camera Off)'}
 									</DropdownMenu.Item>
 								</DropdownMenu.Content>
 							</div>
