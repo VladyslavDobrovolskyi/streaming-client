@@ -706,6 +706,7 @@ export default function RoomPage() {
 	return (
 		<div
 			ref={playerWrapperRef}
+			onMouseEnter={() => setHighlightedUser(null)}
 			className={`player-wrapper ${isPlaying ? 'playing' : ''}`}
 			onMouseMove={showControlsHandler}
 			onMouseLeave={() => {

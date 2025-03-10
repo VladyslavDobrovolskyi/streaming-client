@@ -117,6 +117,7 @@ export default function UserList({
 									}}
 									onMouseEnter={() => setHighlightedUser(clientID)}
 									onMouseLeave={() => setHighlightedUser(null)}
+									//
 								>
 									<Avatar
 										src={clientID === localVideoId ? avatar : participantInfo[clientID]?.avatar}
