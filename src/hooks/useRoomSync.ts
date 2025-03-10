@@ -256,6 +256,22 @@ export default function useRoomSync(
 		[roomID, participantInfo, localUsername, avatar, isCameraDisabled, isMicrophoneDisabled]
 	)
 
+	const handleSyncState = useCallback(
+		({ time, isPlaying }: { time: number; isPlaying: boolean }) => {
+			if (!videoRef.current || isSyncingRef.current) return
+
+			isSyncingRef.current = true
+			videoRef.current.seekTo(time, 'seconds')
+			if (isPlaying) {
+				videoRef.current.getInternalPlayer().play()
+			} else {
+				videoRef.current.getInternalPlayer().pause()
+			}
+			isSyncingRef.current = false
+		},
+		[videoRef]
+	)
+
 	const handleClientLeave = useCallback(
 		({ peerID }) => {
 			if (!participantInfo[peerID]) return
@@ -313,6 +329,7 @@ export default function useRoomSync(
 		socket.on(ACTIONS.SYNC_INFO, handleInfoSync)
 		socket.on(ACTIONS.REMOVE_PEER, handleClientLeave)
 		socket.on(ACTIONS.RECEIVE_VIDEO_PLAY, handlePlay)
+		socket.on(ACTIONS.SYNC_STATE, handleSyncState)
 		// socket.on(ACTIONS.SYNC_CAMERA, handleCameraSync)
 		// socket.on(ACTIONS.SYNC_MICROPHONE, handleMicrophoneSync)
 		socket.on(ACTIONS.REQUEST_PARTICIPANT_INFO, handleRequestParticipantInfo)
@@ -320,6 +337,7 @@ export default function useRoomSync(
 		socket.on(ACTIONS.RECEIVE_PRIVATE_MESSAGE, handlePrivateMessage)
 
 		return () => {
+			socket.off(ACTIONS.SYNC_STATE, handleSyncState)
 			socket.off(ACTIONS.VIDEO_PLAY, handlePlay)
 			socket.off(ACTIONS.VIDEO_PAUSE, handlePause)
 			socket.off(ACTIONS.VIDEO_SEEK, handleSeek)
@@ -345,6 +363,7 @@ export default function useRoomSync(
 		// handleMicrophoneSync,
 		handleInfoSync,
 		handleRequestParticipantInfo,
+		handleSyncState,
 	])
 
 	const emitPlay = useCallback(
