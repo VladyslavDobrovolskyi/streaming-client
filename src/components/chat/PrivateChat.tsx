@@ -59,9 +59,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	}
 
 	useEffect(() => {
-		if (highlight) {
-			setIsActive(true)
-		}
+		setIsActive(highlight)
 	}, [highlight])
 
 	return (
