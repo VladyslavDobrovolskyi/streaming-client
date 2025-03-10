@@ -36,7 +36,7 @@ export default function RoomPage() {
 	const [volume, setVolume] = useState(0.8)
 	const [muted, setMuted] = useState(false)
 	const [played, setPlayed] = useState(0)
-	const [loaded, setLoaded] = useState(0)
+	const [loaded, setLoaded] = useState<number>(0)
 	const [showControls, setShowControls] = useState(false)
 	const [showVolumeControl, setShowVolumeControl] = useState(false)
 	const [isFullscreen, setIsFullscreen] = useState(false)
@@ -131,11 +131,6 @@ export default function RoomPage() {
 				return newToasts
 			}
 		})
-	}
-
-	const hideMeToggle = () => {
-		// Toggle the hideMe state without affecting individual camera states
-		setHideMe(prevState => !prevState)
 	}
 
 	const toggleRemoteMic = (clientID: string) => {
@@ -805,7 +800,6 @@ export default function RoomPage() {
 				muted={muted}
 				volume={volume}
 				played={played}
-				loaded={loaded}
 				duration={duration}
 				isFullscreen={isFullscreen}
 				showControls={showControls}
@@ -837,7 +831,10 @@ export default function RoomPage() {
 				onMicMuteUnmute={handleMicMuteUnmute}
 				onCameraMuteUnmute={handleCameraMuteUnmute}
 				onMovieModeToggle={handleMovieModeToggle}
-				hideMeToggle={() => toggleRemoteCamera(LOCAL_VIDEO)}
+				hideMeToggle={() => {
+					toggleRemoteCamera(LOCAL_VIDEO)
+					setHideMe(prev => !prev)
+				}}
 				onHoveredItemChange={setHoveredItem}
 				onToggleChat={() => setShowChat(prev => !prev)}
 				formatTime={formatTime}
