@@ -7,6 +7,7 @@ import { IoChatboxEllipsesOutline } from 'react-icons/io5'
 import { IoChatbox } from 'react-icons/io5'
 import { ImCross } from 'react-icons/im'
 import { LiaUsersCogSolid } from 'react-icons/lia'
+import { useEffect } from 'react'
 // import { FaUsers } from 'react-icons/fa'
 // import type { UserListProps } from '../../types/room-types'
 
@@ -31,6 +32,14 @@ export default function UserList({
 	showUserListButton,
 	privateChats,
 }) {
+	useEffect(() => {
+		const saveHighlightedUser = highlightedUser
+		if (!showUserList) {
+			setHighlightedUser(null)
+			setHighlightedUser(saveHighlightedUser)
+		}
+	}, [showUserList, highlightedUser, setHighlightedUser])
+
 	return (
 		<>
 			{clients.length > 1 && (
