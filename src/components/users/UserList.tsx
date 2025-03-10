@@ -5,6 +5,7 @@ import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
 import { IoChatboxEllipsesOutline } from 'react-icons/io5'
 import { IoChatbox } from 'react-icons/io5'
+import { ImCross } from 'react-icons/im'
 import { LiaUsersCogSolid } from 'react-icons/lia'
 // import type { UserListProps } from '../../types/room-types'
 
@@ -140,6 +141,7 @@ export default function UserList({
 													: 'rgba(165, 247, 65, 0.7)',
 											opacity: parcipantVolume[clientID] === 0 ? 0.3 : 1,
 											cursor: 'pointer',
+											position: 'relative', // Add position relative for absolute positioning of overlay
 										}}
 									>
 										{clientID === localVideoId ? (
@@ -149,7 +151,18 @@ export default function UserList({
 												<FaMicrophoneAlt />
 											)
 										) : participantInfo[clientID].isMicrophoneDisabled ? (
-											<FaMicrophoneAltSlash />
+											<>
+												<FaMicrophoneAltSlash />
+												<ImCross
+													style={{
+														position: 'absolute',
+														top: '-5px',
+														right: '-5px',
+														color: 'rgba(247, 65, 101, 1)',
+														fontSize: '10px',
+													}}
+												/>
+											</>
 										) : (
 											<FaMicrophoneAlt />
 										)}
