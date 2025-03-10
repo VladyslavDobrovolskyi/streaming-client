@@ -19,7 +19,6 @@ import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
 import { IoMdChatboxes } from 'react-icons/io'
 import { useRef } from 'react'
-import type { VideoControlsProps } from '../../types/room-types'
 
 export default function VideoControls({
 	isPlaying,
@@ -29,6 +28,7 @@ export default function VideoControls({
 	duration,
 	isFullscreen,
 	showControls,
+	hideMeToggle,
 	setShowControls,
 	showVolumeControl,
 	isRoomChatIsActive,
@@ -38,7 +38,7 @@ export default function VideoControls({
 	isMicrophoneDisabled,
 	isCameraDisabled,
 	isMovieMode,
-	hideUsers,
+	hideMe,
 	hoveredItem,
 	onPlay,
 	onPause,
@@ -57,12 +57,11 @@ export default function VideoControls({
 	onMicMuteUnmute,
 	onCameraMuteUnmute,
 	onMovieModeToggle,
-	onHideUsersToggle,
 	onHoveredItemChange,
 	onToggleChat,
 	formatTime,
 	getSpeakerIcon,
-}: VideoControlsProps) {
+}) {
 	const sliderRef = useRef<HTMLDivElement>(null)
 
 	return (
@@ -386,9 +385,9 @@ export default function VideoControls({
 									<DropdownMenu.Item
 										onSelect={event => {
 											event.preventDefault()
-											onHideUsersToggle()
+											hideMeToggle()
 										}}
-										onMouseEnter={() => onHoveredItemChange('hideUsers')}
+										onMouseEnter={() => onHoveredItemChange('hideMe')}
 										onMouseLeave={() => onHoveredItemChange(null)}
 										style={{
 											padding: '8px 12px',
@@ -397,9 +396,7 @@ export default function VideoControls({
 											alignItems: 'center',
 											gap: '8px',
 											backgroundColor:
-												hoveredItem === 'hideUsers'
-													? 'rgba(255, 255, 255, 0.1)'
-													: 'transparent',
+												hoveredItem === 'hideMe' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
 											color: 'white',
 											border: 'none',
 											width: '100%',
@@ -407,8 +404,8 @@ export default function VideoControls({
 											outline: 'none',
 										}}
 									>
-										{hideUsers ? <EyeOpenIcon /> : <EyeClosedIcon />}
-										{hideUsers ? 'ShowUsers' : 'Hide Users'}
+										{hideMe ? <EyeOpenIcon /> : <EyeClosedIcon />}
+										{hideMe ? 'Show me' : 'Hide me'}
 									</DropdownMenu.Item>
 								</DropdownMenu.Content>
 							</div>

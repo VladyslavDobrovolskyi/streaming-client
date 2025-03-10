@@ -69,7 +69,7 @@ export default function RoomPage() {
 	const [coveredClients, setCoveredClients] = useState<Record<string, boolean>>({})
 	const [isMovieMode, setIsMovieMode] = useState(false)
 	const [clientPositions, setClientPositions] = useState<Record<string, { x: number; y: number }>>({})
-	const [hideUsers, setHideUsers] = useState(false)
+	const [hideMe, setHideMe] = useState(false)
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
 	const [hoveredItem, setHoveredItem] = useState<string | null>(null)
 	const [showUserList, setShowUserList] = useState(false)
@@ -133,9 +133,9 @@ export default function RoomPage() {
 		})
 	}
 
-	const hideAllUsers = () => {
-		// Toggle the hideUsers state without affecting individual camera states
-		setHideUsers(prevState => !prevState)
+	const hideMeToggle = () => {
+		// Toggle the hideMe state without affecting individual camera states
+		setHideMe(prevState => !prevState)
 	}
 
 	const toggleRemoteMic = (clientID: string) => {
@@ -767,7 +767,6 @@ export default function RoomPage() {
 				coveredClients={coveredClients}
 				clientVolumes={clientVolumes}
 				highlightedUser={highlightedUser}
-				hideUsers={hideUsers}
 				onPositionChange={(id, pos) => {
 					setClientPositions(prev => ({ ...prev, [id]: pos }))
 					updateUserPosition(id, pos)
@@ -818,7 +817,7 @@ export default function RoomPage() {
 				isMicrophoneDisabled={isMicrophoneDisabled}
 				isCameraDisabled={isCameraDisabled}
 				isMovieMode={isMovieMode}
-				hideUsers={hideUsers}
+				hideMe={hideMe}
 				hoveredItem={hoveredItem}
 				isRoomChatIsActive={showChat}
 				onPlay={handlePlay}
@@ -838,7 +837,7 @@ export default function RoomPage() {
 				onMicMuteUnmute={handleMicMuteUnmute}
 				onCameraMuteUnmute={handleCameraMuteUnmute}
 				onMovieModeToggle={handleMovieModeToggle}
-				onHideUsersToggle={hideAllUsers}
+				hideMeToggle={() => toggleRemoteCamera(LOCAL_VIDEO)}
 				onHoveredItemChange={setHoveredItem}
 				onToggleChat={() => setShowChat(prev => !prev)}
 				formatTime={formatTime}
