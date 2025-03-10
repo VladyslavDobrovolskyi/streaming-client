@@ -350,7 +350,10 @@ export default function VideoControls({
 											}}
 											onMouseEnter={() => {
 												onHoveredItemChange('mic')
-												showTooltip(isMicrophoneDisabled ? 'Enable' : 'Disable', 'mic')
+												showTooltip(
+													isMicrophoneDisabled ? 'Enable Microphone' : 'Disable Microphone',
+													'mic'
+												)
 											}}
 											onMouseLeave={() => {
 												onHoveredItemChange(null)
@@ -390,7 +393,10 @@ export default function VideoControls({
 											}}
 											onMouseEnter={() => {
 												onHoveredItemChange('camera')
-												showTooltip('Camera', 'camera')
+												showTooltip(
+													isCameraDisabled ? 'Enable Camera' : 'Disable Camera',
+													'camera'
+												)
 											}}
 											onMouseLeave={() => {
 												onHoveredItemChange(null)
@@ -432,7 +438,10 @@ export default function VideoControls({
 											}}
 											onMouseEnter={() => {
 												onHoveredItemChange('movieMode')
-												showTooltip('Movie Mode', 'movieMode')
+												showTooltip(
+													isMovieMode ? 'Disable Movie Mode' : 'Enable Movie Mode',
+													'movieMode'
+												)
 											}}
 											onMouseLeave={() => {
 												onHoveredItemChange(null)
@@ -476,7 +485,14 @@ export default function VideoControls({
 											}}
 											onMouseEnter={() => {
 												onHoveredItemChange('hideMe')
-												showTooltip('Hide Me', 'hideMe')
+												showTooltip(
+													isCameraDisabled
+														? 'Camera is disabled '
+														: hideMe
+														? 'Show me '
+														: 'Hide me',
+													'hideMe'
+												)
 											}}
 											onMouseLeave={() => {
 												onHoveredItemChange(null)
