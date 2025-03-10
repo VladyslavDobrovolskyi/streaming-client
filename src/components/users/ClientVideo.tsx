@@ -44,7 +44,7 @@ export default function ClientVideo({
 	onPositionChange,
 	onSizeChange,
 	onVolumeChange,
-	clientVolume,
+	participantVolume,
 	onCoverToggle,
 	isCovered,
 	volume,
@@ -57,12 +57,6 @@ export default function ClientVideo({
 	const [muted, setMuted] = useState(false)
 	const [mutedBySlider, setMutedBySlider] = useState(false)
 	const videoRef = useRef<HTMLVideoElement>(null)
-
-	useEffect(() => {
-		if (clientVolume === 0) {
-			setMuted(true)
-		}
-	}, [clientVolume])
 
 	useEffect(() => {
 		if (videoRef.current) {
@@ -90,6 +84,14 @@ export default function ClientVideo({
 			return
 		}
 	}
+
+	useEffect(() => {
+		if (participantVolume[clientID] === 0) {
+			setMuted(true)
+		} else {
+			setMuted(false)
+		}
+	}, [participantVolume, clientID])
 
 	const handleVolumeChange = (newVolume: number) => {
 		if (newVolume === 0) {

@@ -47,7 +47,7 @@ export default function ParticipantsView({
 						clientID={clientID}
 						provideMediaRef={provideMediaRef}
 						isLocal={clientID === localVideoId}
-						clientVolume={clientVolumes[clientID] || 1}
+						participantVolume={clientVolumes}
 						// username={participantData.username || 'Anonymous'}
 						isCameraMuted={isCameraMuted}
 						isMicrophoneMuted={
