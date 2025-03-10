@@ -136,7 +136,7 @@ export default function RoomPage() {
 	const toggleRemoteMic = (clientID: string) => {
 		setClientVolumes(prev => {
 			const currentVolume = prev[clientID] || 0.5
-			const newVolume = currentVolume > 0 ? 0 : previousVolumeRef.current || 0.5
+			const newVolume = currentVolume > 0 ? 0 : 0.5
 			const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
 			if (videoElement) {
 				videoElement.volume = newVolume
