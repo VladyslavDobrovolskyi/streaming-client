@@ -88,13 +88,13 @@ export default function ClientVideo({
 		}
 	}
 
-	useEffect(() => {
-		if (participantVolume[clientID] === 0) {
-			setMuted(true)
-		} else {
-			setMuted(false)
-		}
-	}, [participantVolume, clientID])
+	// useEffect(() => {
+	// 	if (participantVolume[clientID] === 0) {
+	// 		setMuted(true)
+	// 	} else {
+	// 		setMuted(false)
+	// 	}
+	// }, [participantVolume, clientID])
 
 	const handleVolumeChange = (newVolume: number) => {
 		if (newVolume === 0) {
