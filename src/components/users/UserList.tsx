@@ -42,7 +42,7 @@ export default function UserList({
 
 	return (
 		<>
-			{clients && (
+			{participantInfo.length > 1 && (
 				<div
 					style={{
 						display: showUserListButton ? 'block' : 'none',
