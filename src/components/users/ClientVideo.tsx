@@ -13,25 +13,25 @@ import {
 } from '@radix-ui/react-icons'
 import { Slider } from '@radix-ui/themes'
 
-interface ClientVideoProps {
-	clientID: string
-	provideMediaRef: (clientID: string, instance: HTMLVideoElement | null) => Promise<void>
-	isLocal: boolean
-	username: string
-	isCameraMuted: boolean
-	isMicrophoneMuted: boolean
-	position: { x: number; y: number }
-	size: { width: number; height: number; scale?: number }
-	onPositionChange: (clientID: string, position: { x: number; y: number }) => void
-	onSizeChange: (clientID: string, size: { width: number; height: number; scale?: number }) => void
-	onVolumeChange: (clientID: string, volume: number) => void
-	onCoverToggle: (clientID: string) => void
-	isCovered: boolean
-	volume: number
-	highlightedUser: string | null
-	onMouseEnter: (id: string) => void
-	onMouseLeave: () => void
-}
+// interface ClientVideoProps {
+// 	clientID: string
+// 	provideMediaRef: (clientID: string, instance: HTMLVideoElement | null) => Promise<void>
+// 	isLocal: boolean
+// 	username: string
+// 	isCameraMuted: boolean
+// 	isMicrophoneMuted: boolean
+// 	position: { x: number; y: number }
+// 	size: { width: number; height: number; scale?: number }
+// 	onPositionChange: (clientID: string, position: { x: number; y: number }) => void
+// 	onSizeChange: (clientID: string, size: { width: number; height: number; scale?: number }) => void
+// 	onVolumeChange: (clientID: string, volume: number) => void
+// 	onCoverToggle: (clientID: string) => void
+// 	isCovered: boolean
+// 	volume: number
+// 	highlightedUser: string | null
+// 	onMouseEnter: (id: string) => void
+// 	onMouseLeave: () => void
+// }
 
 export default function ClientVideo({
 	clientID,
@@ -44,18 +44,25 @@ export default function ClientVideo({
 	onPositionChange,
 	onSizeChange,
 	onVolumeChange,
+	clientVolume,
 	onCoverToggle,
 	isCovered,
 	volume,
 	highlightedUser,
 	onMouseEnter,
 	onMouseLeave,
-}: ClientVideoProps) {
+}) {
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
 	const [volumeBeforeMute, setVolumeBeforeMute] = useState(0)
 	const [muted, setMuted] = useState(false)
 	const [mutedBySlider, setMutedBySlider] = useState(false)
 	const videoRef = useRef<HTMLVideoElement>(null)
+
+	useEffect(() => {
+		if (clientVolume === 0) {
+			setMuted(true)
+		}
+	}, [clientVolume])
 
 	useEffect(() => {
 		if (videoRef.current) {
