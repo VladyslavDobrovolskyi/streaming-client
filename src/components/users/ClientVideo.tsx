@@ -63,8 +63,9 @@ export default function ClientVideo({
 			const effectiveVolume = participantVolume[clientID] !== undefined ? participantVolume[clientID] : volume
 			videoRef.current.volume = muted ? 0 : effectiveVolume
 			videoRef.current.muted = muted || isLocal || isMicrophoneMuted
+			onVolumeChange(clientID, effectiveVolume)
 		}
-	}, [volume, muted, isLocal, isMicrophoneMuted, participantVolume, clientID])
+	}, [volume, muted, isLocal, isMicrophoneMuted, participantVolume, clientID, onVolumeChange])
 
 	const handleToggleMuted = volume => {
 		if (mutedBySlider) {
@@ -77,6 +78,7 @@ export default function ClientVideo({
 		if (muted) {
 			setMuted(false)
 			onVolumeChange(clientID, volumeBeforeMute)
+
 			return
 		} else {
 			setVolumeBeforeMute(volume)
