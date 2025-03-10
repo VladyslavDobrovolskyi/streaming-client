@@ -40,16 +40,17 @@ export default function ClientVideo({
 	const [muted, setMuted] = useState(false)
 	const [mutedBySlider, setMutedBySlider] = useState(false)
 	const videoRef = useRef<HTMLVideoElement>(null)
+	const DEFAULT_VOLUME = 0.5
 
 	// Helper function to get effective volume
 	const getEffectiveVolume = () => {
 		if (participantVolume && clientID in participantVolume) {
 			return participantVolume[clientID]
 		}
-		if (volume !== undefined && volume !== null) {
+		if (volume !== undefined && volume !== null && volume > 0) {
 			return volume
 		}
-		return 0.5 // Default fallback
+		return DEFAULT_VOLUME // Default fallback
 	}
 
 	// This effect runs once when the component mounts to connect the videoRef to provideMediaRef
@@ -64,14 +65,27 @@ export default function ClientVideo({
 		}
 	}, [clientID, provideMediaRef])
 
+	// Initialize new users with default volume
 	useEffect(() => {
 		// If this client doesn't have a volume set in participantVolume, initialize it
 		if (participantVolume && !(clientID in participantVolume)) {
-			const initialVolume = volume !== undefined && volume !== null ? volume : 0.5
+			// Always ensure new users have a non-zero volume
+			// If volume prop is greater than 0, use it, otherwise use DEFAULT_VOLUME
+			const initialVolume = volume !== undefined && volume !== null && volume > 0 ? volume : DEFAULT_VOLUME
+
 			console.log(`Initializing volume for ${clientID} to ${initialVolume}`)
 			onVolumeChange(clientID, initialVolume)
+
+			// Ensure muted state is false for new users
+			setMuted(false)
+
+			// Directly update the video element if it exists
+			if (videoRef.current) {
+				videoRef.current.volume = initialVolume
+				videoRef.current.muted = isLocal || isMicrophoneMuted
+			}
 		}
-	}, [clientID, participantVolume, onVolumeChange, volume])
+	}, [clientID, participantVolume, onVolumeChange, volume, isLocal, isMicrophoneMuted])
 
 	useEffect(() => {
 		if (videoRef.current) {
@@ -133,12 +147,12 @@ export default function ClientVideo({
 		if (mutedBySlider) {
 			setMuted(false)
 			setMutedBySlider(false)
-			onVolumeChange(clientID, 0.5) // Update participantVolume
-			console.log(`Unmuting from slider: setting volume to 0.5`)
+			onVolumeChange(clientID, DEFAULT_VOLUME) // Update participantVolume
+			console.log(`Unmuting from slider: setting volume to ${DEFAULT_VOLUME}`)
 
 			// Directly update the video element
 			if (videoRef.current) {
-				videoRef.current.volume = 0.5
+				videoRef.current.volume = DEFAULT_VOLUME
 				videoRef.current.muted = isLocal || isMicrophoneMuted
 			}
 			return
@@ -146,7 +160,7 @@ export default function ClientVideo({
 
 		if (muted) {
 			// Unmuting - update participantVolume
-			const newVolume = volumeBeforeMute > 0 ? volumeBeforeMute : 0.5
+			const newVolume = volumeBeforeMute > 0 ? volumeBeforeMute : DEFAULT_VOLUME
 			console.log(`Unmuting: setting volume to ${newVolume}`)
 			onVolumeChange(clientID, newVolume) // This updates participantVolume
 
@@ -158,8 +172,8 @@ export default function ClientVideo({
 		} else {
 			// Muting - save current volume and update participantVolume
 			const currentVolume = getEffectiveVolume()
-			setVolumeBeforeMute(currentVolume > 0 ? currentVolume : 0.5)
-			console.log(`Muting: saving volume ${currentVolume > 0 ? currentVolume : 0.5} and setting to 0`)
+			setVolumeBeforeMute(currentVolume > 0 ? currentVolume : DEFAULT_VOLUME)
+			console.log(`Muting: saving volume ${currentVolume > 0 ? currentVolume : DEFAULT_VOLUME} and setting to 0`)
 			onVolumeChange(clientID, 0) // This updates participantVolume
 
 			// Directly update the video element
