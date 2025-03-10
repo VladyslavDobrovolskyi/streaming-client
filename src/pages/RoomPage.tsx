@@ -83,6 +83,7 @@ export default function RoomPage() {
 		{}
 	)
 	const [clientVolumes, setClientVolumes] = useState<Record<string, number>>({})
+	const [clientCameras, setClientCameras] = useState<Record<string, boolean>>({})
 	const [unreadMessages, setUnreadMessages] = useState<Record<string, number>>({})
 	const userListWidth = 380
 	const playerRef = useRef<ReactPlayer>(null)
@@ -147,6 +148,15 @@ export default function RoomPage() {
 				videoElement.muted = previousVolume === 0
 			}
 			updateUserVolume(clientID, videoElement.volume)
+		}
+	}
+
+	const toggleRemoteCamera = (clientID: string) => {
+		const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
+		if (videoElement) {
+			const currentVisibility = clientCameras[clientID]
+			setClientCameras(prev => ({ ...prev, [clientID]: !currentVisibility }))
+			videoElement.style.display = currentVisibility ? 'none' : 'block'
 		}
 	}
 
@@ -819,10 +829,12 @@ export default function RoomPage() {
 				togglePrivateChat={togglePrivateChat}
 				unreadMessages={unreadMessages}
 				toggleRemoteMic={toggleRemoteMic}
+				toggleRemoteCamera={toggleRemoteCamera}
 				avatar={avatar}
 				userListWidth={userListWidth}
 				showUserListButton={showUserListButton}
-				parcipantVolume={clientVolumes}
+				participantVolume={clientVolumes}
+				participantCameras={clientCameras}
 				hideUsers={hideUsers}
 				privateChats={privateChats}
 			/>

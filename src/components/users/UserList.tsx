@@ -19,9 +19,11 @@ export default function UserList({
 	isCameraDisabled,
 	highlightedUser,
 	setHighlightedUser,
-	parcipantVolume,
+	participantVolume,
+	participantCameras,
 	togglePrivateChat,
 	toggleRemoteMic,
+	toggleRemoteCamera,
 	unreadMessages,
 	avatar,
 	userListWidth,
@@ -139,12 +141,12 @@ export default function UserList({
 													: participantInfo[clientID].isMicrophoneDisabled
 													? 'rgba(247, 65, 101, 0.7)'
 													: 'rgba(165, 247, 65, 0.7)',
-											opacity: parcipantVolume[clientID] === 0 ? 0.3 : 1,
+											opacity: participantVolume[clientID] === 0 ? 0.3 : 1,
 											cursor: 'pointer',
 											position: 'relative', // Add position relative for absolute positioning of overlay
 										}}
 									>
-										{parcipantVolume[clientID] === 0 && (
+										{participantVolume[clientID] === 0 && (
 											<ImCross
 												style={{
 													position: 'absolute',
@@ -164,7 +166,7 @@ export default function UserList({
 										) : participantInfo[clientID].isMicrophoneDisabled ? (
 											<>
 												<FaMicrophoneAltSlash />
-												{parcipantVolume[clientID] === 0 && (
+												{participantVolume[clientID] === 0 && (
 													<ImCross
 														style={{
 															position: 'absolute',
@@ -181,6 +183,7 @@ export default function UserList({
 										)}
 									</span>
 									<span
+										onClick={() => toggleRemoteCamera(clientID)}
 										style={{
 											color:
 												participantInfo[clientID].isCameraDisabled ||
@@ -190,6 +193,17 @@ export default function UserList({
 											opacity: hideUsers ? 0.3 : 1,
 										}}
 									>
+										{participantCameras[clientID] === false && (
+											<ImCross
+												style={{
+													position: 'absolute',
+													top: '0px',
+													right: '0px',
+													color: 'white',
+													transform: 'scale(0.7)',
+												}}
+											/>
+										)}
 										{participantInfo[clientID].isCameraDisabled ||
 										(clientID === localVideoId && isCameraDisabled) ? (
 											<BsCameraVideoOffFill />
