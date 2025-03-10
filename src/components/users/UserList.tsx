@@ -200,7 +200,7 @@ export default function UserList({
 												<span
 													style={{
 														position: 'absolute',
-														top: '45%',
+														top: '50%',
 														left: '50%',
 														transform: 'translate(-50%, -50%)',
 														fontSize: '1.2rem',
@@ -208,6 +208,7 @@ export default function UserList({
 														color: 'black',
 														borderRadius: '50%',
 														fontWeight: 'bold',
+														opacity: 0.8,
 													}}
 												>
 													{unreadMessages[clientID]}
