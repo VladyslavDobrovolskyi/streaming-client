@@ -17,11 +17,6 @@ const slideOut = keyframes({
 	},
 })
 
-const swipeOut = keyframes({
-	from: { transform: 'translateX(var(--radix-toast-swipe-end-x))' },
-	to: { transform: 'translateX(calc(100% + 1rem))' },
-})
-
 export const StyledToastViewport = styled(Toast.Viewport, {
 	position: 'fixed',
 	bottom: 0,
@@ -52,10 +47,9 @@ export const StyledToastRoot = styled(Toast.Root, {
 		animation: `${slideIn} 150ms cubic-bezier(0.16, 1, 0.3, 1)`,
 	},
 
-	// Exit animation - make sure it has enough time to complete
-	'&[data-state="closed"]': {
-		animation: `${slideOut} 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
-		pointerEvents: 'none',
+	// Custom disappearing animation
+	'&.disappearing': {
+		animation: `${slideOut} 1000ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
 	},
 
 	// Swipe animations
@@ -67,7 +61,7 @@ export const StyledToastRoot = styled(Toast.Root, {
 		transition: 'transform 200ms ease-out',
 	},
 	'&[data-swipe="end"]': {
-		animation: `${swipeOut} 200ms ease-out forwards`,
+		animation: `${slideOut} 200ms ease-out forwards`,
 	},
 })
 
