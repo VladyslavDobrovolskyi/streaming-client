@@ -12,7 +12,6 @@ import {
 	EyeOpenIcon,
 	EyeClosedIcon,
 	SquareIcon,
-	// DotsHorizontalIcon,
 	SectionIcon,
 	GearIcon,
 } from '@radix-ui/react-icons'
@@ -304,6 +303,8 @@ export default function VideoControls({
 										borderRadius: '4px',
 										padding: '4px',
 										zIndex: 9999,
+										overflow: 'hidden', // Add this to prevent content from overflowing
+										width: '100%', // Ensure the content takes full width of its container
 									}}
 								>
 									<DropdownMenu.Item
@@ -323,9 +324,10 @@ export default function VideoControls({
 												hoveredItem === 'mic' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
 											color: 'white',
 											border: 'none',
-											width: '100%',
+											width: '100%', // Ensure the item takes full width
 											textAlign: 'left',
 											outline: 'none',
+											boxSizing: 'border-box', // Add this to include padding in width calculation
 										}}
 									>
 										{isMicrophoneDisabled ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
@@ -347,9 +349,10 @@ export default function VideoControls({
 												hoveredItem === 'camera' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
 											color: 'white',
 											border: 'none',
-											width: '100%',
+											width: '100%', // Ensure the item takes full width
 											textAlign: 'left',
 											outline: 'none',
+											boxSizing: 'border-box', // Add this to include padding in width calculation
 										}}
 									>
 										{isCameraDisabled ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
@@ -373,9 +376,10 @@ export default function VideoControls({
 													: 'transparent',
 											color: 'white',
 											border: 'none',
-											width: '100%',
+											width: '100%', // Ensure the item takes full width
 											textAlign: 'left',
 											outline: 'none',
+											boxSizing: 'border-box', // Add this to include padding in width calculation
 										}}
 									>
 										{isMovieMode ? <SectionIcon /> : <SquareIcon />}
@@ -399,10 +403,11 @@ export default function VideoControls({
 												hoveredItem === 'hideMe' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
 											color: isCameraDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
 											border: 'none',
-											width: '100%',
+											width: '100%', // Ensure the item takes full width
 											textAlign: 'left',
 											outline: 'none',
 											opacity: isCameraDisabled ? 0.5 : 1,
+											boxSizing: 'border-box', // Add this to include padding in width calculation
 										}}
 										disabled={isCameraDisabled}
 									>
