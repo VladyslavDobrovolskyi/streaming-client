@@ -844,6 +844,8 @@ export default function RoomPage() {
 				onToggleChat={() => setShowChat(prev => !prev)}
 				formatTime={formatTime}
 				getSpeakerIcon={getSpeakerIcon}
+				initialMicrophoneDisabledState={initialMicrophoneDisabledState}
+				initialCameraDisabledState={initialCameraDisabledState}
 			/>
 			<UserList
 				showUserList={showUserList}

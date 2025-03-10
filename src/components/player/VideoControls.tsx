@@ -39,6 +39,8 @@ export default function VideoControls({
 	isCameraDisabled,
 	isMovieMode,
 	hideMe,
+	initialCameraDisabledState,
+	initialMicrophoneDisabledState,
 	hoveredItem,
 	onPlay,
 	onPause,
@@ -393,12 +395,18 @@ export default function VideoControls({
 										<DropdownMenu.Item
 											onSelect={event => {
 												event.preventDefault()
-												onMicMuteUnmute()
+												if (!initialMicrophoneDisabledState) {
+													onMicMuteUnmute()
+												}
 											}}
 											onMouseEnter={() => {
 												onHoveredItemChange('mic')
 												showTooltip(
-													isMicrophoneDisabled ? 'Enable Microphone' : 'Disable Microphone',
+													initialMicrophoneDisabledState
+														? 'Not allowed'
+														: isMicrophoneDisabled
+														? 'Enable Microphone'
+														: 'Disable Microphone',
 													'mic'
 												)
 											}}
@@ -408,24 +416,42 @@ export default function VideoControls({
 											}}
 											style={{
 												padding: '8px 12px',
-												cursor: 'pointer',
+												cursor: initialMicrophoneDisabledState ? 'not-allowed' : 'pointer',
 												display: 'flex',
 												alignItems: 'center',
 												justifyContent: 'center',
 												backgroundColor:
 													hoveredItem === 'mic' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
-												color: 'white',
+												color: initialMicrophoneDisabledState
+													? 'rgba(255, 255, 255, 0.5)'
+													: 'white',
 												border: 'none',
 												width: '100%',
 												textAlign: 'center',
 												outline: 'none',
 												boxSizing: 'border-box',
-												transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+												opacity: initialMicrophoneDisabledState ? 0.5 : 1,
+												transition: initialMicrophoneDisabledState
+													? 'none'
+													: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 											}}
-											onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.1)')}
-											onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
-											onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
-											onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.1)')}
+											onMouseOver={e => {
+												if (!initialMicrophoneDisabledState)
+													e.currentTarget.style.transform = 'scale(1.1)'
+											}}
+											onMouseOut={e => {
+												if (!initialMicrophoneDisabledState)
+													e.currentTarget.style.transform = 'scale(1)'
+											}}
+											onMouseDown={e => {
+												if (!initialMicrophoneDisabledState)
+													e.currentTarget.style.transform = 'scale(0.9)'
+											}}
+											onMouseUp={e => {
+												if (!initialMicrophoneDisabledState)
+													e.currentTarget.style.transform = 'scale(1.1)'
+											}}
+											disabled={initialMicrophoneDisabledState}
 										>
 											{isMicrophoneDisabled ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
 										</DropdownMenu.Item>
@@ -441,12 +467,18 @@ export default function VideoControls({
 										<DropdownMenu.Item
 											onSelect={event => {
 												event.preventDefault()
-												onCameraMuteUnmute()
+												if (!initialCameraDisabledState) {
+													onCameraMuteUnmute()
+												}
 											}}
 											onMouseEnter={() => {
 												onHoveredItemChange('camera')
 												showTooltip(
-													isCameraDisabled ? 'Enable Camera' : 'Disable Camera',
+													initialCameraDisabledState
+														? 'Not allowed'
+														: isCameraDisabled
+														? 'Enable Camera'
+														: 'Disable Camera',
 													'camera'
 												)
 											}}
@@ -456,7 +488,7 @@ export default function VideoControls({
 											}}
 											style={{
 												padding: '8px 12px',
-												cursor: 'pointer',
+												cursor: initialCameraDisabledState ? 'not-allowed' : 'pointer',
 												display: 'flex',
 												alignItems: 'center',
 												justifyContent: 'center',
@@ -464,18 +496,36 @@ export default function VideoControls({
 													hoveredItem === 'camera'
 														? 'rgba(255, 255, 255, 0.1)'
 														: 'transparent',
-												color: 'white',
+												color: initialCameraDisabledState
+													? 'rgba(255, 255, 255, 0.5)'
+													: 'white',
 												border: 'none',
 												width: '100%',
 												textAlign: 'center',
 												outline: 'none',
 												boxSizing: 'border-box',
-												transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+												opacity: initialCameraDisabledState ? 0.5 : 1,
+												transition: initialCameraDisabledState
+													? 'none'
+													: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 											}}
-											onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.1)')}
-											onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
-											onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
-											onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.1)')}
+											onMouseOver={e => {
+												if (!initialCameraDisabledState)
+													e.currentTarget.style.transform = 'scale(1.1)'
+											}}
+											onMouseOut={e => {
+												if (!initialCameraDisabledState)
+													e.currentTarget.style.transform = 'scale(1)'
+											}}
+											onMouseDown={e => {
+												if (!initialCameraDisabledState)
+													e.currentTarget.style.transform = 'scale(0.9)'
+											}}
+											onMouseUp={e => {
+												if (!initialCameraDisabledState)
+													e.currentTarget.style.transform = 'scale(1.1)'
+											}}
+											disabled={initialCameraDisabledState}
 										>
 											{isCameraDisabled ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
 										</DropdownMenu.Item>
