@@ -185,6 +185,7 @@ export default function UserList({
 									<span
 										onClick={() => toggleRemoteCamera(clientID)}
 										style={{
+											cursor: 'pointer',
 											color:
 												participantInfo[clientID].isCameraDisabled ||
 												(clientID === localVideoId && isCameraDisabled)
