@@ -149,20 +149,19 @@ export default function RoomPage() {
 		setClientVolumes(prev => {
 			const updatedVolumes = { ...prev, [clientID]: newVolume }
 			console.log('Updated clientVolumes:', updatedVolumes)
+
+			// Update the video element directly for immediate effect
+			const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
+			if (videoElement) {
+				videoElement.volume = newVolume
+				videoElement.muted = newVolume === 0
+				console.log(`Updated video element: volume=${newVolume}, muted=${newVolume === 0}`)
+			} else {
+				console.log(`Video element not found for client ${clientID}`)
+			}
+
 			return updatedVolumes
 		})
-		updateUserVolume(clientID, newVolume)
-		// Update the video element directly for immediate effect
-		const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
-		if (videoElement) {
-			videoElement.volume = newVolume
-			videoElement.muted = newVolume === 0
-			console.log(`Updated video element: volume=${newVolume}, muted=${newVolume === 0}`)
-		} else {
-			console.log(`Video element not found for client ${clientID}`)
-		}
-
-		// Also update user volume in local storage for persistence
 		updateUserVolume(clientID, newVolume)
 	}
 
