@@ -279,6 +279,20 @@ export default function useRoomSync(
 		},
 		[participantInfo, addToast]
 	)
+	const handleTimeAndStateRequest = useCallback(
+		socketID => {
+			if (videoRef.current) {
+				const currentTime = videoRef.current.getCurrentTime()
+				const isPlaying = !videoRef.current.getInternalPlayer().paused
+				socket.emit(ACTIONS.SEND_TIME_AND_STATE, {
+					socketID,
+					time: currentTime,
+					isPlaying,
+				})
+			}
+		},
+		[videoRef]
+	)
 
 	const handlePrivateMessage = useCallback(
 		({ from }) => {
@@ -302,6 +316,7 @@ export default function useRoomSync(
 		// socket.on(ACTIONS.SYNC_CAMERA, handleCameraSync)
 		// socket.on(ACTIONS.SYNC_MICROPHONE, handleMicrophoneSync)
 		socket.on(ACTIONS.REQUEST_PARTICIPANT_INFO, handleRequestParticipantInfo)
+		socket.on(ACTIONS.REQUEST_TIME_AND_STATE, handleTimeAndStateRequest)
 		socket.on(ACTIONS.RECEIVE_PRIVATE_MESSAGE, handlePrivateMessage)
 
 		return () => {
@@ -310,6 +325,8 @@ export default function useRoomSync(
 			socket.off(ACTIONS.VIDEO_SEEK, handleSeek)
 			socket.off(ACTIONS.REQUEST_SYNC, handleSyncRequest)
 			socket.off(ACTIONS.SYNC_INFO, handleInfoSync)
+			socket.off(ACTIONS.REQUEST_TIME_AND_STATE, handleTimeAndStateRequest)
+
 			// socket.off(ACTIONS.SYNC_CAMERA, handleCameraSync)
 			// socket.off(ACTIONS.SYNC_MICROPHONE, handleMicrophoneSync)
 			socket.off(ACTIONS.REQUEST_PARTICIPANT_INFO, handleRequestParticipantInfo)
@@ -317,6 +334,7 @@ export default function useRoomSync(
 			socket.off(ACTIONS.RECEIVE_PRIVATE_MESSAGE, handlePrivateMessage)
 		}
 	}, [
+		handleTimeAndStateRequest,
 		handlePlay,
 		handlePause,
 		handleSeek,
@@ -352,6 +370,10 @@ export default function useRoomSync(
 
 	const requestSync = useCallback(() => {
 		socket.emit(ACTIONS.REQUEST_SYNC, { roomID })
+	}, [roomID])
+
+	const requestTimeAndState = useCallback(() => {
+		socket.emit(ACTIONS.REQUEST_TIME_AND_STATE, { roomID })
 	}, [roomID])
 
 	const emitInfoSync = useCallback(
@@ -396,6 +418,8 @@ export default function useRoomSync(
 		setLastSeekDirection,
 		setParticipantInfo,
 		participantInfo,
+		requestTimeAndState,
+
 		// participantCameras,
 		// participantMicrophones,
 	}

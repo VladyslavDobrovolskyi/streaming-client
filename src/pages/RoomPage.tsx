@@ -186,6 +186,7 @@ export default function RoomPage() {
 		participantInfo,
 		setParticipantInfo,
 		requestParticipantInfo,
+		requestTimeAndState,
 	} = useRoomSync(
 		roomID!,
 		playerRef,
@@ -702,6 +703,12 @@ export default function RoomPage() {
 		}, {} as Record<string, boolean>)
 		setClientCameras(prev => ({ ...prev, ...storedCameraVisibility }))
 	}, [userData])
+
+	useEffect(() => {
+		if (!isLoading) {
+			requestTimeAndState()
+		}
+	}, [isLoading, requestTimeAndState])
 
 	return (
 		<div
