@@ -73,9 +73,7 @@ export default function UserList({
 						transition: 'right 0.5s ease-in-out',
 					}}
 				>
-					<h2
-						style={{ color: 'white', padding: '5px', borderBottom: '1px solid rgba(255, 255, 255, 0.2)' }}
-					></h2>
+					<h2 style={{ color: 'white', padding: '5px' }}></h2>
 					{Object.keys(participantInfo).length === 0 && (
 						<div style={{ padding: '10px', color: 'white', textAlign: 'center' }}>
 							<p>No other participants are currently in the room.</p>
