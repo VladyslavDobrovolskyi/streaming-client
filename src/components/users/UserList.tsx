@@ -219,7 +219,7 @@ export default function UserList({
 											transition: 'transform 0.1s ease',
 										}}
 									>
-										{participantCameras[clientID] === false && (
+										{(participantCameras[clientID] === false || hideUsers) && (
 											<ImCross
 												style={{
 													position: 'absolute',
