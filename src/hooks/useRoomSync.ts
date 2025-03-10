@@ -242,6 +242,16 @@ export default function useRoomSync(
 					isMicrophoneDisabled,
 				},
 			})
+
+			if (videoRef.current) {
+				const currentTime = videoRef.current.getCurrentTime()
+				const isPlaying = !videoRef.current.getInternalPlayer().paused
+				socket.emit(ACTIONS.SYNC_STATE, {
+					roomID,
+					time: currentTime,
+					isPlaying,
+				})
+			}
 			socket.emit(ACTIONS.SEND_PARTICIPANT_INFO, {
 				roomID,
 				requesterId,
@@ -253,7 +263,7 @@ export default function useRoomSync(
 				},
 			})
 		},
-		[roomID, participantInfo, localUsername, avatar, isCameraDisabled, isMicrophoneDisabled]
+		[roomID, participantInfo, localUsername, avatar, isCameraDisabled, isMicrophoneDisabled, videoRef]
 	)
 
 	const handleClientLeave = useCallback(
