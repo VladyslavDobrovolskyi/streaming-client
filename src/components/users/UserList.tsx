@@ -40,9 +40,10 @@ export default function UserList({
 		}
 	}, [showUserList, highlightedUser, setHighlightedUser])
 
+	console.log(clients)
 	return (
 		<>
-			{clients > 1 && (
+			{clients.length > 1 && (
 				<div
 					style={{
 						display: showUserListButton ? 'block' : 'none',
