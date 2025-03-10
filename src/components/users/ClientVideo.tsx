@@ -14,26 +14,6 @@ import {
 } from '@radix-ui/react-icons'
 import { Slider } from '@radix-ui/themes'
 
-// interface ClientVideoProps {
-// 	clientID: string
-// 	provideMediaRef: (clientID: string, instance: HTMLVideoElement | null) => Promise<void>
-// 	isLocal: boolean
-// 	username: string
-// 	isCameraMuted: boolean
-// 	isMicrophoneMuted: boolean
-// 	position: { x: number; y: number }
-// 	size: { width: number; height: number; scale?: number }
-// 	onPositionChange: (clientID: string, position: { x: number; y: number }) => void
-// 	onSizeChange: (clientID: string, size: { width: number; height: number; scale?: number }) => void
-// 	onVolumeChange: (clientID: string, volume: number) => void
-// 	onCoverToggle: (clientID: string) => void
-// 	isCovered: boolean
-// 	volume: number
-// 	highlightedUser: string | null
-// 	onMouseEnter: (id: string) => void
-// 	onMouseLeave: () => void
-// }
-
 export default function ClientVideo({
 	clientID,
 	provideMediaRef,
@@ -61,6 +41,18 @@ export default function ClientVideo({
 	const [mutedBySlider, setMutedBySlider] = useState(false)
 	const videoRef = useRef<HTMLVideoElement>(null)
 
+	// This effect runs once when the component mounts to connect the videoRef to provideMediaRef
+	useEffect(() => {
+		if (videoRef.current) {
+			provideMediaRef(clientID, videoRef.current)
+		}
+
+		// Cleanup function to handle unmounting
+		return () => {
+			provideMediaRef(clientID, null)
+		}
+	}, [clientID, provideMediaRef])
+
 	useEffect(() => {
 		if (videoRef.current) {
 			// Always prioritize participantVolume as the source of truth
@@ -72,6 +64,12 @@ export default function ClientVideo({
 			// Apply volume and muted state to video element
 			videoRef.current.volume = effectiveVolume
 			videoRef.current.muted = effectiveVolume === 0 || isLocal || isMicrophoneMuted
+
+			console.log(
+				`Setting video element: volume=${effectiveVolume}, muted=${
+					effectiveVolume === 0 || isLocal || isMicrophoneMuted
+				}`
+			)
 		}
 	}, [volume, participantVolume, clientID, isLocal, isMicrophoneMuted])
 
@@ -101,6 +99,11 @@ export default function ClientVideo({
 			// When covered, set volume to 0 in participantVolume
 			onVolumeChange(clientID, 0)
 			setMuted(true)
+
+			// Directly mute the video element
+			if (videoRef.current) {
+				videoRef.current.muted = true
+			}
 		}
 	}, [isCovered, clientID, onVolumeChange])
 
@@ -112,6 +115,12 @@ export default function ClientVideo({
 			setMutedBySlider(false)
 			onVolumeChange(clientID, 0.5) // Update participantVolume
 			console.log(`Unmuting from slider: setting volume to 0.5`)
+
+			// Directly update the video element
+			if (videoRef.current) {
+				videoRef.current.volume = 0.5
+				videoRef.current.muted = isLocal || isMicrophoneMuted
+			}
 			return
 		}
 
@@ -120,30 +129,44 @@ export default function ClientVideo({
 			const newVolume = volumeBeforeMute > 0 ? volumeBeforeMute : 0.5
 			console.log(`Unmuting: setting volume to ${newVolume}`)
 			onVolumeChange(clientID, newVolume) // This updates participantVolume
+
+			// Directly update the video element
+			if (videoRef.current) {
+				videoRef.current.volume = newVolume
+				videoRef.current.muted = isLocal || isMicrophoneMuted
+			}
 		} else {
 			// Muting - save current volume and update participantVolume
 			const currentVolume = participantVolume[clientID] !== undefined ? participantVolume[clientID] : volume
 			setVolumeBeforeMute(currentVolume > 0 ? currentVolume : 0.5)
 			console.log(`Muting: saving volume ${currentVolume > 0 ? currentVolume : 0.5} and setting to 0`)
 			onVolumeChange(clientID, 0) // This updates participantVolume
+
+			// Directly update the video element
+			if (videoRef.current) {
+				videoRef.current.muted = true
+			}
 		}
 	}
-
-	// useEffect(() => {
-	// 	if (participantVolume[clientID] === 0) {
-	// 		setMuted(true)
-	// 	} else {
-	// 		setMuted(false)
-	// 	}
-	// }, [participantVolume, clientID])
 
 	const handleVolumeChange = (newVolume: number) => {
 		if (newVolume === 0) {
 			setMuted(true)
 			setMutedBySlider(true)
+
+			// Directly mute the video element
+			if (videoRef.current) {
+				videoRef.current.muted = true
+			}
 		} else {
 			setMuted(false)
 			setMutedBySlider(false)
+
+			// Directly update the video element
+			if (videoRef.current) {
+				videoRef.current.volume = newVolume
+				videoRef.current.muted = isLocal || isMicrophoneMuted
+			}
 		}
 		onVolumeChange(clientID, newVolume) // This updates participantVolume
 	}
@@ -211,11 +234,7 @@ export default function ClientVideo({
 					<video
 						width='100%'
 						height='100%'
-						ref={instance => {
-							if (instance) {
-								provideMediaRef(clientID, instance)
-							}
-						}}
+						ref={videoRef}
 						data-client-id={clientID}
 						autoPlay
 						playsInline
