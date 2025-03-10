@@ -160,7 +160,7 @@ export default function UserList({
 															top: '-5px',
 															right: '-5px',
 															color: 'white',
-															fontSize: '10px',
+															fontSize: '5px',
 														}}
 													/>
 												)}
