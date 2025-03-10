@@ -134,21 +134,17 @@ export default function RoomPage() {
 	}
 
 	const toggleRemoteMic = (clientID: string) => {
-		const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
-		if (videoElement) {
-			const currentVolume = videoElement.volume
-			if (currentVolume > 0) {
-				setClientVolumes(prev => ({ ...prev, [clientID]: 0 }))
-				videoElement.volume = 0
-				videoElement.muted = true
-			} else {
-				const previousVolume = clientVolumes[clientID] || 0.5
-				setClientVolumes(prev => ({ ...prev, [clientID]: previousVolume }))
-				videoElement.volume = previousVolume
-				videoElement.muted = previousVolume === 0
+		setClientVolumes(prev => {
+			const currentVolume = prev[clientID] || 0.5
+			const newVolume = currentVolume > 0 ? 0 : previousVolumeRef.current || 0.5
+			const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
+			if (videoElement) {
+				videoElement.volume = newVolume
+				videoElement.muted = newVolume === 0
 			}
-			updateUserVolume(clientID, videoElement.volume)
-		}
+			updateUserVolume(clientID, newVolume)
+			return { ...prev, [clientID]: newVolume }
+		})
 	}
 
 	const toggleRemoteCamera = (clientID: string) => {
