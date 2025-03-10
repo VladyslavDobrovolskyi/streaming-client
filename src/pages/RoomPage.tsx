@@ -155,6 +155,9 @@ export default function RoomPage() {
 		const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
 		if (videoElement) {
 			const currentVisibility = clientCameras[clientID]
+			if (currentVisibility === undefined) {
+				setClientCameras(prev => ({ ...prev, [clientID]: true }))
+			}
 			setClientCameras(prev => ({ ...prev, [clientID]: !currentVisibility }))
 			const parentElement = videoElement.parentElement as HTMLElement
 			if (parentElement) {
