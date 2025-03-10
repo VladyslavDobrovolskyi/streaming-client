@@ -192,7 +192,6 @@ export default function UserList({
 											) : (
 												<IoChatboxEllipsesOutline
 													style={{
-														fill: 'none',
 														position: 'relative',
 													}}
 												/>
