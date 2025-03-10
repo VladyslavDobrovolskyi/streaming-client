@@ -65,11 +65,14 @@ export default function ClientVideo({
 		if (videoRef.current) {
 			const effectiveVolume = participantVolume[clientID] !== undefined ? participantVolume[clientID] : volume
 
-			if (volume === 0) {
+			// Set muted state based on volume
+			if (effectiveVolume === 0) {
 				setMuted(true)
 			}
-			videoRef.current.volume = muted ? 0 : effectiveVolume
-			videoRef.current.muted = muted || isLocal || isMicrophoneMuted
+
+			// Always apply muted state to the video element
+			videoRef.current.volume = effectiveVolume
+			videoRef.current.muted = muted || isLocal || isMicrophoneMuted || effectiveVolume === 0
 			onVolumeChange(clientID, effectiveVolume)
 		}
 	}, [volume, muted, isLocal, isMicrophoneMuted, participantVolume, clientID, onVolumeChange])
@@ -81,7 +84,9 @@ export default function ClientVideo({
 			console.log(`ClientVideo: Volume for ${clientID} changed to ${newVolume}`)
 
 			// Update muted state based on volume
-			setMuted(newVolume === 0)
+			if (newVolume === 0) {
+				setMuted(true)
+			}
 
 			// Also update the video element's volume directly
 			if (videoRef.current) {
@@ -93,6 +98,14 @@ export default function ClientVideo({
 			}
 		}
 	}, [participantVolume, clientID, isLocal, isMicrophoneMuted])
+
+	// Add this new useEffect to handle the isCovered state
+	useEffect(() => {
+		if (isCovered && videoRef.current) {
+			videoRef.current.muted = true
+			setMuted(true)
+		}
+	}, [isCovered])
 
 	const handleToggleMuted = volume => {
 		console.log(`handleToggleMuted called with volume ${volume}, current muted state: ${muted}`)
@@ -111,12 +124,24 @@ export default function ClientVideo({
 			const newVolume = volumeBeforeMute > 0 ? volumeBeforeMute : 0.5
 			console.log(`Unmuting: setting volume to ${newVolume}`)
 			onVolumeChange(clientID, newVolume)
+
+			// Directly update the video element
+			if (videoRef.current) {
+				videoRef.current.muted = isLocal || isMicrophoneMuted
+				videoRef.current.volume = newVolume
+			}
 		} else {
 			// Muting
 			setVolumeBeforeMute(volume > 0 ? volume : 0.5)
 			setMuted(true)
 			console.log(`Muting: saving volume ${volume > 0 ? volume : 0.5} and setting to 0`)
 			onVolumeChange(clientID, 0)
+
+			// Directly update the video element
+			if (videoRef.current) {
+				videoRef.current.muted = true
+				videoRef.current.volume = 0
+			}
 		}
 	}
 
