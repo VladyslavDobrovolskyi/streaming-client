@@ -58,18 +58,6 @@ export default function ClientVideo({
 	const [mutedBySlider, setMutedBySlider] = useState(false)
 	const videoRef = useRef<HTMLVideoElement>(null)
 
-	useEffect(() => {
-		if (videoRef.current) {
-			const effectiveVolume = participantVolume[clientID] !== undefined ? participantVolume[clientID] : volume
-			if (effectiveVolume === 0) {
-				setMuted(true)
-			}
-			videoRef.current.volume = muted ? 0 : effectiveVolume
-			videoRef.current.muted = muted || isLocal || isMicrophoneMuted
-			onVolumeChange(clientID, effectiveVolume)
-		}
-	}, [volume, muted, isLocal, isMicrophoneMuted, participantVolume, clientID, onVolumeChange])
-
 	const handleToggleMuted = volume => {
 		if (mutedBySlider) {
 			setMuted(false)
@@ -106,6 +94,19 @@ export default function ClientVideo({
 		}
 		onVolumeChange(clientID, newVolume)
 	}
+
+	useEffect(() => {
+		if (videoRef.current) {
+			const effectiveVolume = participantVolume[clientID] !== undefined ? participantVolume[clientID] : volume
+
+			if (effectiveVolume === 0) {
+				handleVolumeChange(0)
+			}
+			videoRef.current.volume = muted ? 0 : effectiveVolume
+			videoRef.current.muted = muted || isLocal || isMicrophoneMuted
+			onVolumeChange(clientID, effectiveVolume)
+		}
+	}, [volume, muted, isLocal, isMicrophoneMuted, participantVolume, clientID, onVolumeChange, handleVolumeChange])
 
 	const getVolumeIcon = (volume: number) => {
 		const IconStyles = {
