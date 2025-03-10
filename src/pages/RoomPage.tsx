@@ -134,21 +134,8 @@ export default function RoomPage() {
 	}
 
 	const hideAllUsers = () => {
-		// Toggle the hideUsers state
-		setHideUsers(prevState => {
-			const newHideUsersState = !prevState
-
-			// Update clientCameras based on the new hideUsers state
-			Object.keys(participantInfo).forEach(clientID => {
-				if (clientID !== localPeerId) {
-					// If we're hiding users, set camera to false
-					// If we're showing users, set camera to true
-					setClientCameras(prev => ({ ...prev, [clientID]: !newHideUsersState }))
-				}
-			})
-
-			return newHideUsersState
-		})
+		// Toggle the hideUsers state without affecting individual camera states
+		setHideUsers(prevState => !prevState)
 	}
 
 	const toggleRemoteMic = (clientID: string) => {
