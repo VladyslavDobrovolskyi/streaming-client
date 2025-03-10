@@ -20,7 +20,7 @@ interface ActionIndicatorProps {
 
 const ActionIndicator: React.FC<ActionIndicatorProps> = ({ action, volume }) => {
 	const getIcon = () => {
-		const iconStyle = { transform: 'scale(2.5)', color: 'white' }
+		const iconStyle = { transform: 'scale(2.5)', color: 'white', opacity: '0.8' }
 		switch (action) {
 			case 'play':
 				return <PlayIcon style={iconStyle} />

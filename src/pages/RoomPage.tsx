@@ -217,6 +217,7 @@ export default function RoomPage() {
 
 		if (!showControls) {
 			setShowUserList(false)
+			setHighlightedUser(null)
 		}
 	}, [showControls])
 
