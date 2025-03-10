@@ -60,10 +60,11 @@ export default function ClientVideo({
 
 	useEffect(() => {
 		if (videoRef.current) {
-			videoRef.current.volume = muted ? 0 : volume
+			const effectiveVolume = participantVolume[clientID] !== undefined ? participantVolume[clientID] : volume
+			videoRef.current.volume = muted ? 0 : effectiveVolume
 			videoRef.current.muted = muted || isLocal || isMicrophoneMuted
 		}
-	}, [volume, muted, isLocal, isMicrophoneMuted])
+	}, [volume, muted, isLocal, isMicrophoneMuted, participantVolume, clientID])
 
 	const handleToggleMuted = volume => {
 		if (mutedBySlider) {
