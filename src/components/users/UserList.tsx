@@ -157,10 +157,8 @@ export default function UserList({
 													<ImCross
 														style={{
 															position: 'absolute',
-															top: '-5px',
-															right: '-5px',
 															color: 'white',
-															transform: 'scale(0.5)',
+															transform: 'scale(0.7)',
 														}}
 													/>
 												)}
