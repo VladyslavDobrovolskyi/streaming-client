@@ -308,6 +308,7 @@ export default function useRoomSync(
 					isPlaying,
 				})
 			}
+			console.log('Received time and state request. Sending time and state')
 		},
 		[videoRef]
 	)
@@ -395,6 +396,7 @@ export default function useRoomSync(
 
 	const requestTimeAndState = useCallback(() => {
 		socket.emit(ACTIONS.REQUEST_TIME_AND_STATE, { roomID })
+		console.log('Requesting time and state')
 	}, [roomID])
 
 	const emitInfoSync = useCallback(
