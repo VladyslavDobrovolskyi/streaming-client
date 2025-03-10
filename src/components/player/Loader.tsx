@@ -1,11 +1,7 @@
 import React from 'react'
 import { GearIcon } from '@radix-ui/react-icons' // Adjust the import path as necessary
 
-interface LoaderProps {
-	isLoading: boolean
-}
-
-const Loader: React.FC<LoaderProps> = ({ isLoading }) => {
+const Loader: React.FC = () => {
 	return (
 		<div
 			style={{
@@ -24,11 +20,11 @@ const Loader: React.FC<LoaderProps> = ({ isLoading }) => {
 						width: '3rem',
 						height: '3rem',
 						animation: 'spin 1s linear infinite',
-						transform: 'scale(1.5)',
+						transform: 'scale(2)',
 						color: 'white',
 					}}
 				/>
-				<p style={{ color: 'white', fontWeight: '500' }}>{isLoading ? 'Loading...' : 'Buffering...'}</p>
+				{/* <p style={{ color: 'white', fontWeight: '500' }}>{isLoading ? 'Loading...' : 'Buffering...'}</p> */}
 			</div>
 		</div>
 	)
