@@ -51,6 +51,7 @@ export default function ClientVideo({
 	highlightedUser,
 	onMouseEnter,
 	onMouseLeave,
+	toggleCamera,
 }) {
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
 	const [volumeBeforeMute, setVolumeBeforeMute] = useState(0)
@@ -222,8 +223,7 @@ export default function ClientVideo({
 								<EyeOpenIcon
 									style={{ color: 'white', transform: 'scale(1)' }}
 									onClick={() => {
-										onCoverToggle(clientID)
-										handleToggleMuted(volume)
+										toggleCamera(clientID)
 									}}
 								/>
 							</div>

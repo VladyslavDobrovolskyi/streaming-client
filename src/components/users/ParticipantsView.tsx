@@ -10,6 +10,7 @@ export default function ParticipantsView({
 	localVideoId,
 	isCameraDisabled,
 	isMicrophoneDisabled,
+	toggleRemoteCamera,
 	clientPositions,
 	clientSizes,
 	coveredClients,
@@ -67,6 +68,7 @@ export default function ParticipantsView({
 						provideMediaRef={provideMediaRef}
 						isLocal={clientID === localVideoId}
 						participantVolume={clientVolumes}
+						toggleCamera={() => toggleRemoteCamera(clientID)}
 						// username={participantData.username || 'Anonymous'}
 						isCameraMuted={isCameraMuted}
 						isMicrophoneMuted={

@@ -760,6 +760,7 @@ export default function RoomPage() {
 				clientPositions={clientPositions}
 				clientSizes={clientSizes}
 				coveredClients={coveredClients}
+				toggleRemoteCamera={toggleRemoteCamera}
 				clientVolumes={clientVolumes}
 				highlightedUser={highlightedUser}
 				onPositionChange={(id, pos) => {
