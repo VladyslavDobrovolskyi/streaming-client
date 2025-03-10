@@ -14,7 +14,15 @@ const Loader: React.FC = () => {
 				zIndex: 40,
 			}}
 		>
-			<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
+			<div
+				style={{
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center',
+					gap: '0.75rem',
+					transform: 'scale(2)',
+				}}
+			>
 				<GearIcon
 					style={{
 						width: '3rem',
