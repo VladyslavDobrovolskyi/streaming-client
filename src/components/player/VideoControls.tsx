@@ -18,7 +18,7 @@ import {
 import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
 import { IoMdChatboxes } from 'react-icons/io'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 
 export default function VideoControls({
 	isPlaying,
@@ -63,6 +63,23 @@ export default function VideoControls({
 	getSpeakerIcon,
 }) {
 	const sliderRef = useRef<HTMLDivElement>(null)
+	const [tooltipText, setTooltipText] = useState('')
+	const [tooltipVisible, setTooltipVisible] = useState(false)
+	const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
+
+	const showTooltip = (text, event) => {
+		setTooltipText(text)
+		setTooltipVisible(true)
+		// Position the tooltip near the cursor but slightly offset
+		setTooltipPosition({
+			x: event.clientX + 10,
+			y: event.clientY - 30,
+		})
+	}
+
+	const hideTooltip = () => {
+		setTooltipVisible(false)
+	}
 
 	return (
 		<div
@@ -312,68 +329,82 @@ export default function VideoControls({
 											event.preventDefault()
 											onMicMuteUnmute()
 										}}
-										onMouseEnter={() => onHoveredItemChange('mic')}
-										onMouseLeave={() => onHoveredItemChange(null)}
+										onMouseEnter={event => {
+											onHoveredItemChange('mic')
+											showTooltip('Microphone', event)
+										}}
+										onMouseLeave={() => {
+											onHoveredItemChange(null)
+											hideTooltip()
+										}}
 										style={{
 											padding: '8px 12px',
 											cursor: 'pointer',
 											display: 'flex',
 											alignItems: 'center',
-											gap: '8px',
+											justifyContent: 'center',
 											backgroundColor:
 												hoveredItem === 'mic' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
 											color: 'white',
 											border: 'none',
 											width: '100%', // Ensure the item takes full width
-											textAlign: 'left',
+											textAlign: 'center',
 											outline: 'none',
 											boxSizing: 'border-box', // Add this to include padding in width calculation
-											justifyContent: 'flex-start',
 										}}
 									>
 										{isMicrophoneDisabled ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
-										<span style={{ marginLeft: '8px' }}>Microphone</span>
 									</DropdownMenu.Item>
 									<DropdownMenu.Item
 										onSelect={event => {
 											event.preventDefault()
 											onCameraMuteUnmute()
 										}}
-										onMouseEnter={() => onHoveredItemChange('camera')}
-										onMouseLeave={() => onHoveredItemChange(null)}
+										onMouseEnter={event => {
+											onHoveredItemChange('camera')
+											showTooltip('Camera', event)
+										}}
+										onMouseLeave={() => {
+											onHoveredItemChange(null)
+											hideTooltip()
+										}}
 										style={{
 											padding: '8px 12px',
 											cursor: 'pointer',
 											display: 'flex',
 											alignItems: 'center',
-											gap: '8px',
+											justifyContent: 'center',
 											backgroundColor:
 												hoveredItem === 'camera' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
 											color: 'white',
 											border: 'none',
 											width: '100%', // Ensure the item takes full width
-											textAlign: 'left',
+											textAlign: 'center',
 											outline: 'none',
 											boxSizing: 'border-box', // Add this to include padding in width calculation
-											justifyContent: 'flex-start',
 										}}
 									>
 										{isCameraDisabled ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
-										<span style={{ marginLeft: '8px' }}>Camera</span>
 									</DropdownMenu.Item>
 									<DropdownMenu.Item
 										onSelect={event => {
 											event.preventDefault()
 											onMovieModeToggle()
 										}}
-										onMouseEnter={() => onHoveredItemChange('movieMode')}
-										onMouseLeave={() => onHoveredItemChange(null)}
+										onMouseEnter={event => {
+											onHoveredItemChange('movieMode')
+											showTooltip('Movie Mode', event)
+										}}
+										onMouseLeave={() => {
+											onHoveredItemChange(null)
+											hideTooltip()
+										}}
 										style={{
 											padding: '8px 12px',
 											cursor: 'pointer',
 											display: 'flex',
 											alignItems: 'center',
-											gap: '8px',
+											justifyContent: 'center',
 											backgroundColor:
 												hoveredItem === 'movieMode'
 													? 'rgba(255, 255, 255, 0.1)'
@@ -381,14 +412,12 @@ export default function VideoControls({
 											color: 'white',
 											border: 'none',
 											width: '100%', // Ensure the item takes full width
-											textAlign: 'left',
+											textAlign: 'center',
 											outline: 'none',
 											boxSizing: 'border-box', // Add this to include padding in width calculation
-											justifyContent: 'flex-start',
 										}}
 									>
 										{isMovieMode ? <SectionIcon /> : <SquareIcon />}
-										<span style={{ marginLeft: '8px' }}>Movie Mode</span>
 									</DropdownMenu.Item>
 									<DropdownMenu.Item
 										onSelect={event => {
@@ -397,29 +426,33 @@ export default function VideoControls({
 												hideMeToggle()
 											}
 										}}
-										onMouseEnter={() => onHoveredItemChange('hideMe')}
-										onMouseLeave={() => onHoveredItemChange(null)}
+										onMouseEnter={event => {
+											onHoveredItemChange('hideMe')
+											showTooltip('Hide Me', event)
+										}}
+										onMouseLeave={() => {
+											onHoveredItemChange(null)
+											hideTooltip()
+										}}
 										style={{
 											padding: '8px 12px',
 											cursor: isCameraDisabled ? 'not-allowed' : 'pointer',
 											display: 'flex',
 											alignItems: 'center',
-											gap: '8px',
+											justifyContent: 'center',
 											backgroundColor:
 												hoveredItem === 'hideMe' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
 											color: isCameraDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
 											border: 'none',
 											width: '100%', // Ensure the item takes full width
-											textAlign: 'left',
+											textAlign: 'center',
 											outline: 'none',
 											opacity: isCameraDisabled ? 0.5 : 1,
 											boxSizing: 'border-box', // Add this to include padding in width calculation
-											justifyContent: 'flex-start',
 										}}
 										disabled={isCameraDisabled}
 									>
 										{hideMe ? <EyeOpenIcon /> : <EyeClosedIcon />}
-										<span style={{ marginLeft: '8px' }}>Hide Me</span>
 									</DropdownMenu.Item>
 								</DropdownMenu.Content>
 							</div>
@@ -455,6 +488,27 @@ export default function VideoControls({
 					alignItems: 'center',
 				}}
 			></button>
+
+			{/* Custom tooltip */}
+			{tooltipVisible && (
+				<div
+					style={{
+						position: 'fixed',
+						left: `${tooltipPosition.x}px`,
+						top: `${tooltipPosition.y}px`,
+						backgroundColor: 'rgba(0, 0, 0, 0.8)',
+						color: 'white',
+						padding: '4px 8px',
+						borderRadius: '4px',
+						fontSize: '12px',
+						zIndex: 10000,
+						pointerEvents: 'none',
+						transform: 'translateX(-50%)',
+					}}
+				>
+					{tooltipText}
+				</div>
+			)}
 		</div>
 	)
 }
