@@ -90,7 +90,7 @@ export default function UserList({
 										padding: '10px',
 										borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
 										backgroundColor:
-											highlightedUser === clientID ? 'rgba(0, 255, 255,0.4)' : 'transparent',
+											highlightedUser === clientID ? 'var(--accent-color-main' : 'transparent',
 										display: 'flex',
 										alignItems: 'center',
 										gap: '10px',

@@ -131,7 +131,9 @@ export default function ClientVideo({
 						cursor: 'default',
 						display: isCameraMuted ? 'none' : 'block',
 						border:
-							highlightedUser === clientID ? '3px solid rgba(0, 255, 255,0.4)' : '3px solid transparent',
+							highlightedUser === clientID
+								? '3px solid var(--accent-color-main'
+								: '3px solid transparent',
 						boxShadow: highlightedUser === clientID ? '0 0 10px cyan' : 'none',
 						borderRadius: 'var(--radius-4)',
 						transform: `scale(${size.scale || 1})`,
