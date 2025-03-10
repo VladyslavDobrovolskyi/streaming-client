@@ -824,6 +824,7 @@ export default function RoomPage() {
 				showUserListButton={showUserListButton}
 				parcipantVolume={clientVolumes}
 				hideUsers={hideUsers}
+				privateChats={privateChats}
 			/>
 			{showChat && (
 				<RoomChat
