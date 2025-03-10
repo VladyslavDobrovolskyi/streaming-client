@@ -694,6 +694,9 @@ export default function RoomPage() {
 		const storedCameraVisibility = Object.entries(userData).reduce((acc, [clientId, data]) => {
 			if (data.cameraVisible !== undefined) {
 				acc[clientId] = data.cameraVisible
+				if (clientId === LOCAL_VIDEO) {
+					setHideMe(!data.cameraVisible)
+				}
 			}
 			return acc
 		}, {} as Record<string, boolean>)
