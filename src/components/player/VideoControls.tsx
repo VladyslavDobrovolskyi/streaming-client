@@ -70,11 +70,16 @@ export default function VideoControls({
 	const showTooltip = (text, event) => {
 		setTooltipText(text)
 		setTooltipVisible(true)
-		// Position the tooltip near the cursor but slightly offset
-		setTooltipPosition({
-			x: event.clientX + 10,
-			y: event.clientY - 30,
-		})
+
+		// Get the dropdown menu position
+		const menuRect = document.querySelector('.dropdown-menu-content')?.getBoundingClientRect()
+		if (menuRect) {
+			// Position the tooltip to the left of the menu at the same vertical level as the cursor
+			setTooltipPosition({
+				x: menuRect.left - 10, // 10px to the left of the menu
+				y: event.clientY,
+			})
+		}
 	}
 
 	const hideTooltip = () => {
@@ -311,6 +316,7 @@ export default function VideoControls({
 								}}
 							>
 								<DropdownMenu.Content
+									className='dropdown-menu-content'
 									onMouseEnter={() => {
 										setShowControls(true)
 									}}
@@ -320,8 +326,8 @@ export default function VideoControls({
 										borderRadius: '4px',
 										padding: '4px',
 										zIndex: 9999,
-										overflow: 'hidden', // Add this to prevent content from overflowing
-										width: '100%', // Ensure the content takes full width of its container
+										overflow: 'hidden',
+										width: '100%',
 									}}
 								>
 									<DropdownMenu.Item
@@ -347,10 +353,10 @@ export default function VideoControls({
 												hoveredItem === 'mic' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
 											color: 'white',
 											border: 'none',
-											width: '100%', // Ensure the item takes full width
+											width: '100%',
 											textAlign: 'center',
 											outline: 'none',
-											boxSizing: 'border-box', // Add this to include padding in width calculation
+											boxSizing: 'border-box',
 										}}
 									>
 										{isMicrophoneDisabled ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
@@ -378,10 +384,10 @@ export default function VideoControls({
 												hoveredItem === 'camera' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
 											color: 'white',
 											border: 'none',
-											width: '100%', // Ensure the item takes full width
+											width: '100%',
 											textAlign: 'center',
 											outline: 'none',
-											boxSizing: 'border-box', // Add this to include padding in width calculation
+											boxSizing: 'border-box',
 										}}
 									>
 										{isCameraDisabled ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
@@ -411,10 +417,10 @@ export default function VideoControls({
 													: 'transparent',
 											color: 'white',
 											border: 'none',
-											width: '100%', // Ensure the item takes full width
+											width: '100%',
 											textAlign: 'center',
 											outline: 'none',
-											boxSizing: 'border-box', // Add this to include padding in width calculation
+											boxSizing: 'border-box',
 										}}
 									>
 										{isMovieMode ? <SectionIcon /> : <SquareIcon />}
@@ -444,11 +450,11 @@ export default function VideoControls({
 												hoveredItem === 'hideMe' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
 											color: isCameraDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
 											border: 'none',
-											width: '100%', // Ensure the item takes full width
+											width: '100%',
 											textAlign: 'center',
 											outline: 'none',
 											opacity: isCameraDisabled ? 0.5 : 1,
-											boxSizing: 'border-box', // Add this to include padding in width calculation
+											boxSizing: 'border-box',
 										}}
 										disabled={isCameraDisabled}
 									>
@@ -503,7 +509,8 @@ export default function VideoControls({
 						fontSize: '12px',
 						zIndex: 10000,
 						pointerEvents: 'none',
-						transform: 'translateX(-50%)',
+						transform: 'translateX(-100%)', // Move it to the left of the position
+						whiteSpace: 'nowrap',
 					}}
 				>
 					{tooltipText}
