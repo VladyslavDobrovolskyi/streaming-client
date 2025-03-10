@@ -66,18 +66,24 @@ export default function VideoControls({
 	const [tooltipText, setTooltipText] = useState('')
 	const [tooltipVisible, setTooltipVisible] = useState(false)
 	const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
+	const menuItemRefs = {
+		mic: useRef<HTMLDivElement>(null),
+		camera: useRef<HTMLDivElement>(null),
+		movieMode: useRef<HTMLDivElement>(null),
+		hideMe: useRef<HTMLDivElement>(null),
+	}
 
-	const showTooltip = (text, event) => {
+	const showTooltip = (text, itemKey) => {
 		setTooltipText(text)
 		setTooltipVisible(true)
 
-		// Get the dropdown menu position
-		const menuRect = document.querySelector('.dropdown-menu-content')?.getBoundingClientRect()
-		if (menuRect) {
-			// Position the tooltip to the left of the menu at the same vertical level as the cursor
+		// Get the position of the specific menu item
+		const itemElement = menuItemRefs[itemKey]?.current
+		if (itemElement) {
+			const rect = itemElement.getBoundingClientRect()
 			setTooltipPosition({
-				x: menuRect.left - 10, // 10px to the left of the menu
-				y: event.clientY,
+				x: rect.left - 10, // 10px to the left of the menu item
+				y: rect.top + rect.height / 2, // Vertically center with the menu item
 			})
 		}
 	}
@@ -330,136 +336,175 @@ export default function VideoControls({
 										width: '100%',
 									}}
 								>
-									<DropdownMenu.Item
-										onSelect={event => {
-											event.preventDefault()
-											onMicMuteUnmute()
-										}}
-										onMouseEnter={event => {
-											onHoveredItemChange('mic')
-											showTooltip('Microphone', event)
-										}}
-										onMouseLeave={() => {
-											onHoveredItemChange(null)
-											hideTooltip()
-										}}
+									<div
+										ref={menuItemRefs.mic}
 										style={{
-											padding: '8px 12px',
-											cursor: 'pointer',
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'center',
-											backgroundColor:
-												hoveredItem === 'mic' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
-											color: 'white',
-											border: 'none',
+											position: 'relative',
 											width: '100%',
-											textAlign: 'center',
-											outline: 'none',
-											boxSizing: 'border-box',
 										}}
 									>
-										{isMicrophoneDisabled ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
-									</DropdownMenu.Item>
-									<DropdownMenu.Item
-										onSelect={event => {
-											event.preventDefault()
-											onCameraMuteUnmute()
-										}}
-										onMouseEnter={event => {
-											onHoveredItemChange('camera')
-											showTooltip('Camera', event)
-										}}
-										onMouseLeave={() => {
-											onHoveredItemChange(null)
-											hideTooltip()
-										}}
+										<DropdownMenu.Item
+											onSelect={event => {
+												event.preventDefault()
+												onMicMuteUnmute()
+											}}
+											onMouseEnter={() => {
+												onHoveredItemChange('mic')
+												showTooltip('Microphone', 'mic')
+											}}
+											onMouseLeave={() => {
+												onHoveredItemChange(null)
+												hideTooltip()
+											}}
+											style={{
+												padding: '8px 12px',
+												cursor: 'pointer',
+												display: 'flex',
+												alignItems: 'center',
+												justifyContent: 'center',
+												backgroundColor:
+													hoveredItem === 'mic' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+												color: 'white',
+												border: 'none',
+												width: '100%',
+												textAlign: 'center',
+												outline: 'none',
+												boxSizing: 'border-box',
+											}}
+										>
+											{isMicrophoneDisabled ? <FaMicrophoneAltSlash /> : <FaMicrophoneAlt />}
+										</DropdownMenu.Item>
+									</div>
+
+									<div
+										ref={menuItemRefs.camera}
 										style={{
-											padding: '8px 12px',
-											cursor: 'pointer',
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'center',
-											backgroundColor:
-												hoveredItem === 'camera' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
-											color: 'white',
-											border: 'none',
+											position: 'relative',
 											width: '100%',
-											textAlign: 'center',
-											outline: 'none',
-											boxSizing: 'border-box',
 										}}
 									>
-										{isCameraDisabled ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
-									</DropdownMenu.Item>
-									<DropdownMenu.Item
-										onSelect={event => {
-											event.preventDefault()
-											onMovieModeToggle()
-										}}
-										onMouseEnter={event => {
-											onHoveredItemChange('movieMode')
-											showTooltip('Movie Mode', event)
-										}}
-										onMouseLeave={() => {
-											onHoveredItemChange(null)
-											hideTooltip()
-										}}
+										<DropdownMenu.Item
+											onSelect={event => {
+												event.preventDefault()
+												onCameraMuteUnmute()
+											}}
+											onMouseEnter={() => {
+												onHoveredItemChange('camera')
+												showTooltip('Camera', 'camera')
+											}}
+											onMouseLeave={() => {
+												onHoveredItemChange(null)
+												hideTooltip()
+											}}
+											style={{
+												padding: '8px 12px',
+												cursor: 'pointer',
+												display: 'flex',
+												alignItems: 'center',
+												justifyContent: 'center',
+												backgroundColor:
+													hoveredItem === 'camera'
+														? 'rgba(255, 255, 255, 0.1)'
+														: 'transparent',
+												color: 'white',
+												border: 'none',
+												width: '100%',
+												textAlign: 'center',
+												outline: 'none',
+												boxSizing: 'border-box',
+											}}
+										>
+											{isCameraDisabled ? <BsCameraVideoOffFill /> : <BsCameraVideoFill />}
+										</DropdownMenu.Item>
+									</div>
+
+									<div
+										ref={menuItemRefs.movieMode}
 										style={{
-											padding: '8px 12px',
-											cursor: 'pointer',
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'center',
-											backgroundColor:
-												hoveredItem === 'movieMode'
-													? 'rgba(255, 255, 255, 0.1)'
-													: 'transparent',
-											color: 'white',
-											border: 'none',
+											position: 'relative',
 											width: '100%',
-											textAlign: 'center',
-											outline: 'none',
-											boxSizing: 'border-box',
 										}}
 									>
-										{isMovieMode ? <SectionIcon /> : <SquareIcon />}
-									</DropdownMenu.Item>
-									<DropdownMenu.Item
-										onSelect={event => {
-											event.preventDefault()
-											if (!isCameraDisabled) {
-												hideMeToggle()
-											}
-										}}
-										onMouseEnter={event => {
-											onHoveredItemChange('hideMe')
-											showTooltip('Hide Me', event)
-										}}
-										onMouseLeave={() => {
-											onHoveredItemChange(null)
-											hideTooltip()
-										}}
+										<DropdownMenu.Item
+											onSelect={event => {
+												event.preventDefault()
+												onMovieModeToggle()
+											}}
+											onMouseEnter={() => {
+												onHoveredItemChange('movieMode')
+												showTooltip('Movie Mode', 'movieMode')
+											}}
+											onMouseLeave={() => {
+												onHoveredItemChange(null)
+												hideTooltip()
+											}}
+											style={{
+												padding: '8px 12px',
+												cursor: 'pointer',
+												display: 'flex',
+												alignItems: 'center',
+												justifyContent: 'center',
+												backgroundColor:
+													hoveredItem === 'movieMode'
+														? 'rgba(255, 255, 255, 0.1)'
+														: 'transparent',
+												color: 'white',
+												border: 'none',
+												width: '100%',
+												textAlign: 'center',
+												outline: 'none',
+												boxSizing: 'border-box',
+											}}
+										>
+											{isMovieMode ? <SectionIcon /> : <SquareIcon />}
+										</DropdownMenu.Item>
+									</div>
+
+									<div
+										ref={menuItemRefs.hideMe}
 										style={{
-											padding: '8px 12px',
-											cursor: isCameraDisabled ? 'not-allowed' : 'pointer',
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'center',
-											backgroundColor:
-												hoveredItem === 'hideMe' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
-											color: isCameraDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
-											border: 'none',
+											position: 'relative',
 											width: '100%',
-											textAlign: 'center',
-											outline: 'none',
-											opacity: isCameraDisabled ? 0.5 : 1,
-											boxSizing: 'border-box',
 										}}
-										disabled={isCameraDisabled}
 									>
-										{hideMe ? <EyeOpenIcon /> : <EyeClosedIcon />}
-									</DropdownMenu.Item>
+										<DropdownMenu.Item
+											onSelect={event => {
+												event.preventDefault()
+												if (!isCameraDisabled) {
+													hideMeToggle()
+												}
+											}}
+											onMouseEnter={() => {
+												onHoveredItemChange('hideMe')
+												showTooltip('Hide Me', 'hideMe')
+											}}
+											onMouseLeave={() => {
+												onHoveredItemChange(null)
+												hideTooltip()
+											}}
+											style={{
+												padding: '8px 12px',
+												cursor: isCameraDisabled ? 'not-allowed' : 'pointer',
+												display: 'flex',
+												alignItems: 'center',
+												justifyContent: 'center',
+												backgroundColor:
+													hoveredItem === 'hideMe'
+														? 'rgba(255, 255, 255, 0.1)'
+														: 'transparent',
+												color: isCameraDisabled ? 'rgba(255, 255, 255, 0.5)' : 'white',
+												border: 'none',
+												width: '100%',
+												textAlign: 'center',
+												outline: 'none',
+												opacity: isCameraDisabled ? 0.5 : 1,
+												boxSizing: 'border-box',
+											}}
+											disabled={isCameraDisabled}
+										>
+											{hideMe ? <EyeOpenIcon /> : <EyeClosedIcon />}
+										</DropdownMenu.Item>
+									</div>
 								</DropdownMenu.Content>
 							</div>
 						)}
@@ -509,7 +554,7 @@ export default function VideoControls({
 						fontSize: '12px',
 						zIndex: 10000,
 						pointerEvents: 'none',
-						transform: 'translateX(-100%)', // Move it to the left of the position
+						transform: 'translateX(-100%) translateY(-50%)', // Move it to the left and center vertically
 						whiteSpace: 'nowrap',
 					}}
 				>
