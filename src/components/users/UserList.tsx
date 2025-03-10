@@ -40,7 +40,6 @@ export default function UserList({
 		}
 	}, [showUserList, highlightedUser, setHighlightedUser])
 
-	console.log(clients)
 	return (
 		<>
 			{clients.length > 1 && (
@@ -70,7 +69,7 @@ export default function UserList({
 				</div>
 			)}
 
-			{showUserList && (
+			{showUserList && clients.length > 1 && (
 				<div
 					style={{
 						position: 'absolute',
