@@ -137,6 +137,17 @@ export default function RoomPage() {
 		setClientVolumes(prev => {
 			const currentVolume = prev[clientID] || 0.5
 			const newVolume = currentVolume > 0 ? 0 : 0.5
+
+			// Update the video element directly for immediate effect
+			const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
+			if (videoElement) {
+				videoElement.volume = newVolume
+				videoElement.muted = newVolume === 0
+			}
+
+			// Also update user volume in local storage for persistence
+			updateUserVolume(clientID, newVolume)
+
 			return { ...prev, [clientID]: newVolume }
 		})
 	}

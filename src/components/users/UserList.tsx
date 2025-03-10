@@ -131,7 +131,15 @@ export default function UserList({
 										</p>
 									</div>
 									<span
-										onClick={() => toggleRemoteMic(clientID)}
+										onClick={event => {
+											toggleRemoteMic(clientID)
+											// Add a visual feedback for the click
+											const element = event.currentTarget
+											element.style.transform = 'scale(0.9)'
+											setTimeout(() => {
+												element.style.transform = 'scale(1)'
+											}, 100)
+										}}
 										style={{
 											color:
 												clientID === localVideoId
@@ -143,7 +151,8 @@ export default function UserList({
 													: 'rgba(165, 247, 65, 0.7)',
 											opacity: participantVolume[clientID] === 0 ? 0.3 : 1,
 											cursor: 'pointer',
-											position: 'relative', // Add position relative for absolute positioning of overlay
+											position: 'relative',
+											transition: 'transform 0.1s ease',
 										}}
 									>
 										{participantVolume[clientID] === 0 && (

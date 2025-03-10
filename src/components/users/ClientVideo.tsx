@@ -69,12 +69,18 @@ export default function ClientVideo({
 	}, [volume, muted, isLocal, isMicrophoneMuted, participantVolume, clientID, onVolumeChange])
 
 	useEffect(() => {
-		if (participantVolume[clientID] === 0) {
-			setMuted(true)
-		} else {
-			setMuted(false)
+		// Check if this client's volume is defined in participantVolume
+		if (participantVolume && clientID in participantVolume) {
+			// Update muted state based on volume
+			setMuted(participantVolume[clientID] === 0)
+
+			// Also update the video element's volume directly
+			if (videoRef.current) {
+				videoRef.current.volume = participantVolume[clientID]
+				videoRef.current.muted = participantVolume[clientID] === 0 || isLocal || isMicrophoneMuted
+			}
 		}
-	}, [participantVolume, clientID])
+	}, [participantVolume, clientID, isLocal, isMicrophoneMuted])
 
 	const handleToggleMuted = volume => {
 		if (mutedBySlider) {
@@ -85,15 +91,15 @@ export default function ClientVideo({
 		}
 
 		if (muted) {
+			// Unmuting
 			setMuted(false)
-			onVolumeChange(clientID, volumeBeforeMute)
-
-			return
+			const newVolume = volumeBeforeMute > 0 ? volumeBeforeMute : 0.5
+			onVolumeChange(clientID, newVolume)
 		} else {
-			setVolumeBeforeMute(volume)
+			// Muting
+			setVolumeBeforeMute(volume > 0 ? volume : 0.5)
 			setMuted(true)
 			onVolumeChange(clientID, 0)
-			return
 		}
 	}
 
