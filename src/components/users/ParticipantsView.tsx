@@ -13,6 +13,7 @@ export default function ParticipantsView({
 	toggleRemoteCamera,
 	clientPositions,
 	clientSizes,
+	clientCameras,
 	coveredClients,
 	clientVolumes,
 	highlightedUser,
@@ -87,6 +88,7 @@ export default function ParticipantsView({
 						onMouseEnter={() => onHighlightChange(clientID)}
 						onMouseLeave={() => onHighlightChange(null)}
 						setHideMe={setHideMe}
+						cameraStatus={clientCameras[clientID]}
 					/>
 				)
 			})}

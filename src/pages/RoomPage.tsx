@@ -757,6 +757,7 @@ export default function RoomPage() {
 				isCameraDisabled={isCameraDisabled}
 				isMicrophoneDisabled={isMicrophoneDisabled}
 				clientPositions={clientPositions}
+				clientCameras={clientCameras}
 				clientSizes={clientSizes}
 				coveredClients={coveredClients}
 				toggleRemoteCamera={toggleRemoteCamera}

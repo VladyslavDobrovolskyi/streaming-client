@@ -33,6 +33,7 @@ export default function ClientVideo({
 	onMouseEnter,
 	onMouseLeave,
 	toggleCamera,
+	cameraStatus,
 	setHideMe,
 }) {
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
@@ -234,7 +235,7 @@ export default function ClientVideo({
 				zIndex: 12000,
 				pointerEvents: 'auto',
 			}}
-			hide={isCameraMuted}
+			hide={isCameraMuted || cameraStatus === false}
 		>
 			{({ isDragging }) => (
 				<div
