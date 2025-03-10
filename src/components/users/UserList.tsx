@@ -88,9 +88,10 @@ export default function UserList({
 									key={clientID}
 									style={{
 										padding: '10px',
-										borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+										border: '3px solid rgba(255, 255, 255, 1)',
+										borderRadius: 'var(--radius-4)',
 										backgroundColor:
-											highlightedUser === clientID ? 'var(--accent-color-main' : 'transparent',
+											highlightedUser === clientID ? 'rgba(255,255,255,0.2)' : 'transparent',
 										display: 'flex',
 										alignItems: 'center',
 										gap: '10px',
