@@ -684,15 +684,20 @@ export default function RoomPage() {
 
 	// Add this effect to track new room chat messages
 	useEffect(() => {
+		// Only count unread messages when the chat is closed
 		if (!showChat && chatMessages.length > 0) {
 			// Only increment for messages that arrived after the chat was last closed
 			if (chatMessages.length > lastSeenMessageCountRef.current) {
 				setUnreadRoomMessages(chatMessages.length - lastSeenMessageCountRef.current)
 			}
+		} else if (showChat) {
+			// When chat is open, keep the lastSeenMessageCount updated with the current message count
+			// This ensures we're always tracking the latest seen message
+			lastSeenMessageCountRef.current = chatMessages.length
 		}
 	}, [chatMessages, showChat])
 
-	// Modify the handleToggleChat function to update the last seen count when opening and closing chat
+	// Modify the handleToggleChat function to update the last seen count when opening chat
 	const handleToggleChat = () => {
 		if (!showChat) {
 			// Opening the chat - reset unread count and update last seen
