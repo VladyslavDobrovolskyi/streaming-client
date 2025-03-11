@@ -331,22 +331,22 @@ export default function VideoControls({
 									position: 'absolute',
 									top: '-5px',
 									right: '-5px',
-									backgroundColor: 'transparent',
+									backgroundColor: 'transperent',
 									opacity: '0.8',
 									color: 'white',
 									borderRadius: '50%',
-									border: '2px solid white',
-									width: unreadRoomMessages < 99 ? '18px' : '24px',
-									height: unreadRoomMessages < 99 ? '18px' : '24px',
+									border: '2px solid var(--gray-3)',
+									width: '18px',
+									height: '18px',
 									display: 'flex',
 									alignItems: 'center',
 									justifyContent: 'center',
-									fontSize: unreadRoomMessages < 99 ? '11px' : '9px',
+									fontSize: '10px',
 									fontWeight: 'bold',
 									boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
 								}}
 							>
-								{unreadRoomMessages > 99 ? '99+' : unreadRoomMessages}
+								{unreadRoomMessages > 99 ? '99' : unreadRoomMessages}
 							</div>
 						)}
 					</button>
