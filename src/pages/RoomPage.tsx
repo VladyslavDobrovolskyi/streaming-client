@@ -685,6 +685,13 @@ export default function RoomPage() {
 		setShowChat(false)
 	}
 
+	const togglePlayByMouse = () => {
+		if (!isPlaying) {
+			handlePlay()
+		} else {
+			handlePause()
+		}
+	}
 	// Add this effect to track new room chat messages
 	useEffect(() => {
 		// Only count unread messages when the chat is closed
@@ -773,6 +780,7 @@ export default function RoomPage() {
 			ref={playerWrapperRef}
 			onMouseEnter={() => setHighlightedUser(null)}
 			className={`player-wrapper ${isPlaying ? 'playing' : ''}`}
+			onClick={togglePlayByMouse}
 			onMouseMove={showControlsHandler}
 			onMouseLeave={() => {
 				if (!isDragging && !isMenuOpen) {
