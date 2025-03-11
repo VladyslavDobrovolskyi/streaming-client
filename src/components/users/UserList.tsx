@@ -293,6 +293,7 @@ export default function UserList({
 													position: 'relative',
 													transform: 'scale(0.9)',
 													paddingTop: '2px',
+													zIndex: 99999,
 													opacity: privateChats[clientID] ? 1 : 0.7,
 												}}
 											/>
@@ -301,9 +302,10 @@ export default function UserList({
 													style={{
 														fill: 'rgba(165, 247, 65, 0.7)',
 														position: 'absolute',
-														transform: 'scale(1.0)',
-														top: '0px',
-														left: '0px',
+														transform: 'scale(1.15)',
+														zIndex: 20,
+														top: '8px',
+														left: '5px',
 														opacity: privateChats[clientID] ? 1 : 0.7,
 													}}
 												/>
