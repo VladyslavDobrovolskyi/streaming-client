@@ -215,7 +215,8 @@ export default function ClientVideo({
 		// Get effective volume
 		const effectiveVolume = getEffectiveVolume()
 
-		if (muted || effectiveVolume === 0) return <SpeakerOffIcon style={{ ...IconStyles, opacity: 0.8 }} />
+		if (muted || effectiveVolume === 0)
+			return <SpeakerOffIcon style={{ ...IconStyles, opacity: 0.6, transform: 'scale(0.5)' }} />
 		if (effectiveVolume < 0.33) return <SpeakerQuietIcon style={IconStyles} />
 		if (effectiveVolume < 0.66) return <SpeakerModerateIcon style={IconStyles} />
 		return <SpeakerLoudIcon style={IconStyles} />
