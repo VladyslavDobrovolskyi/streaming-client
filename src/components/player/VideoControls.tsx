@@ -462,6 +462,9 @@ export default function VideoControls({
 									onMouseEnter={() => {
 										setShowControls(true)
 									}}
+									onMouseLeave={() => {
+										onMenuClose()
+									}}
 									style={{
 										backgroundColor: 'rgba(0, 0, 0, 0.8)',
 										borderRadius: '4px',
