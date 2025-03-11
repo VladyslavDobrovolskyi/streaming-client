@@ -333,6 +333,7 @@ export default function RoomPage() {
 		if (state.loadedSeconds > 0 && duration === 300) {
 			setDuration(playerRef.current?.getDuration() || 300)
 		}
+		console.log('Progress event:')
 	}
 
 	const handleSeekChange = (value: number[]) => {
