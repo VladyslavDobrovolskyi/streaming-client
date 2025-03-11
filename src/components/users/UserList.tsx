@@ -294,9 +294,20 @@ export default function UserList({
 													transform: 'scale(0.9)',
 													paddingTop: '2px',
 													opacity: privateChats[clientID] ? 1 : 0.7,
-													border: '2px solid rgba(165, 247, 65, 0.7)',
 												}}
 											/>
+											{privateChats[clientID] && (
+												<IoChatbox
+													style={{
+														fill: 'rgba(165, 247, 65, 0.7)',
+														position: 'absolute',
+														transform: 'scale(1.0)',
+														top: '0px',
+														left: '0px',
+														opacity: privateChats[clientID] ? 1 : 0.7,
+													}}
+												/>
+											)}
 
 											{unreadMessages[clientID] > 0 && (
 												<>
