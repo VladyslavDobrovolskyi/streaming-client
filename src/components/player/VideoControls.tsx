@@ -116,6 +116,12 @@ export default function VideoControls({
 		}
 	}, [isMenuOpen])
 
+	const clearMenuTimeout = () => {
+		if (menuTimeout) {
+			clearTimeout(menuTimeout)
+		}
+	}
+
 	const showTooltip = (text, itemKey) => {
 		setTooltipText(text)
 		setTooltipVisible(true)
@@ -463,6 +469,7 @@ export default function VideoControls({
 									ref={menuRef}
 									onMouseEnter={() => {
 										setShowControls(true)
+										clearMenuTimeout()
 									}}
 									style={{
 										backgroundColor: 'rgba(0, 0, 0, 0.8)',
