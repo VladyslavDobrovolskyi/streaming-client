@@ -863,7 +863,7 @@ export default function RoomPage() {
 					zIndex: 30,
 				}}
 			>
-				<ActionIndicator action={currentAction} volume={volume} />
+				{!isLoading && <ActionIndicator action={currentAction} volume={volume} />}
 			</div>
 			<VideoControls
 				isPlaying={isPlaying}
