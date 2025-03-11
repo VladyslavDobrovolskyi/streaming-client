@@ -705,6 +705,11 @@ export default function RoomPage() {
 	}, [userData])
 
 	useEffect(() => {
+		console.log('Clients Object:', clients)
+		console.log('Participant Info Object:', participantInfo)
+	}, [clients, participantInfo])
+
+	useEffect(() => {
 		if (!isLoading) {
 			requestTimeAndState()
 		}
