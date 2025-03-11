@@ -286,22 +286,28 @@ export default function UserList({
 												/>
 											)}
 											{unreadMessages[clientID] > 0 && (
-												<span
+												<div
 													style={{
 														position: 'absolute',
-														top: '40%',
-														left: '50%',
-														transform: 'translate(-50%, -50%) scale(1.1)',
-														fontSize: '1.2rem',
-														backgroundColor: 'transparent',
-														color: 'black',
+														top: '-5px',
+														right: '-5px',
+														backgroundColor: 'transperent',
+														opacity: '0.8',
+														color: 'white',
 														borderRadius: '50%',
+														border: '2px solid var(--gray-3)',
+														width: '18px',
+														height: '18px',
+														display: 'flex',
+														alignItems: 'center',
+														justifyContent: 'center',
+														fontSize: '10px',
 														fontWeight: 'bold',
-														opacity: 0.8,
+														boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
 													}}
 												>
-													{unreadMessages[clientID]}
-												</span>
+													{unreadMessages[clientID] > 99 ? '99' : unreadMessages[clientID]}
+												</div>
 											)}
 										</button>
 									</div>
