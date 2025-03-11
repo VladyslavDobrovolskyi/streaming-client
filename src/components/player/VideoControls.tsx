@@ -95,18 +95,16 @@ export default function VideoControls({
 		}
 
 		// Set a new timeout
-		const timeout = setTimeout(() => {
-			onMenuClose()
-		}, 3000)
-
-		setMenuTimeout(timeout as NodeJS.Timeout)
 	}
 
 	// When menu opens, start the timer
 	useEffect(() => {
 		if (isMenuOpen) {
-			startMenuCloseTimer()
-
+			setMenuTimeout(
+				setTimeout(() => {
+					onMenuClose()
+				}, 3000)
+			)
 			// Clear timeout when component unmounts or menu closes
 			return () => {
 				if (menuTimeout) {
@@ -115,12 +113,6 @@ export default function VideoControls({
 			}
 		}
 	}, [isMenuOpen])
-
-	const clearMenuTimeout = () => {
-		if (menuTimeout) {
-			clearTimeout(menuTimeout)
-		}
-	}
 
 	const showTooltip = (text, itemKey) => {
 		setTooltipText(text)
@@ -469,7 +461,6 @@ export default function VideoControls({
 									ref={menuRef}
 									onMouseEnter={() => {
 										setShowControls(true)
-										clearMenuTimeout()
 									}}
 									style={{
 										backgroundColor: 'rgba(0, 0, 0, 0.8)',
