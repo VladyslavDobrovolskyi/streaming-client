@@ -42,7 +42,7 @@ export default function UserList({
 
 	return (
 		<>
-			{clients.length > 1 && clients.length !== 0 && (
+			{clients.length >= 1 && clients.length !== 0 && (
 				<div
 					style={{
 						display: showUserListButton ? 'block' : 'none',
@@ -69,7 +69,7 @@ export default function UserList({
 				</div>
 			)}
 
-			{showUserList && clients.length > 1 && clients.length !== 0 && (
+			{showUserList && clients.length >= 1 && clients.length !== 0 && (
 				<div
 					style={{
 						position: 'absolute',
