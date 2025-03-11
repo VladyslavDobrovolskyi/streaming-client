@@ -344,7 +344,6 @@ export default function ClientVideo({
 												display: 'flex',
 												alignItems: 'center',
 											}}
-											onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.2)')}
 											onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
 											onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
 											onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.2)')}
