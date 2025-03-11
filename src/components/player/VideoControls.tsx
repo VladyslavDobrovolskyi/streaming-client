@@ -500,6 +500,7 @@ export default function VideoControls({
 											}}
 											onMouseLeave={() => {
 												onHoveredItemChange(null)
+												onMenuClose()
 												hideTooltip()
 											}}
 											style={{
@@ -574,6 +575,7 @@ export default function VideoControls({
 											}}
 											onMouseLeave={() => {
 												onHoveredItemChange(null)
+												onMenuClose()
 												hideTooltip()
 											}}
 											style={{
@@ -645,6 +647,8 @@ export default function VideoControls({
 											}}
 											onMouseLeave={() => {
 												onHoveredItemChange(null)
+												onMenuClose()
+
 												hideTooltip()
 											}}
 											style={{
@@ -696,6 +700,8 @@ export default function VideoControls({
 											}}
 											onMouseLeave={() => {
 												onHoveredItemChange(null)
+												onMenuClose()
+
 												hideTooltip()
 											}}
 											style={{
@@ -754,6 +760,8 @@ export default function VideoControls({
 											}}
 											onMouseLeave={() => {
 												onHoveredItemChange(null)
+												onMenuClose()
+
 												hideTooltip()
 											}}
 											style={{
