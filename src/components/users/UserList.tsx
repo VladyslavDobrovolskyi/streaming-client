@@ -276,6 +276,7 @@ export default function UserList({
 													style={{
 														fill: 'white',
 														position: 'relative',
+														transform: 'scale(0.9)',
 													}}
 												/>
 											) : (
@@ -289,9 +290,9 @@ export default function UserList({
 												<div
 													style={{
 														position: 'absolute',
-														top: '-5px',
-														right: '-5px',
-														backgroundColor: 'transperent',
+														top: '-6px',
+														right: '-6px',
+														backgroundColor: 'transparent',
 														opacity: '0.8',
 														color: 'white',
 														borderRadius: '50%',
