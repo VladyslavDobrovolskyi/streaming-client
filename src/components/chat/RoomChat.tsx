@@ -59,6 +59,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 			initialPosition={{ x: window.innerWidth - 640, y: window.innerHeight - 550 }}
 			disableWheelZoomClass='scroll-area'
 			bounds='parent'
+			focused={isActive}
 		>
 			{({ isDragging }) => (
 				<Box
