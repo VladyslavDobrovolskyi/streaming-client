@@ -20,14 +20,16 @@ interface ActionIndicatorProps {
 
 const ActionIndicator: React.FC<ActionIndicatorProps> = ({ action, volume }) => {
 	const getIcon = () => {
-		const iconStyle = { transform: 'scale(2.5)', color: 'rgb(139, 141, 152)', opacity: '0.9' }
+		const iconStyle = { transform: 'scale(2.5)', color: 'white', opacity: '0.9' }
 		switch (action) {
 			case 'play':
 				return <PlayIcon style={iconStyle} />
 			case 'pause':
 				return <PauseIcon style={iconStyle} />
 			case 'mute':
-				return <SpeakerOffIcon style={iconStyle} />
+				return (
+					<SpeakerOffIcon style={{ transform: 'scale(2.5)', color: 'rgb(139, 141, 152)', opacity: '0.9' }} />
+				)
 			case 'unmute':
 			case 'volume':
 				if (volume === 0) return <SpeakerOffIcon style={iconStyle} />
