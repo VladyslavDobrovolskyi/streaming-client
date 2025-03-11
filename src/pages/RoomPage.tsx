@@ -750,13 +750,14 @@ export default function RoomPage() {
 	}, [clients, participantInfo])
 
 	useEffect(() => {
-		if (playerRef.current) {
-			const playerElement = playerRef.current.getInternalPlayer()
-			if (playerElement) {
-				playerElement.onclick = isPlaying ? handlePause : handlePlay
+		if (!isLoading) {
+			if (playerRef.current) {
+				const playerElement = playerRef.current.getInternalPlayer()
+				if (playerElement) {
+					playerElement.onclick = isPlaying ? handlePause : handlePlay
+				}
 			}
 		}
-
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isLoading, isPlaying])
 
