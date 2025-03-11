@@ -267,7 +267,7 @@ export default function UserList({
 												color: 'white',
 												padding: '5px',
 												position: 'relative',
-												opacity: privateChats[clientID] ? 1 : 0.5,
+												opacity: privateChats[clientID] ? 0.5 : 1,
 												transition: 'transform 0.1s ease',
 											}}
 										>
@@ -294,7 +294,7 @@ export default function UserList({
 														top: '-8px',
 														right: '-8px',
 														backgroundColor: 'transparent',
-														opacity: '0.8',
+														opacity: '1',
 														color: 'white',
 														borderRadius: '50%',
 														border: '2px solid var(--gray-3)',
