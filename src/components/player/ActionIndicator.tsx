@@ -27,9 +27,7 @@ const ActionIndicator: React.FC<ActionIndicatorProps> = ({ action, volume }) => 
 			case 'pause':
 				return <PauseIcon style={iconStyle} />
 			case 'mute':
-				return (
-					<SpeakerOffIcon style={{ transform: 'scale(2.5)', color: 'rgb(139, 141, 152)', opacity: '0.9' }} />
-				)
+				return <SpeakerOffIcon style={{ ...iconStyle, color: 'rgb(139, 141, 152)' }} />
 			case 'unmute':
 			case 'volume':
 				if (volume === 0) return <SpeakerOffIcon style={iconStyle} />
