@@ -959,7 +959,8 @@ export default function RoomPage() {
 						/>
 					)
 			)}
-			<ToastNotifications toasts={toasts} />
+
+			{notificationStatus && <ToastNotifications toasts={toasts} />}
 		</div>
 	)
 }
