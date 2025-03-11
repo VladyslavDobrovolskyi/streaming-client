@@ -447,7 +447,6 @@ export default function VideoControls({
 						</DropdownMenu.Trigger>
 						{isMenuOpen && (
 							<div
-								onMouseLeave={onMenuClose}
 								style={{
 									position: 'fixed',
 									bottom: showControls ? '60px' : '10px',
@@ -757,7 +756,6 @@ export default function VideoControls({
 											}}
 											onMouseLeave={() => {
 												onHoveredItemChange(null)
-												onMenuClose()
 
 												hideTooltip()
 											}}
