@@ -18,7 +18,7 @@ import {
 import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
 import { IoMdChatboxes } from 'react-icons/io'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export default function VideoControls({
 	isPlaying,
@@ -75,6 +75,10 @@ export default function VideoControls({
 		movieMode: useRef<HTMLDivElement>(null),
 		hideMe: useRef<HTMLDivElement>(null),
 	}
+
+	useEffect(() => {
+		console.log('Room messages:', unreadRoomMessages)
+	}, [unreadRoomMessages])
 
 	const showTooltip = (text, itemKey) => {
 		setTooltipText(text)
