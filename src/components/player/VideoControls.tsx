@@ -73,6 +73,8 @@ export default function VideoControls({
 	const [tooltipText, setTooltipText] = useState('')
 	const [tooltipVisible, setTooltipVisible] = useState(false)
 	const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
+	const [menuTimeout, setMenuTimeout] = useState<NodeJS.Timeout | null>(null)
+	const menuRef = useRef(null)
 	const menuItemRefs = {
 		mic: useRef<HTMLDivElement>(null),
 		camera: useRef<HTMLDivElement>(null),
@@ -84,6 +86,24 @@ export default function VideoControls({
 	useEffect(() => {
 		console.log('Room messages:', unreadRoomMessages)
 	}, [unreadRoomMessages])
+
+	useEffect(() => {
+		// When menu opens, set a timeout to close it after 3 seconds
+		if (isMenuOpen) {
+			const timeout = setTimeout(() => {
+				onMenuClose()
+			}, 3000)
+
+			setMenuTimeout(timeout as NodeJS.Timeout)
+
+			// Clear timeout when component unmounts or menu closes
+			return () => {
+				if (menuTimeout) {
+					clearTimeout(menuTimeout)
+				}
+			}
+		}
+	}, [isMenuOpen])
 
 	const showTooltip = (text, itemKey) => {
 		setTooltipText(text)
@@ -429,8 +449,29 @@ export default function VideoControls({
 							>
 								<DropdownMenu.Content
 									className='dropdown-menu-content'
+									ref={menuRef}
 									onMouseEnter={() => {
 										setShowControls(true)
+										// Reset the timeout when hovering over menu items
+										if (menuTimeout) {
+											clearTimeout(menuTimeout)
+											setMenuTimeout(
+												setTimeout(() => {
+													onMenuClose()
+												}, 3000) as NodeJS.Timeout
+											)
+										}
+									}}
+									onMouseMove={() => {
+										// Also reset on mouse movement within the menu
+										if (menuTimeout) {
+											clearTimeout(menuTimeout)
+											setMenuTimeout(
+												setTimeout(() => {
+													onMenuClose()
+												}, 3000) as NodeJS.Timeout
+											)
+										}
 									}}
 									onMouseLeave={onMenuClose}
 									style={{
