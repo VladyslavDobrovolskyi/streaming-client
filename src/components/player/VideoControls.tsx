@@ -357,7 +357,7 @@ export default function VideoControls({
 										top: '23%',
 										right: '29%',
 										backgroundColor: 'var(--gray-3)',
-										opacity: 0.7,
+										opacity: 1,
 										color: 'white',
 										borderRadius: '50%',
 										border: '2px solid var(--gray-3)',
