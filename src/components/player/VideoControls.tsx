@@ -100,6 +100,23 @@ export default function VideoControls({
 		}
 	}
 
+	const pulseAnimation = `
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+`
+
 	const hideTooltip = () => {
 		setTooltipVisible(false)
 	}
@@ -331,28 +348,32 @@ export default function VideoControls({
 					>
 						<IoMdChatboxes />
 						{unreadRoomMessages > 0 && !isRoomChatIsActive && (
-							<div
-								style={{
-									position: 'absolute',
-									top: '-5px',
-									right: '-5px',
-									backgroundColor: 'transperent',
-									opacity: '0.8',
-									color: 'white',
-									borderRadius: '50%',
-									border: '2px solid var(--gray-3)',
-									width: '18px',
-									height: '18px',
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'center',
-									fontSize: '10px',
-									fontWeight: 'bold',
-									boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-								}}
-							>
-								{unreadRoomMessages > 99 ? '99' : unreadRoomMessages}
-							</div>
+							<>
+								<style>{pulseAnimation}</style>
+								<div
+									style={{
+										zIndex: 999999,
+										position: 'absolute',
+										top: '23%',
+										right: '29%',
+										backgroundColor: 'rgba(247, 65, 101, 0.7)',
+										color: 'white',
+										borderRadius: '50%',
+										border: '2px solid var(--gray-3)',
+										width: '17px',
+										height: '17px',
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+										fontSize: '10px',
+										fontWeight: 'bold',
+										boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+										animation: 'pulse 1.5s infinite ease-in-out',
+									}}
+								>
+									{unreadRoomMessages > 99 ? '99' : unreadRoomMessages}
+								</div>
+							</>
 						)}
 					</button>
 					<DropdownMenu.Root open={isMenuOpen} onOpenChange={open => (open ? onMenuOpen() : onMenuClose())}>
