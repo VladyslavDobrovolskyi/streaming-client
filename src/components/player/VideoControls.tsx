@@ -105,12 +105,12 @@ export default function VideoControls({
 					onMenuClose()
 				}, 3000)
 			)
-			// Clear timeout when component unmounts or menu closes
-			return () => {
-				if (menuTimeout) {
-					clearTimeout(menuTimeout)
-				}
+		} else {
+			// Clear timeout when menu closes
+			if (menuTimeout) {
+				clearTimeout(menuTimeout)
 			}
+			hideTooltip()
 		}
 	}, [isMenuOpen])
 
