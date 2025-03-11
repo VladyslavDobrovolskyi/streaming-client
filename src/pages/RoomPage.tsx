@@ -766,7 +766,7 @@ export default function RoomPage() {
 		}
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isPlaying])
+	}, [])
 	useEffect(() => {
 		if (isLoading) {
 			clients.forEach(clientID => {
