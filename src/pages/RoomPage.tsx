@@ -749,25 +749,17 @@ export default function RoomPage() {
 		console.log('Participant Info Object:', participantInfo)
 	}, [clients, participantInfo])
 
-	const togglePlayByMouse = () => {
-		if (isPlaying) {
-			handlePause()
-		} else {
-			handlePlay()
-		}
-	}
-
 	useEffect(() => {
-		if (!isLoading)
-			if (playerRef.current) {
-				const playerElement = playerRef.current.getInternalPlayer()
-				if (playerElement) {
-					playerElement.onclick = togglePlayByMouse
-				}
+		if (playerRef.current) {
+			const playerElement = playerRef.current.getInternalPlayer()
+			if (playerElement) {
+				playerElement.onclick = isPlaying ? handlePause : handlePlay
 			}
+		}
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isLoading])
+	}, [isPlaying])
+
 	useEffect(() => {
 		if (isLoading) {
 			clients.forEach(clientID => {
