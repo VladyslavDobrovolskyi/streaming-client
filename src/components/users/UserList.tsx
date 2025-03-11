@@ -40,9 +40,11 @@ export default function UserList({
 		}
 	}, [showUserList, highlightedUser, setHighlightedUser])
 
+	const filteredClients = clients.filter(clientID => clientID !== 'LOCAL_VIDEO')
+
 	return (
 		<>
-			{clients.length >= 1 && clients.length !== 0 && (
+			{filteredClients.length >= 1 && filteredClients.length !== 0 && (
 				<div
 					style={{
 						display: showUserListButton ? 'block' : 'none',
@@ -69,7 +71,7 @@ export default function UserList({
 				</div>
 			)}
 
-			{showUserList && clients.length >= 1 && clients.length !== 0 && (
+			{showUserList && filteredClients.length >= 1 && filteredClients.length !== 0 && (
 				<div
 					style={{
 						position: 'absolute',
