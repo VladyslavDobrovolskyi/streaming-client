@@ -87,14 +87,25 @@ export default function VideoControls({
 		console.log('Room messages:', unreadRoomMessages)
 	}, [unreadRoomMessages])
 
-	useEffect(() => {
-		// When menu opens, set a timeout to close it after 3 seconds
-		if (isMenuOpen) {
-			const timeout = setTimeout(() => {
-				onMenuClose()
-			}, 3000)
+	// Function to start or reset the menu close timer
+	const startMenuCloseTimer = () => {
+		// Clear any existing timeout
+		if (menuTimeout) {
+			clearTimeout(menuTimeout)
+		}
 
-			setMenuTimeout(timeout as NodeJS.Timeout)
+		// Set a new timeout
+		const timeout = setTimeout(() => {
+			onMenuClose()
+		}, 3000)
+
+		setMenuTimeout(timeout as NodeJS.Timeout)
+	}
+
+	// When menu opens, start the timer
+	useEffect(() => {
+		if (isMenuOpen) {
+			startMenuCloseTimer()
 
 			// Clear timeout when component unmounts or menu closes
 			return () => {
@@ -103,11 +114,7 @@ export default function VideoControls({
 				}
 			}
 		}
-	}, [isMenuOpen, onMenuClose, menuTimeout])
-
-	// Add a new state to track if the user is hovering over the menu
-	// Remove this line
-	// const [isHoveringMenu, setIsHoveringMenu] = useState(false);
+	}, [isMenuOpen])
 
 	const showTooltip = (text, itemKey) => {
 		setTooltipText(text)
@@ -456,27 +463,6 @@ export default function VideoControls({
 									ref={menuRef}
 									onMouseEnter={() => {
 										setShowControls(true)
-										// Clear the timeout when hovering over menu items
-										if (menuTimeout) {
-											clearTimeout(menuTimeout)
-										}
-									}}
-									onMouseMove={() => {
-										// Clear the timeout when moving within the menu
-										if (menuTimeout) {
-											clearTimeout(menuTimeout)
-										}
-									}}
-									onMouseLeave={() => {
-										// Set a new timeout when leaving the menu
-										if (menuTimeout) {
-											clearTimeout(menuTimeout)
-										}
-										setMenuTimeout(
-											setTimeout(() => {
-												onMenuClose()
-											}, 3000) as NodeJS.Timeout
-										)
 									}}
 									style={{
 										backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -502,6 +488,8 @@ export default function VideoControls({
 												}
 											}}
 											onMouseEnter={() => {
+												// Reset the timer when hovering over menu items
+												startMenuCloseTimer()
 												onHoveredItemChange('mic')
 												showTooltip(
 													initialMicrophoneDisabledState
@@ -574,6 +562,8 @@ export default function VideoControls({
 												}
 											}}
 											onMouseEnter={() => {
+												// Reset the timer when hovering over menu items
+												startMenuCloseTimer()
 												onHoveredItemChange('camera')
 												showTooltip(
 													initialCameraDisabledState
@@ -645,6 +635,8 @@ export default function VideoControls({
 												setNotificationStatus(!notificationStatus)
 											}}
 											onMouseEnter={() => {
+												// Reset the timer when hovering over menu items
+												startMenuCloseTimer()
 												onHoveredItemChange('notification')
 												showTooltip(
 													notificationStatus
@@ -696,6 +688,8 @@ export default function VideoControls({
 												onMovieModeToggle()
 											}}
 											onMouseEnter={() => {
+												// Reset the timer when hovering over menu items
+												startMenuCloseTimer()
 												onHoveredItemChange('movieMode')
 												showTooltip(
 													isMovieMode ? 'Disable Movie Mode' : 'Enable Movie Mode',
@@ -748,6 +742,8 @@ export default function VideoControls({
 												}
 											}}
 											onMouseEnter={() => {
+												// Reset the timer when hovering over menu items
+												startMenuCloseTimer()
 												onHoveredItemChange('hideMe')
 												showTooltip(
 													isCameraDisabled
