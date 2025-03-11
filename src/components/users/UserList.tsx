@@ -316,6 +316,7 @@ export default function UserList({
 													<style>{pulseAnimation}</style>
 													<div
 														style={{
+															zIndex: 999999,
 															position: 'absolute',
 															top: '23%',
 															right: '29%',
