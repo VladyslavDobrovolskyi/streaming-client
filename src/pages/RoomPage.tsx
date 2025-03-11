@@ -686,11 +686,10 @@ export default function RoomPage() {
 	}
 
 	const togglePlayByMouse = () => {
-		if (!isPlaying) {
+		if (isPlaying) {
+			handlePause()
+		} else {
 			handlePlay()
-			if (isPlaying) {
-				handlePause()
-			}
 		}
 	}
 
