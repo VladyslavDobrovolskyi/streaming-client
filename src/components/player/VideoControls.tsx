@@ -42,6 +42,7 @@ export default function VideoControls({
 	initialCameraDisabledState,
 	initialMicrophoneDisabledState,
 	hoveredItem,
+	unreadRoomMessages,
 	onPlay,
 	onPause,
 	onSeekChange,
@@ -312,6 +313,7 @@ export default function VideoControls({
 							opacity: isRoomChatIsActive ? 0.5 : 1,
 							scale: 1.1,
 							transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+							position: 'relative', // Add position relative for badge positioning
 						}}
 						onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.2)')}
 						onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
@@ -319,6 +321,28 @@ export default function VideoControls({
 						onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.2)')}
 					>
 						<IoMdChatboxes />
+						{unreadRoomMessages > 0 && !isRoomChatIsActive && (
+							<div
+								style={{
+									position: 'absolute',
+									top: '-5px',
+									right: '-5px',
+									backgroundColor: '#ff4757',
+									color: 'white',
+									borderRadius: '50%',
+									width: '18px',
+									height: '18px',
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+									fontSize: '10px',
+									fontWeight: 'bold',
+									boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+								}}
+							>
+								{unreadRoomMessages > 99 ? '99+' : unreadRoomMessages}
+							</div>
+						)}
 					</button>
 					<DropdownMenu.Root open={isMenuOpen} onOpenChange={open => (open ? onMenuOpen() : onMenuClose())}>
 						<DropdownMenu.Trigger asChild>

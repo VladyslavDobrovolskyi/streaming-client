@@ -84,6 +84,8 @@ export default function RoomPage() {
 	const [clientVolumes, setClientVolumes] = useState<Record<string, number>>({})
 	const [clientCameras, setClientCameras] = useState<Record<string, boolean>>({})
 	const [unreadMessages, setUnreadMessages] = useState<Record<string, number>>({})
+	// Add a new state for tracking unread room chat messages after the unreadMessages state
+	const [unreadRoomMessages, setUnreadRoomMessages] = useState(0)
 	const userListWidth = 380
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<number | null>(null)
@@ -673,8 +675,25 @@ export default function RoomPage() {
 		})
 	}
 
+	// Modify the closeChat function to reset unread messages
 	const closeChat = () => {
 		setShowChat(false)
+	}
+
+	// Add this effect to track new room chat messages
+	useEffect(() => {
+		if (!showChat && chatMessages.length > 0) {
+			// Only increment for new messages when chat is closed
+			setUnreadRoomMessages(prev => prev + 1)
+		}
+	}, [chatMessages, showChat])
+
+	// Add this to reset unread messages when opening chat
+	const handleToggleChat = () => {
+		if (!showChat) {
+			setUnreadRoomMessages(0)
+		}
+		setShowChat(prev => !prev)
 	}
 
 	useEffect(() => {
@@ -857,7 +876,8 @@ export default function RoomPage() {
 					setHideMe(prev => !prev)
 				}}
 				onHoveredItemChange={setHoveredItem}
-				onToggleChat={() => setShowChat(prev => !prev)}
+				onToggleChat={handleToggleChat}
+				unreadRoomMessages={unreadRoomMessages}
 				formatTime={formatTime}
 				getSpeakerIcon={getSpeakerIcon}
 				initialMicrophoneDisabledState={initialMicrophoneDisabledState}
