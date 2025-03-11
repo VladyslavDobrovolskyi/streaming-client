@@ -106,6 +106,7 @@ export default function ClientVideo({
 				}`
 			)
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [volume, participantVolume, clientID, isLocal, isMicrophoneMuted])
 
 	useEffect(() => {
