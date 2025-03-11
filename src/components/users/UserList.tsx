@@ -3,7 +3,6 @@
 import { Avatar } from '@radix-ui/themes'
 import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
-import { IoChatboxEllipsesOutline } from 'react-icons/io5'
 import { IoChatbox } from 'react-icons/io5'
 import { ImCross } from 'react-icons/im'
 import { LiaUsersCogSolid } from 'react-icons/lia'
@@ -271,22 +270,15 @@ export default function UserList({
 												transition: 'transform 0.1s ease',
 											}}
 										>
-											{unreadMessages[clientID] > 0 ? (
-												<IoChatbox
-													style={{
-														fill: 'white',
-														position: 'relative',
-														transform: 'scale(0.9)',
-														paddingTop: '2px',
-													}}
-												/>
-											) : (
-												<IoChatboxEllipsesOutline
-													style={{
-														position: 'relative',
-													}}
-												/>
-											)}
+											<IoChatbox
+												style={{
+													fill: 'white',
+													position: 'relative',
+													transform: 'scale(0.9)',
+													paddingTop: '2px',
+												}}
+											/>
+
 											{unreadMessages[clientID] > 0 && (
 												<div
 													style={{
