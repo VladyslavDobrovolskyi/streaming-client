@@ -758,15 +758,16 @@ export default function RoomPage() {
 	}
 
 	useEffect(() => {
-		if (playerRef.current) {
-			const playerElement = playerRef.current.getInternalPlayer()
-			if (playerElement) {
-				playerElement.onclick = togglePlayByMouse
+		if (!isLoading)
+			if (playerRef.current) {
+				const playerElement = playerRef.current.getInternalPlayer()
+				if (playerElement) {
+					playerElement.onclick = togglePlayByMouse
+				}
 			}
-		}
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isPlaying])
+	}, [isLoading])
 	useEffect(() => {
 		if (isLoading) {
 			clients.forEach(clientID => {
