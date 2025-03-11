@@ -333,7 +333,7 @@ export default function VideoControls({
 									right: '-5px',
 									backgroundColor: 'white',
 									opacity: '0.8',
-									color: 'white',
+									color: 'black',
 									borderRadius: '50%',
 									border: '2px solid var(--gray-3)',
 									width: '18px',
