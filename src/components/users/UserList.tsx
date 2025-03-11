@@ -319,7 +319,7 @@ export default function UserList({
 															position: 'absolute',
 															top: '23%',
 															right: '29%',
-															backgroundColor: 'rgba(247, 65, 101, 0.7)',
+															backgroundColor: 'rgba(247, 65, 101, 1)',
 															color: 'white',
 															borderRadius: '50%',
 															border: '2px solid var(--gray-3)',
