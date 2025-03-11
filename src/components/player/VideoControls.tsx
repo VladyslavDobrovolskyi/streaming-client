@@ -103,7 +103,7 @@ export default function VideoControls({
 			setMenuTimeout(
 				setTimeout(() => {
 					onMenuClose()
-				}, 3000)
+				}, 2000)
 			)
 		} else {
 			// Clear timeout when menu closes
