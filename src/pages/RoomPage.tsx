@@ -684,9 +684,9 @@ export default function RoomPage() {
 	useEffect(() => {
 		if (!showChat && chatMessages.length > 0) {
 			// Only increment for new messages when chat is closed
-			setUnreadRoomMessages(prev => prev + 1)
+			setUnreadRoomMessages(prev => prev + unreadRoomMessages)
 		}
-	}, [chatMessages, showChat])
+	}, [chatMessages, showChat, unreadRoomMessages])
 
 	// Add this to reset unread messages when opening chat
 	const handleToggleChat = () => {
