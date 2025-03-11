@@ -103,7 +103,11 @@ export default function VideoControls({
 				}
 			}
 		}
-	}, [isMenuOpen])
+	}, [isMenuOpen, onMenuClose, menuTimeout])
+
+	// Add a new state to track if the user is hovering over the menu
+	// Remove this line
+	// const [isHoveringMenu, setIsHoveringMenu] = useState(false);
 
 	const showTooltip = (text, itemKey) => {
 		setTooltipText(text)
@@ -452,28 +456,28 @@ export default function VideoControls({
 									ref={menuRef}
 									onMouseEnter={() => {
 										setShowControls(true)
-										// Reset the timeout when hovering over menu items
+										// Clear the timeout when hovering over menu items
 										if (menuTimeout) {
 											clearTimeout(menuTimeout)
-											setMenuTimeout(
-												setTimeout(() => {
-													onMenuClose()
-												}, 3000) as NodeJS.Timeout
-											)
 										}
 									}}
 									onMouseMove={() => {
-										// Also reset on mouse movement within the menu
+										// Clear the timeout when moving within the menu
 										if (menuTimeout) {
 											clearTimeout(menuTimeout)
-											setMenuTimeout(
-												setTimeout(() => {
-													onMenuClose()
-												}, 3000) as NodeJS.Timeout
-											)
 										}
 									}}
-									onMouseLeave={onMenuClose}
+									onMouseLeave={() => {
+										// Set a new timeout when leaving the menu
+										if (menuTimeout) {
+											clearTimeout(menuTimeout)
+										}
+										setMenuTimeout(
+											setTimeout(() => {
+												onMenuClose()
+											}, 3000) as NodeJS.Timeout
+										)
+									}}
 									style={{
 										backgroundColor: 'rgba(0, 0, 0, 0.8)',
 										borderRadius: '4px',
