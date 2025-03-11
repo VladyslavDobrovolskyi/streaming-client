@@ -10,6 +10,24 @@ import { useEffect } from 'react'
 // import { FaUsers } from 'react-icons/fa'
 // import type { UserListProps } from '../../types/room-types'
 
+// Add this after the imports
+const pulseAnimation = `
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+`
+
 export default function UserList({
 	showUserList,
 	toggleUserList,
@@ -280,28 +298,33 @@ export default function UserList({
 											/>
 
 											{unreadMessages[clientID] > 0 && (
-												<div
-													style={{
-														position: 'absolute',
-														top: '23%',
-														right: '29%',
-														backgroundColor: 'transparent',
-														opacity: '1',
-														color: 'white',
-														borderRadius: '50%',
-														border: '2px solid var(--gray-3)',
-														width: '17px',
-														height: '17px',
-														display: 'flex',
-														alignItems: 'center',
-														justifyContent: 'center',
-														fontSize: '10px',
-														fontWeight: 'bold',
-														boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-													}}
-												>
-													{unreadMessages[clientID] > 99 ? '99' : unreadMessages[clientID]}
-												</div>
+												<>
+													<style>{pulseAnimation}</style>
+													<div
+														style={{
+															position: 'absolute',
+															top: '23%',
+															right: '29%',
+															backgroundColor: 'rgba(255, 0, 0, 0.7)',
+															color: 'white',
+															borderRadius: '50%',
+															border: '2px solid var(--gray-3)',
+															width: '17px',
+															height: '17px',
+															display: 'flex',
+															alignItems: 'center',
+															justifyContent: 'center',
+															fontSize: '10px',
+															fontWeight: 'bold',
+															boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+															animation: 'pulse 1.5s infinite ease-in-out',
+														}}
+													>
+														{unreadMessages[clientID] > 99
+															? '99'
+															: unreadMessages[clientID]}
+													</div>
+												</>
 											)}
 										</button>
 									</div>
