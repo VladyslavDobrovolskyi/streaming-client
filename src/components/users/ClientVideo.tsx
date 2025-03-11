@@ -238,6 +238,7 @@ export default function ClientVideo({
 				pointerEvents: 'auto',
 			}}
 			hide={isCameraMuted || cameraStatus === false}
+			focused={highlightedUser === clientID}
 		>
 			{({ isDragging }) => (
 				<div
