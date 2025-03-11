@@ -758,7 +758,7 @@ export default function RoomPage() {
 		}
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isPlaying])
+	}, [isLoading, isPlaying])
 
 	useEffect(() => {
 		if (isLoading) {
