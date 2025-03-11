@@ -19,6 +19,8 @@ import { FaMicrophoneAlt, FaMicrophoneAltSlash } from 'react-icons/fa'
 import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
 import { IoMdChatboxes } from 'react-icons/io'
 import { useEffect, useRef, useState } from 'react'
+import { IoMdNotifications } from 'react-icons/io'
+import { IoMdNotificationsOff } from 'react-icons/io'
 
 export default function VideoControls({
 	isPlaying,
@@ -62,6 +64,8 @@ export default function VideoControls({
 	onMovieModeToggle,
 	onHoveredItemChange,
 	onToggleChat,
+	notificationStatus,
+	setNotificationStatus,
 	formatTime,
 	getSpeakerIcon,
 }) {
@@ -74,6 +78,7 @@ export default function VideoControls({
 		camera: useRef<HTMLDivElement>(null),
 		movieMode: useRef<HTMLDivElement>(null),
 		hideMe: useRef<HTMLDivElement>(null),
+		notification: useRef<HTMLDivElement>(null),
 	}
 
 	useEffect(() => {
@@ -684,6 +689,57 @@ export default function VideoControls({
 											>
 												{hideMe ? <EyeOpenIcon /> : <EyeClosedIcon />}
 											</div>
+										</DropdownMenu.Item>
+									</div>
+									<div
+										ref={menuItemRefs.notification}
+										style={{
+											position: 'relative',
+											width: '100%',
+										}}
+									>
+										<DropdownMenu.Item
+											onSelect={event => {
+												event.preventDefault()
+												setNotificationStatus(!notificationStatus)
+											}}
+											onMouseEnter={() => {
+												onHoveredItemChange('notification')
+												showTooltip(
+													notificationStatus
+														? 'Disable Notifications'
+														: 'Enable Notifications',
+													'notification'
+												)
+											}}
+											onMouseLeave={() => {
+												onHoveredItemChange(null)
+												hideTooltip()
+											}}
+											style={{
+												padding: '8px 12px',
+												cursor: 'pointer',
+												display: 'flex',
+												alignItems: 'center',
+												justifyContent: 'center',
+												backgroundColor:
+													hoveredItem === 'notification'
+														? 'rgba(255, 255, 255, 0.1)'
+														: 'transparent',
+												color: 'white',
+												border: 'none',
+												width: '100%',
+												textAlign: 'center',
+												outline: 'none',
+												boxSizing: 'border-box',
+												transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+											}}
+											onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.1)')}
+											onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
+											onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
+											onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.1)')}
+										>
+											{notificationStatus ? <IoMdNotifications /> : <IoMdNotificationsOff />}
 										</DropdownMenu.Item>
 									</div>
 								</DropdownMenu.Content>

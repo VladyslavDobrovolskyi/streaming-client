@@ -81,6 +81,7 @@ export default function RoomPage() {
 	const [clientSizes, setClientSizes] = useState<Record<string, { width: number; height: number; scale?: number }>>(
 		{}
 	)
+	const [notificationStatus, setNotificationStatus] = useState(true)
 	const [clientVolumes, setClientVolumes] = useState<Record<string, number>>({})
 	const [clientCameras, setClientCameras] = useState<Record<string, boolean>>({})
 	const [unreadMessages, setUnreadMessages] = useState<Record<string, number>>({})
@@ -896,6 +897,8 @@ export default function RoomPage() {
 				getSpeakerIcon={getSpeakerIcon}
 				initialMicrophoneDisabledState={initialMicrophoneDisabledState}
 				initialCameraDisabledState={initialCameraDisabledState}
+				notificationStatus={notificationStatus}
+				setNotificationStatus={setNotificationStatus}
 			/>
 			<UserList
 				showUserList={showUserList}
