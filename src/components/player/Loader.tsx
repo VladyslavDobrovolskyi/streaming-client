@@ -11,8 +11,8 @@ const Loader: React.FC = () => {
 				alignItems: 'center',
 				justifyContent: 'center',
 				backgroundColor: 'rgba(0, 0, 0, 0.3)',
-				backdropFilter: 'blur(5px)',
-				zIndex: 40,
+				backdropFilter: 'blur(4px)',
+				zIndex: 999998,
 			}}
 		>
 			<div
@@ -22,6 +22,7 @@ const Loader: React.FC = () => {
 					alignItems: 'center',
 					gap: '0.75rem',
 					transform: 'scale(1.5)',
+					zIndex: 999999,
 				}}
 			>
 				<GearIcon
@@ -31,6 +32,7 @@ const Loader: React.FC = () => {
 						animation: 'spin 1s linear infinite',
 						transform: 'scale(4)',
 						color: 'white',
+						zIndex: 999999,
 					}}
 				/>
 				{/* <p style={{ color: 'white', fontWeight: '500' }}>{isLoading ? 'Loading...' : 'Buffering...'}</p> */}
