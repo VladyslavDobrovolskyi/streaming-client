@@ -68,6 +68,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 			initialPosition={{ x: window.innerWidth - 620, y: window.innerHeight - 550 }}
 			disableWheelZoomClass='scroll-area'
 			bounds='parent'
+			focused={highlight}
 		>
 			{({ isDragging }) => (
 				<Box

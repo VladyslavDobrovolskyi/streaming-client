@@ -20,6 +20,7 @@ interface DraggableResizableProps {
 	resizeHandleStyles?: React.CSSProperties
 	disableWheelZoomClass?: string
 	hide?: boolean
+	focused?: boolean
 }
 
 const DraggableResizable: React.FC<DraggableResizableProps> = ({
@@ -35,6 +36,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 	resizeHandleStyles,
 	disableWheelZoomClass,
 	hide = false,
+	focused,
 }) => {
 	const [size, setSize] = useState(initialSize)
 	const [position, setPosition] = useState(initialPosition)
@@ -218,7 +220,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 						width: size.width * scale,
 						height: size.height * scale,
 						position: 'absolute',
-						zIndex: 12000,
+						zIndex: focused ? 2147483647 : 12000,
 						top: '15px',
 						left: '15px',
 					}}
