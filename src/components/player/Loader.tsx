@@ -10,7 +10,8 @@ const Loader: React.FC = () => {
 				display: 'flex',
 				alignItems: 'center',
 				justifyContent: 'center',
-				backgroundColor: 'rgba(0, 0, 0, 0.2)',
+				backgroundColor: 'rgba(0, 0, 0, 0.3)',
+				backdropFilter: 'blur(5px)',
 				zIndex: 40,
 			}}
 		>

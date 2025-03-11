@@ -410,6 +410,8 @@ export default function RoomPage() {
 		const allChatsIsClosed = !isAnyChatOpen
 
 		const handleKeyDown = (e: KeyboardEvent) => {
+			if (isLoading) return
+
 			if (allChatsIsClosed) {
 				if (e.code === 'Space') {
 					e.preventDefault()
@@ -748,9 +750,22 @@ export default function RoomPage() {
 	}, [clients, participantInfo])
 
 	useEffect(() => {
-		if (!isLoading) {
-			requestTimeAndState()
+		if (isLoading) {
+			clients.forEach(clientID => {
+				const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
+				if (videoElement) {
+					videoElement.muted = true
+				}
+			})
+		} else {
+			clients.forEach(clientID => {
+				const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
+				if (videoElement) {
+					videoElement.muted = false
+				}
+			})
 		}
+		requestTimeAndState()
 	}, [isLoading, requestTimeAndState])
 
 	return (
