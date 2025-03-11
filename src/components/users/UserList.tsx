@@ -294,6 +294,7 @@ export default function UserList({
 													transform: 'scale(0.9)',
 													paddingTop: '2px',
 													opacity: privateChats[clientID] ? 1 : 0.7,
+													border: '2px solid rgba(165, 247, 65, 0.7)',
 												}}
 											/>
 
