@@ -209,7 +209,7 @@ export default function ClientVideo({
 	const getVolumeIcon = () => {
 		const IconStyles = {
 			color: 'white',
-			transform: 'scale(0.5)',
+			transform: 'scale(0.6)',
 		}
 
 		// Get effective volume
@@ -347,7 +347,7 @@ export default function ClientVideo({
 											onMouseOver={e => (e.currentTarget.style.transform = 'scale(1)')}
 											onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
 											onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
-											onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.2)')}
+											onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.4)')}
 										>
 											{getVolumeIcon()}
 										</button>
