@@ -338,9 +338,12 @@ export default function RoomPage() {
 	const handleSeekChange = (value: number[]) => {
 		const newTime = value[0]
 		setPlayed(newTime / duration)
-		const currentTime = playerRef.current?.getCurrentTime() || 0
-		const direction = value[0] > currentTime ? 'forward' : 'backward'
-		setLastSeekDirection(direction)
+
+		if (!isDragging) {
+			const currentTime = playerRef.current?.getCurrentTime() || 0
+			const direction = value[0] > currentTime ? 'forward' : 'backward'
+			setLastSeekDirection(direction)
+		}
 	}
 
 	const handleSeekStart = () => {
