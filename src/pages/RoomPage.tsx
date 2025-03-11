@@ -86,6 +86,8 @@ export default function RoomPage() {
 	const [unreadMessages, setUnreadMessages] = useState<Record<string, number>>({})
 	// Add a new state for tracking unread room chat messages after the unreadMessages state
 	const [unreadRoomMessages, setUnreadRoomMessages] = useState(0)
+	// Add a ref to track the last seen message count after the unreadRoomMessages state
+	const lastSeenMessageCountRef = useRef(0)
 	const userListWidth = 380
 	const playerRef = useRef<ReactPlayer>(null)
 	const controlsTimeoutRef = useRef<number | null>(null)
@@ -683,15 +685,22 @@ export default function RoomPage() {
 	// Add this effect to track new room chat messages
 	useEffect(() => {
 		if (!showChat && chatMessages.length > 0) {
-			// Only increment for new messages when chat is closed
-			setUnreadRoomMessages(prev => prev + unreadRoomMessages)
+			// Only increment for messages that arrived after the chat was last closed
+			if (chatMessages.length > lastSeenMessageCountRef.current) {
+				setUnreadRoomMessages(chatMessages.length - lastSeenMessageCountRef.current)
+			}
 		}
-	}, [chatMessages, showChat, unreadRoomMessages])
+	}, [chatMessages, showChat])
 
-	// Add this to reset unread messages when opening chat
+	// Modify the handleToggleChat function to update the last seen count when opening and closing chat
 	const handleToggleChat = () => {
 		if (!showChat) {
+			// Opening the chat - reset unread count and update last seen
 			setUnreadRoomMessages(0)
+			lastSeenMessageCountRef.current = chatMessages.length
+		} else {
+			// Closing the chat - update last seen count
+			lastSeenMessageCountRef.current = chatMessages.length
 		}
 		setShowChat(prev => !prev)
 	}
