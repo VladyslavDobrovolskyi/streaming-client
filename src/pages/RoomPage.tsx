@@ -329,11 +329,13 @@ export default function RoomPage() {
 		if (!isDragging) {
 			setPlayed(state.played)
 			setLoaded(state.loaded)
+			const currentTime = playerRef.current?.getCurrentTime() || 0
+			const direction = state.playedSeconds > currentTime ? 'forward' : 'backward'
+			setLastSeekDirection(direction)
 		}
 		if (state.loadedSeconds > 0 && duration === 300) {
 			setDuration(playerRef.current?.getDuration() || 300)
 		}
-		console.log('Progress event:')
 	}
 
 	const handleSeekChange = (value: number[]) => {
