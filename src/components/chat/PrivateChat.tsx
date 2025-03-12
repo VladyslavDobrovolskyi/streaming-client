@@ -64,13 +64,10 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	}
 
 	useEffect(() => {
-		setIsActive(highlight)
-	}, [highlight])
-
-	useEffect(() => {
-		if (isTyping) setIsActive(true)
-		else setIsActive(highlight && isHovered)
-	}, [isTyping, highlight, isHovered])
+		if (!isTyping && !isHovered) {
+			setIsActive(false)
+		}
+	}, [isHovered, isTyping])
 
 	return (
 		<DraggableResizable
@@ -78,7 +75,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 			initialPosition={{ x: window.innerWidth - 620, y: window.innerHeight - 550 }}
 			disableWheelZoomClass='scroll-area'
 			bounds='parent'
-			focused={highlight}
+			focused={isActive}
 		>
 			{({ isDragging }) => (
 				<Box
@@ -88,8 +85,10 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						onMouseEnter(recipientId)
 					}}
 					onMouseLeave={() => {
-						setIsActive(false)
-						setIsHovered(true)
+						setIsHovered(false)
+						if (!isTyping) {
+							setIsActive(false)
+						}
 						onMouseLeave()
 					}}
 					style={{
