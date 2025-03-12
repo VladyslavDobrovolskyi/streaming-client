@@ -6,6 +6,13 @@ import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar } from '@radix-ui
 import { MdKeyboardReturn } from 'react-icons/md'
 import DraggableResizable from '../DraggableResizable'
 
+const animationStyles = `
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+`
+
 interface PrivateChatProps {
 	onMouseEnter: (id: string) => void
 	onMouseLeave: () => void
@@ -40,6 +47,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
 	const [isHovered, setIsHovered] = useState(false)
 	const [isAtBottom, setIsAtBottom] = useState(true)
+	const [hasNewMessages, setHasNewMessages] = useState(false)
 
 	const handleScroll = () => {
 		const scrollArea = scrollAreaRef.current
@@ -51,12 +59,17 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 
 	useEffect(() => {
 		const scrollArea = scrollAreaRef.current
-		if (scrollArea && isAtBottom) {
-			const scrollTimeout = setTimeout(() => {
-				scrollArea.scrollTop = scrollArea.scrollHeight
-			}, 0)
-
-			return () => clearTimeout(scrollTimeout)
+		if (scrollArea) {
+			if (isAtBottom) {
+				const scrollTimeout = setTimeout(() => {
+					scrollArea.scrollTop = scrollArea.scrollHeight
+				}, 0)
+				setHasNewMessages(false)
+				return () => clearTimeout(scrollTimeout)
+			} else {
+				// If we're not at the bottom and new messages arrive, show the indicator
+				setHasNewMessages(true)
+			}
 		}
 	}, [privateMessages, isAtBottom])
 
@@ -82,6 +95,17 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 			setIsActive(false)
 		}
 	}, [isHovered, isTyping])
+
+	useEffect(() => {
+		// Add animation styles to document
+		const styleElement = document.createElement('style')
+		styleElement.innerHTML = animationStyles
+		document.head.appendChild(styleElement)
+
+		return () => {
+			document.head.removeChild(styleElement)
+		}
+	}, [])
 
 	return (
 		<DraggableResizable
@@ -253,6 +277,49 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 							</Box>
 						))}
 					</ScrollArea>
+					{hasNewMessages && !isAtBottom && (
+						<Flex
+							justify='center'
+							style={{
+								position: 'absolute',
+								bottom: '70px',
+								left: 0,
+								right: 0,
+								zIndex: 10,
+							}}
+						>
+							<Button
+								size='1'
+								variant='soft'
+								onClick={() => {
+									const scrollArea = scrollAreaRef.current
+									if (scrollArea) {
+										scrollArea.scrollTop = scrollArea.scrollHeight
+									}
+								}}
+								style={{
+									borderRadius: '999px',
+									boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+									display: 'flex',
+									alignItems: 'center',
+									gap: '4px',
+									padding: '6px 12px',
+									animation: 'fadeIn 0.3s ease',
+								}}
+							>
+								<svg
+									width='16'
+									height='16'
+									viewBox='0 0 24 24'
+									fill='none'
+									xmlns='http://www.w3.org/2000/svg'
+								>
+									<path d='M12 16L6 10H18L12 16Z' fill='currentColor' />
+								</svg>
+								New messages
+							</Button>
+						</Flex>
+					)}
 					<Flex
 						p='3'
 						gap='2'
