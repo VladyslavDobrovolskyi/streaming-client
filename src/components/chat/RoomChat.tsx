@@ -135,7 +135,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		return !anyNonLocalVisible && anyLocalVisible
 	}
 
-	// Check visibility of sequence messages
+	// Modify the checkSequenceVisibility function to add the new condition
 	const checkSequenceVisibility = () => {
 		if (messages.length === 0) return
 
@@ -205,9 +205,17 @@ const RoomChat: React.FC<RoomChatProps> = ({
 				return msgRect.top >= scrollAreaRect.top && msgRect.bottom <= scrollAreaRect.bottom
 			})
 
+			// NEW CONDITION: Check if we're in the middle of a sequence
 			// Show the floating avatar if:
-			// The first message is NOT visible but the last message IS visible
-			if (!isSequenceStartVisible && isSequenceEndVisible && hasVisibleMessages) {
+			// 1. The first message is NOT visible but the last message IS visible, OR
+			// 2. The last message is NOT visible but the first message IS visible, OR
+			// 3. BOTH the first AND last messages are NOT visible but some messages in between ARE visible
+			if (
+				hasVisibleMessages &&
+				((!isSequenceStartVisible && isSequenceEndVisible) ||
+					(isSequenceStartVisible && !isSequenceEndVisible) ||
+					(!isSequenceStartVisible && !isSequenceEndVisible))
+			) {
 				setInvisibleSequenceStartIndex(startIndex)
 				setFloatingAvatarSender(sender)
 				setShowFloatingAvatar(true)
@@ -593,7 +601,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 								title={
 									onlyLocalMessagesVisible
 										? `${participantInfo[floatingAvatarSender]?.username} was the last person to send a message. Click to see their messages.`
-										: `${participantInfo[floatingAvatarSender]?.username}'s first message in this sequence is not visible. Click to scroll to it.`
+										: `${participantInfo[floatingAvatarSender]?.username}'s sequence is partially visible. Click to scroll to the beginning.`
 								}
 							/>
 						</Box>
