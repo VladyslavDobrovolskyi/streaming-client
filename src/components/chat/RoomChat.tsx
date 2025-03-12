@@ -39,23 +39,23 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	onMouseLeave,
 	setIsTyping,
 	isTyping,
-	isRoomChatIsActive,
-	setIsRoomChatIsActive,
 }) => {
 	const [isActive, setIsActive] = useState(true)
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
+
+	const [isHovered, setIsHovered] = useState(false)
+
+	useEffect(() => {
+		if (!isTyping && !isHovered) {
+			setIsActive(false)
+		}
+	}, [isHovered, isTyping])
 
 	useEffect(() => {
 		if (scrollAreaRef.current) {
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
 	}, [messages])
-
-	useEffect(() => {
-		if (isTyping) setIsActive(true)
-		setIsActive(isRoomChatIsActive)
-		console.log('IsroomChatIsActive', isRoomChatIsActive)
-	}, [isTyping, isActive, isRoomChatIsActive])
 
 	const getMessageClasses = (message: { sender: string }, index: number) => {
 		const prevMessage = messages[index - 1]
@@ -79,9 +79,9 @@ const RoomChat: React.FC<RoomChatProps> = ({
 				<Box
 					onMouseEnter={() => {
 						setIsActive(true)
-						setIsRoomChatIsActive(true)
+						setIsHovered(true)
 					}}
-					onMouseLeave={() => setIsActive(false)}
+					onMouseLeave={() => (isTyping ? setIsHovered(false) : setIsActive(false))}
 					style={{
 						backgroundColor: 'var(--gray-1)',
 						borderRadius: 'var(--radius-4)',
