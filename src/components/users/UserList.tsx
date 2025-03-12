@@ -81,7 +81,12 @@ export default function UserList({
 							borderRadius: '50% 0 0 50%',
 							padding: '10px',
 							cursor: 'pointer',
+							transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 						}}
+						onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.2)')}
+						onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
+						onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
+						onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.2)')}
 					>
 						<LiaUsersCogSolid style={{ color: 'white' }} />
 					</button>
@@ -187,8 +192,12 @@ export default function UserList({
 											opacity: participantVolume[clientID] === 0 ? 0.3 : 1,
 											cursor: 'pointer',
 											position: 'relative',
-											transition: 'transform 0.1s ease',
+											transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 										}}
+										onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.2)')}
+										onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
+										onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
+										onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.2)')}
 									>
 										{participantVolume[clientID] === 0 && (
 											<ImCross
@@ -245,8 +254,12 @@ export default function UserList({
 													: 'rgba(165, 247, 65, 0.7)',
 											opacity: participantCameras[clientID] === false ? 0.3 : 1,
 											position: 'relative',
-											transition: 'transform 0.1s ease',
+											transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 										}}
+										onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.2)')}
+										onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
+										onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
+										onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.2)')}
 									>
 										{participantCameras[clientID] === false && (
 											<ImCross
@@ -266,83 +279,83 @@ export default function UserList({
 											<BsCameraVideoFill />
 										)}
 									</span>
-									<div style={{ display: 'flex', alignItems: 'center' }}>
-										<button
-											onClick={event => {
-												togglePrivateChat(clientID)
-												// Add a visual feedback for the click
-												const element = event.currentTarget
-												element.style.transform = 'scale(0.9)'
-												setTimeout(() => {
-													element.style.transform = 'scale(1)'
-												}, 100)
-											}}
+									<button
+										onClick={event => {
+											togglePrivateChat(clientID)
+											// Add a visual feedback for the click
+											const element = event.currentTarget
+											element.style.transform = 'scale(0.9)'
+											setTimeout(() => {
+												element.style.transform = 'scale(1)'
+											}, 100)
+										}}
+										style={{
+											background: 'none',
+											border: 'none',
+											cursor: 'pointer',
+											color: 'white',
+											padding: '5px',
+											position: 'relative',
+											transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+										}}
+										onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.2)')}
+										onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
+										onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
+										onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.2)')}
+									>
+										<IoChatbox
 											style={{
-												background: 'none',
-												border: 'none',
-												cursor: 'pointer',
-												color: 'white',
-												padding: '5px',
+												fill: 'white',
 												position: 'relative',
-												transition: 'transform 0.1s ease',
+												transform: 'scale(0.9)',
+												paddingTop: '2px',
+												zIndex: 99999,
+												opacity: privateChats[clientID] ? 1 : 0.7,
 											}}
-										>
+										/>
+										{privateChats[clientID] && (
 											<IoChatbox
 												style={{
-													fill: 'white',
-													position: 'relative',
-													transform: 'scale(0.9)',
-													paddingTop: '2px',
-													zIndex: 99999,
+													fill: 'rgba(165, 247, 65, 0.7)',
+													position: 'absolute',
+													transform: 'scale(1.15)',
+													zIndex: 20,
+													top: '8px',
+													left: '5px',
 													opacity: privateChats[clientID] ? 1 : 0.7,
 												}}
 											/>
-											{privateChats[clientID] && (
-												<IoChatbox
-													style={{
-														fill: 'rgba(165, 247, 65, 0.7)',
-														position: 'absolute',
-														transform: 'scale(1.15)',
-														zIndex: 20,
-														top: '8px',
-														left: '5px',
-														opacity: privateChats[clientID] ? 1 : 0.7,
-													}}
-												/>
-											)}
+										)}
 
-											{unreadMessages[clientID] > 0 && (
-												<>
-													<style>{pulseAnimation}</style>
-													<div
-														style={{
-															zIndex: 999999,
-															position: 'absolute',
-															top: '23%',
-															right: '29%',
-															backgroundColor: 'rgba(247, 65, 101, 0.7)',
-															color: 'white',
-															borderRadius: '50%',
-															border: '2px solid var(--gray-3)',
-															width: '17px',
-															height: '17px',
-															display: 'flex',
-															alignItems: 'center',
-															justifyContent: 'center',
-															fontSize: '10px',
-															fontWeight: 'bold',
-															boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-															animation: 'pulse 1.5s infinite ease-in-out',
-														}}
-													>
-														{unreadMessages[clientID] > 99
-															? '99'
-															: unreadMessages[clientID]}
-													</div>
-												</>
-											)}
-										</button>
-									</div>
+										{unreadMessages[clientID] > 0 && (
+											<>
+												<style>{pulseAnimation}</style>
+												<div
+													style={{
+														zIndex: 999999,
+														position: 'absolute',
+														top: '23%',
+														right: '29%',
+														backgroundColor: 'rgba(247, 65, 101, 0.7)',
+														color: 'white',
+														borderRadius: '50%',
+														border: '2px solid var(--gray-3)',
+														width: '17px',
+														height: '17px',
+														display: 'flex',
+														alignItems: 'center',
+														justifyContent: 'center',
+														fontSize: '10px',
+														fontWeight: 'bold',
+														boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+														animation: 'pulse 1.5s infinite ease-in-out',
+													}}
+												>
+													{unreadMessages[clientID] > 99 ? '99' : unreadMessages[clientID]}
+												</div>
+											</>
+										)}
+									</button>
 								</div>
 							)
 						})}
