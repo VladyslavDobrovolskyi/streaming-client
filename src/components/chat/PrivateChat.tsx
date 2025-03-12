@@ -48,12 +48,20 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	const [isHovered, setIsHovered] = useState(false)
 	const [isAtBottom, setIsAtBottom] = useState(true)
 	const [hasNewMessages, setHasNewMessages] = useState(false)
+	// Add a new state variable to track the last seen message count
+	const [lastSeenMessageCount, setLastSeenMessageCount] = useState(0)
 
 	const handleScroll = () => {
 		const scrollArea = scrollAreaRef.current
 		if (scrollArea) {
 			const isScrolledToBottom = scrollArea.scrollHeight - scrollArea.scrollTop <= scrollArea.clientHeight + 10 // Добавляем небольшой запас
 			setIsAtBottom(isScrolledToBottom)
+
+			// When user scrolls to bottom, update the last seen message count
+			if (isScrolledToBottom) {
+				setLastSeenMessageCount(privateMessages.length)
+				setHasNewMessages(false)
+			}
 		}
 	}
 
@@ -64,14 +72,19 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 				const scrollTimeout = setTimeout(() => {
 					scrollArea.scrollTop = scrollArea.scrollHeight
 				}, 0)
+				// Update last seen count when at bottom
+				setLastSeenMessageCount(privateMessages.length)
 				setHasNewMessages(false)
 				return () => clearTimeout(scrollTimeout)
 			} else {
-				// If we're not at the bottom and new messages arrive, show the indicator
-				setHasNewMessages(true)
+				// Only show new messages indicator if there are actually new messages
+				// since the last time user was at the bottom
+				if (privateMessages.length > lastSeenMessageCount) {
+					setHasNewMessages(true)
+				}
 			}
 		}
-	}, [privateMessages, isAtBottom])
+	}, [privateMessages, isAtBottom, lastSeenMessageCount])
 
 	const handleSend = () => {
 		if (message.trim()) {
@@ -295,6 +308,8 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 									const scrollArea = scrollAreaRef.current
 									if (scrollArea) {
 										scrollArea.scrollTop = scrollArea.scrollHeight
+										setLastSeenMessageCount(privateMessages.length)
+										setHasNewMessages(false)
 									}
 								}}
 								style={{
