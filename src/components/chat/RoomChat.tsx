@@ -1,3 +1,5 @@
+'use client'
+
 import type React from 'react'
 import { useState, useRef, useEffect } from 'react'
 import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar } from '@radix-ui/themes'
@@ -6,24 +8,24 @@ import DraggableResizable from '../DraggableResizable'
 
 // Add animation styles for the new messages indicator
 const animationStyles = `@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+from { opacity: 0; transform: translateY(10px); }
+to { opacity: 1; transform: translateY(0); }
 }`
 
 const pulseAnimation = `  @keyframes pulse {
-    0% {
-      transform: scale(1);
-      opacity: 1;
-    }
-    50% {
-      transform: scale(1.1);
-      opacity: 0.8;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }`
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}`
 
 interface RoomChatProps {
 	realClientID: string | null
@@ -66,7 +68,29 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	const [lastSeenMessageCount, setLastSeenMessageCount] = useState(0)
 	const prevMessagesCountRef = useRef(messages.length)
 
-	// Handle scroll events to track position
+	// Add new state variables for tracking the last message sender
+	const [lastVisibleSender, setLastVisibleSender] = useState<string | null>(null)
+	const [showFloatingAvatar, setShowFloatingAvatar] = useState(false)
+	const lastMessageRef = useRef<HTMLDivElement>(null)
+
+	// Add this function after the handleScroll function
+	const checkLastMessageVisibility = () => {
+		if (messages.length === 0) return
+		const lastMessage = messages[messages.length - 1]
+		if (lastMessage.sender === realClientID) return
+		const lastMessageElement = lastMessageRef.current
+		if (!lastMessageElement) return
+		const rect = lastMessageElement.getBoundingClientRect()
+		const scrollAreaRect = scrollAreaRef.current?.getBoundingClientRect()
+		if (!scrollAreaRect) return
+
+		// Check if the last message is out of view (scrolled up)
+		const isVisible = rect.top >= scrollAreaRect.top && rect.bottom <= scrollAreaRect.bottom
+		setShowFloatingAvatar(!isVisible)
+		setLastVisibleSender(!isVisible ? lastMessage.sender : null)
+	}
+
+	// Modify the handleScroll function to also check message visibility
 	const handleScroll = () => {
 		const filteredMessages = messages.filter(msg => msg.sender !== realClientID)
 		const scrollArea = scrollAreaRef.current
@@ -78,9 +102,20 @@ const RoomChat: React.FC<RoomChatProps> = ({
 			if (isScrolledToBottom) {
 				setLastSeenMessageCount(filteredMessages.length)
 				setHasNewMessages(false)
+				setShowFloatingAvatar(false)
 			}
+
+			// Check if last message is visible
+			checkLastMessageVisibility()
 		}
 	}
+
+	// Add effect to check visibility when messages change
+	useEffect(() => {
+		if (messages.length > 0) {
+			checkLastMessageVisibility()
+		}
+	}, [messages])
 
 	useEffect(() => {
 		if (!isTyping && !isHovered) {
@@ -253,6 +288,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 									textAlign: msg.sender === realClientID ? 'right' : 'left',
 									marginBottom: '8px',
 								}}
+								ref={index === messages.length - 1 ? lastMessageRef : undefined}
 							>
 								<Flex align='end' gap='2' justify={msg.sender === realClientID ? 'end' : 'start'}>
 									{msg.sender !== realClientID && (
@@ -322,6 +358,44 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							</Box>
 						))}
 					</ScrollArea>
+					{showFloatingAvatar && lastVisibleSender && participantInfo[lastVisibleSender] && (
+						<Box
+							style={{
+								position: 'absolute',
+								top: '60px',
+								left: '50%',
+								transform: 'translateX(-50%)',
+								zIndex: 20,
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+								padding: '4px 8px',
+								borderRadius: '999px',
+								backgroundColor: 'rgba(255, 255, 255, 0.9)',
+								boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+								animation: 'pulse 1.5s infinite',
+							}}
+						>
+							<Avatar
+								src={participantInfo[lastVisibleSender]?.avatar}
+								fallback={participantInfo[lastVisibleSender]?.username[0]}
+								size='2'
+								onClick={() => {
+									// Scroll to the last message
+									const scrollArea = scrollAreaRef.current
+									if (scrollArea) {
+										scrollArea.scrollTop = scrollArea.scrollHeight
+										setShowFloatingAvatar(false)
+									}
+								}}
+								style={{
+									cursor: 'pointer',
+									border: '2px solid var(--gray-4)',
+								}}
+								title={`${participantInfo[lastVisibleSender]?.username} is typing. Click to scroll to their message.`}
+							/>
+						</Box>
+					)}
 					{/* Add new messages indicator */}
 					{hasNewMessages && !isAtBottom && (
 						<Flex
