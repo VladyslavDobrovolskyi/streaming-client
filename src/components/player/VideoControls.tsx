@@ -406,7 +406,11 @@ export default function VideoControls({
 							</>
 						)}
 					</button>
-					<DropdownMenu.Root open={isMenuOpen} onOpenChange={open => (open ? onMenuOpen() : onMenuClose())}>
+					<DropdownMenu.Root
+						open={isMenuOpen}
+						onOpenChange={open => (open ? onMenuOpen() : onMenuClose())}
+						modal={false}
+					>
 						<DropdownMenu.Trigger asChild>
 							<button
 								style={{
@@ -482,6 +486,7 @@ export default function VideoControls({
 										}}
 									>
 										<DropdownMenu.Item
+											tabIndex={-1}
 											onSelect={event => {
 												event.preventDefault()
 												if (!initialMicrophoneDisabledState) {
@@ -556,6 +561,7 @@ export default function VideoControls({
 										}}
 									>
 										<DropdownMenu.Item
+											tabIndex={-1}
 											onSelect={event => {
 												event.preventDefault()
 												if (!initialCameraDisabledState) {
@@ -631,6 +637,7 @@ export default function VideoControls({
 										}}
 									>
 										<DropdownMenu.Item
+											tabIndex={-1}
 											onSelect={event => {
 												event.preventDefault()
 												setNotificationStatus(!notificationStatus)
@@ -685,6 +692,7 @@ export default function VideoControls({
 										}}
 									>
 										<DropdownMenu.Item
+											tabIndex={-1}
 											onSelect={event => {
 												event.preventDefault()
 												onMovieModeToggle()
@@ -738,6 +746,7 @@ export default function VideoControls({
 										}}
 									>
 										<DropdownMenu.Item
+											tabIndex={-1}
 											onSelect={event => {
 												event.preventDefault()
 												if (!isCameraDisabled) {
