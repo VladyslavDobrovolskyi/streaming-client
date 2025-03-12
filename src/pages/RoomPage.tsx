@@ -73,6 +73,7 @@ export default function RoomPage() {
 	const [hoveredItem, setHoveredItem] = useState<string | null>(null)
 	const [showUserList, setShowUserList] = useState(false)
 	const [highlightedUser, setHighlightedUser] = useState<string | null>(null)
+	const [isRoomChatIsActive, setIsRoomChatIsActive] = useState(true)
 	const [showChat, setShowChat] = useState(false)
 	const [chatInput, setChatInput] = useState('')
 	const [localUsername, setLocalUsername] = useState('')
@@ -802,7 +803,10 @@ export default function RoomPage() {
 	return (
 		<div
 			ref={playerWrapperRef}
-			onMouseEnter={() => setHighlightedUser(null)}
+			onMouseEnter={() => {
+				setHighlightedUser(null)
+				setIsRoomChatIsActive(false)
+			}}
 			className={`player-wrapper ${isPlaying ? 'playing' : ''}`}
 			onMouseMove={showControlsHandler}
 			onMouseLeave={() => {
@@ -981,6 +985,7 @@ export default function RoomPage() {
 					onClose={closeChat}
 					onMouseEnter={setHighlightedUser}
 					onMouseLeave={() => setHighlightedUser(null)}
+					isRoomChatIsActive={isRoomChatIsActive}
 				/>
 			)}
 			{Object.entries(privateChats).map(

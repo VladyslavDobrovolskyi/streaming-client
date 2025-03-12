@@ -22,6 +22,7 @@ interface RoomChatProps {
 	onMouseLeave: () => void
 	isTyping: boolean
 	setIsTyping: (isTyping: boolean) => void
+	isRoomChatIsActive: boolean
 }
 
 const RoomChat: React.FC<RoomChatProps> = ({
@@ -37,6 +38,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	onMouseLeave,
 	setIsTyping,
 	isTyping,
+	isRoomChatIsActive,
 }) => {
 	const [isActive, setIsActive] = useState(true)
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
@@ -49,7 +51,10 @@ const RoomChat: React.FC<RoomChatProps> = ({
 
 	useEffect(() => {
 		if (isTyping) setIsActive(true)
-	}, [isTyping, isActive])
+		else {
+			setIsActive(isRoomChatIsActive)
+		}
+	}, [isTyping, isActive, isRoomChatIsActive])
 
 	const getMessageClasses = (message: { sender: string }, index: number) => {
 		const prevMessage = messages[index - 1]
