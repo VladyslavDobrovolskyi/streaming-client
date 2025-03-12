@@ -34,7 +34,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	onMouseEnter,
 	onMouseLeave,
 }) => {
-	const [isActive, setIsActive] = useState(true)
+	const [isActive, setIsActive] = useState(false)
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
