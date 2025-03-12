@@ -90,6 +90,9 @@ export default function UserList({
 						onMouseOut={e => (showUserList ? null : (e.currentTarget.style.transform = 'scale(1)'))}
 						onMouseDown={e => (showUserList ? null : (e.currentTarget.style.transform = 'scale(0.9)'))}
 						onMouseUp={e => (showUserList ? null : (e.currentTarget.style.transform = 'scale(1.2)'))}
+						onKeyDown={e => {
+							e.preventDefault()
+						}}
 					>
 						<LiaUsersCogSolid style={{ color: 'white' }} />
 					</button>
