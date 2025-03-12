@@ -352,7 +352,6 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 								left: 0,
 								right: 0,
 								zIndex: 10,
-								cursor: 'pointer',
 							}}
 						>
 							<style>{pulseAnimation}</style>
@@ -377,6 +376,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 									gap: '4px',
 									padding: '6px 12px',
 									animation: 'fadeIn 0.3s ease, pulse 1.5s infinite',
+									cursor: 'pointer',
 								}}
 							>
 								<svg
