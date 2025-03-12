@@ -39,23 +39,26 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	const [isActive, setIsActive] = useState(true)
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
 	const [isHovered, setIsHovered] = useState(false)
+	const [isAtBottom, setIsAtBottom] = useState(true)
+
+	const handleScroll = () => {
+		const scrollArea = scrollAreaRef.current
+		if (scrollArea) {
+			const isScrolledToBottom = scrollArea.scrollHeight - scrollArea.scrollTop === scrollArea.clientHeight
+			setIsAtBottom(isScrolledToBottom)
+		}
+	}
 
 	useEffect(() => {
 		const scrollArea = scrollAreaRef.current
-		if (scrollArea) {
-			// Проверяем, находится ли пользователь внизу контейнера
-			const isScrolledToBottom = scrollArea.scrollHeight - scrollArea.scrollTop === scrollArea.clientHeight
+		if (scrollArea && isAtBottom) {
+			const scrollTimeout = setTimeout(() => {
+				scrollArea.scrollTop = scrollArea.scrollHeight
+			}, 0)
 
-			// Прокручиваем вниз только если пользователь уже был внизу
-			if (isScrolledToBottom) {
-				const scrollTimeout = setTimeout(() => {
-					scrollArea.scrollTop = scrollArea.scrollHeight
-				}, 0)
-
-				return () => clearTimeout(scrollTimeout)
-			}
+			return () => clearTimeout(scrollTimeout)
 		}
-	}, [privateMessages])
+	}, [privateMessages, isAtBottom])
 
 	const handleSend = () => {
 		if (message.trim()) {
@@ -197,6 +200,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						ref={scrollAreaRef}
 						className='scroll-area'
 						scrollbars='vertical'
+						onScroll={handleScroll}
 					>
 						{privateMessages.map((msg, index) => (
 							<Box
