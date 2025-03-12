@@ -94,8 +94,14 @@ export default function RoomPage() {
 	const controlsTimeoutRef = useRef<number | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
 	const previousVolumeRef = useRef(volume)
-	const { userData, updateUserPosition, updateUserStatus, updateUserVolume, updateUserCameraVisibility } =
-		useLocalStorageSync(roomID!)
+	const {
+		userData,
+		updateUserPosition,
+		updateUserStatus,
+		updateUserVolume,
+		updateUserCameraVisibility,
+		updateNotificationStatus,
+	} = useLocalStorageSync(roomID!)
 
 	// Add handlers for video loading states
 	const handleReady = () => {
@@ -241,6 +247,12 @@ export default function RoomPage() {
 		setMicMuted(initialMicrophoneDisabledState)
 		setCameraMuted(initialCameraDisabledState)
 	}, [loaded, initialCameraDisabledState, initialMicrophoneDisabledState])
+
+	useEffect(() => {
+		if (localPeerId) {
+			updateNotificationStatus(LOCAL_VIDEO, notificationStatus)
+		}
+	}, [notificationStatus, localPeerId, updateNotificationStatus])
 
 	useEffect(() => {
 		if (lastSeekDirection) {
@@ -742,6 +754,14 @@ export default function RoomPage() {
 			return acc
 		}, {} as Record<string, boolean>)
 		setClientCameras(prev => ({ ...prev, ...storedCameraVisibility }))
+
+		const storedNotifications = Object.entries(userData).reduce((acc, [clientId, data]) => {
+			if (clientId === LOCAL_VIDEO && data.notificationStatus !== undefined) {
+				acc[clientId] = data.notificationStatus
+			}
+			return acc
+		}, {} as Record<string, boolean>)
+		setNotificationStatus(storedNotifications[LOCAL_VIDEO] ?? true)
 	}, [userData])
 
 	useEffect(() => {

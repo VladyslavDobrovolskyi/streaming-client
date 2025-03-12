@@ -16,7 +16,8 @@ interface UserData {
 	position: UserPosition
 	status: UserStatus
 	volume: number
-	cameraVisible?: boolean // Added camera visibility state
+	cameraVisible?: boolean
+	notificationStatus?: boolean
 }
 
 const useLocalStorageSync = (roomId: string) => {
@@ -55,9 +56,12 @@ const useLocalStorageSync = (roomId: string) => {
 		updateUserData(userId, { volume })
 	}
 
-	// Add new function to update camera visibility
 	const updateUserCameraVisibility = (userId: string, cameraVisible: boolean) => {
 		updateUserData(userId, { cameraVisible })
+	}
+
+	const updateNotificationStatus = (userId: string, notificationStatus: boolean) => {
+		updateUserData(userId, { notificationStatus })
 	}
 
 	return {
@@ -65,7 +69,8 @@ const useLocalStorageSync = (roomId: string) => {
 		updateUserPosition,
 		updateUserStatus,
 		updateUserVolume,
-		updateUserCameraVisibility, // Export the new function
+		updateUserCameraVisibility,
+		updateNotificationStatus,
 	}
 }
 
