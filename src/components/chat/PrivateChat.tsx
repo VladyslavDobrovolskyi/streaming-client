@@ -52,6 +52,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	const [lastSeenMessageCount, setLastSeenMessageCount] = useState(0)
 
 	const handleScroll = () => {
+		const filteredMessages = privateMessages.filter(msg => msg.from !== realClientID)
 		const scrollArea = scrollAreaRef.current
 		if (scrollArea) {
 			const isScrolledToBottom = scrollArea.scrollHeight - scrollArea.scrollTop <= scrollArea.clientHeight + 10 // Добавляем небольшой запас
@@ -59,7 +60,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 
 			// When user scrolls to bottom, update the last seen message count
 			if (isScrolledToBottom) {
-				setLastSeenMessageCount(privateMessages.length)
+				setLastSeenMessageCount(filteredMessages.length)
 				setHasNewMessages(false)
 			}
 		}
@@ -67,24 +68,26 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 
 	useEffect(() => {
 		const scrollArea = scrollAreaRef.current
+		const filteredMessages = privateMessages.filter(msg => msg.from !== realClientID)
 		if (scrollArea) {
 			if (isAtBottom) {
 				const scrollTimeout = setTimeout(() => {
 					scrollArea.scrollTop = scrollArea.scrollHeight
 				}, 0)
+
 				// Update last seen count when at bottom
-				setLastSeenMessageCount(privateMessages.length)
+				setLastSeenMessageCount(filteredMessages.length)
 				setHasNewMessages(false)
 				return () => clearTimeout(scrollTimeout)
 			} else {
 				// Only show new messages indicator if there are actually new messages
 				// since the last time user was at the bottom
-				if (privateMessages.length > lastSeenMessageCount) {
+				if (filteredMessages.length > lastSeenMessageCount) {
 					setHasNewMessages(true)
 				}
 			}
 		}
-	}, [privateMessages, isAtBottom, lastSeenMessageCount])
+	}, [privateMessages, isAtBottom, lastSeenMessageCount, realClientID])
 
 	const handleSend = () => {
 		if (message.trim()) {
@@ -308,7 +311,9 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 									const scrollArea = scrollAreaRef.current
 									if (scrollArea) {
 										scrollArea.scrollTop = scrollArea.scrollHeight
-										setLastSeenMessageCount(privateMessages.length)
+										setLastSeenMessageCount(
+											privateMessages.filter(msg => msg.from !== realClientID).length
+										)
 										setHasNewMessages(false)
 									}
 								}}
