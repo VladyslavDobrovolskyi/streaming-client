@@ -83,6 +83,7 @@ export default function UserList({
 							cursor: 'pointer',
 							transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 							marginRight: showUserList ? '5px' : '0',
+							backdropFilter: 'blur(4px)',
 						}}
 						onMouseOver={e => (showUserList ? null : (e.currentTarget.style.transform = 'scale(1.2)'))}
 						onMouseOut={e => (showUserList ? null : (e.currentTarget.style.transform = 'scale(1)'))}
@@ -103,6 +104,7 @@ export default function UserList({
 						width: `${userListWidth}px`,
 						height: '100%',
 						backgroundColor: 'rgba(0, 0, 0, 0.5)',
+						backdropFilter: 'blur(4px)',
 						zIndex: 25,
 						overflowY: 'auto',
 						overflowX: 'hidden',
