@@ -113,7 +113,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 			setMessage('')
 
 			// When user sends a message and scroll is at bottom, maintain scroll position
-			if (isAtBottom && scrollAreaRef.current) {
+			if (scrollAreaRef.current) {
 				setTimeout(() => {
 					if (scrollAreaRef.current) {
 						scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
@@ -128,17 +128,6 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 			setIsActive(false)
 		}
 	}, [isHovered, isTyping])
-
-	useEffect(() => {
-		// Add animation styles to document
-		const styleElement = document.createElement('style')
-		styleElement.innerHTML = animationStyles
-		document.head.appendChild(styleElement)
-
-		return () => {
-			document.head.removeChild(styleElement)
-		}
-	}, [])
 
 	const getMessageClasses = (message: { from: string }, index: number) => {
 		const prevMessage = privateMessages[index - 1]
