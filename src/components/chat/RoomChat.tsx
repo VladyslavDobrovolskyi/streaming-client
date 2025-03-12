@@ -23,6 +23,7 @@ interface RoomChatProps {
 	isTyping: boolean
 	setIsTyping: (isTyping: boolean) => void
 	isRoomChatIsActive: boolean
+	setIsRoomChatIsActive: (isActive: boolean) => void
 }
 
 const RoomChat: React.FC<RoomChatProps> = ({
@@ -39,6 +40,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	setIsTyping,
 	isTyping,
 	isRoomChatIsActive,
+	setIsRoomChatIsActive,
 }) => {
 	const [isActive, setIsActive] = useState(true)
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
@@ -76,7 +78,10 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		>
 			{({ isDragging }) => (
 				<Box
-					onMouseEnter={() => setIsActive(true)}
+					onMouseEnter={() => {
+						setIsActive(true)
+						setIsRoomChatIsActive(true)
+					}}
 					onMouseLeave={() => setIsActive(false)}
 					style={{
 						backgroundColor: 'var(--gray-1)',
