@@ -41,14 +41,20 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	const [isHovered, setIsHovered] = useState(false)
 
 	useEffect(() => {
-		// Use setTimeout to ensure the DOM has updated before scrolling
-		const scrollTimeout = setTimeout(() => {
-			if (scrollAreaRef.current) {
-				scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
-			}
-		}, 0)
+		const scrollArea = scrollAreaRef.current
+		if (scrollArea) {
+			// Проверяем, находится ли пользователь внизу контейнера
+			const isScrolledToBottom = scrollArea.scrollHeight - scrollArea.scrollTop === scrollArea.clientHeight
 
-		return () => clearTimeout(scrollTimeout)
+			// Прокручиваем вниз только если пользователь уже был внизу
+			if (isScrolledToBottom) {
+				const scrollTimeout = setTimeout(() => {
+					scrollArea.scrollTop = scrollArea.scrollHeight
+				}, 0)
+
+				return () => clearTimeout(scrollTimeout)
+			}
+		}
 	}, [privateMessages])
 
 	const handleSend = () => {
