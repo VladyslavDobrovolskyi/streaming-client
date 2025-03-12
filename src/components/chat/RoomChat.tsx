@@ -202,7 +202,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		return null
 	}
 
-	// Modify the checkSequenceVisibility function to add the new condition
+	// Modify the checkSequenceVisibility function to implement the chain of previous user avatars
 	const checkSequenceVisibility = () => {
 		if (messages.length === 0) return
 
@@ -262,16 +262,51 @@ const RoomChat: React.FC<RoomChatProps> = ({
 					setIsPreviousUserAvatar(false)
 					return
 				} else {
-					// NEW CONDITION: If first message IS visible, show the previous user's avatar
-					const previousSequence = findPreviousSequence(startIndex)
+					// If first message IS visible, find the previous user's avatar
+					// and continue finding previous users if their first messages are also visible
+					let currentStartIndex = startIndex
+					let previousSequence = findPreviousSequence(currentStartIndex)
 
-					if (previousSequence) {
-						setInvisibleSequenceStartIndex(previousSequence.startIndex)
-						setFloatingAvatarSender(previousSequence.sender)
-						setShowFloatingAvatar(true)
-						setIsPreviousUserAvatar(true)
-						return
+					// Keep looking for previous sequences until we find one whose first message is not visible
+					// or until we run out of previous sequences
+					while (previousSequence) {
+						const prevStartRef = sequenceStartRefs[previousSequence.startIndex]
+
+						// If we don't have a ref for the previous sequence, use this one
+						if (!prevStartRef?.current) {
+							setInvisibleSequenceStartIndex(previousSequence.startIndex)
+							setFloatingAvatarSender(previousSequence.sender)
+							setShowFloatingAvatar(true)
+							setIsPreviousUserAvatar(true)
+							return
+						}
+
+						// Check if the first message of the previous sequence is visible
+						const prevStartRect = prevStartRef.current.getBoundingClientRect()
+						const isPrevSequenceStartVisible =
+							prevStartRect.top >= scrollAreaRect.top && prevStartRect.bottom <= scrollAreaRect.bottom
+
+						if (!isPrevSequenceStartVisible) {
+							// If the previous sequence's first message is not visible, show its avatar
+							setInvisibleSequenceStartIndex(previousSequence.startIndex)
+							setFloatingAvatarSender(previousSequence.sender)
+							setShowFloatingAvatar(true)
+							setIsPreviousUserAvatar(true)
+							return
+						}
+
+						// If the previous sequence's first message is visible, continue looking further back
+						currentStartIndex = previousSequence.startIndex
+						previousSequence = findPreviousSequence(currentStartIndex)
 					}
+
+					// If we've gone through all previous sequences and they're all visible,
+					// don't show any floating avatar
+					setShowFloatingAvatar(false)
+					setInvisibleSequenceStartIndex(null)
+					setFloatingAvatarSender(null)
+					setIsPreviousUserAvatar(false)
+					return
 				}
 			}
 		}
