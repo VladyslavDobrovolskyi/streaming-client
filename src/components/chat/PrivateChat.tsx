@@ -50,6 +50,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	const [hasNewMessages, setHasNewMessages] = useState(false)
 	// Add a new state variable to track the last seen message count
 	const [lastSeenMessageCount, setLastSeenMessageCount] = useState(0)
+	const prevMessagesCountRef = useRef(privateMessages.length)
 
 	const handleScroll = () => {
 		const filteredMessages = privateMessages.filter(msg => msg.from !== realClientID)
@@ -71,14 +72,23 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 		const filteredMessages = privateMessages.filter(msg => msg.from !== realClientID)
 		if (scrollArea) {
 			if (isAtBottom) {
-				const scrollTimeout = setTimeout(() => {
-					scrollArea.scrollTop = scrollArea.scrollHeight
-				}, 0)
+				// Only scroll if there are new messages to avoid unnecessary scrolling
+				const currentMessagesCount = privateMessages.length
 
-				// Update last seen count when at bottom
-				setLastSeenMessageCount(filteredMessages.length)
-				setHasNewMessages(false)
-				return () => clearTimeout(scrollTimeout)
+				if (currentMessagesCount > prevMessagesCountRef.current) {
+					const scrollTimeout = setTimeout(() => {
+						scrollArea.scrollTop = scrollArea.scrollHeight
+					}, 0)
+
+					// Update last seen count when at bottom
+					setLastSeenMessageCount(filteredMessages.length)
+					setHasNewMessages(false)
+
+					// Update reference for next comparison
+					prevMessagesCountRef.current = currentMessagesCount
+
+					return () => clearTimeout(scrollTimeout)
+				}
 			} else {
 				// Only show new messages indicator if there are actually new messages
 				// since the last time user was at the bottom
