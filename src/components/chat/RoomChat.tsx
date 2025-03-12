@@ -87,6 +87,10 @@ const RoomChat: React.FC<RoomChatProps> = ({
 			}
 		})
 
+		// Get the last message sender (who is not the current user)
+		const lastMessages = [...messages].reverse()
+		const lastMessageSender = lastMessages.find(msg => msg.sender !== realClientID)?.sender
+
 		// Check if any first messages are out of view
 		let foundInvisibleSender = false
 
@@ -116,7 +120,10 @@ const RoomChat: React.FC<RoomChatProps> = ({
 					return msgRect.top >= scrollAreaRect.top && msgRect.bottom <= scrollAreaRect.bottom
 				})
 
-				if (hasVisibleMessages && !foundInvisibleSender) {
+				// Show the avatar if:
+				// 1. There are visible messages from this sender AND
+				// 2. This sender is also the last person who sent a message
+				if (hasVisibleMessages && !foundInvisibleSender && sender === lastMessageSender) {
 					setInvisibleFirstMessageSender(sender)
 					setShowFloatingAvatar(true)
 					foundInvisibleSender = true
