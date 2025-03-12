@@ -38,6 +38,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	const [message, setMessage] = useState('')
 	const [isActive, setIsActive] = useState(true)
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
+	const [isHovered, setIsHovered] = useState(false)
 
 	useEffect(() => {
 		if (scrollAreaRef.current) {
@@ -68,8 +69,8 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 
 	useEffect(() => {
 		if (isTyping) setIsActive(true)
-		else setIsActive(highlight)
-	}, [isTyping, highlight])
+		else setIsActive(highlight && isHovered)
+	}, [isTyping, highlight, isHovered])
 
 	return (
 		<DraggableResizable
@@ -83,10 +84,12 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 				<Box
 					onMouseEnter={() => {
 						setIsActive(true)
+						setIsHovered(true)
 						onMouseEnter(recipientId)
 					}}
 					onMouseLeave={() => {
 						setIsActive(false)
+						setIsHovered(true)
 						onMouseLeave()
 					}}
 					style={{
