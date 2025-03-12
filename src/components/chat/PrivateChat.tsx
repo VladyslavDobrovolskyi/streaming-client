@@ -41,10 +41,15 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	const [isHovered, setIsHovered] = useState(false)
 
 	useEffect(() => {
-		if (scrollAreaRef.current) {
-			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
-		}
-	}, [privateMessages]) // Changed dependency to privateMessages
+		// Use setTimeout to ensure the DOM has updated before scrolling
+		const scrollTimeout = setTimeout(() => {
+			if (scrollAreaRef.current) {
+				scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
+			}
+		}, 0)
+
+		return () => clearTimeout(scrollTimeout)
+	}, [privateMessages])
 
 	const handleSend = () => {
 		if (message.trim()) {
