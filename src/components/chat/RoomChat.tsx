@@ -121,27 +121,10 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		const rect = sequenceStartRef.current.getBoundingClientRect()
 		const isSequenceStartVisible = rect.top >= scrollAreaRect.top && rect.bottom <= scrollAreaRect.bottom
 
-		// Check if the last message from this sender is visible
-		let isLastMessageVisible = false
-		// Find the last message index without using findLastIndex (ES2023)
-		const messagesReversed = [...messages].reverse()
-		const reversedIndex = messagesReversed.findIndex(msg => msg.sender === lastMessageSender)
-		const lastMessageIndex = reversedIndex !== -1 ? messages.length - 1 - reversedIndex : -1
-
-		if (lastMessageIndex !== -1) {
-			const lastMessageRef = document.querySelector(`.message-${lastMessageIndex}`)
-			if (lastMessageRef) {
-				const lastMessageRect = lastMessageRef.getBoundingClientRect()
-				isLastMessageVisible =
-					lastMessageRect.top >= scrollAreaRect.top && lastMessageRect.bottom <= scrollAreaRect.bottom
-			}
-		}
-
 		// Only show the floating avatar if:
 		// 1. The sequence start message is NOT visible AND
-		// 2. There are visible messages from this sender AND
-		// 3. The last message is NOT visible
-		if (!isSequenceStartVisible && !isLastMessageVisible) {
+		// 2. There are visible messages from this sender
+		if (!isSequenceStartVisible) {
 			// Check if there are any visible messages from this sender
 			const hasVisibleMessages = messages.some((msg, i) => {
 				if (msg.sender !== lastMessageSender) return false
