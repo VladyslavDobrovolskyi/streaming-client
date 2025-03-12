@@ -36,6 +36,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	onMouseEnter,
 	onMouseLeave,
 	setIsTyping,
+	isTyping,
 }) => {
 	const [isActive, setIsActive] = useState(true)
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
@@ -45,6 +46,10 @@ const RoomChat: React.FC<RoomChatProps> = ({
 			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
 		}
 	}, [messages])
+
+	useEffect(() => {
+		if (isTyping) setIsActive(true)
+	}, [isTyping])
 
 	const getMessageClasses = (message: { sender: string }, index: number) => {
 		const prevMessage = messages[index - 1]
