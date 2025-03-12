@@ -68,8 +68,8 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 
 	useEffect(() => {
 		if (isTyping) setIsActive(true)
-		else setIsActive(false)
-	}, [isTyping, isActive])
+		else setIsActive(highlight)
+	}, [isTyping, highlight])
 
 	return (
 		<DraggableResizable

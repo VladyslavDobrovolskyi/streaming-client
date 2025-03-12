@@ -49,7 +49,6 @@ const RoomChat: React.FC<RoomChatProps> = ({
 
 	useEffect(() => {
 		if (isTyping) setIsActive(true)
-		else setIsActive(false)
 	}, [isTyping, isActive])
 
 	const getMessageClasses = (message: { sender: string }, index: number) => {
