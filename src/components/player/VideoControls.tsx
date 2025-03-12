@@ -486,6 +486,9 @@ export default function VideoControls({
 										}}
 									>
 										<DropdownMenu.Item
+											onKeyDown={event => {
+												event.preventDefault()
+											}}
 											tabIndex={-1}
 											onSelect={event => {
 												event.preventDefault()
@@ -562,6 +565,9 @@ export default function VideoControls({
 									>
 										<DropdownMenu.Item
 											tabIndex={-1}
+											onKeyDown={event => {
+												event.preventDefault()
+											}}
 											onSelect={event => {
 												event.preventDefault()
 												if (!initialCameraDisabledState) {
@@ -638,6 +644,9 @@ export default function VideoControls({
 									>
 										<DropdownMenu.Item
 											tabIndex={-1}
+											onKeyDown={event => {
+												event.preventDefault()
+											}}
 											onSelect={event => {
 												event.preventDefault()
 												setNotificationStatus(!notificationStatus)
@@ -693,6 +702,9 @@ export default function VideoControls({
 									>
 										<DropdownMenu.Item
 											tabIndex={-1}
+											onKeyDown={event => {
+												event.preventDefault()
+											}}
 											onSelect={event => {
 												event.preventDefault()
 												onMovieModeToggle()
@@ -747,6 +759,9 @@ export default function VideoControls({
 									>
 										<DropdownMenu.Item
 											tabIndex={-1}
+											onKeyDown={event => {
+												event.preventDefault()
+											}}
 											onSelect={event => {
 												event.preventDefault()
 												if (!isCameraDisabled) {
