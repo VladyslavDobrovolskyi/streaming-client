@@ -788,7 +788,7 @@ export default function RoomPage() {
 			className={`player-wrapper ${isPlaying ? 'playing' : ''}`}
 			onMouseMove={showControlsHandler}
 			onMouseLeave={() => {
-				if (!isDragging && !isMenuOpen) {
+				if (!isDragging && !isMenuOpen && !showUserList) {
 					setShowControls(false)
 				}
 			}}
