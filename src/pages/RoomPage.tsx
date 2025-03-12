@@ -986,6 +986,7 @@ export default function RoomPage() {
 					onMouseEnter={setHighlightedUser}
 					onMouseLeave={() => setHighlightedUser(null)}
 					isRoomChatIsActive={isRoomChatIsActive}
+					setIsRoomChatIsActive={setIsRoomChatIsActive}
 				/>
 			)}
 			{Object.entries(privateChats).map(
