@@ -195,6 +195,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						style={{
 							flex: 1,
 							padding: '16px',
+							paddingBottom: '0px',
 							background: 'linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(250,250,250,0.98))',
 						}}
 						ref={scrollAreaRef}
