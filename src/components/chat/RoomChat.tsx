@@ -467,29 +467,15 @@ const RoomChat: React.FC<RoomChatProps> = ({
 
 			// First, scroll to the message to get its position
 			sequenceStartRefs[invisibleSequenceStartIndex].current?.scrollIntoView({ behavior: 'auto' })
-			scrollArea.scrollBy({ top: -5, behavior: 'smooth' }) // Scroll up by 80 pixels to show more context
+			scrollArea.scrollBy({ top: -5, behavior: 'smooth' }) // Scroll up by 5 pixels to show more context
+		}
+	}
 
-			// Then, scroll up a bit to show more context
-			// setTimeout(() => {
-			// 	// Get the current scroll position
-			// 	const currentScrollTop = scrollArea.scrollTop
-
-			// 	// Scroll up by 80px (or adjust as needed) to show more context
-			// 	const newScrollTop = Math.max(0, currentScrollTop - 80)
-
-			// 	// Apply the new scroll position with smooth behavior
-			// 	scrollArea.scrollTo({
-			// 		top: newScrollTop,
-			// 		behavior: 'smooth',
-			// 	})
-
-			// 	// Hide the floating avatar after scrolling
-			// 	setTimeout(() => {
-			// 		setShowFloatingAvatar(false)
-			// 		setOnlyLocalMessagesVisible(false)
-			// 		setIsPreviousUserAvatar(false)
-			// 	}, 500)
-			// }, 50)
+	// Handle scroll to bottom click
+	const handleScrollToBottom = () => {
+		const scrollArea = scrollAreaRef.current
+		if (scrollArea) {
+			scrollArea.scrollTop = scrollArea.scrollHeight
 		}
 	}
 
@@ -682,7 +668,51 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							)
 						})}
 					</ScrollArea>
-					{showFloatingAvatar && floatingAvatarSender && participantInfo[floatingAvatarSender] && (
+
+					{/* Floating avatar or scroll to bottom button */}
+					{showFloatingAvatar &&
+						!isAtTop &&
+						floatingAvatarSender &&
+						participantInfo[floatingAvatarSender] && (
+							<Box
+								style={{
+									position: 'absolute',
+									top: '60px',
+									left: '42%',
+									transform: 'translateX(-50%)',
+									zIndex: 20,
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+									padding: '4px 8px',
+									borderRadius: '999px',
+									backgroundColor: 'rgba(255, 255, 255, 0.9)',
+									boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+									animation: 'pulse 1.5s infinite',
+								}}
+							>
+								<Avatar
+									src={participantInfo[floatingAvatarSender]?.avatar}
+									fallback={participantInfo[floatingAvatarSender]?.username[0]}
+									size='2'
+									onClick={handleAvatarClick}
+									style={{
+										cursor: 'pointer',
+										border: '2px solid var(--gray-4)',
+									}}
+									title={
+										onlyLocalMessagesVisible
+											? `${participantInfo[floatingAvatarSender]?.username} was the last person to send a message. Click to see their messages.`
+											: isPreviousUserAvatar
+											? `${participantInfo[floatingAvatarSender]?.username}'s messages came before this sequence. Click to see them.`
+											: `${participantInfo[floatingAvatarSender]?.username}'s first message is not visible. Click to scroll to it.`
+									}
+								/>
+							</Box>
+						)}
+
+					{/* Scroll to bottom button in the same position as floating avatar */}
+					{isAtTop && (
 						<Box
 							style={{
 								position: 'absolute',
@@ -700,25 +730,36 @@ const RoomChat: React.FC<RoomChatProps> = ({
 								animation: 'pulse 1.5s infinite',
 							}}
 						>
-							<Avatar
-								src={participantInfo[floatingAvatarSender]?.avatar}
-								fallback={participantInfo[floatingAvatarSender]?.username[0]}
-								size='2'
-								onClick={handleAvatarClick}
+							<Button
+								size='1'
+								variant='ghost'
+								onClick={handleScrollToBottom}
 								style={{
+									borderRadius: '999px',
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+									width: '32px',
+									height: '32px',
+									padding: '0',
 									cursor: 'pointer',
 									border: '2px solid var(--gray-4)',
 								}}
-								title={
-									onlyLocalMessagesVisible
-										? `${participantInfo[floatingAvatarSender]?.username} was the last person to send a message. Click to see their messages.`
-										: isPreviousUserAvatar
-										? `${participantInfo[floatingAvatarSender]?.username}'s messages came before this sequence. Click to see them.`
-										: `${participantInfo[floatingAvatarSender]?.username}'s first message is not visible. Click to scroll to it.`
-								}
-							/>
+								title='Scroll to bottom'
+							>
+								<svg
+									width='16'
+									height='16'
+									viewBox='0 0 24 24'
+									fill='none'
+									xmlns='http://www.w3.org/2000/svg'
+								>
+									<path d='M12 16L6 10H18L12 16Z' fill='currentColor' />
+								</svg>
+							</Button>
 						</Box>
 					)}
+
 					{/* Add new messages indicator */}
 					{hasNewMessages && !isAtBottom && (
 						<Flex
@@ -734,16 +775,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							<Button
 								size='1'
 								variant='soft'
-								onClick={() => {
-									const scrollArea = scrollAreaRef.current
-									if (scrollArea) {
-										scrollArea.scrollTop = scrollArea.scrollHeight
-										setLastSeenMessageCount(
-											messages.filter(msg => msg.sender !== realClientID).length
-										)
-										setHasNewMessages(false)
-									}
-								}}
+								onClick={handleScrollToBottom}
 								style={{
 									borderRadius: '999px',
 									boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
@@ -768,51 +800,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							</Button>
 						</Flex>
 					)}
-					{/* Scroll to bottom button when at top */}
-					{isAtTop && (
-						<Flex
-							justify='center'
-							style={{
-								position: 'absolute',
-								bottom: '50%',
-								right: '10px',
-								zIndex: 10,
-							}}
-						>
-							<Button
-								size='1'
-								variant='soft'
-								onClick={() => {
-									const scrollArea = scrollAreaRef.current
-									if (scrollArea) {
-										scrollArea.scrollTop = scrollArea.scrollHeight
-									}
-								}}
-								style={{
-									borderRadius: '999px',
-									boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'center',
-									width: '36px',
-									height: '36px',
-									padding: '0',
-									animation: 'fadeIn 0.3s ease, pulse 1.5s infinite',
-									cursor: 'pointer',
-								}}
-							>
-								<svg
-									width='16'
-									height='16'
-									viewBox='0 0 24 24'
-									fill='none'
-									xmlns='http://www.w3.org/2000/svg'
-								>
-									<path d='M12 16L6 10H18L12 16Z' fill='currentColor' />
-								</svg>
-							</Button>
-						</Flex>
-					)}
+
 					<Flex
 						p='3'
 						gap='2'
