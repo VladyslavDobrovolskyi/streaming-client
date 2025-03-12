@@ -73,7 +73,7 @@ export default function RoomPage() {
 	const [hoveredItem, setHoveredItem] = useState<string | null>(null)
 	const [showUserList, setShowUserList] = useState(false)
 	const [highlightedUser, setHighlightedUser] = useState<string | null>(null)
-	const [isRoomChatIsActive, setIsRoomChatIsActive] = useState(true)
+	const [isRoomChatIsActive, setIsRoomChatIsActive] = useState(false)
 	const [showChat, setShowChat] = useState(false)
 	const [chatInput, setChatInput] = useState('')
 	const [localUsername, setLocalUsername] = useState('')
