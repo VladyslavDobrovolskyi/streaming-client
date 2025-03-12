@@ -49,7 +49,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 
 	useEffect(() => {
 		if (isTyping) setIsActive(true)
-	}, [isTyping])
+	}, [isTyping, isActive])
 
 	const getMessageClasses = (message: { sender: string }, index: number) => {
 		const prevMessage = messages[index - 1]
