@@ -80,10 +80,17 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		// Create a map to track the first message from each sender
 		const firstMessageSenders = new Map<string, number>()
 
-		// Find the first message index for each sender
+		// Create a map to track the last message from each sender
+		const lastMessageSenders = new Map<string, number>()
+
+		// Find the first and last message index for each sender
 		messages.forEach((msg, index) => {
-			if (msg.sender !== realClientID && !firstMessageSenders.has(msg.sender)) {
-				firstMessageSenders.set(msg.sender, index)
+			if (msg.sender !== realClientID) {
+				if (!firstMessageSenders.has(msg.sender)) {
+					firstMessageSenders.set(msg.sender, index)
+				}
+				// Always update to get the latest message
+				lastMessageSenders.set(msg.sender, index)
 			}
 		})
 
@@ -94,23 +101,24 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		// Check if any first messages are out of view
 		let foundInvisibleSender = false
 
-		firstMessageSenders.forEach((index, sender) => {
-			const ref = firstMessageRefs[sender]
-			if (!ref || !ref.current) return
+		firstMessageSenders.forEach((firstIndex, sender) => {
+			const firstMessageRef = firstMessageRefs[sender]
+			if (!firstMessageRef || !firstMessageRef.current) return
 
-			const rect = ref.current.getBoundingClientRect()
+			const firstMessageRect = firstMessageRef.current.getBoundingClientRect()
 			const scrollAreaRect = scrollAreaRef.current?.getBoundingClientRect()
 			if (!scrollAreaRect) return
 
 			// Check if this first message is out of view (scrolled up)
-			const isVisible = rect.top >= scrollAreaRect.top && rect.bottom <= scrollAreaRect.bottom
+			const isFirstMessageVisible =
+				firstMessageRect.top >= scrollAreaRect.top && firstMessageRect.bottom <= scrollAreaRect.bottom
 
-			// If not visible and we're currently showing messages from this sender
-			if (!isVisible) {
+			// If first message is not visible and this sender is the last message sender
+			if (!isFirstMessageVisible && sender === lastMessageSender) {
 				// Check if there are visible messages from this sender
 				const hasVisibleMessages = messages.some((msg, i) => {
 					if (msg.sender !== sender) return false
-					if (i <= index) return false // Skip the first message we already checked
+					if (i <= firstIndex) return false // Skip the first message we already checked
 
 					// For subsequent messages from this sender, check if they're visible
 					const msgRef = document.querySelector(`.message-${i}`)
@@ -120,10 +128,25 @@ const RoomChat: React.FC<RoomChatProps> = ({
 					return msgRect.top >= scrollAreaRect.top && msgRect.bottom <= scrollAreaRect.bottom
 				})
 
-				// Show the avatar if:
+				// Get the last message index for this sender
+				const lastMessageIndex = lastMessageSenders.get(sender)
+
+				// Check if the last message from this sender is visible
+				let isLastMessageVisible = false
+				if (lastMessageIndex !== undefined) {
+					const lastMessageRef = document.querySelector(`.message-${lastMessageIndex}`)
+					if (lastMessageRef) {
+						const lastMessageRect = lastMessageRef.getBoundingClientRect()
+						isLastMessageVisible =
+							lastMessageRect.top >= scrollAreaRect.top && lastMessageRect.bottom <= scrollAreaRect.bottom
+					}
+				}
+
+				// Only show the floating avatar if:
 				// 1. There are visible messages from this sender AND
-				// 2. This sender is also the last person who sent a message
-				if (hasVisibleMessages && !foundInvisibleSender && sender === lastMessageSender) {
+				// 2. This sender is the last person who sent a message AND
+				// 3. The last message from this sender is NOT visible
+				if (hasVisibleMessages && !foundInvisibleSender && !isLastMessageVisible) {
 					setInvisibleFirstMessageSender(sender)
 					setShowFloatingAvatar(true)
 					foundInvisibleSender = true
