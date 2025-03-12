@@ -421,6 +421,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 
 			// First, scroll to the message to get its position
 			sequenceStartRefs[invisibleSequenceStartIndex].current?.scrollIntoView({ behavior: 'auto' })
+			scrollArea.scrollBy({ top: -5, behavior: 'smooth' }) // Scroll up by 80 pixels to show more context
 
 			// Then, scroll up a bit to show more context
 			// setTimeout(() => {
