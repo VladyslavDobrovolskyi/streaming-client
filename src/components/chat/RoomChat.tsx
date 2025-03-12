@@ -641,7 +641,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							style={{
 								position: 'absolute',
 								top: '60px',
-								left: '50%',
+								left: '42%',
 								transform: 'translateX(-50%)',
 								zIndex: 20,
 								display: 'flex',
