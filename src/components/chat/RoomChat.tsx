@@ -416,14 +416,33 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	// Handle avatar click to scroll to the appropriate message
 	const handleAvatarClick = () => {
 		if (invisibleSequenceStartIndex !== null && sequenceStartRefs[invisibleSequenceStartIndex]?.current) {
-			// Always scroll to the first message of the sequence
-			sequenceStartRefs[invisibleSequenceStartIndex].current?.scrollIntoView({ behavior: 'smooth' })
+			const scrollArea = scrollAreaRef.current
+			if (!scrollArea) return
 
+			// First, scroll to the message to get its position
+			sequenceStartRefs[invisibleSequenceStartIndex].current?.scrollIntoView({ behavior: 'auto' })
+
+			// Then, scroll up a bit to show more context
 			setTimeout(() => {
-				setShowFloatingAvatar(false)
-				setOnlyLocalMessagesVisible(false)
-				setIsPreviousUserAvatar(false)
-			}, 500)
+				// Get the current scroll position
+				const currentScrollTop = scrollArea.scrollTop
+
+				// Scroll up by 80px (or adjust as needed) to show more context
+				const newScrollTop = Math.max(0, currentScrollTop - 80)
+
+				// Apply the new scroll position with smooth behavior
+				scrollArea.scrollTo({
+					top: newScrollTop,
+					behavior: 'smooth',
+				})
+
+				// Hide the floating avatar after scrolling
+				setTimeout(() => {
+					setShowFloatingAvatar(false)
+					setOnlyLocalMessagesVisible(false)
+					setIsPreviousUserAvatar(false)
+				}, 500)
+			}, 50)
 		}
 	}
 
