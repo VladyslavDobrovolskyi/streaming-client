@@ -712,7 +712,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						)}
 
 					{/* Scroll to bottom button in the same position as floating avatar */}
-					{isAtTop && (
+					{isAtTop && !hasNewMessages && (
 						<Box
 							style={{
 								position: 'absolute',
