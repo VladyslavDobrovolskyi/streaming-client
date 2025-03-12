@@ -83,14 +83,12 @@ export default function UserList({
 							cursor: 'pointer',
 							transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 						}}
+						onMouseOver={e => (showUserList ? null : (e.currentTarget.style.transform = 'scale(1.2)'))}
+						onMouseOut={e => (showUserList ? null : (e.currentTarget.style.transform = 'scale(1)'))}
+						onMouseDown={e => (showUserList ? null : (e.currentTarget.style.transform = 'scale(0.9)'))}
+						onMouseUp={e => (showUserList ? null : (e.currentTarget.style.transform = 'scale(1.2)'))}
 					>
-						<LiaUsersCogSolid
-							style={{ color: 'white' }}
-							onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.2)')}
-							onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
-							onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
-							onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.2)')}
-						/>
+						<LiaUsersCogSolid style={{ color: 'white' }} />
 					</button>
 				</div>
 			)}
