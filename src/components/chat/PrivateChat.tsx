@@ -360,7 +360,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						<Box
 							style={{
 								position: 'absolute',
-								top: '60px',
+								top: '15%',
 								left: '42%',
 								transform: 'translateX(-50%)',
 								zIndex: 20,
@@ -383,8 +383,8 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 									display: 'flex',
 									alignItems: 'center',
 									justifyContent: 'center',
-									width: '32px',
-									height: '32px',
+									width: '42px',
+									height: '42px',
 									padding: '0',
 									cursor: 'pointer',
 									border: '2px solid var(--gray-4)',
