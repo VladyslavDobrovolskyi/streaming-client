@@ -423,6 +423,7 @@ export default function RoomPage() {
 
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (isLoading) return
+			if (isMenuOpen) return
 
 			if (allChatsIsClosed) {
 				if (e.code === 'Space') {
