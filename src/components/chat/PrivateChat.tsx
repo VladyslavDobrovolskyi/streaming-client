@@ -13,6 +13,23 @@ const animationStyles = `
 }
 `
 
+const pulseAnimation = `
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+`
+
 interface PrivateChatProps {
 	onMouseEnter: (id: string) => void
 	onMouseLeave: () => void
@@ -335,8 +352,10 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 								left: 0,
 								right: 0,
 								zIndex: 10,
+								cursor: 'pointer',
 							}}
 						>
+							<style>{pulseAnimation}</style>
 							<Button
 								size='1'
 								variant='soft'
@@ -357,7 +376,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 									alignItems: 'center',
 									gap: '4px',
 									padding: '6px 12px',
-									animation: 'fadeIn 0.3s ease',
+									animation: 'fadeIn 0.3s ease, pulse 1.5s infinite',
 								}}
 							>
 								<svg
