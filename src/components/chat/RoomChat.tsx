@@ -68,118 +68,121 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	const [lastSeenMessageCount, setLastSeenMessageCount] = useState(0)
 	const prevMessagesCountRef = useRef(messages.length)
 
-	// Replace the state variables for tracking the last message sender with these variables for tracking the first message
-	const [firstMessageRefs, setFirstMessageRefs] = useState<Record<string, React.RefObject<HTMLDivElement>>>({})
-	const [invisibleFirstMessageSender, setInvisibleFirstMessageSender] = useState<string | null>(null)
+	// State for tracking sequence start messages
+	const [sequenceStartRefs, setSequenceStartRefs] = useState<Record<number, React.RefObject<HTMLDivElement>>>({})
+	const [invisibleSequenceStartIndex, setInvisibleSequenceStartIndex] = useState<number | null>(null)
 	const [showFloatingAvatar, setShowFloatingAvatar] = useState(false)
 
-	// Replace the checkLastMessageVisibility function with this function to check first message visibility
-	const checkFirstMessageVisibility = () => {
-		if (messages.length === 0) return
+	// Find all sequence start indices (where a user starts sending messages after someone else)
+	const findSequenceStartIndices = () => {
+		const indices: number[] = []
 
-		// Create a map to track the first message from each sender
-		const firstMessageSenders = new Map<string, number>()
-
-		// Create a map to track the last message from each sender
-		const lastMessageSenders = new Map<string, number>()
-
-		// Find the first and last message index for each sender
 		messages.forEach((msg, index) => {
-			if (msg.sender !== realClientID) {
-				if (!firstMessageSenders.has(msg.sender)) {
-					firstMessageSenders.set(msg.sender, index)
-				}
-				// Always update to get the latest message
-				lastMessageSenders.set(msg.sender, index)
+			if (msg.sender === realClientID) return // Skip messages from the current user
+
+			// If this is the first message or the previous message was from a different sender
+			if (index === 0 || messages[index - 1].sender !== msg.sender) {
+				indices.push(index)
 			}
 		})
+
+		return indices
+	}
+
+	// Check visibility of sequence start messages
+	const checkSequenceStartVisibility = () => {
+		if (messages.length === 0) return
+
+		// Get all sequence start indices
+		const sequenceStartIndices = findSequenceStartIndices()
 
 		// Get the last message sender (who is not the current user)
 		const lastMessages = [...messages].reverse()
 		const lastMessageSender = lastMessages.find(msg => msg.sender !== realClientID)?.sender
+		if (!lastMessageSender) return
 
-		// Check if any first messages are out of view
-		let foundInvisibleSender = false
+		// Find the last sequence start index for the last message sender
+		const lastSenderSequenceStarts = sequenceStartIndices.filter(
+			index => messages[index].sender === lastMessageSender
+		)
 
-		firstMessageSenders.forEach((firstIndex, sender) => {
-			const firstMessageRef = firstMessageRefs[sender]
-			if (!firstMessageRef || !firstMessageRef.current) return
+		if (lastSenderSequenceStarts.length === 0) return
 
-			const firstMessageRect = firstMessageRef.current.getBoundingClientRect()
-			const scrollAreaRect = scrollAreaRef.current?.getBoundingClientRect()
-			if (!scrollAreaRect) return
+		// Get the last sequence start index
+		const lastSequenceStartIndex = lastSenderSequenceStarts[lastSenderSequenceStarts.length - 1]
+		const sequenceStartRef = sequenceStartRefs[lastSequenceStartIndex]
 
-			// Check if this first message is out of view (scrolled up)
-			const isFirstMessageVisible =
-				firstMessageRect.top >= scrollAreaRect.top && firstMessageRect.bottom <= scrollAreaRect.bottom
+		if (!sequenceStartRef || !sequenceStartRef.current) return
 
-			// If first message is not visible and this sender is the last message sender
-			if (!isFirstMessageVisible && sender === lastMessageSender) {
-				// Check if there are visible messages from this sender
-				const hasVisibleMessages = messages.some((msg, i) => {
-					if (msg.sender !== sender) return false
-					if (i <= firstIndex) return false // Skip the first message we already checked
+		const scrollAreaRect = scrollAreaRef.current?.getBoundingClientRect()
+		if (!scrollAreaRect) return
 
-					// For subsequent messages from this sender, check if they're visible
-					const msgRef = document.querySelector(`.message-${i}`)
-					if (!msgRef) return false
+		// Check if the sequence start message is visible
+		const rect = sequenceStartRef.current.getBoundingClientRect()
+		const isSequenceStartVisible = rect.top >= scrollAreaRect.top && rect.bottom <= scrollAreaRect.bottom
 
-					const msgRect = msgRef.getBoundingClientRect()
-					return msgRect.top >= scrollAreaRect.top && msgRect.bottom <= scrollAreaRect.bottom
-				})
+		// Check if the last message from this sender is visible
+		let isLastMessageVisible = false
+		// Find the last message index without using findLastIndex (ES2023)
+		const messagesReversed = [...messages].reverse()
+		const reversedIndex = messagesReversed.findIndex(msg => msg.sender === lastMessageSender)
+		const lastMessageIndex = reversedIndex !== -1 ? messages.length - 1 - reversedIndex : -1
 
-				// Get the last message index for this sender
-				const lastMessageIndex = lastMessageSenders.get(sender)
-
-				// Check if the last message from this sender is visible
-				let isLastMessageVisible = false
-				if (lastMessageIndex !== undefined) {
-					const lastMessageRef = document.querySelector(`.message-${lastMessageIndex}`)
-					if (lastMessageRef) {
-						const lastMessageRect = lastMessageRef.getBoundingClientRect()
-						isLastMessageVisible =
-							lastMessageRect.top >= scrollAreaRect.top && lastMessageRect.bottom <= scrollAreaRect.bottom
-					}
-				}
-
-				// Only show the floating avatar if:
-				// 1. There are visible messages from this sender AND
-				// 2. This sender is the last person who sent a message AND
-				// 3. The last message from this sender is NOT visible
-				if (hasVisibleMessages && !foundInvisibleSender && !isLastMessageVisible) {
-					setInvisibleFirstMessageSender(sender)
-					setShowFloatingAvatar(true)
-					foundInvisibleSender = true
-				}
+		if (lastMessageIndex !== -1) {
+			const lastMessageRef = document.querySelector(`.message-${lastMessageIndex}`)
+			if (lastMessageRef) {
+				const lastMessageRect = lastMessageRef.getBoundingClientRect()
+				isLastMessageVisible =
+					lastMessageRect.top >= scrollAreaRect.top && lastMessageRect.bottom <= scrollAreaRect.bottom
 			}
-		})
-
-		if (!foundInvisibleSender) {
-			setShowFloatingAvatar(false)
-			setInvisibleFirstMessageSender(null)
 		}
+
+		// Only show the floating avatar if:
+		// 1. The sequence start message is NOT visible AND
+		// 2. There are visible messages from this sender AND
+		// 3. The last message is NOT visible
+		if (!isSequenceStartVisible && !isLastMessageVisible) {
+			// Check if there are any visible messages from this sender
+			const hasVisibleMessages = messages.some((msg, i) => {
+				if (msg.sender !== lastMessageSender) return false
+				if (i < lastSequenceStartIndex) return false // Skip messages before the sequence start
+
+				const msgRef = document.querySelector(`.message-${i}`)
+				if (!msgRef) return false
+
+				const msgRect = msgRef.getBoundingClientRect()
+				return msgRect.top >= scrollAreaRect.top && msgRect.bottom <= scrollAreaRect.bottom
+			})
+
+			if (hasVisibleMessages) {
+				setInvisibleSequenceStartIndex(lastSequenceStartIndex)
+				setShowFloatingAvatar(true)
+				return
+			}
+		}
+
+		// If we get here, don't show the floating avatar
+		setShowFloatingAvatar(false)
+		setInvisibleSequenceStartIndex(null)
 	}
 
-	// Add this effect to initialize refs for first messages
+	// Initialize refs for sequence start messages
 	useEffect(() => {
-		const newRefs: Record<string, React.RefObject<HTMLDivElement>> = {}
-		const firstMessageSenders = new Set<string>()
+		const sequenceStartIndices = findSequenceStartIndices()
+		const newRefs: Record<number, React.RefObject<HTMLDivElement>> = {}
 
-		messages.forEach(msg => {
-			if (msg.sender !== realClientID && !firstMessageSenders.has(msg.sender)) {
-				firstMessageSenders.add(msg.sender)
-				if (!firstMessageRefs[msg.sender]) {
-					newRefs[msg.sender] = React.createRef<HTMLDivElement>()
-				}
+		sequenceStartIndices.forEach(index => {
+			if (!sequenceStartRefs[index]) {
+				newRefs[index] = React.createRef<HTMLDivElement>()
 			}
 		})
 
 		if (Object.keys(newRefs).length > 0) {
-			setFirstMessageRefs(prev => ({ ...prev, ...newRefs }))
+			setSequenceStartRefs(prev => ({ ...prev, ...newRefs }))
 		}
 	}, [messages, realClientID])
 
-	// Modify the handleScroll function to check first message visibility instead of last message
+	// Modify the handleScroll function to check sequence start visibility
 	const handleScroll = () => {
 		const filteredMessages = messages.filter(msg => msg.sender !== realClientID)
 		const scrollArea = scrollAreaRef.current
@@ -194,20 +197,20 @@ const RoomChat: React.FC<RoomChatProps> = ({
 				setShowFloatingAvatar(false)
 			}
 
-			// Check if first messages are visible
-			checkFirstMessageVisibility()
+			// Check if sequence start messages are visible
+			checkSequenceStartVisibility()
 		}
 	}
 
-	// Replace the useEffect that checks message visibility
+	// Check visibility when messages or refs change
 	useEffect(() => {
-		if (messages.length > 0 && Object.keys(firstMessageRefs).length > 0) {
+		if (messages.length > 0 && Object.keys(sequenceStartRefs).length > 0) {
 			// Wait for refs to be attached
 			setTimeout(() => {
-				checkFirstMessageVisibility()
+				checkSequenceStartVisibility()
 			}, 100)
 		}
-	}, [messages, firstMessageRefs])
+	}, [messages, sequenceStartRefs])
 
 	useEffect(() => {
 		if (!isTyping && !isHovered) {
@@ -373,8 +376,8 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						onScroll={handleScroll}
 					>
 						{messages.map((msg, index) => {
-							// Determine if this is the first message from this sender
-							const isFirstFromSender = messages.findIndex(m => m.sender === msg.sender) === index
+							// Determine if this is the start of a sequence (first message after someone else)
+							const isSequenceStart = index === 0 || messages[index - 1].sender !== msg.sender
 
 							return (
 								<Box
@@ -385,8 +388,8 @@ const RoomChat: React.FC<RoomChatProps> = ({
 										marginBottom: '8px',
 									}}
 									ref={
-										msg.sender !== realClientID && isFirstFromSender
-											? firstMessageRefs[msg.sender] || null
+										msg.sender !== realClientID && isSequenceStart
+											? sequenceStartRefs[index] || null
 											: null
 									}
 								>
@@ -462,8 +465,8 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						})}
 					</ScrollArea>
 					{showFloatingAvatar &&
-						invisibleFirstMessageSender &&
-						participantInfo[invisibleFirstMessageSender] && (
+						invisibleSequenceStartIndex !== null &&
+						messages[invisibleSequenceStartIndex] && (
 							<Box
 								style={{
 									position: 'absolute',
@@ -482,20 +485,15 @@ const RoomChat: React.FC<RoomChatProps> = ({
 								}}
 							>
 								<Avatar
-									src={participantInfo[invisibleFirstMessageSender]?.avatar}
-									fallback={participantInfo[invisibleFirstMessageSender]?.username[0]}
+									src={participantInfo[messages[invisibleSequenceStartIndex].sender]?.avatar}
+									fallback={
+										participantInfo[messages[invisibleSequenceStartIndex].sender]?.username[0]
+									}
 									size='2'
 									onClick={() => {
-										// Find the first message from this sender
-										const firstMessageIndex = messages.findIndex(
-											msg => msg.sender === invisibleFirstMessageSender
-										)
-										if (
-											firstMessageIndex >= 0 &&
-											firstMessageRefs[invisibleFirstMessageSender]?.current
-										) {
-											// Scroll to the first message
-											firstMessageRefs[invisibleFirstMessageSender].current?.scrollIntoView({
+										// Scroll to the sequence start message
+										if (sequenceStartRefs[invisibleSequenceStartIndex]?.current) {
+											sequenceStartRefs[invisibleSequenceStartIndex].current?.scrollIntoView({
 												behavior: 'smooth',
 											})
 											setTimeout(() => {
@@ -507,7 +505,9 @@ const RoomChat: React.FC<RoomChatProps> = ({
 										cursor: 'pointer',
 										border: '2px solid var(--gray-4)',
 									}}
-									title={`${participantInfo[invisibleFirstMessageSender]?.username}'s first message is not visible. Click to scroll to it.`}
+									title={`${
+										participantInfo[messages[invisibleSequenceStartIndex].sender]?.username
+									}'s first message in this sequence is not visible. Click to scroll to it.`}
 								/>
 							</Box>
 						)}
