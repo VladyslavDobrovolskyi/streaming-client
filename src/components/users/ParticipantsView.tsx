@@ -53,7 +53,6 @@ export default function ParticipantsView({
 				width: '100%',
 				height: '100%',
 				pointerEvents: 'none',
-				zIndex: 10,
 				opacity: 1,
 				visibility: 'visible',
 				transition: 'opacity 0.3s ease, visibility 0.3s ease',
