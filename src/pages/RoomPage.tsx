@@ -372,12 +372,12 @@ export default function RoomPage() {
 		if (controlsTimeoutRef.current) {
 			clearTimeout(controlsTimeoutRef.current)
 		}
-		if (!isDragging && !isMenuOpen) {
+		if (!isDragging && !isMenuOpen && !showUserList) {
 			controlsTimeoutRef.current = setTimeout(() => {
 				setShowControls(false)
 			}, 3000) as unknown as number
 		}
-	}, [isDragging, isMenuOpen])
+	}, [isDragging, isMenuOpen, showUserList])
 
 	const handleFullscreenToggle = () => {
 		if (!document.fullscreenElement) {
