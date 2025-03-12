@@ -618,6 +618,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 															: 'hidden',
 														cursor: 'pointer',
 														transition: 'opacity 0.3s ease',
+														borderRadius: '0px',
 													}}
 													onClick={() => onOpenPrivateChat(msg.sender)}
 													title={`Open private chat with ${
@@ -698,7 +699,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 									onClick={handleAvatarClick}
 									style={{
 										cursor: 'pointer',
-										border: '2px solid var(--gray-4)',
+										borderRadius: '0px',
 									}}
 									title={
 										onlyLocalMessagesVisible
