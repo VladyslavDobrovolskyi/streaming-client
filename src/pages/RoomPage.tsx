@@ -422,8 +422,8 @@ export default function RoomPage() {
 		const allChatsIsClosed = !isAnyChatOpen
 
 		const handleKeyDown = (e: KeyboardEvent) => {
-			e.preventDefault()
 			if (isLoading) return
+
 			if (allChatsIsClosed) {
 				if (e.code === 'Space') {
 					e.preventDefault()
