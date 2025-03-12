@@ -348,7 +348,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 							justify='center'
 							style={{
 								position: 'absolute',
-								bottom: '105px',
+								bottom: '110px',
 								left: 0,
 								right: 0,
 								zIndex: 10,
