@@ -70,102 +70,162 @@ const RoomChat: React.FC<RoomChatProps> = ({
 
 	// State for tracking sequence start messages
 	const [sequenceStartRefs, setSequenceStartRefs] = useState<Record<number, React.RefObject<HTMLDivElement>>>({})
+	const [sequenceEndRefs, setSequenceEndRefs] = useState<Record<number, React.RefObject<HTMLDivElement>>>({})
 	const [invisibleSequenceStartIndex, setInvisibleSequenceStartIndex] = useState<number | null>(null)
+	const [invisibleSequenceEndIndex, setInvisibleSequenceEndIndex] = useState<number | null>(null)
 	const [showFloatingAvatar, setShowFloatingAvatar] = useState(false)
+	const [floatingAvatarSender, setFloatingAvatarSender] = useState<string | null>(null)
 
-	// Find all sequence start indices (where a user starts sending messages after someone else)
-	const findSequenceStartIndices = () => {
-		const indices: number[] = []
+	// Find all sequence start and end indices
+	const findSequenceIndices = () => {
+		const startIndices: number[] = []
+		const endIndices: number[] = []
 
 		messages.forEach((msg, index) => {
 			if (msg.sender === realClientID) return // Skip messages from the current user
 
 			// If this is the first message or the previous message was from a different sender
 			if (index === 0 || messages[index - 1].sender !== msg.sender) {
-				indices.push(index)
+				startIndices.push(index)
+			}
+
+			// If this is the last message or the next message is from a different sender
+			if (index === messages.length - 1 || messages[index + 1].sender !== msg.sender) {
+				endIndices.push(index)
 			}
 		})
 
-		return indices
+		return { startIndices, endIndices }
 	}
 
-	// Check visibility of sequence start messages
-	const checkSequenceStartVisibility = () => {
+	// Get the last non-local sender
+	const getLastNonLocalSender = () => {
+		for (let i = messages.length - 1; i >= 0; i--) {
+			if (messages[i].sender !== realClientID) {
+				return messages[i].sender
+			}
+		}
+		return null
+	}
+
+	// Check visibility of sequence messages
+	const checkSequenceVisibility = () => {
 		if (messages.length === 0) return
 
-		// Get all sequence start indices
-		const sequenceStartIndices = findSequenceStartIndices()
+		// Get all sequence indices
+		const { startIndices, endIndices } = findSequenceIndices()
 
 		// Get the last message sender (who is not the current user)
-		const lastMessages = [...messages].reverse()
-		const lastMessageSender = lastMessages.find(msg => msg.sender !== realClientID)?.sender
-		if (!lastMessageSender) return
-
-		// Find the last sequence start index for the last message sender
-		const lastSenderSequenceStarts = sequenceStartIndices.filter(
-			index => messages[index].sender === lastMessageSender
-		)
-
-		if (lastSenderSequenceStarts.length === 0) return
-
-		// Get the last sequence start index
-		const lastSequenceStartIndex = lastSenderSequenceStarts[lastSenderSequenceStarts.length - 1]
-		const sequenceStartRef = sequenceStartRefs[lastSequenceStartIndex]
-
-		if (!sequenceStartRef || !sequenceStartRef.current) return
+		const lastNonLocalSender = getLastNonLocalSender()
+		if (!lastNonLocalSender) return
 
 		const scrollAreaRect = scrollAreaRef.current?.getBoundingClientRect()
 		if (!scrollAreaRect) return
 
-		// Check if the sequence start message is visible
-		const rect = sequenceStartRef.current.getBoundingClientRect()
-		const isSequenceStartVisible = rect.top >= scrollAreaRect.top && rect.bottom <= scrollAreaRect.bottom
+		// Find all sequences for the last non-local sender
+		const lastSenderStartIndices: number[] = []
+		const lastSenderEndIndices: number[] = []
 
-		// Only show the floating avatar if:
-		// 1. The sequence start message is NOT visible AND
-		// 2. There are visible messages from this sender
-		if (!isSequenceStartVisible) {
-			// Check if there are any visible messages from this sender
-			const hasVisibleMessages = messages.some((msg, i) => {
-				if (msg.sender !== lastMessageSender) return false
-				if (i < lastSequenceStartIndex) return false // Skip messages before the sequence start
-
-				const msgRef = document.querySelector(`.message-${i}`)
-				if (!msgRef) return false
-
-				const msgRect = msgRef.getBoundingClientRect()
-				return msgRect.top >= scrollAreaRect.top && msgRect.bottom <= scrollAreaRect.bottom
-			})
-
-			if (hasVisibleMessages) {
-				setInvisibleSequenceStartIndex(lastSequenceStartIndex)
-				setShowFloatingAvatar(true)
-				return
+		startIndices.forEach(startIndex => {
+			if (messages[startIndex].sender === lastNonLocalSender) {
+				lastSenderStartIndices.push(startIndex)
+				// Find the corresponding end index
+				const endIndex = endIndices.find(
+					endIdx => endIdx >= startIndex && messages[endIdx].sender === lastNonLocalSender
+				)
+				if (endIndex !== undefined) {
+					lastSenderEndIndices.push(endIndex)
+				}
 			}
+		})
+
+		if (lastSenderStartIndices.length === 0) return
+
+		// Get the last sequence start and end indices
+		const lastSequenceStartIndex = lastSenderStartIndices[lastSenderStartIndices.length - 1]
+		const lastSequenceEndIndex = lastSenderEndIndices[lastSenderEndIndices.length - 1]
+
+		const startRef = sequenceStartRefs[lastSequenceStartIndex]
+		const endRef = sequenceEndRefs[lastSequenceEndIndex]
+
+		if (!startRef?.current || !endRef?.current) return
+
+		// Check if the sequence start message is visible
+		const startRect = startRef.current.getBoundingClientRect()
+		const isSequenceStartVisible = startRect.top >= scrollAreaRect.top && startRect.bottom <= scrollAreaRect.bottom
+
+		// Check if the sequence end message is visible
+		const endRect = endRef.current.getBoundingClientRect()
+		const isSequenceEndVisible = endRect.top >= scrollAreaRect.top && endRect.bottom <= scrollAreaRect.bottom
+
+		// Check if there are any visible messages from this sender in this sequence
+		const hasVisibleMessages = messages.some((msg, i) => {
+			if (msg.sender !== lastNonLocalSender) return false
+			if (i < lastSequenceStartIndex || i > lastSequenceEndIndex) return false
+
+			const msgRef = document.querySelector(`.message-${i}`)
+			if (!msgRef) return false
+
+			const msgRect = msgRef.getBoundingClientRect()
+			return msgRect.top >= scrollAreaRect.top && msgRect.bottom <= scrollAreaRect.bottom
+		})
+
+		// Show the floating avatar if:
+		// 1. Either the sequence start OR end message is NOT visible AND
+		// 2. There are visible messages from this sender
+		if ((!isSequenceStartVisible || !isSequenceEndVisible) && hasVisibleMessages) {
+			if (!isSequenceStartVisible) {
+				setInvisibleSequenceStartIndex(lastSequenceStartIndex)
+			} else {
+				setInvisibleSequenceStartIndex(null)
+			}
+
+			if (!isSequenceEndVisible) {
+				setInvisibleSequenceEndIndex(lastSequenceEndIndex)
+			} else {
+				setInvisibleSequenceEndIndex(null)
+			}
+
+			setFloatingAvatarSender(lastNonLocalSender)
+			setShowFloatingAvatar(true)
+			return
 		}
 
 		// If we get here, don't show the floating avatar
 		setShowFloatingAvatar(false)
 		setInvisibleSequenceStartIndex(null)
+		setInvisibleSequenceEndIndex(null)
+		setFloatingAvatarSender(null)
 	}
 
-	// Initialize refs for sequence start messages
+	// Initialize refs for sequence start and end messages
 	useEffect(() => {
-		const sequenceStartIndices = findSequenceStartIndices()
-		const newRefs: Record<number, React.RefObject<HTMLDivElement>> = {}
+		const { startIndices, endIndices } = findSequenceIndices()
 
-		sequenceStartIndices.forEach(index => {
+		const newStartRefs: Record<number, React.RefObject<HTMLDivElement>> = {}
+		startIndices.forEach(index => {
 			if (!sequenceStartRefs[index]) {
-				newRefs[index] = React.createRef<HTMLDivElement>()
+				newStartRefs[index] = React.createRef<HTMLDivElement>()
 			}
 		})
 
-		if (Object.keys(newRefs).length > 0) {
-			setSequenceStartRefs(prev => ({ ...prev, ...newRefs }))
+		const newEndRefs: Record<number, React.RefObject<HTMLDivElement>> = {}
+		endIndices.forEach(index => {
+			if (!sequenceEndRefs[index]) {
+				newEndRefs[index] = React.createRef<HTMLDivElement>()
+			}
+		})
+
+		if (Object.keys(newStartRefs).length > 0) {
+			setSequenceStartRefs(prev => ({ ...prev, ...newStartRefs }))
+		}
+
+		if (Object.keys(newEndRefs).length > 0) {
+			setSequenceEndRefs(prev => ({ ...prev, ...newEndRefs }))
 		}
 	}, [messages, realClientID])
 
-	// Modify the handleScroll function to check sequence start visibility
+	// Modify the handleScroll function to check sequence visibility
 	const handleScroll = () => {
 		const filteredMessages = messages.filter(msg => msg.sender !== realClientID)
 		const scrollArea = scrollAreaRef.current
@@ -180,20 +240,24 @@ const RoomChat: React.FC<RoomChatProps> = ({
 				setShowFloatingAvatar(false)
 			}
 
-			// Check if sequence start messages are visible
-			checkSequenceStartVisibility()
+			// Check if sequence messages are visible
+			checkSequenceVisibility()
 		}
 	}
 
 	// Check visibility when messages or refs change
 	useEffect(() => {
-		if (messages.length > 0 && Object.keys(sequenceStartRefs).length > 0) {
+		if (
+			messages.length > 0 &&
+			Object.keys(sequenceStartRefs).length > 0 &&
+			Object.keys(sequenceEndRefs).length > 0
+		) {
 			// Wait for refs to be attached
 			setTimeout(() => {
-				checkSequenceStartVisibility()
+				checkSequenceVisibility()
 			}, 100)
 		}
-	}, [messages, sequenceStartRefs])
+	}, [messages, sequenceStartRefs, sequenceEndRefs])
 
 	useEffect(() => {
 		if (!isTyping && !isHovered) {
@@ -261,6 +325,30 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		const isLast = !nextMessage || nextMessage.sender !== message.sender
 
 		return `message ${isFirst ? 'message-first' : ''} ${isLast ? 'message-last' : ''}`
+	}
+
+	// Determine if a message is the start or end of a sequence
+	const isSequenceStart = (index: number) => {
+		return index === 0 || messages[index - 1].sender !== messages[index].sender
+	}
+
+	const isSequenceEnd = (index: number) => {
+		return index === messages.length - 1 || messages[index + 1].sender !== messages[index].sender
+	}
+
+	// Handle avatar click to scroll to the appropriate message
+	const handleAvatarClick = () => {
+		if (invisibleSequenceStartIndex !== null && sequenceStartRefs[invisibleSequenceStartIndex]?.current) {
+			// If start is not visible, scroll to it
+			sequenceStartRefs[invisibleSequenceStartIndex].current?.scrollIntoView({ behavior: 'smooth' })
+		} else if (invisibleSequenceEndIndex !== null && sequenceEndRefs[invisibleSequenceEndIndex]?.current) {
+			// If end is not visible, scroll to it
+			sequenceEndRefs[invisibleSequenceEndIndex].current?.scrollIntoView({ behavior: 'smooth' })
+		}
+
+		setTimeout(() => {
+			setShowFloatingAvatar(false)
+		}, 500)
 	}
 
 	return (
@@ -359,8 +447,9 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						onScroll={handleScroll}
 					>
 						{messages.map((msg, index) => {
-							// Determine if this is the start of a sequence (first message after someone else)
-							const isSequenceStart = index === 0 || messages[index - 1].sender !== msg.sender
+							// Determine if this is the start or end of a sequence
+							const isStart = isSequenceStart(index)
+							const isEnd = isSequenceEnd(index)
 
 							return (
 								<Box
@@ -371,8 +460,12 @@ const RoomChat: React.FC<RoomChatProps> = ({
 										marginBottom: '8px',
 									}}
 									ref={
-										msg.sender !== realClientID && isSequenceStart
-											? sequenceStartRefs[index] || null
+										msg.sender !== realClientID
+											? isStart
+												? sequenceStartRefs[index] || null
+												: isEnd
+												? sequenceEndRefs[index] || null
+												: null
 											: null
 									}
 								>
@@ -447,53 +540,41 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							)
 						})}
 					</ScrollArea>
-					{showFloatingAvatar &&
-						invisibleSequenceStartIndex !== null &&
-						messages[invisibleSequenceStartIndex] && (
-							<Box
+					{showFloatingAvatar && floatingAvatarSender && participantInfo[floatingAvatarSender] && (
+						<Box
+							style={{
+								position: 'absolute',
+								top: '60px',
+								left: '50%',
+								transform: 'translateX(-50%)',
+								zIndex: 20,
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+								padding: '4px 8px',
+								borderRadius: '999px',
+								backgroundColor: 'rgba(255, 255, 255, 0.9)',
+								boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+								animation: 'pulse 1.5s infinite',
+							}}
+						>
+							<Avatar
+								src={participantInfo[floatingAvatarSender]?.avatar}
+								fallback={participantInfo[floatingAvatarSender]?.username[0]}
+								size='2'
+								onClick={handleAvatarClick}
 								style={{
-									position: 'absolute',
-									top: '60px',
-									left: '50%',
-									transform: 'translateX(-50%)',
-									zIndex: 20,
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'center',
-									padding: '4px 8px',
-									borderRadius: '999px',
-									backgroundColor: 'rgba(255, 255, 255, 0.9)',
-									boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-									animation: 'pulse 1.5s infinite',
+									cursor: 'pointer',
+									border: '2px solid var(--gray-4)',
 								}}
-							>
-								<Avatar
-									src={participantInfo[messages[invisibleSequenceStartIndex].sender]?.avatar}
-									fallback={
-										participantInfo[messages[invisibleSequenceStartIndex].sender]?.username[0]
-									}
-									size='2'
-									onClick={() => {
-										// Scroll to the sequence start message
-										if (sequenceStartRefs[invisibleSequenceStartIndex]?.current) {
-											sequenceStartRefs[invisibleSequenceStartIndex].current?.scrollIntoView({
-												behavior: 'smooth',
-											})
-											setTimeout(() => {
-												setShowFloatingAvatar(false)
-											}, 500)
-										}
-									}}
-									style={{
-										cursor: 'pointer',
-										border: '2px solid var(--gray-4)',
-									}}
-									title={`${
-										participantInfo[messages[invisibleSequenceStartIndex].sender]?.username
-									}'s first message in this sequence is not visible. Click to scroll to it.`}
-								/>
-							</Box>
-						)}
+								title={
+									invisibleSequenceStartIndex !== null
+										? `${participantInfo[floatingAvatarSender]?.username}'s first message in this sequence is not visible. Click to scroll to it.`
+										: `${participantInfo[floatingAvatarSender]?.username}'s last message in this sequence is not visible. Click to scroll to it.`
+								}
+							/>
+						</Box>
+					)}
 					{/* Add new messages indicator */}
 					{hasNewMessages && !isAtBottom && (
 						<Flex
