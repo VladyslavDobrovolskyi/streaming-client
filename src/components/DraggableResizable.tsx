@@ -1,5 +1,3 @@
-'use client'
-
 import type React from 'react'
 import { useState, useRef, useCallback, useEffect, type ReactNode } from 'react'
 import { Resizable, type ResizeCallbackData } from 'react-resizable'

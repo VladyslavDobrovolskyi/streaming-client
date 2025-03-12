@@ -238,7 +238,7 @@ export default function ClientVideo({
 				pointerEvents: 'auto',
 			}}
 			hide={isCameraMuted || cameraStatus === false}
-			focused={highlightedUser === clientID}
+			focused={highlightedUser === clientID || hoveredClient === clientID}
 		>
 			{({ isDragging }) => (
 				<div
@@ -258,7 +258,7 @@ export default function ClientVideo({
 						borderRadius: 'var(--radius-4)',
 						transform: `scale(${size.scale || 1})`,
 						transformOrigin: 'center center',
-						zIndex: 11000,
+						zIndex: hoveredClient === clientID ? 2147483647 : 11000,
 					}}
 					onMouseEnter={() => {
 						setHoveredClient(clientID)
