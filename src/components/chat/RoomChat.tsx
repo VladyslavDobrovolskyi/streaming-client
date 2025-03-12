@@ -1,10 +1,29 @@
-'use client'
-
 import type React from 'react'
 import { useState, useRef, useEffect } from 'react'
 import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar } from '@radix-ui/themes'
 import { MdKeyboardReturn } from 'react-icons/md'
 import DraggableResizable from '../DraggableResizable'
+
+// Add animation styles for the new messages indicator
+const animationStyles = `@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}`
+
+const pulseAnimation = `  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }`
 
 interface RoomChatProps {
 	realClientID: string | null
@@ -40,8 +59,28 @@ const RoomChat: React.FC<RoomChatProps> = ({
 }) => {
 	const [isActive, setIsActive] = useState(true)
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
-
 	const [isHovered, setIsHovered] = useState(false)
+	// Add new state variables for scroll tracking
+	const [isAtBottom, setIsAtBottom] = useState(true)
+	const [hasNewMessages, setHasNewMessages] = useState(false)
+	const [lastSeenMessageCount, setLastSeenMessageCount] = useState(0)
+	const prevMessagesCountRef = useRef(messages.length)
+
+	// Handle scroll events to track position
+	const handleScroll = () => {
+		const filteredMessages = messages.filter(msg => msg.sender !== realClientID)
+		const scrollArea = scrollAreaRef.current
+		if (scrollArea) {
+			const isScrolledToBottom = scrollArea.scrollHeight - scrollArea.scrollTop <= scrollArea.clientHeight + 10 // Add a small buffer
+			setIsAtBottom(isScrolledToBottom)
+
+			// When user scrolls to bottom, update the last seen message count
+			if (isScrolledToBottom) {
+				setLastSeenMessageCount(filteredMessages.length)
+				setHasNewMessages(false)
+			}
+		}
+	}
 
 	useEffect(() => {
 		if (!isTyping && !isHovered) {
@@ -49,11 +88,57 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		}
 	}, [isHovered, isTyping])
 
+	// Effect to scroll to bottom when chat opens
 	useEffect(() => {
-		if (scrollAreaRef.current) {
-			scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
+		const scrollArea = scrollAreaRef.current
+		if (scrollArea) {
+			scrollArea.scrollTop = scrollArea.scrollHeight
 		}
-	}, [messages])
+	}, []) // Empty dependency array ensures this runs only once when component mounts
+
+	// Effect to handle new messages and scrolling
+	useEffect(() => {
+		const scrollArea = scrollAreaRef.current
+		const filteredMessages = messages.filter(msg => msg.sender !== realClientID)
+		if (scrollArea) {
+			if (isAtBottom) {
+				// Only scroll if there are new messages to avoid unnecessary scrolling
+				const currentMessagesCount = messages.length
+
+				if (currentMessagesCount > prevMessagesCountRef.current) {
+					const scrollTimeout = setTimeout(() => {
+						scrollArea.scrollTop = scrollArea.scrollHeight
+					}, 0)
+
+					// Update last seen count when at bottom
+					setLastSeenMessageCount(filteredMessages.length)
+					setHasNewMessages(false)
+
+					// Update reference for next comparison
+					prevMessagesCountRef.current = currentMessagesCount
+
+					return () => clearTimeout(scrollTimeout)
+				}
+			} else {
+				// Only show new messages indicator if there are actually new messages
+				// since the last time user was at the bottom
+				if (filteredMessages.length > lastSeenMessageCount) {
+					setHasNewMessages(true)
+				}
+			}
+		}
+	}, [messages, isAtBottom, lastSeenMessageCount, realClientID])
+
+	// Add animation styles to document
+	useEffect(() => {
+		const styleElement = document.createElement('style')
+		styleElement.innerHTML = animationStyles + pulseAnimation
+		document.head.appendChild(styleElement)
+
+		return () => {
+			document.head.removeChild(styleElement)
+		}
+	}, [])
 
 	const getMessageClasses = (message: { sender: string }, index: number) => {
 		const prevMessage = messages[index - 1]
@@ -152,11 +237,13 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						style={{
 							flex: 1,
 							padding: '16px',
+							paddingBottom: '0px',
 							background: 'linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(250,250,250,0.98))',
 						}}
 						ref={scrollAreaRef}
 						className='scroll-area'
 						scrollbars='vertical'
+						onScroll={handleScroll}
 					>
 						{messages.map((msg, index) => (
 							<Box
@@ -235,6 +322,55 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							</Box>
 						))}
 					</ScrollArea>
+					{/* Add new messages indicator */}
+					{hasNewMessages && !isAtBottom && (
+						<Flex
+							justify='center'
+							style={{
+								position: 'absolute',
+								bottom: '110px',
+								left: 0,
+								right: 0,
+								zIndex: 10,
+							}}
+						>
+							<Button
+								size='1'
+								variant='soft'
+								onClick={() => {
+									const scrollArea = scrollAreaRef.current
+									if (scrollArea) {
+										scrollArea.scrollTop = scrollArea.scrollHeight
+										setLastSeenMessageCount(
+											messages.filter(msg => msg.sender !== realClientID).length
+										)
+										setHasNewMessages(false)
+									}
+								}}
+								style={{
+									borderRadius: '999px',
+									boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+									display: 'flex',
+									alignItems: 'center',
+									gap: '4px',
+									padding: '6px 12px',
+									animation: 'fadeIn 0.3s ease, pulse 1.5s infinite',
+									cursor: 'pointer',
+								}}
+							>
+								<svg
+									width='16'
+									height='16'
+									viewBox='0 0 24 24'
+									fill='none'
+									xmlns='http://www.w3.org/2000/svg'
+								>
+									<path d='M12 16L6 10H18L12 16Z' fill='currentColor' />
+								</svg>
+								New messages
+							</Button>
+						</Flex>
+					)}
 					<Flex
 						p='3'
 						gap='2'
@@ -289,5 +425,4 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		</DraggableResizable>
 	)
 }
-
 export default RoomChat
