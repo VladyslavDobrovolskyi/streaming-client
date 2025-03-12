@@ -411,7 +411,12 @@ export default function VideoControls({
 						onOpenChange={open => (open ? onMenuOpen() : onMenuClose())}
 						modal={false}
 					>
-						<DropdownMenu.Trigger asChild>
+						<DropdownMenu.Trigger
+							asChild
+							onKeyDown={event => {
+								event.preventDefault()
+							}}
+						>
 							<button
 								style={{
 									color: 'white',
@@ -424,6 +429,9 @@ export default function VideoControls({
 									alignItems: 'center',
 									transform: isMenuOpen ? 'scale(1.2) rotate(90deg)' : 'scale(1) rotate(0deg)',
 									transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+								}}
+								onKeyDown={event => {
+									event.preventDefault()
 								}}
 								onMouseOver={e => {
 									if (!isMenuOpen) {
