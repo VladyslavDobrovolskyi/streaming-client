@@ -72,9 +72,9 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	const [sequenceStartRefs, setSequenceStartRefs] = useState<Record<number, React.RefObject<HTMLDivElement>>>({})
 	const [sequenceEndRefs, setSequenceEndRefs] = useState<Record<number, React.RefObject<HTMLDivElement>>>({})
 	const [invisibleSequenceStartIndex, setInvisibleSequenceStartIndex] = useState<number | null>(null)
-	const [invisibleSequenceEndIndex, setInvisibleSequenceEndIndex] = useState<number | null>(null)
 	const [showFloatingAvatar, setShowFloatingAvatar] = useState(false)
 	const [floatingAvatarSender, setFloatingAvatarSender] = useState<string | null>(null)
+	const [onlyLocalMessagesVisible, setOnlyLocalMessagesVisible] = useState(false)
 
 	// Find all sequence start and end indices
 	const findSequenceIndices = () => {
@@ -108,60 +108,11 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		return null
 	}
 
-	// Check visibility of sequence messages
-	const checkSequenceVisibility = () => {
-		if (messages.length === 0) return
-
-		// Get all sequence indices
-		const { startIndices, endIndices } = findSequenceIndices()
-
-		// Get the last message sender (who is not the current user)
-		const lastNonLocalSender = getLastNonLocalSender()
-		if (!lastNonLocalSender) return
-
-		const scrollAreaRect = scrollAreaRef.current?.getBoundingClientRect()
-		if (!scrollAreaRect) return
-
-		// Find all sequences for the last non-local sender
-		const lastSenderStartIndices: number[] = []
-		const lastSenderEndIndices: number[] = []
-
-		startIndices.forEach(startIndex => {
-			if (messages[startIndex].sender === lastNonLocalSender) {
-				lastSenderStartIndices.push(startIndex)
-				// Find the corresponding end index
-				const endIndex = endIndices.find(
-					endIdx => endIdx >= startIndex && messages[endIdx].sender === lastNonLocalSender
-				)
-				if (endIndex !== undefined) {
-					lastSenderEndIndices.push(endIndex)
-				}
-			}
-		})
-
-		if (lastSenderStartIndices.length === 0) return
-
-		// Get the last sequence start and end indices
-		const lastSequenceStartIndex = lastSenderStartIndices[lastSenderStartIndices.length - 1]
-		const lastSequenceEndIndex = lastSenderEndIndices[lastSenderEndIndices.length - 1]
-
-		const startRef = sequenceStartRefs[lastSequenceStartIndex]
-		const endRef = sequenceEndRefs[lastSequenceEndIndex]
-
-		if (!startRef?.current || !endRef?.current) return
-
-		// Check if the sequence start message is visible
-		const startRect = startRef.current.getBoundingClientRect()
-		const isSequenceStartVisible = startRect.top >= scrollAreaRect.top && startRect.bottom <= scrollAreaRect.bottom
-
-		// Check if the sequence end message is visible
-		const endRect = endRef.current.getBoundingClientRect()
-		const isSequenceEndVisible = endRect.top >= scrollAreaRect.top && endRect.bottom <= scrollAreaRect.bottom
-
-		// Check if there are any visible messages from this sender in this sequence
-		const hasVisibleMessages = messages.some((msg, i) => {
-			if (msg.sender !== lastNonLocalSender) return false
-			if (i < lastSequenceStartIndex || i > lastSequenceEndIndex) return false
+	// Check if any non-local messages are visible
+	const checkIfOnlyLocalMessagesVisible = (scrollAreaRect: DOMRect) => {
+		// Check if any non-local messages are visible
+		const anyNonLocalVisible = messages.some((msg, i) => {
+			if (msg.sender === realClientID) return false
 
 			const msgRef = document.querySelector(`.message-${i}`)
 			if (!msgRef) return false
@@ -170,32 +121,106 @@ const RoomChat: React.FC<RoomChatProps> = ({
 			return msgRect.top >= scrollAreaRect.top && msgRect.bottom <= scrollAreaRect.bottom
 		})
 
-		// Show the floating avatar if:
-		// 1. Either the sequence start OR end message is NOT visible AND
-		// 2. There are visible messages from this sender
-		if ((!isSequenceStartVisible || !isSequenceEndVisible) && hasVisibleMessages) {
-			if (!isSequenceStartVisible) {
-				setInvisibleSequenceStartIndex(lastSequenceStartIndex)
-			} else {
-				setInvisibleSequenceStartIndex(null)
-			}
+		// If no non-local messages are visible but there are some local messages visible
+		const anyLocalVisible = messages.some((msg, i) => {
+			if (msg.sender !== realClientID) return false
 
-			if (!isSequenceEndVisible) {
-				setInvisibleSequenceEndIndex(lastSequenceEndIndex)
-			} else {
-				setInvisibleSequenceEndIndex(null)
-			}
+			const msgRef = document.querySelector(`.message-${i}`)
+			if (!msgRef) return false
 
-			setFloatingAvatarSender(lastNonLocalSender)
-			setShowFloatingAvatar(true)
-			return
+			const msgRect = msgRef.getBoundingClientRect()
+			return msgRect.top >= scrollAreaRect.top && msgRect.bottom <= scrollAreaRect.bottom
+		})
+
+		return !anyNonLocalVisible && anyLocalVisible
+	}
+
+	// Check visibility of sequence messages
+	const checkSequenceVisibility = () => {
+		if (messages.length === 0) return
+
+		const scrollAreaRect = scrollAreaRef.current?.getBoundingClientRect()
+		if (!scrollAreaRect) return
+
+		// First check if only local messages are visible
+		const onlyLocalVisible = checkIfOnlyLocalMessagesVisible(scrollAreaRect)
+		setOnlyLocalMessagesVisible(onlyLocalVisible)
+
+		if (onlyLocalVisible) {
+			// Get the last non-local sender
+			const lastNonLocalSender = getLastNonLocalSender()
+			if (lastNonLocalSender) {
+				// Find the first message of their last sequence
+				const { startIndices } = findSequenceIndices()
+				const lastSenderStartIndices = startIndices.filter(
+					index => messages[index].sender === lastNonLocalSender
+				)
+
+				if (lastSenderStartIndices.length > 0) {
+					const lastSequenceStartIndex = lastSenderStartIndices[lastSenderStartIndices.length - 1]
+					setInvisibleSequenceStartIndex(lastSequenceStartIndex)
+					setFloatingAvatarSender(lastNonLocalSender)
+					setShowFloatingAvatar(true)
+					return
+				}
+			}
+		}
+
+		// Get all sequence indices
+		const { startIndices, endIndices } = findSequenceIndices()
+
+		// Process each sequence to check visibility
+		for (let i = 0; i < startIndices.length; i++) {
+			const startIndex = startIndices[i]
+			const sender = messages[startIndex].sender
+
+			// Find the corresponding end index
+			const endIndex = endIndices.find(endIdx => endIdx >= startIndex && messages[endIdx].sender === sender)
+
+			if (endIndex === undefined) continue
+
+			const startRef = sequenceStartRefs[startIndex]
+			const endRef = sequenceEndRefs[endIndex]
+
+			if (!startRef?.current || !endRef?.current) continue
+
+			// Check if the sequence start message is visible
+			const startRect = startRef.current.getBoundingClientRect()
+			const isSequenceStartVisible =
+				startRect.top >= scrollAreaRect.top && startRect.bottom <= scrollAreaRect.bottom
+
+			// Check if the sequence end message is visible
+			const endRect = endRef.current.getBoundingClientRect()
+			const isSequenceEndVisible = endRect.top >= scrollAreaRect.top && endRect.bottom <= scrollAreaRect.bottom
+
+			// Check if any messages from this sequence are visible
+			const hasVisibleMessages = messages.some((msg, idx) => {
+				if (msg.sender !== sender) return false
+				if (idx < startIndex || idx > endIndex) return false
+
+				const msgRef = document.querySelector(`.message-${idx}`)
+				if (!msgRef) return false
+
+				const msgRect = msgRef.getBoundingClientRect()
+				return msgRect.top >= scrollAreaRect.top && msgRect.bottom <= scrollAreaRect.bottom
+			})
+
+			// Show the floating avatar if:
+			// The first message is NOT visible but the last message IS visible
+			if (!isSequenceStartVisible && isSequenceEndVisible && hasVisibleMessages) {
+				setInvisibleSequenceStartIndex(startIndex)
+				setFloatingAvatarSender(sender)
+				setShowFloatingAvatar(true)
+				return
+			}
 		}
 
 		// If we get here, don't show the floating avatar
-		setShowFloatingAvatar(false)
-		setInvisibleSequenceStartIndex(null)
-		setInvisibleSequenceEndIndex(null)
-		setFloatingAvatarSender(null)
+		if (!onlyLocalMessagesVisible) {
+			setShowFloatingAvatar(false)
+			setInvisibleSequenceStartIndex(null)
+			setFloatingAvatarSender(null)
+		}
 	}
 
 	// Initialize refs for sequence start and end messages
@@ -339,16 +364,14 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	// Handle avatar click to scroll to the appropriate message
 	const handleAvatarClick = () => {
 		if (invisibleSequenceStartIndex !== null && sequenceStartRefs[invisibleSequenceStartIndex]?.current) {
-			// If start is not visible, scroll to it
+			// Always scroll to the first message of the sequence
 			sequenceStartRefs[invisibleSequenceStartIndex].current?.scrollIntoView({ behavior: 'smooth' })
-		} else if (invisibleSequenceEndIndex !== null && sequenceEndRefs[invisibleSequenceEndIndex]?.current) {
-			// If end is not visible, scroll to it
-			sequenceEndRefs[invisibleSequenceEndIndex].current?.scrollIntoView({ behavior: 'smooth' })
-		}
 
-		setTimeout(() => {
-			setShowFloatingAvatar(false)
-		}, 500)
+			setTimeout(() => {
+				setShowFloatingAvatar(false)
+				setOnlyLocalMessagesVisible(false)
+			}, 500)
+		}
 	}
 
 	return (
@@ -568,9 +591,9 @@ const RoomChat: React.FC<RoomChatProps> = ({
 									border: '2px solid var(--gray-4)',
 								}}
 								title={
-									invisibleSequenceStartIndex !== null
-										? `${participantInfo[floatingAvatarSender]?.username}'s first message in this sequence is not visible. Click to scroll to it.`
-										: `${participantInfo[floatingAvatarSender]?.username}'s last message in this sequence is not visible. Click to scroll to it.`
+									onlyLocalMessagesVisible
+										? `${participantInfo[floatingAvatarSender]?.username} was the last person to send a message. Click to see their messages.`
+										: `${participantInfo[floatingAvatarSender]?.username}'s first message in this sequence is not visible. Click to scroll to it.`
 								}
 							/>
 						</Box>
