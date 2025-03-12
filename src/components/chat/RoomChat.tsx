@@ -69,6 +69,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						backgroundColor: 'var(--gray-1)',
 						borderRadius: 'var(--radius-4)',
 						overflow: 'hidden',
+						zIndex: isActive ? 2147483647 : 12000,
 						display: 'flex',
 						flexDirection: 'column',
 						width: '100%',
