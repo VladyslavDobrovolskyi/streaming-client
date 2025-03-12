@@ -67,6 +67,14 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 		}
 	}
 
+	// Effect to scroll to bottom when chat opens
+	useEffect(() => {
+		const scrollArea = scrollAreaRef.current
+		if (scrollArea) {
+			scrollArea.scrollTop = scrollArea.scrollHeight
+		}
+	}, []) // Empty dependency array ensures this runs only once when component mounts
+
 	useEffect(() => {
 		const scrollArea = scrollAreaRef.current
 		const filteredMessages = privateMessages.filter(msg => msg.from !== realClientID)
@@ -103,8 +111,34 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 		if (message.trim()) {
 			sendPrivateMessage({ to: recipientId, message })
 			setMessage('')
+
+			// When user sends a message and scroll is at bottom, maintain scroll position
+			if (isAtBottom && scrollAreaRef.current) {
+				setTimeout(() => {
+					if (scrollAreaRef.current) {
+						scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight
+					}
+				}, 0)
+			}
 		}
 	}
+
+	useEffect(() => {
+		if (!isTyping && !isHovered) {
+			setIsActive(false)
+		}
+	}, [isHovered, isTyping])
+
+	useEffect(() => {
+		// Add animation styles to document
+		const styleElement = document.createElement('style')
+		styleElement.innerHTML = animationStyles
+		document.head.appendChild(styleElement)
+
+		return () => {
+			document.head.removeChild(styleElement)
+		}
+	}, [])
 
 	const getMessageClasses = (message: { from: string }, index: number) => {
 		const prevMessage = privateMessages[index - 1]
