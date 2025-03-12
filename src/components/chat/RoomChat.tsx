@@ -67,6 +67,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	const [hasNewMessages, setHasNewMessages] = useState(false)
 	const [lastSeenMessageCount, setLastSeenMessageCount] = useState(0)
 	const prevMessagesCountRef = useRef(messages.length)
+	const [isAtTop, setIsAtTop] = useState(false)
 
 	// State for tracking sequence start messages
 	const [sequenceStartRefs, setSequenceStartRefs] = useState<Record<number, React.RefObject<HTMLDivElement>>>({})
@@ -315,7 +316,10 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		const scrollArea = scrollAreaRef.current
 		if (scrollArea) {
 			const isScrolledToBottom = scrollArea.scrollHeight - scrollArea.scrollTop <= scrollArea.clientHeight + 10 // Add a small buffer
+			const isScrolledToTop = scrollArea.scrollTop <= 10 // Add a small buffer for "at top" detection
+
 			setIsAtBottom(isScrolledToBottom)
+			setIsAtTop(isScrolledToTop)
 
 			// When user scrolls to bottom, update the last seen message count
 			if (isScrolledToBottom) {
@@ -726,6 +730,51 @@ const RoomChat: React.FC<RoomChatProps> = ({
 									<path d='M12 16L6 10H18L12 16Z' fill='currentColor' />
 								</svg>
 								New messages
+							</Button>
+						</Flex>
+					)}
+					{/* Scroll to bottom button when at top */}
+					{isAtTop && (
+						<Flex
+							justify='center'
+							style={{
+								position: 'absolute',
+								bottom: '50%',
+								right: '10px',
+								zIndex: 10,
+							}}
+						>
+							<Button
+								size='1'
+								variant='soft'
+								onClick={() => {
+									const scrollArea = scrollAreaRef.current
+									if (scrollArea) {
+										scrollArea.scrollTop = scrollArea.scrollHeight
+									}
+								}}
+								style={{
+									borderRadius: '999px',
+									boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+									width: '36px',
+									height: '36px',
+									padding: '0',
+									animation: 'fadeIn 0.3s ease, pulse 1.5s infinite',
+									cursor: 'pointer',
+								}}
+							>
+								<svg
+									width='16'
+									height='16'
+									viewBox='0 0 24 24'
+									fill='none'
+									xmlns='http://www.w3.org/2000/svg'
+								>
+									<path d='M12 16L6 10H18L12 16Z' fill='currentColor' />
+								</svg>
 							</Button>
 						</Flex>
 					)}
