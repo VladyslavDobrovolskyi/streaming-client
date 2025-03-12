@@ -224,11 +224,18 @@ const RoomChat: React.FC<RoomChatProps> = ({
 
 				if (lastSenderStartIndices.length > 0) {
 					const lastSequenceStartIndex = lastSenderStartIndices[lastSenderStartIndices.length - 1]
-					setInvisibleSequenceStartIndex(lastSequenceStartIndex)
-					setFloatingAvatarSender(lastNonLocalSender)
-					setShowFloatingAvatar(true)
-					setIsPreviousUserAvatar(false)
-					return
+
+					// Check if the local user's messages are the first in the chat
+					const localUserFirstInChat = messages.length > 0 && messages[0].sender === realClientID
+
+					// Only show floating avatar if the local user's messages are not the first in the chat
+					if (!localUserFirstInChat) {
+						setInvisibleSequenceStartIndex(lastSequenceStartIndex)
+						setFloatingAvatarSender(lastNonLocalSender)
+						setShowFloatingAvatar(true)
+						setIsPreviousUserAvatar(false)
+						return
+					}
 				}
 			}
 		} else {
