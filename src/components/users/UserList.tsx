@@ -84,6 +84,7 @@ export default function UserList({
 							transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 							marginRight: showUserList ? '5px' : '0',
 							backdropFilter: 'blur(4px)',
+							transform: showUserList ? 'scale(1.2)' : 'scale(1)',
 						}}
 						onMouseOver={e => (showUserList ? null : (e.currentTarget.style.transform = 'scale(1.2)'))}
 						onMouseOut={e => (showUserList ? null : (e.currentTarget.style.transform = 'scale(1)'))}
