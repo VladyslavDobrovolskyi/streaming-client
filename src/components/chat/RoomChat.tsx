@@ -1,6 +1,6 @@
 'use client'
 
-import type React from 'react'
+import React from 'react'
 import { useState, useRef, useEffect } from 'react'
 import { Box, Flex, ScrollArea, Text, TextArea, Button, Avatar } from '@radix-ui/themes'
 import { MdKeyboardReturn } from 'react-icons/md'
@@ -68,29 +68,88 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	const [lastSeenMessageCount, setLastSeenMessageCount] = useState(0)
 	const prevMessagesCountRef = useRef(messages.length)
 
-	// Add new state variables for tracking the last message sender
-	const [lastVisibleSender, setLastVisibleSender] = useState<string | null>(null)
+	// Replace the state variables for tracking the last message sender with these variables for tracking the first message
+	const [firstMessageRefs, setFirstMessageRefs] = useState<Record<string, React.RefObject<HTMLDivElement>>>({})
+	const [invisibleFirstMessageSender, setInvisibleFirstMessageSender] = useState<string | null>(null)
 	const [showFloatingAvatar, setShowFloatingAvatar] = useState(false)
-	const lastMessageRef = useRef<HTMLDivElement>(null)
 
-	// Add this function after the handleScroll function
-	const checkLastMessageVisibility = () => {
+	// Replace the checkLastMessageVisibility function with this function to check first message visibility
+	const checkFirstMessageVisibility = () => {
 		if (messages.length === 0) return
-		const lastMessage = messages[messages.length - 1]
-		if (lastMessage.sender === realClientID) return
-		const lastMessageElement = lastMessageRef.current
-		if (!lastMessageElement) return
-		const rect = lastMessageElement.getBoundingClientRect()
-		const scrollAreaRect = scrollAreaRef.current?.getBoundingClientRect()
-		if (!scrollAreaRect) return
 
-		// Check if the last message is out of view (scrolled up)
-		const isVisible = rect.top >= scrollAreaRect.top && rect.bottom <= scrollAreaRect.bottom
-		setShowFloatingAvatar(!isVisible)
-		setLastVisibleSender(!isVisible ? lastMessage.sender : null)
+		// Create a map to track the first message from each sender
+		const firstMessageSenders = new Map<string, number>()
+
+		// Find the first message index for each sender
+		messages.forEach((msg, index) => {
+			if (msg.sender !== realClientID && !firstMessageSenders.has(msg.sender)) {
+				firstMessageSenders.set(msg.sender, index)
+			}
+		})
+
+		// Check if any first messages are out of view
+		let foundInvisibleSender = false
+
+		firstMessageSenders.forEach((index, sender) => {
+			const ref = firstMessageRefs[sender]
+			if (!ref || !ref.current) return
+
+			const rect = ref.current.getBoundingClientRect()
+			const scrollAreaRect = scrollAreaRef.current?.getBoundingClientRect()
+			if (!scrollAreaRect) return
+
+			// Check if this first message is out of view (scrolled up)
+			const isVisible = rect.top >= scrollAreaRect.top && rect.bottom <= scrollAreaRect.bottom
+
+			// If not visible and we're currently showing messages from this sender
+			if (!isVisible) {
+				// Check if there are visible messages from this sender
+				const hasVisibleMessages = messages.some((msg, i) => {
+					if (msg.sender !== sender) return false
+					if (i <= index) return false // Skip the first message we already checked
+
+					// For subsequent messages from this sender, check if they're visible
+					const msgRef = document.querySelector(`.message-${i}`)
+					if (!msgRef) return false
+
+					const msgRect = msgRef.getBoundingClientRect()
+					return msgRect.top >= scrollAreaRect.top && msgRect.bottom <= scrollAreaRect.bottom
+				})
+
+				if (hasVisibleMessages && !foundInvisibleSender) {
+					setInvisibleFirstMessageSender(sender)
+					setShowFloatingAvatar(true)
+					foundInvisibleSender = true
+				}
+			}
+		})
+
+		if (!foundInvisibleSender) {
+			setShowFloatingAvatar(false)
+			setInvisibleFirstMessageSender(null)
+		}
 	}
 
-	// Modify the handleScroll function to also check message visibility
+	// Add this effect to initialize refs for first messages
+	useEffect(() => {
+		const newRefs: Record<string, React.RefObject<HTMLDivElement>> = {}
+		const firstMessageSenders = new Set<string>()
+
+		messages.forEach(msg => {
+			if (msg.sender !== realClientID && !firstMessageSenders.has(msg.sender)) {
+				firstMessageSenders.add(msg.sender)
+				if (!firstMessageRefs[msg.sender]) {
+					newRefs[msg.sender] = React.createRef<HTMLDivElement>()
+				}
+			}
+		})
+
+		if (Object.keys(newRefs).length > 0) {
+			setFirstMessageRefs(prev => ({ ...prev, ...newRefs }))
+		}
+	}, [messages, realClientID])
+
+	// Modify the handleScroll function to check first message visibility instead of last message
 	const handleScroll = () => {
 		const filteredMessages = messages.filter(msg => msg.sender !== realClientID)
 		const scrollArea = scrollAreaRef.current
@@ -105,17 +164,20 @@ const RoomChat: React.FC<RoomChatProps> = ({
 				setShowFloatingAvatar(false)
 			}
 
-			// Check if last message is visible
-			checkLastMessageVisibility()
+			// Check if first messages are visible
+			checkFirstMessageVisibility()
 		}
 	}
 
-	// Add effect to check visibility when messages change
+	// Replace the useEffect that checks message visibility
 	useEffect(() => {
-		if (messages.length > 0) {
-			checkLastMessageVisibility()
+		if (messages.length > 0 && Object.keys(firstMessageRefs).length > 0) {
+			// Wait for refs to be attached
+			setTimeout(() => {
+				checkFirstMessageVisibility()
+			}, 100)
 		}
-	}, [messages])
+	}, [messages, firstMessageRefs])
 
 	useEffect(() => {
 		if (!isTyping && !isHovered) {
@@ -280,122 +342,145 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						scrollbars='vertical'
 						onScroll={handleScroll}
 					>
-						{messages.map((msg, index) => (
-							<Box
-								key={index}
-								className={getMessageClasses(msg, index)}
-								style={{
-									textAlign: msg.sender === realClientID ? 'right' : 'left',
-									marginBottom: '8px',
-								}}
-								ref={index === messages.length - 1 ? lastMessageRef : undefined}
-							>
-								<Flex align='end' gap='2' justify={msg.sender === realClientID ? 'end' : 'start'}>
-									{msg.sender !== realClientID && (
-										<div style={{ position: 'relative' }}>
-											<Avatar
-												onMouseEnter={() => onMouseEnter(msg.sender)}
-												onMouseLeave={onMouseLeave}
-												src={participantInfo[msg.sender]?.avatar}
-												fallback={participantInfo[msg.sender]?.username[0]}
-												size='1'
-												style={{
-													marginBottom: '4px',
-													opacity: getMessageClasses(msg, index).includes('message-first')
-														? 1
-														: 0,
-													visibility: getMessageClasses(msg, index).includes('message-first')
-														? 'visible'
-														: 'hidden',
-													cursor: 'pointer',
-													transition: 'opacity 0.3s ease',
-												}}
-												onClick={() => onOpenPrivateChat(msg.sender)}
-												title={`Open private chat with ${
-													participantInfo[msg.sender]?.username
-												}`}
-											/>
-										</div>
-									)}
-									<Box
-										style={{
-											maxWidth: '85%',
-											wordBreak: 'break-word',
-										}}
-									>
-										<Text
-											as='span'
-											size='2'
+						{messages.map((msg, index) => {
+							// Determine if this is the first message from this sender
+							const isFirstFromSender = messages.findIndex(m => m.sender === msg.sender) === index
+
+							return (
+								<Box
+									key={index}
+									className={`message message-${index} ${getMessageClasses(msg, index)}`}
+									style={{
+										textAlign: msg.sender === realClientID ? 'right' : 'left',
+										marginBottom: '8px',
+									}}
+									ref={
+										msg.sender !== realClientID && isFirstFromSender
+											? firstMessageRefs[msg.sender] || null
+											: null
+									}
+								>
+									<Flex align='end' gap='2' justify={msg.sender === realClientID ? 'end' : 'start'}>
+										{msg.sender !== realClientID && (
+											<div style={{ position: 'relative' }}>
+												<Avatar
+													onMouseEnter={() => onMouseEnter(msg.sender)}
+													onMouseLeave={onMouseLeave}
+													src={participantInfo[msg.sender]?.avatar}
+													fallback={participantInfo[msg.sender]?.username[0]}
+													size='1'
+													style={{
+														marginBottom: '4px',
+														opacity: getMessageClasses(msg, index).includes('message-first')
+															? 1
+															: 0,
+														visibility: getMessageClasses(msg, index).includes(
+															'message-first'
+														)
+															? 'visible'
+															: 'hidden',
+														cursor: 'pointer',
+														transition: 'opacity 0.3s ease',
+													}}
+													onClick={() => onOpenPrivateChat(msg.sender)}
+													title={`Open private chat with ${
+														participantInfo[msg.sender]?.username
+													}`}
+												/>
+											</div>
+										)}
+										<Box
 											style={{
-												display: 'inline-block',
-												backgroundColor:
-													msg.sender === realClientID
-														? 'rgba(65, 150, 247, 0.75)'
-														: 'var(--gray-3)',
-												color: msg.sender === realClientID ? 'white' : 'var(--gray-12)',
-												border: '3px solid rgba(0, 0, 0, 0.1)',
-												borderRadius:
-													msg.sender === realClientID
-														? getMessageClasses(msg, index).includes('message-last')
-															? '18px 18px 0 18px'
-															: '18px 18px 4px 18px'
-														: getMessageClasses(msg, index).includes('message-last')
-														? '18px 18px 18px 0'
-														: '18px 18px 18px 4px',
-												padding: '8px 12px',
-												whiteSpace: 'pre-wrap',
-												boxShadow:
-													msg.sender === realClientID
-														? '0 2px 5px rgba(0, 0, 0, 0.1)'
-														: '0 2px 5px rgba(0, 0, 0, 0.05)',
-												transition: 'transform 0.2s ease, opacity 0.2s ease',
+												maxWidth: '85%',
+												wordBreak: 'break-word',
 											}}
 										>
-											{msg.message}
-										</Text>
-									</Box>
-								</Flex>
-							</Box>
-						))}
+											<Text
+												as='span'
+												size='2'
+												style={{
+													display: 'inline-block',
+													backgroundColor:
+														msg.sender === realClientID
+															? 'rgba(65, 150, 247, 0.75)'
+															: 'var(--gray-3)',
+													color: msg.sender === realClientID ? 'white' : 'var(--gray-12)',
+													border: '3px solid rgba(0, 0, 0, 0.1)',
+													borderRadius:
+														msg.sender === realClientID
+															? getMessageClasses(msg, index).includes('message-last')
+																? '18px 18px 0 18px'
+																: '18px 18px 4px 18px'
+															: getMessageClasses(msg, index).includes('message-last')
+															? '18px 18px 18px 0'
+															: '18px 18px 18px 4px',
+													padding: '8px 12px',
+													whiteSpace: 'pre-wrap',
+													boxShadow:
+														msg.sender === realClientID
+															? '0 2px 5px rgba(0, 0, 0, 0.1)'
+															: '0 2px 5px rgba(0, 0, 0, 0.05)',
+													transition: 'transform 0.2s ease, opacity 0.2s ease',
+												}}
+											>
+												{msg.message}
+											</Text>
+										</Box>
+									</Flex>
+								</Box>
+							)
+						})}
 					</ScrollArea>
-					{showFloatingAvatar && lastVisibleSender && participantInfo[lastVisibleSender] && (
-						<Box
-							style={{
-								position: 'absolute',
-								top: '60px',
-								left: '50%',
-								transform: 'translateX(-50%)',
-								zIndex: 20,
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								padding: '4px 8px',
-								borderRadius: '999px',
-								backgroundColor: 'rgba(255, 255, 255, 0.9)',
-								boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-								animation: 'pulse 1.5s infinite',
-							}}
-						>
-							<Avatar
-								src={participantInfo[lastVisibleSender]?.avatar}
-								fallback={participantInfo[lastVisibleSender]?.username[0]}
-								size='2'
-								onClick={() => {
-									// Scroll to the last message
-									const scrollArea = scrollAreaRef.current
-									if (scrollArea) {
-										scrollArea.scrollTop = scrollArea.scrollHeight
-										setShowFloatingAvatar(false)
-									}
-								}}
+					{showFloatingAvatar &&
+						invisibleFirstMessageSender &&
+						participantInfo[invisibleFirstMessageSender] && (
+							<Box
 								style={{
-									cursor: 'pointer',
-									border: '2px solid var(--gray-4)',
+									position: 'absolute',
+									top: '60px',
+									left: '50%',
+									transform: 'translateX(-50%)',
+									zIndex: 20,
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+									padding: '4px 8px',
+									borderRadius: '999px',
+									backgroundColor: 'rgba(255, 255, 255, 0.9)',
+									boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+									animation: 'pulse 1.5s infinite',
 								}}
-								title={`${participantInfo[lastVisibleSender]?.username} is typing. Click to scroll to their message.`}
-							/>
-						</Box>
-					)}
+							>
+								<Avatar
+									src={participantInfo[invisibleFirstMessageSender]?.avatar}
+									fallback={participantInfo[invisibleFirstMessageSender]?.username[0]}
+									size='2'
+									onClick={() => {
+										// Find the first message from this sender
+										const firstMessageIndex = messages.findIndex(
+											msg => msg.sender === invisibleFirstMessageSender
+										)
+										if (
+											firstMessageIndex >= 0 &&
+											firstMessageRefs[invisibleFirstMessageSender]?.current
+										) {
+											// Scroll to the first message
+											firstMessageRefs[invisibleFirstMessageSender].current?.scrollIntoView({
+												behavior: 'smooth',
+											})
+											setTimeout(() => {
+												setShowFloatingAvatar(false)
+											}, 500)
+										}
+									}}
+									style={{
+										cursor: 'pointer',
+										border: '2px solid var(--gray-4)',
+									}}
+									title={`${participantInfo[invisibleFirstMessageSender]?.username}'s first message is not visible. Click to scroll to it.`}
+								/>
+							</Box>
+						)}
 					{/* Add new messages indicator */}
 					{hasNewMessages && !isAtBottom && (
 						<Flex
