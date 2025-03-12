@@ -44,7 +44,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	const handleScroll = () => {
 		const scrollArea = scrollAreaRef.current
 		if (scrollArea) {
-			const isScrolledToBottom = scrollArea.scrollHeight - scrollArea.scrollTop === scrollArea.clientHeight
+			const isScrolledToBottom = scrollArea.scrollHeight - scrollArea.scrollTop <= scrollArea.clientHeight + 10 // Добавляем небольшой запас
 			setIsAtBottom(isScrolledToBottom)
 		}
 	}
