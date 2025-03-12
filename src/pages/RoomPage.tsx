@@ -87,6 +87,7 @@ export default function RoomPage() {
 	const [unreadMessages, setUnreadMessages] = useState<Record<string, number>>({})
 	// Add a new state for tracking unread room chat messages after the unreadMessages state
 	const [unreadRoomMessages, setUnreadRoomMessages] = useState(0)
+	const [isTyping, setIsTyping] = useState(false)
 	// Add a ref to track the last seen message count after the unreadRoomMessages state
 	const lastSeenMessageCountRef = useRef(0)
 	const userListWidth = 380
@@ -418,13 +419,10 @@ export default function RoomPage() {
 	}, [showControlsHandler])
 
 	useEffect(() => {
-		const isAnyChatOpen = Object.values(privateChats).some(chat => chat) || showChat
-		const allChatsIsClosed = !isAnyChatOpen
-
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (isLoading) return
 
-			if (allChatsIsClosed) {
+			if (!isTyping) {
 				if (e.code === 'Space') {
 					e.preventDefault()
 					if (!isPlaying) {
@@ -971,6 +969,8 @@ export default function RoomPage() {
 			/>
 			{showChat && (
 				<RoomChat
+					isTyping={isTyping}
+					setIsTyping={setIsTyping}
 					onOpenPrivateChat={togglePrivateChat}
 					realClientID={localPeerId}
 					participantInfo={participantInfo}
@@ -987,6 +987,8 @@ export default function RoomPage() {
 				([clientID, isOpen]) =>
 					isOpen && (
 						<PrivateChat
+							isTyping={isTyping}
+							setIsTyping={setIsTyping}
 							onMouseEnter={() => setHighlightedUser(clientID)}
 							onMouseLeave={() => setHighlightedUser(null)}
 							key={clientID}

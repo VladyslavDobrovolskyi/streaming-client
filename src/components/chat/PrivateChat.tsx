@@ -17,6 +17,8 @@ interface PrivateChatProps {
 	privateMessages: Array<{ from: string; to: string; message: string }>
 	realClientID: string
 	highlight: boolean
+	isTyping: boolean
+	setIsTyping: (isTyping: boolean) => void
 }
 
 const PrivateChat: React.FC<PrivateChatProps> = ({
@@ -29,6 +31,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	sendPrivateMessage,
 	privateMessages,
 	realClientID,
+	setIsTyping,
 	highlight,
 }) => {
 	const [message, setMessage] = useState('')
@@ -236,6 +239,8 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 						}}
 					>
 						<TextArea
+							onFocus={() => setIsTyping(true)}
+							onBlur={() => setIsTyping(false)}
 							style={{
 								flex: 1,
 								transition: 'border-color 0.3s ease, box-shadow 0.3s ease',

@@ -20,6 +20,8 @@ interface RoomChatProps {
 	onOpenPrivateChat: (clientID: string) => void
 	onMouseEnter: (id: string) => void
 	onMouseLeave: () => void
+	isTyping: boolean
+	setIsTyping: (isTyping: boolean) => void
 }
 
 const RoomChat: React.FC<RoomChatProps> = ({
@@ -33,6 +35,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	onOpenPrivateChat,
 	onMouseEnter,
 	onMouseLeave,
+	setIsTyping,
 }) => {
 	const [isActive, setIsActive] = useState(true)
 	const scrollAreaRef = useRef<HTMLDivElement>(null)
@@ -230,6 +233,8 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						}}
 					>
 						<TextArea
+							onFocus={() => setIsTyping(true)}
+							onBlur={() => setIsTyping(false)}
 							style={{
 								flex: 1,
 								transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
