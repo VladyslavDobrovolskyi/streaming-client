@@ -89,6 +89,7 @@ export default function RoomPage() {
 	const [unreadMessages, setUnreadMessages] = useState<Record<string, number>>({})
 	// Add a new state for tracking unread room chat messages after the unreadMessages state
 	const [unreadRoomMessages, setUnreadRoomMessages] = useState(0)
+
 	const [isTyping, setIsTyping] = useState(false)
 	// Add a ref to track the last seen message count after the unreadRoomMessages state
 	const lastSeenMessageCountRef = useRef(0)
@@ -97,6 +98,7 @@ export default function RoomPage() {
 	const controlsTimeoutRef = useRef<number | null>(null)
 	const playerWrapperRef = useRef<HTMLDivElement>(null)
 	const previousVolumeRef = useRef(volume)
+	const previousUsersVolumesRef = useRef(new Map())
 	const {
 		userData,
 		updateUserPosition,
@@ -985,6 +987,7 @@ export default function RoomPage() {
 			/>
 			{isLoading && <Loader />}
 			<ParticipantsView
+				previousVolumesRef={previousUsersVolumesRef}
 				clients={clients}
 				setHideMe={setHideMe}
 				participantInfo={participantInfo}
@@ -1083,6 +1086,7 @@ export default function RoomPage() {
 				setNotificationStatus={setNotificationStatus}
 			/>
 			<UserList
+				previousVolumesRef={previousUsersVolumesRef}
 				changeRemoteVolume={changeRemoteVolume}
 				showUserList={showUserList}
 				toggleUserList={toggleUserList}

@@ -23,6 +23,7 @@ export default function ParticipantsView({
 	onCoverToggle,
 	onHighlightChange,
 	setHideMe,
+	previousVolumesRef,
 }) {
 	// Use a ref to track if we're currently updating from this component
 	// This helps prevent circular updates
@@ -83,6 +84,7 @@ export default function ParticipantsView({
 
 				return (
 					<ClientVideo
+						previousVolumesRef={previousVolumesRef}
 						key={clientID}
 						clientID={clientID}
 						provideMediaRef={provideMediaRef}

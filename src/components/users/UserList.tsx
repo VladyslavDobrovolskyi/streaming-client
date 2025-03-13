@@ -107,10 +107,10 @@ export default function UserList({
 	privateChats,
 	changeRemoteVolume, // Добавляем новый проп
 	changeCameraOpacity,
+	previousVolumesRef,
 	camerasOpacity,
 }) {
 	// Store previous volumes to remember them between toggles
-	const previousVolumesRef = useRef(new Map())
 	// Store our own volume state to avoid using toggleRemoteMic for volume changes
 	const [localVolumes, setLocalVolumes] = useState({})
 

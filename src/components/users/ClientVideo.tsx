@@ -37,6 +37,7 @@ export default function ClientVideo({
 	cameraStatus,
 	isMicrophoneDisabled,
 	setHideMe,
+	previousVolumesRef,
 }) {
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
 	const [volumeBeforeMute, setVolumeBeforeMute] = useState(0)
@@ -181,9 +182,19 @@ export default function ClientVideo({
 
 	useEffect(() => {
 		if (isMicrophoneDisabled) {
+			// Save current volume to the ref before muting
+			const currentVolume = getEffectiveVolume()
+			if (currentVolume > 0) {
+				previousVolumesRef.current[clientID] = currentVolume
+			}
+			// Mute the participant
 			handleVolumeChange(0)
+		} else if (previousVolumesRef.current[clientID]) {
+			// Restore previous volume when microphone is enabled again
+			const previousVolume = previousVolumesRef.current[clientID]
+			handleVolumeChange(previousVolume)
 		}
-	}, [isMicrophoneDisabled])
+	}, [isMicrophoneDisabled, clientID])
 	// Add a function to handle camera opacity changes after the handleVolumeChange function
 	const handleCameraOpacityChange = (newOpacity: number) => {
 		setCameraOpacity(newOpacity)
