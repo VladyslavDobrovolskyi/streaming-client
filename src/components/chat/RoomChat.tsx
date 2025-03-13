@@ -776,15 +776,14 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							<Button
 								size='1'
 								variant='soft'
-								className='disable-zoom-on-scroll'
 								onClick={handleScrollToBottom}
 								style={{
 									borderRadius: '999px',
 									boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
 									display: 'flex',
 									alignItems: 'center',
-									gap: '0px',
-									padding: '2px 5px',
+									gap: '4px',
+									padding: '6px 12px',
 									animation: 'fadeIn 0.3s ease, pulse 1.5s infinite',
 									cursor: 'pointer',
 								}}
