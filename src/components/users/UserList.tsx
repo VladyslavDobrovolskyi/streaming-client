@@ -292,37 +292,12 @@ export default function UserList({
 												<FaMicrophoneAltSlash />
 											) : (
 												<div style={{ position: 'relative' }}>
-													<FaMicrophoneAlt
-														style={{
-															color:
-																hoveredMicClientId === clientID
-																	? `linear-gradient(to top, rgba(165, 247, 65, 0.7) ${
-																			(participantVolume[clientID] || 0) * 100
-																	  }%, rgba(128, 128, 128, 0.7) ${
-																			(participantVolume[clientID] || 0) * 100
-																	  }%)`
-																	: 'rgba(165, 247, 65, 0.7)',
-															background:
-																hoveredMicClientId === clientID
-																	? `linear-gradient(to top, rgba(165, 247, 65, 0.7) ${
-																			(participantVolume[clientID] || 0) * 100
-																	  }%, rgba(128, 128, 128, 0.7) ${
-																			(participantVolume[clientID] || 0) * 100
-																	  }%)`
-																	: 'transparent',
-															WebkitBackgroundClip:
-																hoveredMicClientId === clientID ? 'text' : 'unset',
-															WebkitTextFillColor:
-																hoveredMicClientId === clientID
-																	? 'transparent'
-																	: 'unset',
-														}}
-													/>
+													<FaMicrophoneAlt style={{ color: 'rgba(165, 247, 65, 0.7)' }} />
 													{hoveredMicClientId === clientID && (
 														<div
 															style={{
 																position: 'absolute',
-																top: '-20px',
+																bottom: '-18px',
 																left: '50%',
 																transform: 'translateX(-50%)',
 																backgroundColor: 'rgba(0, 0, 0, 0.7)',
@@ -355,26 +330,12 @@ export default function UserList({
 											</>
 										) : (
 											<div style={{ position: 'relative' }}>
-												<FaMicrophoneAlt
-													style={{
-														color: 'transparent',
-														background:
-															hoveredMicClientId === clientID
-																? `linear-gradient(to top, rgba(165, 247, 65, 0.7) ${
-																		(participantVolume[clientID] || 0) * 100
-																  }%, rgba(128, 128, 128, 0.7) ${
-																		(participantVolume[clientID] || 0) * 100
-																  }%)`
-																: 'rgba(165, 247, 65, 0.7)',
-														WebkitBackgroundClip: 'text',
-														WebkitTextFillColor: 'transparent',
-													}}
-												/>
+												<FaMicrophoneAlt style={{ color: 'rgba(165, 247, 65, 0.7)' }} />
 												{hoveredMicClientId === clientID && (
 													<div
 														style={{
 															position: 'absolute',
-															top: '-20px',
+															bottom: '-18px',
 															left: '50%',
 															transform: 'translateX(-50%)',
 															backgroundColor: 'rgba(0, 0, 0, 0.7)',
