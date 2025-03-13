@@ -408,16 +408,17 @@ export default function ClientVideo({
 										}}
 									>
 										<button
-											onClick={handleToggleMuted}
+											onClick={isMicrophoneDisabled ? undefined : handleToggleMuted}
 											style={{
 												color: 'white',
 												border: 'none',
 												padding: '0.5rem',
 												borderRadius: 'var(--radius-4)',
-												cursor: 'pointer',
+												cursor: isMicrophoneDisabled ? 'default' : 'pointer',
 												background: 'none',
 												display: 'flex',
 												alignItems: 'center',
+												opacity: isMicrophoneDisabled ? 0.5 : 1,
 											}}
 										>
 											{getVolumeIcon()}
