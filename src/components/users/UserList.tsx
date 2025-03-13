@@ -70,10 +70,12 @@ export default function UserList({
 		let newVolume = Math.max(0, Math.min(1, currentVolume + direction * 0.01))
 		newVolume = Math.round(newVolume * 100) / 100 // Round to 2 decimal places
 
-		// Update volume
+		console.log(`Adjusting volume: ${Math.round(currentVolume * 100)}% → ${Math.round(newVolume * 100)}%`)
+
+		// Update volume - make sure we're using a specific action type for volume adjustment
 		toggleRemoteMic(clientID, {
 			previousVolume: currentVolume,
-			action: 'setVolume',
+			action: 'adjustVolume', // Use a specific action type for volume adjustment
 			newVolume: newVolume,
 		})
 	}
