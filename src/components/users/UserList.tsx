@@ -86,19 +86,6 @@ const cameraHoverAnimation = `
 `
 
 // Add a new keyframes animation for the highlight effect after the existing animation styles
-const highlightAnimation = `
-  @keyframes highlightPulse {
-    0% {
-      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
-    }
-    70% {
-      box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.2);
-    }
-    100% {
-      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
-    }
-  }
-`
 
 export default function UserList({
 	showUserList,
@@ -541,7 +528,6 @@ export default function UserList({
 			<style>{volumeChangeAnimation}</style>
 			<style>{micHoverAnimation}</style>
 			<style>{cameraHoverAnimation}</style>
-			<style>{highlightAnimation}</style>
 
 			{filteredClients.length >= 1 && filteredClients.length !== 0 && (
 				<div
@@ -625,8 +611,7 @@ export default function UserList({
 										borderRadius: '5px',
 										backgroundColor:
 											highlightedUser === clientID ? 'rgba(255,255,255,0.2)' : 'transparent',
-										boxShadow: highlightedUser === clientID ? 'none' : 'none',
-										animation: highlightedUser === clientID ? 'highlightPulse 2s infinite' : 'none',
+										boxShadow: 'none',
 										display: 'flex',
 										alignItems: 'center',
 										gap: '10px',
