@@ -350,7 +350,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		const filteredMessages = messages.filter(msg => msg.sender !== realClientID)
 		const scrollArea = scrollAreaRef.current
 		if (scrollArea) {
-			const isScrolledToBottom = scrollArea.scrollHeight - scrollArea.scrollTop <= scrollArea.clientHeight + 10 // Add a small buffer
+			const isScrolledToBottom = scrollArea.scrollHeight - scrollArea.scrollTop <= scrollArea.clientHeight + 50 // Add a small buffer
 			const isScrolledToTop = scrollArea.scrollTop <= 10 // Add a small buffer for "at top" detection
 
 			setIsAtBottom(isScrolledToBottom)
