@@ -117,6 +117,9 @@ export default function UserList({
 	const [hoveredMicClientId, setHoveredMicClientId] = useState(null)
 	const [isVolumeChanging, setIsVolumeChanging] = useState(false)
 
+	// Add state to track microphones being unmuted to prevent cross icon flicker
+	const [unmutingMics, setUnmutingMics] = useState({})
+
 	// Add state for camera hover
 	const [hoveredCameraClientId, setHoveredCameraClientId] = useState(null)
 
@@ -415,6 +418,12 @@ export default function UserList({
 			// Unmute: Get the previous volume if available, otherwise use default (0.5)
 			const previousVolume = previousVolumesRef.current.get(clientID) || 0.5
 
+			// Set unmuting flag to prevent cross icon from showing during transition
+			setUnmutingMics(prev => ({
+				...prev,
+				[clientID]: true,
+			}))
+
 			// First update the volume to avoid the cross icon flicker
 			changeRemoteVolume(clientID, previousVolume)
 
@@ -429,6 +438,14 @@ export default function UserList({
 				previousVolume: previousVolume,
 				action: 'unmute',
 			})
+
+			// Clear the unmuting flag after a short delay
+			setTimeout(() => {
+				setUnmutingMics(prev => ({
+					...prev,
+					[clientID]: false,
+				}))
+			}, 500) // Adjust this timeout as needed
 		}
 	}
 
@@ -491,6 +508,15 @@ export default function UserList({
 		return localCameraOpacities[clientID] !== undefined
 			? localCameraOpacities[clientID]
 			: camerasOpacity[clientID] || 1
+	}
+
+	// Function to determine if we should show the cross icon for a microphone
+	const shouldShowMicCross = clientID => {
+		const isMicDisabled =
+			clientID === localVideoId ? isMicrophoneDisabled : participantInfo[clientID]?.isMicrophoneDisabled
+
+		// Don't show cross if mic is disabled or if we're in the process of unmuting
+		return getDisplayVolume(clientID) === 0 && !isMicDisabled && !unmutingMics[clientID]
 	}
 
 	return (
@@ -701,8 +727,8 @@ export default function UserList({
 											}
 										}}
 									>
-										{/* Only show cross icon if volume is 0 AND microphone is NOT disabled */}
-										{getDisplayVolume(clientID) === 0 && !isMicDisabled && (
+										{/* Only show cross icon if volume is 0 AND microphone is NOT disabled AND not currently unmuting */}
+										{shouldShowMicCross(clientID) && (
 											<ImCross
 												style={{
 													position: 'absolute',
@@ -818,11 +844,7 @@ export default function UserList({
 												(clientID === localVideoId && isCameraDisabled)
 													? 'rgba(247, 65, 101, 0.7)'
 													: 'rgba(165, 247, 65, 0.7)',
-											opacity: participantInfo[clientID]?.isCameraDisabled
-												? 1
-												: participantCameras[clientID] === false
-												? 0.3
-												: 1,
+											opacity: participantCameras[clientID] === false ? 0.3 : 1,
 											position: 'relative',
 											transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 										}}
