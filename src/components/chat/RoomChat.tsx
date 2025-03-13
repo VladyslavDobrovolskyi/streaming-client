@@ -751,7 +751,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 								>
 									<path d='M12 16L6 10H18L12 16Z' fill='currentColor' />
 								</svg>
-								{!hasNewMessages ? 'Scroll to bottom' : 'New messages'}
+								{!hasNewMessages ? '' : 'New messages'}
 							</Button>
 						</Flex>
 					)}
