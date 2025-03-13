@@ -187,7 +187,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 		<DraggableResizable
 			initialSize={{ width: 320, height: 480 }}
 			initialPosition={{ x: window.innerWidth - 620, y: window.innerHeight - 550 }}
-			disableWheelZoomClass='scroll-area'
+			disableWheelZoomClass='disable-zoom-on-scroll'
 			bounds='parent'
 			focused={isActive}
 		>
