@@ -73,11 +73,6 @@ export default function UserList({
 		console.log(`Adjusting volume: ${Math.round(currentVolume * 100)}% → ${Math.round(newVolume * 100)}%`)
 
 		// Update volume - make sure we're using a specific action type for volume adjustment
-		toggleRemoteMic(clientID, {
-			previousVolume: currentVolume,
-			action: 'adjustVolume', // Use a specific action type for volume adjustment
-			newVolume: newVolume,
-		})
 	}
 
 	useEffect(() => {
