@@ -342,7 +342,8 @@ export default function RoomPage() {
 		isCameraDisabled,
 		isMicrophoneDisabled,
 		addToast,
-		localPeerId
+		localPeerId,
+		isLoading
 	)
 
 	useEffect(() => {

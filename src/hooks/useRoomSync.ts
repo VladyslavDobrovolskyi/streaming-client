@@ -1,5 +1,7 @@
 'use client'
 
+import type React from 'react'
+
 import { useEffect, useRef, useCallback, useState } from 'react'
 import socket from '../socket/index.ts'
 import ACTIONS from '../socket/actions'
@@ -13,7 +15,8 @@ export default function useRoomSync(
 	isCameraDisabled: boolean,
 	isMicrophoneDisabled: boolean,
 	addToast: (avatar: string, title: string, description: string) => void,
-	localPeerId: string
+	localPeerId: string,
+	isLoadingAttachment: boolean
 ) {
 	const isSyncingRef = useRef(false)
 	const [lastSeekDirection, setLastSeekDirection] = useState<'forward' | 'backward' | null>(null)
@@ -34,7 +37,7 @@ export default function useRoomSync(
 
 	const handlePlay = useCallback(
 		({ socketID, time }: { socketID: string; time: number }) => {
-			if (!videoRef.current || isSyncingRef.current) return
+			if (!videoRef.current || isSyncingRef.current || isLoadingAttachment) return
 			console.log(participantInfo[socketID])
 			console.log('Received play event:', { time })
 			addToast(
@@ -47,12 +50,12 @@ export default function useRoomSync(
 			videoRef.current.getInternalPlayer().play()
 			isSyncingRef.current = false
 		},
-		[videoRef, participantInfo, addToast]
+		[videoRef, participantInfo, addToast, isLoadingAttachment]
 	)
 
 	const handlePause = useCallback(
 		({ socketID, time }: { socketID: string; time: number }) => {
-			if (!videoRef.current || isSyncingRef.current) return
+			if (!videoRef.current || isSyncingRef.current || isLoadingAttachment) return
 			addToast(
 				participantInfo[socketID].avatar,
 				'Syncing',
@@ -63,11 +66,11 @@ export default function useRoomSync(
 			videoRef.current.getInternalPlayer().pause()
 			isSyncingRef.current = false
 		},
-		[videoRef, participantInfo, addToast]
+		[videoRef, participantInfo, addToast, isLoadingAttachment]
 	)
 	const handleSeek = useCallback(
 		({ socketID, time, direction }: { socketID: string; time: number; direction: 'forward' | 'backward' }) => {
-			if (!videoRef.current || isSyncingRef.current) return
+			if (!videoRef.current || isSyncingRef.current || isLoadingAttachment) return
 
 			isSyncingRef.current = true
 			videoRef.current.seekTo(time, 'seconds')
@@ -82,7 +85,7 @@ export default function useRoomSync(
 
 			console.log('Received seek event:', { time, direction })
 		},
-		[videoRef, participantInfo, addToast]
+		[videoRef, participantInfo, addToast, isLoadingAttachment]
 	)
 
 	useEffect(() => {
@@ -258,7 +261,7 @@ export default function useRoomSync(
 
 	const handleSyncState = useCallback(
 		({ time, isPlaying }: { time: number; isPlaying: boolean }) => {
-			if (!videoRef.current || isSyncingRef.current) return
+			if (!videoRef.current || isSyncingRef.current || isLoadingAttachment) return
 
 			console.log('Received sync state event:', { time, isPlaying })
 
@@ -271,7 +274,7 @@ export default function useRoomSync(
 			}
 			isSyncingRef.current = false
 		},
-		[videoRef]
+		[videoRef, isLoadingAttachment]
 	)
 
 	const handleClientLeave = useCallback(
@@ -299,7 +302,7 @@ export default function useRoomSync(
 	)
 	const handleTimeAndStateRequest = useCallback(
 		(socketID: string) => {
-			if (videoRef.current) {
+			if (videoRef.current && !isLoadingAttachment) {
 				const currentTime = videoRef.current.getCurrentTime()
 				const isPlaying = !videoRef.current.getInternalPlayer().paused
 				socket.emit(ACTIONS.SEND_TIME_AND_STATE, {
@@ -310,7 +313,7 @@ export default function useRoomSync(
 			}
 			console.log(`Received time and state request. Sending time and state to `, socketID)
 		},
-		[videoRef]
+		[videoRef, isLoadingAttachment]
 	)
 
 	const handlePrivateMessage = useCallback(
