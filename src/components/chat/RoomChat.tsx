@@ -675,7 +675,8 @@ const RoomChat: React.FC<RoomChatProps> = ({
 					{showFloatingAvatar &&
 						!isAtTop &&
 						floatingAvatarSender &&
-						participantInfo[floatingAvatarSender] && (
+						participantInfo[floatingAvatarSender] &&
+						participantInfo[floatingAvatarSender].avatar && (
 							<Box
 								style={{
 									position: 'absolute',
