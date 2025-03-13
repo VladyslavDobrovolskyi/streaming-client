@@ -569,7 +569,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							paddingBottom: '0px',
 							background: 'linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(250,250,250,0.98))',
 						}}
-						type={isAtBottom ? 'hover' : 'scroll'}
+						type={isAtBottom ? 'scroll' : 'hover'}
 						ref={scrollAreaRef}
 						className='scroll-area'
 						scrollbars='vertical'
