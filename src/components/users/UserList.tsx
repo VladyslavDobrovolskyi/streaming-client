@@ -631,7 +631,8 @@ export default function UserList({
 													: participantInfo[clientID]?.isMicrophoneDisabled
 													? 'rgba(247, 65, 101, 0.7)'
 													: 'rgba(165, 247, 65, 0.7)',
-											opacity: getDisplayVolume(clientID) === 0 ? 0.3 : 1,
+											opacity:
+												getDisplayVolume(clientID) === 0 && !isMicrophoneDisabled ? 0.3 : 1,
 											cursor: isMicDisabled ? 'default' : 'pointer',
 											position: 'relative',
 											transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
