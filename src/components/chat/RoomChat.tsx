@@ -43,6 +43,7 @@ interface RoomChatProps {
 	onMouseLeave: () => void
 	isTyping: boolean
 	setIsTyping: (isTyping: boolean) => void
+	isRoomChatIsActive: boolean
 }
 
 const RoomChat: React.FC<RoomChatProps> = ({

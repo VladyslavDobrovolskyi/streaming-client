@@ -138,37 +138,127 @@ export default function RoomPage() {
 		})
 	}
 
-	const toggleRemoteMic = (clientID: string) => {
+	// Store previous volumes in a Map to remember them between toggles
+	const previousVolumesRef = useRef(new Map())
+
+	// Define an interface for the options parameter
+	interface ToggleMicOptions {
+		action?: 'mute' | 'unmute'
+		previousVolume?: number
+	}
+
+	// Update the function signature with proper typing
+	const toggleRemoteMic = (clientID: string, options: ToggleMicOptions = {}) => {
 		console.log(`Before toggle: clientVolumes[${clientID}] =`, clientVolumes[clientID])
 
-		// Get current volume, default to 0 if not set
-		const currentVolume = clientVolumes[clientID] !== undefined ? clientVolumes[clientID] : 0
+		// Get current volume, default to 0.5 if not set
+		const currentVolume = clientVolumes[clientID] !== undefined ? clientVolumes[clientID] : 0.5
 
-		// Toggle between muted (0) and unmuted (0.5)
-		const newVolume = currentVolume === 0 ? 0.5 : 0
+		// If we're unmuting with a specific previous volume from our enhanced handler
+		if (options.action === 'unmute' && options.previousVolume !== undefined) {
+			console.log(`Unmuting ${clientID} with saved volume: ${options.previousVolume}`)
 
-		console.log(`Toggling mic for ${clientID}: ${currentVolume} -> ${newVolume}`)
+			// Update the state with the saved volume
+			setClientVolumes(prev => {
+				const updatedVolumes = { ...prev, [clientID]: options.previousVolume! }
 
-		// Update the state
-		setClientVolumes(prev => {
-			const updatedVolumes = { ...prev, [clientID]: newVolume }
-			console.log('Updated clientVolumes:', updatedVolumes)
+				// Update the video element directly for immediate effect
+				const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
+				if (videoElement) {
+					videoElement.volume = options.previousVolume!
+					videoElement.muted = false
+					console.log(`Updated video element: volume=${options.previousVolume}, muted=false`)
+				} else {
+					console.log(`Video element not found for client ${clientID}`)
+				}
 
-			// Update the video element directly for immediate effect
-			const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
-			if (videoElement) {
-				videoElement.volume = newVolume
-				videoElement.muted = newVolume === 0
-				console.log(`Updated video element: volume=${newVolume}, muted=${newVolume === 0}`)
-			} else {
-				console.log(`Video element not found for client ${clientID}`)
-			}
+				// Persist the volume change
+				updateUserVolume(clientID, options.previousVolume!)
 
-			return updatedVolumes
-		})
+				return updatedVolumes
+			})
 
-		// Ensure the volume change is persisted
-		updateUserVolume(clientID, newVolume)
+			return
+		}
+
+		// If we're muting with a specific action
+		if (options.action === 'mute' && options.previousVolume !== undefined) {
+			console.log(`Muting ${clientID}, saving volume: ${options.previousVolume}`)
+			previousVolumesRef.current.set(clientID, options.previousVolume)
+
+			// Set volume to 0
+			setClientVolumes(prev => {
+				const updatedVolumes = { ...prev, [clientID]: 0 }
+
+				// Update the video element directly for immediate effect
+				const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
+				if (videoElement) {
+					videoElement.volume = 0
+					videoElement.muted = true
+					console.log(`Updated video element: volume=0, muted=true`)
+				} else {
+					console.log(`Video element not found for client ${clientID}`)
+				}
+
+				// Persist the volume change
+				updateUserVolume(clientID, 0)
+
+				return updatedVolumes
+			})
+
+			return
+		}
+
+		// Standard toggle behavior (for backward compatibility)
+		if (currentVolume > 0) {
+			// Save the current volume before muting
+			previousVolumesRef.current.set(clientID, currentVolume)
+			console.log(`Saving volume for ${clientID}: ${currentVolume}`)
+
+			// Mute by setting volume to 0
+			setClientVolumes(prev => {
+				const updatedVolumes = { ...prev, [clientID]: 0 }
+
+				// Update the video element directly
+				const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
+				if (videoElement) {
+					videoElement.volume = 0
+					videoElement.muted = true
+					console.log(`Updated video element: volume=0, muted=true`)
+				} else {
+					console.log(`Video element not found for client ${clientID}`)
+				}
+
+				// Persist the volume change
+				updateUserVolume(clientID, 0)
+
+				return updatedVolumes
+			})
+		} else {
+			// Get the previous volume if available, otherwise use default (0.5)
+			const previousVolume = previousVolumesRef.current.get(clientID) || 0.5
+			console.log(`Restoring volume for ${clientID}: ${previousVolume}`)
+
+			// Unmute by restoring the previous volume
+			setClientVolumes(prev => {
+				const updatedVolumes = { ...prev, [clientID]: previousVolume }
+
+				// Update the video element directly
+				const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
+				if (videoElement) {
+					videoElement.volume = previousVolume
+					videoElement.muted = false
+					console.log(`Updated video element: volume=${previousVolume}, muted=false`)
+				} else {
+					console.log(`Video element not found for client ${clientID}`)
+				}
+
+				// Persist the volume change
+				updateUserVolume(clientID, previousVolume)
+
+				return updatedVolumes
+			})
+		}
 	}
 	const toggleRemoteCamera = (clientID: string) => {
 		setClientCameras(prev => {
@@ -986,7 +1076,6 @@ export default function RoomPage() {
 					onMouseEnter={setHighlightedUser}
 					onMouseLeave={() => setHighlightedUser(null)}
 					isRoomChatIsActive={isRoomChatIsActive}
-					setIsRoomChatIsActive={setIsRoomChatIsActive}
 				/>
 			)}
 			{Object.entries(privateChats).map(
