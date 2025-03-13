@@ -8,7 +8,7 @@ import 'react-resizable/css/styles.css'
 import { Box } from '@radix-ui/themes'
 
 interface DraggableResizableProps {
-	children: (props: { isDragging: boolean }) => ReactNode
+	children: (props: { isDragging: boolean; scale: number }) => ReactNode
 	initialSize?: { width: number; height: number }
 	initialPosition?: { x: number; y: number }
 	minConstraints?: [number, number]
@@ -16,7 +16,7 @@ interface DraggableResizableProps {
 	dragHandleClassName?: string
 	bounds?: string | false
 	onPositionChange?: (position: { x: number; y: number }) => void
-	onSizeChange?: (size: { width: number; height: number }) => void
+	onSizeChange?: (size: { width: number; height: number; scale?: number }) => void
 	resizeHandleStyles?: React.CSSProperties
 	disableWheelZoomClass?: string | string[]
 	opacity?: number
@@ -69,9 +69,10 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 			e.preventDefault()
 			const scaleFactor = 0.1
 			const newScale = e.deltaY > 0 ? scale * (1 - scaleFactor) : scale * (1 + scaleFactor)
-			setScale(Math.min(Math.max(newScale, 0.5), 2))
+			setScale(newScale)
+			if (onSizeChange) onSizeChange({ ...size, scale: newScale })
 		},
-		[scale, disableWheelZoomClass]
+		[scale, disableWheelZoomClass, size, onSizeChange]
 	)
 
 	const onResize = useCallback(
@@ -80,7 +81,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 			const unscaledHeight = Math.round((newSize.height - 20) / scale)
 
 			setSize({ width: unscaledWidth, height: unscaledHeight })
-			if (onSizeChange) onSizeChange({ width: unscaledWidth, height: unscaledHeight })
+			if (onSizeChange) onSizeChange({ width: unscaledWidth, height: unscaledHeight, scale })
 
 			setPosition(prev => {
 				let newX = prev.x
@@ -256,7 +257,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 						}}
 						// className={dragHandleClassName}
 					>
-						{children({ isDragging })}
+						{children({ isDragging, scale })}
 					</Box>
 				</div>
 			</Resizable>

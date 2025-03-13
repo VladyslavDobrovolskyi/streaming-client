@@ -49,6 +49,7 @@ export default function ClientVideo({
 	const isUpdatingVolumeRef = useRef(false)
 	// Add a state for camera opacity after the existing state declarations
 	// const [cameraOpacity, setCameraOpacity] = useState(1.0)
+	const [scale, setScale] = useState(1)
 
 	// Helper function to get effective volume
 	const getEffectiveVolume = () => {
@@ -130,6 +131,17 @@ export default function ClientVideo({
 			setMuted(true)
 		}
 	}, [isCovered, clientID, onVolumeChange])
+
+	useEffect(() => {
+		// Only update if scale is different from the current size.scale
+		if (scale !== size.scale) {
+			onSizeChange(clientID, {
+				width: size.width,
+				height: size.height,
+				scale,
+			})
+		}
+	}, [scale, size, clientID, onSizeChange])
 
 	// Handle local mute/unmute
 	const handleToggleMuted = () => {
@@ -316,7 +328,12 @@ export default function ClientVideo({
 			minConstraints={[100, 75]}
 			maxConstraints={[300, 200]}
 			onPositionChange={newPosition => onPositionChange(clientID, newPosition)}
-			onSizeChange={newSize => onSizeChange(clientID, { ...newSize, scale: size.scale || 1 })}
+			onSizeChange={newSize => {
+				if (newSize.scale !== undefined) {
+					setScale(newSize.scale)
+				}
+				onSizeChange(clientID, newSize)
+			}}
 			dragHandleClassName='video-drag-handle'
 			resizeHandleStyles={{
 				zIndex: 12000,
@@ -341,8 +358,6 @@ export default function ClientVideo({
 								: '3px solid transparent',
 						boxShadow: highlightedUser === clientID ? '0 0 10px cyan' : 'none',
 						borderRadius: 'var(--radius-4)',
-						transform: `scale(${size.scale || 1})`,
-						transformOrigin: 'center center',
 						zIndex: hoveredClient === clientID ? 2147483647 : 11000,
 					}}
 					onMouseEnter={() => {
