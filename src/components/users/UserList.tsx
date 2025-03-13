@@ -522,6 +522,10 @@ export default function UserList({
 						.map(clientID => {
 							const username = participantInfo[clientID]?.username || 'Anonymous'
 							const displayUsername = username
+							const isMicDisabled =
+								clientID === localVideoId
+									? isMicrophoneDisabled
+									: participantInfo[clientID]?.isMicrophoneDisabled
 
 							return (
 								<div
@@ -570,11 +574,6 @@ export default function UserList({
 									<span
 										onClick={event => {
 											// Check if microphone is disabled before handling click
-											const isMicDisabled =
-												clientID === localVideoId
-													? isMicrophoneDisabled
-													: participantInfo[clientID]?.isMicrophoneDisabled
-
 											if (!isMicDisabled) {
 												// Only toggle if not disabled
 												handleToggleRemoteMic(clientID)
@@ -594,11 +593,6 @@ export default function UserList({
 										}}
 										onMouseEnter={() => {
 											// Don't set hover state if microphone is disabled
-											const isMicDisabled =
-												clientID === localVideoId
-													? isMicrophoneDisabled
-													: participantInfo[clientID]?.isMicrophoneDisabled
-
 											if (isMicDisabled) return
 
 											setHoveredMicClientId(clientID)
@@ -638,59 +632,33 @@ export default function UserList({
 													? 'rgba(247, 65, 101, 0.7)'
 													: 'rgba(165, 247, 65, 0.7)',
 											opacity: getDisplayVolume(clientID) === 0 ? 0.3 : 1,
-											cursor:
-												clientID === localVideoId
-													? isMicrophoneDisabled
-														? 'default'
-														: 'pointer'
-													: participantInfo[clientID]?.isMicrophoneDisabled
-													? 'default'
-													: 'pointer',
+											cursor: isMicDisabled ? 'default' : 'pointer',
 											position: 'relative',
 											transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 										}}
 										onMouseOver={e => {
-											const isMicDisabled =
-												clientID === localVideoId
-													? isMicrophoneDisabled
-													: participantInfo[clientID]?.isMicrophoneDisabled
-
 											if (!isMicDisabled) {
 												e.currentTarget.style.transform = 'scale(1.2)'
 											}
 										}}
 										onMouseOut={e => {
-											const isMicDisabled =
-												clientID === localVideoId
-													? isMicrophoneDisabled
-													: participantInfo[clientID]?.isMicrophoneDisabled
-
 											if (!isMicDisabled) {
 												e.currentTarget.style.transform = 'scale(1)'
 											}
 										}}
 										onMouseDown={e => {
-											const isMicDisabled =
-												clientID === localVideoId
-													? isMicrophoneDisabled
-													: participantInfo[clientID]?.isMicrophoneDisabled
-
 											if (!isMicDisabled) {
 												e.currentTarget.style.transform = 'scale(0.9)'
 											}
 										}}
 										onMouseUp={e => {
-											const isMicDisabled =
-												clientID === localVideoId
-													? isMicrophoneDisabled
-													: participantInfo[clientID]?.isMicrophoneDisabled
-
 											if (!isMicDisabled) {
 												e.currentTarget.style.transform = 'scale(1.2)'
 											}
 										}}
 									>
-										{getDisplayVolume(clientID) === 0 && (
+										{/* Only show cross icon if volume is 0 AND microphone is NOT disabled */}
+										{getDisplayVolume(clientID) === 0 && !isMicDisabled && (
 											<ImCross
 												style={{
 													position: 'absolute',
@@ -731,20 +699,7 @@ export default function UserList({
 												</div>
 											)
 										) : participantInfo[clientID]?.isMicrophoneDisabled ? (
-											<>
-												<FaMicrophoneAltSlash />
-												{getDisplayVolume(clientID) === 0 && (
-													<ImCross
-														style={{
-															position: 'absolute',
-															top: '0px',
-															right: '0px',
-															color: 'white',
-															transform: 'scale(0.7)',
-														}}
-													/>
-												)}
-											</>
+											<FaMicrophoneAltSlash />
 										) : (
 											<div style={{ position: 'relative' }}>
 												<FaMicrophoneAlt style={{ color: 'rgba(165, 247, 65, 0.7)' }} />
