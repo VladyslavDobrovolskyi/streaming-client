@@ -71,6 +71,14 @@ export default function UserList({
 				videoElement.volume = volume
 				// Don't set muted to true even if volume is 0
 				console.log(`Directly updated video element for ${clientID} to volume=${volume}`)
+
+				// Update the parent component's state using a custom event
+				// This is a workaround since we don't have direct access to updateUserVolume
+				const event = new CustomEvent('update-user-volume', {
+					detail: { clientID, volume },
+				})
+				document.dispatchEvent(event)
+
 				return true
 			}
 		} catch (error) {
@@ -105,6 +113,23 @@ export default function UserList({
 		// Try to directly update the video element volume
 		updateVideoElementVolume(clientID, newVolume)
 	}
+
+	// Add an effect to listen for the custom event in the parent component
+	useEffect(() => {
+		// Add this code to RoomPage.tsx to handle the custom event
+		const handleUpdateUserVolume = e => {
+			const { clientID, volume } = e.detail
+			// Call updateUserVolume or setClientVolumes directly
+			console.log(`Custom event received: update volume for ${clientID} to ${volume}`)
+		}
+
+		// Add this to your component's useEffect
+		document.addEventListener('update-user-volume', handleUpdateUserVolume)
+
+		return () => {
+			document.removeEventListener('update-user-volume', handleUpdateUserVolume)
+		}
+	}, [])
 
 	useEffect(() => {
 		if (volumeChangeMode && hoveredMicClientId) {
