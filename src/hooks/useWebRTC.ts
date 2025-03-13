@@ -285,17 +285,43 @@ export default function useWebRTC(roomID: string) {
 			sessionDescription: RTCSessionDescriptionInit
 		}) {
 			console.log(`Setting remote description for ${peerID}`, remoteDescription)
-			await peerConnections.current[peerID]?.setRemoteDescription(new RTCSessionDescription(remoteDescription))
 
-			if (remoteDescription.type === 'offer') {
-				console.log(`Creating answer for ${peerID}`)
-				const answer = await peerConnections.current[peerID].createAnswer()
-				await peerConnections.current[peerID].setLocalDescription(answer)
-				console.log(`Sending answer to ${peerID}`)
-				socket.emit(ACTIONS.RELAY_SDP, {
-					peerID,
-					sessionDescription: answer,
-				})
+			// Проверяем, существует ли соединение
+			const peerConnection = peerConnections.current[peerID]
+			if (!peerConnection) {
+				console.error(`No peer connection found for ${peerID}`)
+				return
+			}
+
+			try {
+				// Устанавливаем удаленное описание
+				await peerConnection.setRemoteDescription(new RTCSessionDescription(remoteDescription))
+
+				// Создаем ответ только если получили предложение и находимся в правильном состоянии
+				if (remoteDescription.type === 'offer') {
+					console.log(`Creating answer for ${peerID}`)
+
+					// Проверяем состояние сигнализации перед созданием ответа
+					if (peerConnection.signalingState === 'have-remote-offer') {
+						const answer = await peerConnection.createAnswer()
+
+						// Проверяем состояние сигнализации перед установкой локального описания
+						if (peerConnection.signalingState === 'have-remote-offer') {
+							await peerConnection.setLocalDescription(answer)
+							console.log(`Sending answer to ${peerID}`)
+							socket.emit(ACTIONS.RELAY_SDP, {
+								peerID,
+								sessionDescription: answer,
+							})
+						} else {
+							console.warn(`Unexpected signaling state: ${peerConnection.signalingState} for ${peerID}`)
+						}
+					} else {
+						console.warn(`Unexpected signaling state: ${peerConnection.signalingState} for ${peerID}`)
+					}
+				}
+			} catch (error) {
+				console.error(`Error handling session description for ${peerID}:`, error)
 			}
 		}
 
