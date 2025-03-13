@@ -485,7 +485,7 @@ export default function UserList({
 																color: 'white',
 																padding: '3px 10px',
 																borderRadius: '5px',
-																fontSize: '9px',
+																fontSize: '10px',
 																whiteSpace: 'nowrap',
 																transition: 'transform 0.2s ease',
 															}}
