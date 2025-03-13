@@ -161,7 +161,8 @@ export default function UserList({
 		event.preventDefault()
 		event.stopPropagation()
 
-		if (!hoveredMicClientId) return
+		// Remove this check since we already have it in the useEffect
+		// if (!hoveredMicClientId) return
 
 		setIsVolumeChanging(true)
 
