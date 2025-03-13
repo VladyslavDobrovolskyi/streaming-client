@@ -17,6 +17,7 @@ interface UserData {
 	status: UserStatus
 	volume: number
 	cameraVisible?: boolean
+	cameraOpacity?: number
 	notificationStatus?: boolean
 }
 
@@ -59,6 +60,9 @@ const useLocalStorageSync = (roomId: string) => {
 	const updateUserCameraVisibility = (userId: string, cameraVisible: boolean) => {
 		updateUserData(userId, { cameraVisible })
 	}
+	const updateUserCameraOpacity = (userId: string, cameraOpacity: number) => {
+		updateUserData(userId, { cameraOpacity })
+	}
 
 	const updateNotificationStatus = (userId: string, notificationStatus: boolean) => {
 		updateUserData(userId, { notificationStatus })
@@ -70,6 +74,7 @@ const useLocalStorageSync = (roomId: string) => {
 		updateUserStatus,
 		updateUserVolume,
 		updateUserCameraVisibility,
+		updateUserCameraOpacity,
 		updateNotificationStatus,
 	}
 }

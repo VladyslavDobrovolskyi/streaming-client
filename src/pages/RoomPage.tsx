@@ -889,6 +889,14 @@ export default function RoomPage() {
 		}, {} as Record<string, boolean>)
 		setClientCameras(prev => ({ ...prev, ...storedCameraVisibility }))
 
+		const storedCamerasOpacity = Object.entries(userData).reduce((acc, [clientId, data]) => {
+			if (data.cameraOpacity !== undefined) {
+				acc[clientId] = data.cameraOpacity
+			}
+			return acc
+		}, {} as Record<string, number>)
+		setCamerasOpacity(prev => ({ ...prev, ...storedCamerasOpacity }))
+
 		const storedNotifications = Object.entries(userData).reduce((acc, [clientId, data]) => {
 			if (clientId === LOCAL_VIDEO && data.notificationStatus !== undefined) {
 				acc[clientId] = data.notificationStatus
