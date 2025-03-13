@@ -106,6 +106,7 @@ export default function RoomPage() {
 		updateUserVolume,
 		updateUserCameraVisibility,
 		updateNotificationStatus,
+		updateUserCameraOpacity,
 	} = useLocalStorageSync(roomID!)
 
 	// Add handlers for video loading states
@@ -320,6 +321,7 @@ export default function RoomPage() {
 			}
 		}
 		setCamerasOpacity(prev => ({ ...prev, [clientID]: opacity }))
+		updateUserCameraOpacity(clientID, opacity)
 	}
 
 	const {
