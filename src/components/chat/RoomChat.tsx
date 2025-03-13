@@ -604,7 +604,6 @@ const RoomChat: React.FC<RoomChatProps> = ({
 												<Avatar
 													onMouseEnter={() => onMouseEnter(msg.sender)}
 													onMouseLeave={onMouseLeave}
-													className='disable-zoom-on-scroll'
 													src={participantInfo[msg.sender]?.avatar}
 													fallback={participantInfo[msg.sender]?.username[0]}
 													size='1'
@@ -697,6 +696,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 								<Avatar
 									src={participantInfo[floatingAvatarSender]?.avatar}
 									fallback={participantInfo[floatingAvatarSender]?.username[0]}
+									className='disable-zoom-on-scroll'
 									size='2'
 									onClick={handleAvatarClick}
 									style={{
