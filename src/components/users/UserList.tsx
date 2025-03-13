@@ -47,6 +47,26 @@ const volumeChangeAnimation = `
   }
 `
 
+// Добавьте следующие стили для визуальной обратной связи при наведении на микрофон
+// Добавьте это после объявления volumeChangeAnimation
+const micHoverAnimation = `
+  @keyframes micHover {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+  .mic-hover {
+    animation: micHover 1s infinite ease-in-out;
+  }
+`
+
 export default function UserList({
 	showUserList,
 	toggleUserList,
@@ -75,6 +95,23 @@ export default function UserList({
 
 	const [hoveredMicClientId, setHoveredMicClientId] = useState(null)
 	const [volumeChangeMode, setVolumeChangeMode] = useState(false)
+
+	// Добавляем глобальный обработчик для предотвращения стандартного поведения колесика
+	useEffect(() => {
+		const preventDefaultWheel = e => {
+			if (volumeChangeMode && hoveredMicClientId) {
+				e.preventDefault()
+				return false
+			}
+		}
+
+		// Используем passive: false для возможности вызова preventDefault()
+		window.addEventListener('wheel', preventDefaultWheel, { passive: false })
+
+		return () => {
+			window.removeEventListener('wheel', preventDefaultWheel)
+		}
+	}, [volumeChangeMode, hoveredMicClientId])
 
 	// Initialize local volumes from participantVolume when it changes
 	useEffect(() => {
@@ -106,6 +143,7 @@ export default function UserList({
 
 	const handleVolumeWheel = (event, clientID) => {
 		event.preventDefault()
+		event.stopPropagation()
 
 		if (!hoveredMicClientId) return
 
@@ -185,10 +223,23 @@ export default function UserList({
 	useEffect(() => {
 		if (volumeChangeMode && hoveredMicClientId) {
 			const wheelHandler = e => handleVolumeWheel(e, hoveredMicClientId)
-			window.addEventListener('wheel', wheelHandler, { passive: false })
+
+			// Используем capture phase для гарантии перехвата события
+			window.addEventListener('wheel', wheelHandler, { passive: false, capture: true })
+
+			// Добавим обработчик для предотвращения потери фокуса
+			const preventBlur = e => {
+				if (volumeChangeMode) {
+					e.preventDefault()
+					e.stopPropagation()
+				}
+			}
+
+			window.addEventListener('blur', preventBlur, { capture: true })
 
 			return () => {
-				window.removeEventListener('wheel', wheelHandler)
+				window.removeEventListener('wheel', wheelHandler, { capture: true })
+				window.removeEventListener('blur', preventBlur, { capture: true })
 			}
 		}
 	}, [volumeChangeMode, hoveredMicClientId])
@@ -361,10 +412,32 @@ export default function UserList({
 										onMouseEnter={() => {
 											setHoveredMicClientId(clientID)
 											setVolumeChangeMode(true)
+
+											// Добавляем визуальную подсказку о возможности прокрутки
+											const volumeIndicator = document.querySelector(
+												`[data-volume-indicator="${clientID}"]`
+											)
+											if (volumeIndicator) {
+												volumeIndicator.classList.add('mic-hover')
+												volumeIndicator.textContent = `${Math.round(
+													getDisplayVolume(clientID) * 100
+												)}% (прокрутите)`
+											}
 										}}
 										onMouseLeave={() => {
 											setHoveredMicClientId(null)
 											setVolumeChangeMode(false)
+
+											// Удаляем визуальную подсказку
+											const volumeIndicator = document.querySelector(
+												`[data-volume-indicator="${clientID}"]`
+											)
+											if (volumeIndicator) {
+												volumeIndicator.classList.remove('mic-hover')
+												volumeIndicator.textContent = `${Math.round(
+													getDisplayVolume(clientID) * 100
+												)}%`
+											}
 										}}
 										style={{
 											color:
@@ -547,6 +620,7 @@ export default function UserList({
 											<>
 												<style>{pulseAnimation}</style>
 												<style>{volumeChangeAnimation}</style>
+												<style>{micHoverAnimation}</style>
 												<IoChatbox
 													style={{
 														fill: 'rgba(165, 247, 65, 0.7)',
