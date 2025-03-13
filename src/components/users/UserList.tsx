@@ -478,14 +478,14 @@ export default function UserList({
 															data-volume-indicator={clientID}
 															style={{
 																position: 'absolute',
-																bottom: '-18px',
+																bottom: '16px',
 																left: '50%',
 																transform: 'translateX(-50%)',
-																backgroundColor: 'rgba(0, 0, 0, 0.7)',
+																backgroundColor: 'rgba(0, 0, 0, 0.6)',
 																color: 'white',
-																padding: '2px 4px',
-																borderRadius: '3px',
-																fontSize: '10px',
+																padding: '3px 10px',
+																borderRadius: '5px',
+																fontSize: '9px',
 																whiteSpace: 'nowrap',
 																transition: 'transform 0.2s ease',
 															}}
