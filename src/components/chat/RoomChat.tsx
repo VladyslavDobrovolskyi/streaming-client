@@ -483,7 +483,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		<DraggableResizable
 			initialSize={{ width: 320, height: 480 }}
 			initialPosition={{ x: window.innerWidth - 640, y: window.innerHeight - 550 }}
-			disableWheelZoomClass='scroll-area'
+			disableWheelZoomClass='disable-zoom-on-scroll'
 			bounds='parent'
 			focused={isActive}
 		>
@@ -536,6 +536,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						<Button
 							variant='ghost'
 							onMouseDown={onClose}
+							className='disable-zoom-on-scroll'
 							style={{
 								color: 'black',
 								fontWeight: 'bold',
@@ -570,7 +571,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							background: 'linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(250,250,250,0.98))',
 						}}
 						ref={scrollAreaRef}
-						className='scroll-area'
+						className='disable-zoom-on-scroll'
 						scrollbars='vertical'
 						onScroll={handleScroll}
 					>
@@ -603,6 +604,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 												<Avatar
 													onMouseEnter={() => onMouseEnter(msg.sender)}
 													onMouseLeave={onMouseLeave}
+													className='disable-zoom-on-scroll'
 													src={participantInfo[msg.sender]?.avatar}
 													fallback={participantInfo[msg.sender]?.username[0]}
 													size='1'
@@ -726,6 +728,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							<Button
 								size='1'
 								variant='soft'
+								className='disable-zoom-on-scroll'
 								onClick={handleScrollToBottom}
 								style={{
 									borderRadius: '999px',
