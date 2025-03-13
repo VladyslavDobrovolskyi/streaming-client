@@ -415,7 +415,16 @@ export default function UserList({
 			// Unmute: Get the previous volume if available, otherwise use default (0.5)
 			const previousVolume = previousVolumesRef.current.get(clientID) || 0.5
 
-			// Call the original toggleRemoteMic with additional context
+			// First update the volume to avoid the cross icon flicker
+			changeRemoteVolume(clientID, previousVolume)
+
+			// Update local state for immediate feedback
+			setLocalVolumes(prev => ({
+				...prev,
+				[clientID]: previousVolume,
+			}))
+
+			// Then call the original toggleRemoteMic with additional context
 			toggleRemoteMic(clientID, {
 				previousVolume: previousVolume,
 				action: 'unmute',
