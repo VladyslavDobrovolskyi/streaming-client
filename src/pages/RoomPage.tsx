@@ -102,6 +102,7 @@ export default function RoomPage() {
 	const {
 		userData,
 		updateUserPosition,
+		updateUserSize,
 		updateUserStatus,
 		updateUserVolume,
 		updateUserCameraVisibility,
@@ -871,6 +872,14 @@ export default function RoomPage() {
 
 		setClientPositions(prev => ({ ...prev, ...storedPositions }))
 
+		const storedSizes = Object.entries(userData).reduce((acc, [clientId, data]) => {
+			if (data.size) {
+				acc[clientId] = data.size
+			}
+			return acc
+		}, {} as Record<string, { width: number; height: number; scale?: number }>)
+		setClientSizes(prev => ({ ...prev, ...storedSizes }))
+
 		const storedVolumes = Object.entries(userData).reduce((acc, [clientId, data]) => {
 			if (data.volume !== undefined) {
 				acc[clientId] = data.volume
@@ -910,6 +919,8 @@ export default function RoomPage() {
 			return acc
 		}, {} as Record<string, boolean>)
 		setNotificationStatus(storedNotifications[LOCAL_VIDEO] ?? true)
+
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [userData])
 
 	useEffect(() => {
@@ -1021,7 +1032,10 @@ export default function RoomPage() {
 					setClientPositions(prev => ({ ...prev, [id]: pos }))
 					updateUserPosition(id, pos)
 				}}
-				onSizeChange={(id, size) => setClientSizes(prev => ({ ...prev, [id]: size }))}
+				onSizeChange={(id, size) => {
+					setClientSizes(prev => ({ ...prev, [id]: size }))
+					updateUserSize(id, size)
+				}}
 				onVolumeChange={(id, vol) => {
 					setClientVolumes(prev => ({ ...prev, [id]: vol }))
 					updateUserVolume(id, vol)

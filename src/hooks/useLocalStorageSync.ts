@@ -12,8 +12,15 @@ interface UserStatus {
 	isMicrophoneDisabled: boolean
 }
 
+interface UserSize {
+	width: number
+	height: number
+	scale: number
+}
+
 interface UserData {
 	position: UserPosition
+	size: UserSize
 	status: UserStatus
 	volume: number
 	cameraVisible?: boolean
@@ -68,9 +75,14 @@ const useLocalStorageSync = (roomId: string) => {
 		updateUserData(userId, { notificationStatus })
 	}
 
+	const updateUserSize = (userId: string, size: UserSize) => {
+		updateUserData(userId, { size })
+	}
+
 	return {
 		userData,
 		updateUserPosition,
+		updateUserSize,
 		updateUserStatus,
 		updateUserVolume,
 		updateUserCameraVisibility,
