@@ -154,10 +154,10 @@ export default function ClientVideo({
 	}
 
 	useEffect(() => {
-		if (!muted && isMicrophoneDisabled) {
+		if (isMicrophoneDisabled) {
 			setMuted(true)
 		}
-	}, [isMicrophoneDisabled, muted])
+	}, [isMicrophoneDisabled])
 
 	// Update the handleVolumeChange function to handle muting at 0 volume
 	const handleVolumeChange = (newVolume: number) => {
