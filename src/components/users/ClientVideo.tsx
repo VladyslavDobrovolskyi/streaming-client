@@ -59,6 +59,8 @@ export default function ClientVideo({
 	useEffect(() => {
 		if (highlightedUser === clientID) {
 			setHoveredClient(highlightedUser)
+		} else {
+			setHoveredClient(null)
 		}
 	}, [clientID, highlightedUser, setHoveredClient])
 
