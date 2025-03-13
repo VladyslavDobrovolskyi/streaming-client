@@ -98,21 +98,21 @@ export default function UserList({
 	const [isVolumeChanging, setIsVolumeChanging] = useState(false)
 
 	// Добавляем глобальный обработчик для предотвращения стандартного поведения колесика
-	useEffect(() => {
-		const preventDefaultWheel = e => {
-			if (volumeChangeMode && hoveredMicClientId) {
-				e.preventDefault()
-				return false
-			}
-		}
+	// useEffect(() => {
+	// 	const preventDefaultWheel = e => {
+	// 		if (volumeChangeMode && hoveredMicClientId) {
+	// 			e.preventDefault()
+	// 			return false
+	// 		}
+	// 	}
 
-		// Используем passive: false для возможности вызова preventDefault()
-		window.addEventListener('wheel', preventDefaultWheel, { passive: false })
+	// 	// Используем passive: false для возможности вызова preventDefault()
+	// 	window.addEventListener('wheel', preventDefaultWheel, { passive: false })
 
-		return () => {
-			window.removeEventListener('wheel', preventDefaultWheel)
-		}
-	}, [volumeChangeMode, hoveredMicClientId])
+	// 	return () => {
+	// 		window.removeEventListener('wheel', preventDefaultWheel)
+	// 	}
+	// }, [volumeChangeMode, hoveredMicClientId])
 
 	// Initialize local volumes from participantVolume when it changes
 	useEffect(() => {
