@@ -859,7 +859,22 @@ export default function UserList({
 											}
 										}}
 									>
-										{/* Removed the cross icon for camera when it's turned off */}
+										{/* Only show cross icon if camera is off AND camera is NOT disabled */}
+										{participantCameras[clientID] === false &&
+											!(
+												participantInfo[clientID]?.isCameraDisabled ||
+												(clientID === localVideoId && isCameraDisabled)
+											) && (
+												<ImCross
+													style={{
+														position: 'absolute',
+														top: '0px',
+														right: '0px',
+														color: 'white',
+														transform: 'scale(0.7)',
+													}}
+												/>
+											)}
 										{participantInfo[clientID].isCameraDisabled ||
 										(clientID === localVideoId && isCameraDisabled) ? (
 											<BsCameraVideoOffFill />
