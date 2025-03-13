@@ -56,6 +56,12 @@ export default function ClientVideo({
 		return DEFAULT_VOLUME // Default fallback
 	}
 
+	useEffect(() => {
+		if (highlightedUser === clientID) {
+			setHoveredClient(highlightedUser)
+		}
+	}, [clientID, highlightedUser, setHoveredClient])
+
 	// This effect runs once when the component mounts to connect the videoRef to provideMediaRef
 	useEffect(() => {
 		if (videoRef.current) {
