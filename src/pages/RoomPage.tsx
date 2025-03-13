@@ -147,6 +147,36 @@ export default function RoomPage() {
 		previousVolume?: number
 	}
 
+	const changeRemoteVolume = (clientID: string, newVolume: number, options: { previousVolume?: number } = {}) => {
+		console.log(`Changing volume for ${clientID}: ${newVolume}` + options)
+
+		// If volume is 0, save the previous value
+		if (newVolume === 0 && clientVolumes[clientID] > 0) {
+			previousVolumesRef.current.set(clientID, clientVolumes[clientID])
+			console.log(`Volume reached 0, saving previous volume: ${clientVolumes[clientID]}`)
+		}
+
+		// Update volume state
+		setClientVolumes(prev => {
+			const updatedVolumes = { ...prev, [clientID]: newVolume }
+
+			// Update video element directly for immediate effect
+			const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
+			if (videoElement) {
+				videoElement.volume = newVolume
+				// If volume is 0, set muted=true, otherwise muted=false
+				videoElement.muted = newVolume === 0
+				console.log(`Updated video element: volume=${newVolume}, muted=${newVolume === 0}`)
+			} else {
+				console.log(`Video element not found for client ${clientID}`)
+			}
+
+			// Persist volume change
+			updateUserVolume(clientID, newVolume)
+
+			return updatedVolumes
+		})
+	}
 	// Update the function signature with proper typing
 	const toggleRemoteMic = (clientID: string, options: ToggleMicOptions = {}) => {
 		console.log(`Before toggle: clientVolumes[${clientID}] =`, clientVolumes[clientID])
@@ -1041,6 +1071,7 @@ export default function RoomPage() {
 				setNotificationStatus={setNotificationStatus}
 			/>
 			<UserList
+				changeRemoteVolume={changeRemoteVolume}
 				showUserList={showUserList}
 				toggleUserList={toggleUserList}
 				clients={clients}

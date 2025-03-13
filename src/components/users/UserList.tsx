@@ -48,7 +48,6 @@ const volumeChangeAnimation = `
 `
 
 // Добавьте следующие стили для визуальной обратной связи при наведении на микрофон
-// Добавьте это после объявления volumeChangeAnimation
 const micHoverAnimation = `
   @keyframes micHover {
     0% {
@@ -87,6 +86,7 @@ export default function UserList({
 	userListWidth,
 	showUserListButton,
 	privateChats,
+	changeRemoteVolume, // Добавляем новый проп
 }) {
 	// Store previous volumes to remember them between toggles
 	const previousVolumesRef = useRef(new Map())
@@ -95,6 +95,7 @@ export default function UserList({
 
 	const [hoveredMicClientId, setHoveredMicClientId] = useState(null)
 	const [volumeChangeMode, setVolumeChangeMode] = useState(false)
+	const [isVolumeChanging, setIsVolumeChanging] = useState(false)
 
 	// Добавляем глобальный обработчик для предотвращения стандартного поведения колесика
 	useEffect(() => {
@@ -115,31 +116,46 @@ export default function UserList({
 
 	// Initialize local volumes from participantVolume when it changes
 	useEffect(() => {
-		setLocalVolumes(participantVolume)
-	}, [participantVolume])
-
-	// Direct access to video elements for volume control
-	const updateVideoElementVolume = (clientID, volume) => {
-		try {
-			// Find the video element for this client using the correct selector
-			const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
-			if (videoElement) {
-				videoElement.volume = volume
-				console.log(`Directly updated video element for ${clientID} to volume=${volume}`)
-
-				// Dispatch event for ClientVideo components to listen to
-				const event = new CustomEvent('update-user-volume', {
-					detail: { clientID, volume },
-				})
-				document.dispatchEvent(event)
-
-				return true
-			}
-		} catch (error) {
-			console.error('Error updating video element volume:', error)
+		if (!isVolumeChanging) {
+			setLocalVolumes(participantVolume)
 		}
-		return false
-	}
+	}, [participantVolume, isVolumeChanging])
+
+	// Слушаем события изменения громкости от RoomPage
+	useEffect(() => {
+		const handleVolumeChanged = e => {
+			const { clientID, volume } = e.detail
+
+			if (!isVolumeChanging) {
+				setLocalVolumes(prev => ({
+					...prev,
+					[clientID]: volume,
+				}))
+			}
+		}
+
+		document.addEventListener('volume-changed', handleVolumeChanged)
+
+		return () => {
+			document.removeEventListener('volume-changed', handleVolumeChanged)
+		}
+	}, [isVolumeChanging])
+
+	// Функция для запроса изменения громкости через RoomPage
+	// Удалите эту функцию
+	// const requestVolumeChange = (clientID, volume) => {
+	//   // Отправляем событие, которое будет обработано в RoomPage
+	//   const event = new CustomEvent("volume-change-request", {
+	//     detail: { clientID, volume }
+	//   });
+	//   document.dispatchEvent(event);
+	//
+	//   // Обновляем локальное состояние для мгновенной обратной связи
+	//   setLocalVolumes(prev => ({
+	//     ...prev,
+	//     [clientID]: volume
+	//   }));
+	// };
 
 	const handleVolumeWheel = (event, clientID) => {
 		event.preventDefault()
@@ -147,11 +163,18 @@ export default function UserList({
 
 		if (!hoveredMicClientId) return
 
+		setIsVolumeChanging(true)
+
 		// Determine direction (up or down)
 		const direction = event.deltaY < 0 ? 1 : -1
 
 		// Get current volume from our local state
-		const currentVolume = localVolumes[clientID] || 0
+		const currentVolume =
+			localVolumes[clientID] !== undefined
+				? localVolumes[clientID]
+				: participantVolume[clientID] !== undefined
+				? participantVolume[clientID]
+				: 0.5
 
 		// Increase the step size to 0.05 (5%) per wheel tick for more noticeable changes
 		let newVolume = Math.max(0, Math.min(1, currentVolume + direction * 0.05))
@@ -159,21 +182,20 @@ export default function UserList({
 
 		console.log(`Adjusting volume: ${Math.round(currentVolume * 100)}% → ${Math.round(newVolume * 100)}%`)
 
-		// Update our local volume state
+		// Если громкость достигла 0, сохраняем предыдущее значение
+		if (newVolume === 0 && currentVolume > 0) {
+			previousVolumesRef.current.set(clientID, currentVolume)
+			console.log(`Volume reached 0, saving previous volume: ${currentVolume}`)
+		}
+
+		// Вызываем changeRemoteVolume напрямую вместо отправки события
+		changeRemoteVolume(clientID, newVolume)
+
+		// Обновляем локальное состояние для мгновенной обратной связи
 		setLocalVolumes(prev => ({
 			...prev,
 			[clientID]: newVolume,
 		}))
-
-		// If volume reaches 0, trigger mute functionality
-		if (newVolume === 0 && currentVolume > 0) {
-			// Store the current volume before muting
-			previousVolumesRef.current.set(clientID, currentVolume)
-			console.log(`Volume reached 0, muting and storing previous volume: ${currentVolume}`)
-		}
-
-		// Try to directly update the video element volume
-		updateVideoElementVolume(clientID, newVolume)
 
 		// Add visual feedback for volume change
 		const volumeIndicator = document.querySelector(`[data-volume-indicator="${clientID}"]`)
@@ -182,43 +204,12 @@ export default function UserList({
 			volumeIndicator.classList.add('volume-change')
 			setTimeout(() => volumeIndicator.classList.remove('volume-change'), 300)
 		}
+
+		// Сбрасываем флаг изменения громкости через небольшую задержку
+		setTimeout(() => {
+			setIsVolumeChanging(false)
+		}, 100)
 	}
-
-	// Add an effect to listen for the custom event in the parent component
-	useEffect(() => {
-		// Add this code to RoomPage.tsx to handle the custom event
-		const handleUpdateUserVolume = e => {
-			const { clientID, volume } = e.detail
-			// Call updateUserVolume or setClientVolumes directly
-			console.log(`Custom event received: update volume for ${clientID} to ${volume}`)
-		}
-
-		// Add this to your component's useEffect
-		document.addEventListener('update-user-volume', handleUpdateUserVolume)
-
-		return () => {
-			document.removeEventListener('update-user-volume', handleUpdateUserVolume)
-		}
-	}, [])
-
-	// Add this effect to listen for volume changes from ClientVideo
-	useEffect(() => {
-		const handleClientVideoVolumeChange = e => {
-			const { clientID, volume } = e.detail
-
-			// Update our local volume state
-			setLocalVolumes(prev => ({
-				...prev,
-				[clientID]: volume,
-			}))
-		}
-
-		document.addEventListener('client-volume-change', handleClientVideoVolumeChange)
-
-		return () => {
-			document.removeEventListener('client-volume-change', handleClientVideoVolumeChange)
-		}
-	}, [])
 
 	useEffect(() => {
 		if (volumeChangeMode && hoveredMicClientId) {
@@ -287,6 +278,10 @@ export default function UserList({
 
 	return (
 		<>
+			<style>{pulseAnimation}</style>
+			<style>{volumeChangeAnimation}</style>
+			<style>{micHoverAnimation}</style>
+
 			{filteredClients.length >= 1 && filteredClients.length !== 0 && (
 				<div
 					style={{
@@ -448,7 +443,7 @@ export default function UserList({
 													: participantInfo[clientID]?.isMicrophoneDisabled
 													? 'rgba(247, 65, 101, 0.7)'
 													: 'rgba(165, 247, 65, 0.7)',
-											opacity: participantVolume[clientID] === 0 ? 0.3 : 1,
+											opacity: getDisplayVolume(clientID) === 0 ? 0.3 : 1,
 											cursor: 'pointer',
 											position: 'relative',
 											transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -458,7 +453,7 @@ export default function UserList({
 										onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
 										onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.2)')}
 									>
-										{participantVolume[clientID] === 0 && (
+										{getDisplayVolume(clientID) === 0 && (
 											<ImCross
 												style={{
 													position: 'absolute',
@@ -500,7 +495,7 @@ export default function UserList({
 										) : participantInfo[clientID]?.isMicrophoneDisabled ? (
 											<>
 												<FaMicrophoneAltSlash />
-												{participantVolume[clientID] === 0 && (
+												{getDisplayVolume(clientID) === 0 && (
 													<ImCross
 														style={{
 															position: 'absolute',
@@ -617,51 +612,43 @@ export default function UserList({
 											}}
 										/>
 										{privateChats[clientID] && (
-											<>
-												<style>{pulseAnimation}</style>
-												<style>{volumeChangeAnimation}</style>
-												<style>{micHoverAnimation}</style>
-												<IoChatbox
-													style={{
-														fill: 'rgba(165, 247, 65, 0.7)',
-														position: 'absolute',
-														transform: 'scale(1.15)',
-														zIndex: 20,
-														top: '8px',
-														left: '5px',
-														opacity: privateChats[clientID] ? 1 : 0.7,
-													}}
-												/>
-											</>
+											<IoChatbox
+												style={{
+													fill: 'rgba(165, 247, 65, 0.7)',
+													position: 'absolute',
+													transform: 'scale(1.15)',
+													zIndex: 20,
+													top: '8px',
+													left: '5px',
+													opacity: privateChats[clientID] ? 1 : 0.7,
+												}}
+											/>
 										)}
 
 										{unreadMessages[clientID] > 0 && (
-											<>
-												<style>{pulseAnimation}</style>
-												<div
-													style={{
-														zIndex: 999999,
-														position: 'absolute',
-														top: '23%',
-														right: '29%',
-														backgroundColor: 'rgba(247, 65, 101, 0.7)',
-														color: 'white',
-														borderRadius: '50%',
-														border: '2px solid var(--gray-3)',
-														width: '17px',
-														height: '17px',
-														display: 'flex',
-														alignItems: 'center',
-														justifyContent: 'center',
-														fontSize: '10px',
-														fontWeight: 'bold',
-														boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-														animation: 'pulse 1.5s infinite ease-in-out',
-													}}
-												>
-													{unreadMessages[clientID] > 99 ? '99' : unreadMessages[clientID]}
-												</div>
-											</>
+											<div
+												style={{
+													zIndex: 999999,
+													position: 'absolute',
+													top: '23%',
+													right: '29%',
+													backgroundColor: 'rgba(247, 65, 101, 0.7)',
+													color: 'white',
+													borderRadius: '50%',
+													border: '2px solid var(--gray-3)',
+													width: '17px',
+													height: '17px',
+													display: 'flex',
+													alignItems: 'center',
+													justifyContent: 'center',
+													fontSize: '10px',
+													fontWeight: 'bold',
+													boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+													animation: 'pulse 1.5s infinite ease-in-out',
+												}}
+											>
+												{unreadMessages[clientID] > 99 ? '99' : unreadMessages[clientID]}
+											</div>
 										)}
 									</button>
 								</div>
