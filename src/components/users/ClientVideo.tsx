@@ -149,9 +149,14 @@ export default function ClientVideo({
 		}
 	}
 
-	// Handle volume slider changes
+	// Update the handleVolumeChange function to handle muting at 0 volume
 	const handleVolumeChange = (newVolume: number) => {
 		isUpdatingVolumeRef.current = true
+
+		// Store current volume before muting if we're going to 0
+		if (newVolume === 0 && getEffectiveVolume() > 0) {
+			setVolumeBeforeMute(getEffectiveVolume())
+		}
 
 		if (newVolume === 0) {
 			setMuted(true)
@@ -170,7 +175,7 @@ export default function ClientVideo({
 		document.dispatchEvent(event)
 	}
 
-	// Add this effect to listen for volume changes from UserList
+	// Also update the effect that listens for volume changes from UserList
 	useEffect(() => {
 		const handleUserListVolumeChange = e => {
 			const { clientID: changedClientID, volume } = e.detail
@@ -178,9 +183,15 @@ export default function ClientVideo({
 				// Only update if this is the target client and we're not already updating
 				isUpdatingVolumeRef.current = true
 
+				// Store current volume before muting if we're going to 0
+				if (volume === 0 && getEffectiveVolume() > 0) {
+					setVolumeBeforeMute(getEffectiveVolume())
+				}
+
 				// Update UI state based on new volume
 				if (volume === 0) {
 					setMuted(true)
+					setMutedBySlider(true)
 				} else {
 					setMuted(false)
 					setMutedBySlider(false)

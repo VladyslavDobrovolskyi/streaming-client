@@ -115,8 +115,8 @@ export default function UserList({
 		// Get current volume from our local state
 		const currentVolume = localVolumes[clientID] || 0
 
-		// Calculate new volume (0.01 = 1% change per wheel tick)
-		let newVolume = Math.max(0, Math.min(1, currentVolume + direction * 0.01))
+		// Increase the step size to 0.05 (5%) per wheel tick for more noticeable changes
+		let newVolume = Math.max(0, Math.min(1, currentVolume + direction * 0.05))
 		newVolume = Math.round(newVolume * 100) / 100 // Round to 2 decimal places
 
 		console.log(`Adjusting volume: ${Math.round(currentVolume * 100)}% → ${Math.round(newVolume * 100)}%`)
@@ -126,6 +126,13 @@ export default function UserList({
 			...prev,
 			[clientID]: newVolume,
 		}))
+
+		// If volume reaches 0, trigger mute functionality
+		if (newVolume === 0 && currentVolume > 0) {
+			// Store the current volume before muting
+			previousVolumesRef.current.set(clientID, currentVolume)
+			console.log(`Volume reached 0, muting and storing previous volume: ${currentVolume}`)
+		}
 
 		// Try to directly update the video element volume
 		updateVideoElementVolume(clientID, newVolume)
