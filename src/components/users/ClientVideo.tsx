@@ -153,12 +153,6 @@ export default function ClientVideo({
 		}
 	}
 
-	useEffect(() => {
-		if (isMicrophoneDisabled) {
-			setMuted(true)
-		}
-	}, [isMicrophoneDisabled])
-
 	// Update the handleVolumeChange function to handle muting at 0 volume
 	const handleVolumeChange = (newVolume: number) => {
 		isUpdatingVolumeRef.current = true
@@ -185,6 +179,11 @@ export default function ClientVideo({
 		document.dispatchEvent(event)
 	}
 
+	useEffect(() => {
+		if (isMicrophoneDisabled) {
+			handleVolumeChange(0)
+		}
+	}, [isMicrophoneDisabled])
 	// Add a function to handle camera opacity changes after the handleVolumeChange function
 	const handleCameraOpacityChange = (newOpacity: number) => {
 		setCameraOpacity(newOpacity)
@@ -412,7 +411,7 @@ export default function ClientVideo({
 										>
 											{getVolumeIcon()}
 										</button>
-										{!muted && (
+										{!muted && !isMicrophoneDisabled && (
 											<div
 												style={{
 													position: 'absolute',
