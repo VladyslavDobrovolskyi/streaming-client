@@ -106,6 +106,8 @@ export default function UserList({
 	showUserListButton,
 	privateChats,
 	changeRemoteVolume, // Добавляем новый проп
+	changeCameraOpacity,
+	camerasOpacity,
 }) {
 	// Store previous volumes to remember them between toggles
 	const previousVolumesRef = useRef(new Map())
@@ -117,6 +119,12 @@ export default function UserList({
 
 	// Add state for camera hover
 	const [hoveredCameraClientId, setHoveredCameraClientId] = useState(null)
+
+	// Add state for camera opacity changing
+	const [isCameraOpacityChanging, setIsCameraOpacityChanging] = useState(false)
+
+	// Add local camera opacities state similar to localVolumes
+	const [localCameraOpacities, setLocalCameraOpacities] = useState({})
 
 	// Добавляем глобальный обработчик для предотвращения стандартного поведения колесика
 	// useEffect(() => {
@@ -142,6 +150,13 @@ export default function UserList({
 		}
 	}, [participantVolume, isVolumeChanging])
 
+	// Initialize local camera opacities when camerasOpacity changes
+	useEffect(() => {
+		if (!isCameraOpacityChanging) {
+			setLocalCameraOpacities(camerasOpacity)
+		}
+	}, [camerasOpacity, isCameraOpacityChanging])
+
 	// Слушаем события изменения громкости от RoomPage
 	useEffect(() => {
 		const handleVolumeChanged = e => {
@@ -161,6 +176,48 @@ export default function UserList({
 			document.removeEventListener('volume-changed', handleVolumeChanged)
 		}
 	}, [isVolumeChanging])
+
+	// Add function to handle camera opacity wheel events
+	const handleCameraOpacityWheel = (event, clientID) => {
+		event.preventDefault()
+		event.stopPropagation()
+
+		setIsCameraOpacityChanging(true)
+
+		// Determine direction (up or down)
+		const direction = event.deltaY < 0 ? 1 : -1
+
+		// Get current opacity from our local state, default to 1 if not set
+		const currentOpacity = localCameraOpacities[clientID] !== undefined ? localCameraOpacities[clientID] : 1
+
+		// Adjust opacity by 0.05 (5%) per wheel tick
+		let newOpacity = Math.max(0.1, Math.min(1, currentOpacity + direction * 0.05))
+		newOpacity = Math.round(newOpacity * 100) / 100 // Round to 2 decimal places
+
+		console.log(`Adjusting camera opacity: ${Math.round(currentOpacity * 100)}% → ${Math.round(newOpacity * 100)}%`)
+
+		// Call the function to change camera opacity
+		changeCameraOpacity(clientID, newOpacity)
+
+		// Update local state for immediate feedback
+		setLocalCameraOpacities(prev => ({
+			...prev,
+			[clientID]: newOpacity,
+		}))
+
+		// Add visual feedback for opacity change
+		const opacityIndicator = document.querySelector(`[data-camera-indicator="${clientID}"]`)
+		if (opacityIndicator) {
+			opacityIndicator.textContent = `Прозрачность: ${Math.round(newOpacity * 100)}%`
+			opacityIndicator.classList.add('volume-change')
+			setTimeout(() => opacityIndicator.classList.remove('volume-change'), 300)
+		}
+
+		// Reset the changing flag after a short delay
+		setTimeout(() => {
+			setIsCameraOpacityChanging(false)
+		}, 100)
+	}
 
 	// Функция для запроса изменения громкости через RoomPage
 	// Удалите эту функцию
@@ -301,6 +358,13 @@ export default function UserList({
 	// Add this function to get camera status display
 	const getDisplayCameraStatus = clientID => {
 		return participantCameras[clientID] !== false
+	}
+
+	// Add this function to get camera opacity display - prefer local state, fall back to camerasOpacity
+	const getDisplayCameraOpacity = clientID => {
+		return localCameraOpacities[clientID] !== undefined
+			? localCameraOpacities[clientID]
+			: camerasOpacity[clientID] || 1
 	}
 
 	return (
@@ -575,6 +639,14 @@ export default function UserList({
 												element.style.transform = 'scale(1)'
 											}, 100)
 										}}
+										onWheel={event => {
+											if (
+												hoveredCameraClientId === clientID &&
+												getDisplayCameraStatus(clientID)
+											) {
+												handleCameraOpacityWheel(event, clientID)
+											}
+										}}
 										onMouseEnter={() => {
 											setHoveredCameraClientId(clientID)
 
@@ -584,9 +656,14 @@ export default function UserList({
 											)
 											if (cameraIndicator) {
 												cameraIndicator.classList.add('camera-hover')
-												cameraIndicator.textContent = getDisplayCameraStatus(clientID)
-													? 'Камера включена (нажмите)'
-													: 'Камера выключена (нажмите)'
+												if (getDisplayCameraStatus(clientID)) {
+													const opacity = getDisplayCameraOpacity(clientID)
+													cameraIndicator.textContent = `Прозрачность: ${Math.round(
+														opacity * 100
+													)}% (прокрутите)`
+												} else {
+													cameraIndicator.textContent = 'Камера выключена (нажмите)'
+												}
 											}
 										}}
 										onMouseLeave={() => {
@@ -598,9 +675,14 @@ export default function UserList({
 											)
 											if (cameraIndicator) {
 												cameraIndicator.classList.remove('camera-hover')
-												cameraIndicator.textContent = getDisplayCameraStatus(clientID)
-													? 'Камера включена'
-													: 'Камера выключена'
+												if (getDisplayCameraStatus(clientID)) {
+													const opacity = getDisplayCameraOpacity(clientID)
+													cameraIndicator.textContent = `Прозрачность: ${Math.round(
+														opacity * 100
+													)}%`
+												} else {
+													cameraIndicator.textContent = 'Камера выключена'
+												}
 											}
 										}}
 										style={{

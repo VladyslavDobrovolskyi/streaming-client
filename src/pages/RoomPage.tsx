@@ -84,6 +84,7 @@ export default function RoomPage() {
 	)
 	const [notificationStatus, setNotificationStatus] = useState(true)
 	const [clientVolumes, setClientVolumes] = useState<Record<string, number>>({})
+	const [camerasOpacity, setCamerasOpacity] = useState<Record<string, number>>({})
 	const [clientCameras, setClientCameras] = useState<Record<string, boolean>>({})
 	const [unreadMessages, setUnreadMessages] = useState<Record<string, number>>({})
 	// Add a new state for tracking unread room chat messages after the unreadMessages state
@@ -306,6 +307,17 @@ export default function RoomPage() {
 
 			return { ...prev, [clientID]: newVisibility }
 		})
+	}
+
+	const changeRemoteCameraOpacity = (clientID: string, opacity: number) => {
+		const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
+		if (videoElement) {
+			const grandParentElement = videoElement.parentElement?.parentElement as HTMLElement
+			if (grandParentElement) {
+				grandParentElement.style.opacity = `${opacity}`
+			}
+		}
+		setCamerasOpacity(prev => ({ ...prev, [clientID]: opacity }))
 	}
 
 	const {
@@ -1091,6 +1103,8 @@ export default function RoomPage() {
 				participantVolume={clientVolumes}
 				participantCameras={clientCameras}
 				privateChats={privateChats}
+				changeCameraOpacity={changeRemoteCameraOpacity}
+				camerasOpacity={camerasOpacity}
 			/>
 			{showChat && (
 				<RoomChat

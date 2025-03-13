@@ -13,6 +13,7 @@ import {
 	SpeakerLoudIcon,
 } from '@radix-ui/react-icons'
 import { Slider } from '@radix-ui/themes'
+import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
 
 export default function ClientVideo({
 	clientID,
@@ -44,6 +45,8 @@ export default function ClientVideo({
 	const DEFAULT_VOLUME = 0.5
 	// Add a ref to track if we're in the middle of a volume update
 	const isUpdatingVolumeRef = useRef(false)
+	// Add a state for camera opacity after the existing state declarations
+	const [cameraOpacity, setCameraOpacity] = useState(1.0)
 
 	// Helper function to get effective volume
 	const getEffectiveVolume = () => {
@@ -175,6 +178,27 @@ export default function ClientVideo({
 		document.dispatchEvent(event)
 	}
 
+	// Add a function to handle camera opacity changes after the handleVolumeChange function
+	const handleCameraOpacityChange = (newOpacity: number) => {
+		setCameraOpacity(newOpacity)
+
+		// If opacity reaches 0, disable the camera
+		if (newOpacity === 0 && cameraStatus !== false) {
+			toggleCamera(clientID)
+		}
+
+		// If opacity increases from 0, enable the camera
+		if (newOpacity > 0 && cameraStatus === false) {
+			toggleCamera(clientID)
+		}
+
+		// Dispatch event to update opacity in other components
+		const event = new CustomEvent('camera-opacity-change', {
+			detail: { clientID, opacity: newOpacity },
+		})
+		document.dispatchEvent(event)
+	}
+
 	// Also update the effect that listens for volume changes from UserList
 	useEffect(() => {
 		const handleUserListVolumeChange = e => {
@@ -213,6 +237,27 @@ export default function ClientVideo({
 
 		return () => {
 			document.removeEventListener('update-user-volume', handleUserListVolumeChange)
+		}
+	}, [clientID])
+
+	// Add an effect to listen for opacity changes from other components
+	useEffect(() => {
+		const handleOpacityChange = e => {
+			const { clientID: changedClientID, opacity } = e.detail
+			if (changedClientID === clientID) {
+				setCameraOpacity(opacity)
+
+				// Update video element opacity
+				if (videoRef.current) {
+					videoRef.current.style.opacity = opacity.toString()
+				}
+			}
+		}
+
+		document.addEventListener('camera-opacity-change', handleOpacityChange)
+
+		return () => {
+			document.removeEventListener('camera-opacity-change', handleOpacityChange)
 		}
 	}, [clientID])
 
@@ -291,6 +336,7 @@ export default function ClientVideo({
 							borderRadius: 'var(--radius-4)',
 							zIndex: 11001,
 							cursor: isDragging ? 'grabbing' : 'move',
+							opacity: cameraOpacity,
 						}}
 					/>
 					{hoveredClient === clientID && (
@@ -385,6 +431,77 @@ export default function ClientVideo({
 												/>
 											</div>
 										)}
+									</div>
+								</div>
+							)}
+							{!isLocal && (
+								<div
+									style={{
+										position: 'absolute',
+										bottom: '-40px',
+										left: '-11px',
+										right: '0px',
+										display: 'flex',
+										alignItems: 'center',
+										pointerEvents: 'auto',
+										zIndex: 11003,
+									}}
+								>
+									<div
+										style={{
+											position: 'relative',
+											display: 'flex',
+											alignItems: 'center',
+										}}
+									>
+										<button
+											onClick={() => toggleCamera(clientID)}
+											style={{
+												color: 'white',
+												border: 'none',
+												padding: '0.5rem',
+												borderRadius: 'var(--radius-4)',
+												cursor: 'pointer',
+												background: 'none',
+												display: 'flex',
+												alignItems: 'center',
+											}}
+										>
+											{cameraStatus ? <BsCameraVideoFill /> : <BsCameraVideoOffFill />}
+										</button>
+										<div
+											style={{
+												position: 'absolute',
+												left: '85%',
+												display: 'flex',
+												alignItems: 'center',
+												height: '100%',
+											}}
+										>
+											<Slider
+												orientation='horizontal'
+												min={0}
+												max={1}
+												step={0.01}
+												value={[cameraOpacity]}
+												onValueChange={value => handleCameraOpacityChange(value[0])}
+												style={
+													{
+														width: size.width - 45,
+														'--slider-thumb-size': '12px',
+													} as React.CSSProperties
+												}
+											/>
+											<div
+												style={{
+													marginLeft: '10px',
+													color: 'white',
+													fontSize: '12px',
+												}}
+											>
+												{Math.round(cameraOpacity * 100)}%
+											</div>
+										</div>
 									</div>
 								</div>
 							)}

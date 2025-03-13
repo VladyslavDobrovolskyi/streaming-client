@@ -19,6 +19,7 @@ interface DraggableResizableProps {
 	onSizeChange?: (size: { width: number; height: number }) => void
 	resizeHandleStyles?: React.CSSProperties
 	disableWheelZoomClass?: string | string[]
+	opacity?: number
 	hide?: boolean
 	focused?: boolean
 }
