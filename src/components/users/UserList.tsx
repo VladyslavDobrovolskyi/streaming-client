@@ -6,7 +6,7 @@ import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
 import { IoChatbox } from 'react-icons/io5'
 import { ImCross } from 'react-icons/im'
 import { LiaUsersCogSolid } from 'react-icons/lia'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 // import { FaUsers } from 'react-icons/fa'
 // import type { UserListProps } from '../../types/room-types'
 
@@ -51,6 +51,43 @@ export default function UserList({
 }) {
 	// Store previous volumes to remember them between toggles
 	const previousVolumesRef = useRef(new Map())
+
+	const [hoveredMicClientId, setHoveredMicClientId] = useState(null)
+	const [volumeChangeMode, setVolumeChangeMode] = useState(false)
+
+	const handleVolumeWheel = (event, clientID) => {
+		event.preventDefault()
+
+		if (!hoveredMicClientId) return
+
+		// Determine direction (up or down)
+		const direction = event.deltaY < 0 ? 1 : -1
+
+		// Get current volume
+		const currentVolume = participantVolume[clientID] || 0
+
+		// Calculate new volume (0.05 = 5% change per wheel tick)
+		let newVolume = Math.max(0, Math.min(1, currentVolume + direction * 0.05))
+		newVolume = Math.round(newVolume * 100) / 100 // Round to 2 decimal places
+
+		// Update volume
+		toggleRemoteMic(clientID, {
+			previousVolume: currentVolume,
+			action: 'setVolume',
+			newVolume: newVolume,
+		})
+	}
+
+	useEffect(() => {
+		if (volumeChangeMode && hoveredMicClientId) {
+			const wheelHandler = e => handleVolumeWheel(e, hoveredMicClientId)
+			window.addEventListener('wheel', wheelHandler, { passive: false })
+
+			return () => {
+				window.removeEventListener('wheel', wheelHandler)
+			}
+		}
+	}, [volumeChangeMode, hoveredMicClientId])
 
 	// Enhanced toggleRemoteMic function that preserves previous volume
 	const handleToggleRemoteMic = clientID => {
@@ -212,6 +249,14 @@ export default function UserList({
 												element.style.transform = 'scale(1)'
 											}, 100)
 										}}
+										onMouseEnter={() => {
+											setHoveredMicClientId(clientID)
+											setVolumeChangeMode(true)
+										}}
+										onMouseLeave={() => {
+											setHoveredMicClientId(null)
+											setVolumeChangeMode(false)
+										}}
 										style={{
 											color:
 												clientID === localVideoId
@@ -246,7 +291,49 @@ export default function UserList({
 											isMicrophoneDisabled ? (
 												<FaMicrophoneAltSlash />
 											) : (
-												<FaMicrophoneAlt />
+												<div style={{ position: 'relative' }}>
+													<FaMicrophoneAlt style={{ color: 'rgba(165, 247, 65, 0.7)' }} />
+													{hoveredMicClientId === clientID && (
+														<div
+															style={{
+																position: 'absolute',
+																bottom: 0,
+																left: 0,
+																right: 0,
+																height: '100%',
+																overflow: 'hidden',
+																pointerEvents: 'none',
+															}}
+														>
+															<div
+																style={{
+																	position: 'absolute',
+																	bottom: 0,
+																	left: 0,
+																	right: 0,
+																	height: `${
+																		(participantVolume[clientID] || 0) * 100
+																	}%`,
+																	backgroundColor: 'rgba(165, 247, 65, 0.7)',
+																	zIndex: -1,
+																}}
+															/>
+															<FaMicrophoneAlt
+																style={{
+																	position: 'absolute',
+																	bottom: 0,
+																	left: 0,
+																	color: 'rgba(128, 128, 128, 0.7)',
+																	clipPath: `polygon(0 0, 100% 0, 100% ${
+																		100 - (participantVolume[clientID] || 0) * 100
+																	}%, 0 ${
+																		100 - (participantVolume[clientID] || 0) * 100
+																	}%)`,
+																}}
+															/>
+														</div>
+													)}
+												</div>
 											)
 										) : participantInfo[clientID]?.isMicrophoneDisabled ? (
 											<>
@@ -264,7 +351,47 @@ export default function UserList({
 												)}
 											</>
 										) : (
-											<FaMicrophoneAlt />
+											<div style={{ position: 'relative' }}>
+												<FaMicrophoneAlt style={{ color: 'rgba(165, 247, 65, 0.7)' }} />
+												{hoveredMicClientId === clientID && (
+													<div
+														style={{
+															position: 'absolute',
+															bottom: 0,
+															left: 0,
+															right: 0,
+															height: '100%',
+															overflow: 'hidden',
+															pointerEvents: 'none',
+														}}
+													>
+														<div
+															style={{
+																position: 'absolute',
+																bottom: 0,
+																left: 0,
+																right: 0,
+																height: `${(participantVolume[clientID] || 0) * 100}%`,
+																backgroundColor: 'rgba(165, 247, 65, 0.7)',
+																zIndex: -1,
+															}}
+														/>
+														<FaMicrophoneAlt
+															style={{
+																position: 'absolute',
+																bottom: 0,
+																left: 0,
+																color: 'rgba(128, 128, 128, 0.7)',
+																clipPath: `polygon(0 0, 100% 0, 100% ${
+																	100 - (participantVolume[clientID] || 0) * 100
+																}%, 0 ${
+																	100 - (participantVolume[clientID] || 0) * 100
+																}%)`,
+															}}
+														/>
+													</div>
+												)}
+											</div>
 										)}
 									</span>
 									<span
