@@ -736,7 +736,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 									justifyContent: 'center',
 									padding: '4px 8px',
 									borderRadius: '999px',
-									backgroundColor: 'rgba(255, 255, 255, 0.9)',
+									backgroundColor: 'trasparent',
 									boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
 									animation: 'pulse 1.5s infinite',
 								}}
