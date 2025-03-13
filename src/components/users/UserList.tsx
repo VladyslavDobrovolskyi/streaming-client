@@ -85,6 +85,21 @@ const cameraHoverAnimation = `
   }
 `
 
+// Add a new keyframes animation for the highlight effect after the existing animation styles
+const highlightAnimation = `
+  @keyframes highlightPulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 10px 5px rgba(0, 255, 255, 0.3);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(0, 255, 255, 0);
+    }
+  }
+`
+
 export default function UserList({
 	showUserList,
 	toggleUserList,
@@ -519,12 +534,14 @@ export default function UserList({
 		return getDisplayVolume(clientID) === 0 && !isMicDisabled && !unmutingMics[clientID]
 	}
 
+	// Update the return statement to include the new style tag
 	return (
 		<>
 			<style>{pulseAnimation}</style>
 			<style>{volumeChangeAnimation}</style>
 			<style>{micHoverAnimation}</style>
 			<style>{cameraHoverAnimation}</style>
+			<style>{highlightAnimation}</style>
 
 			{filteredClients.length >= 1 && filteredClients.length !== 0 && (
 				<div
@@ -608,12 +625,15 @@ export default function UserList({
 										borderRadius: '5px',
 										backgroundColor:
 											highlightedUser === clientID ? 'rgba(255,255,255,0.2)' : 'transparent',
+										boxShadow: highlightedUser === clientID ? '0 0 10px cyan' : 'none',
+										animation: highlightedUser === clientID ? 'highlightPulse 2s infinite' : 'none',
 										display: 'flex',
 										alignItems: 'center',
 										gap: '10px',
 										whiteSpace: 'nowrap',
 										overflow: 'hidden',
 										textOverflow: 'ellipsis',
+										transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
 									}}
 									onMouseEnter={() => setHighlightedUser(clientID)}
 									onMouseLeave={() => setHighlightedUser(null)}
