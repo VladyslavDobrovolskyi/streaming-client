@@ -216,7 +216,7 @@ export default function UserList({
 			// Add visual feedback
 			const opacityIndicator = document.querySelector(`[data-camera-indicator="${clientID}"]`)
 			if (opacityIndicator) {
-				opacityIndicator.textContent = `Прозрачность: ${Math.round(previousOpacity * 100)}%`
+				opacityIndicator.textContent = `${Math.round(previousOpacity * 100)}%`
 				opacityIndicator.classList.add('volume-change')
 				setTimeout(() => opacityIndicator.classList.remove('volume-change'), 300)
 			}
@@ -255,7 +255,7 @@ export default function UserList({
 				// Add visual feedback
 				const opacityIndicator = document.querySelector(`[data-camera-indicator="${clientID}"]`)
 				if (opacityIndicator) {
-					opacityIndicator.textContent = 'Камера выключена'
+					opacityIndicator.textContent = '0%'
 					opacityIndicator.classList.add('volume-change')
 					setTimeout(() => opacityIndicator.classList.remove('volume-change'), 300)
 				}
@@ -272,7 +272,7 @@ export default function UserList({
 				// Add visual feedback for opacity change
 				const opacityIndicator = document.querySelector(`[data-camera-indicator="${clientID}"]`)
 				if (opacityIndicator) {
-					opacityIndicator.textContent = `Прозрачность: ${Math.round(newOpacity * 100)}%`
+					opacityIndicator.textContent = `${Math.round(newOpacity * 100)}%`
 					opacityIndicator.classList.add('volume-change')
 					setTimeout(() => opacityIndicator.classList.remove('volume-change'), 300)
 				}
@@ -722,12 +722,11 @@ export default function UserList({
 												cameraIndicator.classList.add('camera-hover')
 												if (getDisplayCameraStatus(clientID)) {
 													const opacity = getDisplayCameraOpacity(clientID)
-													cameraIndicator.textContent = `Прозрачность: ${Math.round(
+													cameraIndicator.textContent = `${Math.round(
 														opacity * 100
 													)}% (прокрутите)`
 												} else {
-													cameraIndicator.textContent =
-														'Камера выключена (прокрутите вверх для включения)'
+													cameraIndicator.textContent = `0% (прокрутите вверх)`
 												}
 											}
 										}}
@@ -742,11 +741,9 @@ export default function UserList({
 												cameraIndicator.classList.remove('camera-hover')
 												if (getDisplayCameraStatus(clientID)) {
 													const opacity = getDisplayCameraOpacity(clientID)
-													cameraIndicator.textContent = `Прозрачность: ${Math.round(
-														opacity * 100
-													)}%`
+													cameraIndicator.textContent = `${Math.round(opacity * 100)}%`
 												} else {
-													cameraIndicator.textContent = 'Камера выключена'
+													cameraIndicator.textContent = `0%`
 												}
 											}
 										}}
