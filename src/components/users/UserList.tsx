@@ -185,6 +185,16 @@ export default function UserList({
 		event.preventDefault()
 		event.stopPropagation()
 
+		// Check if camera is disabled for this client
+		const isCamDisabled =
+			participantInfo[clientID]?.isCameraDisabled || (clientID === localVideoId && isCameraDisabled)
+
+		// Don't process wheel events if camera is disabled
+		if (isCamDisabled) {
+			console.log(`Camera is disabled for ${clientID}, ignoring opacity change`)
+			return
+		}
+
 		setIsCameraOpacityChanging(true)
 
 		// Determine direction (up or down)
@@ -305,8 +315,15 @@ export default function UserList({
 		event.preventDefault()
 		event.stopPropagation()
 
-		// Remove this check since we already have it in the useEffect
-		// if (!hoveredMicClientId) return
+		// Check if microphone is disabled for this client
+		const isMicDisabled =
+			clientID === localVideoId ? isMicrophoneDisabled : participantInfo[clientID]?.isMicrophoneDisabled
+
+		// Don't process wheel events if microphone is disabled
+		if (isMicDisabled) {
+			console.log(`Microphone is disabled for ${clientID}, ignoring volume change`)
+			return
+		}
 
 		setIsVolumeChanging(true)
 
@@ -568,6 +585,14 @@ export default function UserList({
 											}
 										}}
 										onMouseEnter={() => {
+											// Don't set hover state if microphone is disabled
+											const isMicDisabled =
+												clientID === localVideoId
+													? isMicrophoneDisabled
+													: participantInfo[clientID]?.isMicrophoneDisabled
+
+											if (isMicDisabled) return
+
 											setHoveredMicClientId(clientID)
 
 											// Добавляем визуальную подсказку о возможности прокрутки
@@ -712,6 +737,13 @@ export default function UserList({
 											}
 										}}
 										onMouseEnter={() => {
+											// Don't set hover state if camera is disabled
+											const isCamDisabled =
+												participantInfo[clientID]?.isCameraDisabled ||
+												(clientID === localVideoId && isCameraDisabled)
+
+											if (isCamDisabled) return
+
 											setHoveredCameraClientId(clientID)
 										}}
 										onMouseLeave={() => {
