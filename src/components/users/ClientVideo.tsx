@@ -436,7 +436,7 @@ export default function ClientVideo({
 										>
 											{getVolumeIcon()}
 										</button>
-										{!muted && !isMicrophoneDisabled && (
+										{!muted && !isMicrophoneDisabled && getEffectiveVolume() > 0 && (
 											<div
 												style={{
 													position: 'absolute',
