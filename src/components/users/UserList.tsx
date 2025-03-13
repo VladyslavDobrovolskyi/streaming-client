@@ -67,12 +67,18 @@ export default function UserList({
 		const currentVolume = participantVolume[clientID] || 0
 
 		// Calculate new volume (0.01 = 1% change per wheel tick)
-		let newVolume = Math.max(0, Math.min(1, currentVolume + direction * 0.01))
+		let newVolume = Math.max(0.01, Math.min(1, currentVolume + direction * 0.01))
 		newVolume = Math.round(newVolume * 100) / 100 // Round to 2 decimal places
 
 		console.log(`Adjusting volume: ${Math.round(currentVolume * 100)}% → ${Math.round(newVolume * 100)}%`)
 
-		// Update volume - make sure we're using a specific action type for volume adjustment
+		// Update volume - ONLY adjust volume, never mute
+		toggleRemoteMic(clientID, {
+			previousVolume: currentVolume,
+			action: 'adjustVolume', // Specific action for volume adjustment only
+			newVolume: newVolume,
+			preventMute: true, // Add this flag to prevent muting
+		})
 	}
 
 	useEffect(() => {
