@@ -89,13 +89,13 @@ const cameraHoverAnimation = `
 const highlightAnimation = `
   @keyframes highlightPulse {
     0% {
-      box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.7);
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
     }
     70% {
-      box-shadow: 0 0 10px 5px rgba(0, 255, 255, 0.3);
+      box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.2);
     }
     100% {
-      box-shadow: 0 0 0 0 rgba(0, 255, 255, 0);
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
     }
   }
 `
@@ -625,7 +625,7 @@ export default function UserList({
 										borderRadius: '5px',
 										backgroundColor:
 											highlightedUser === clientID ? 'rgba(255,255,255,0.2)' : 'transparent',
-										boxShadow: highlightedUser === clientID ? '0 0 10px cyan' : 'none',
+										boxShadow: highlightedUser === clientID ? 'none' : 'none',
 										animation: highlightedUser === clientID ? 'highlightPulse 2s infinite' : 'none',
 										display: 'flex',
 										alignItems: 'center',
