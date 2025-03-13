@@ -473,26 +473,27 @@ export default function UserList({
 											) : (
 												<div style={{ position: 'relative' }}>
 													<FaMicrophoneAlt style={{ color: 'rgba(165, 247, 65, 0.7)' }} />
-													{hoveredMicClientId === clientID && (
-														<div
-															data-volume-indicator={clientID}
-															style={{
-																position: 'absolute',
-																bottom: '16px',
-																left: '50%',
-																transform: 'translateX(-50%)',
-																backgroundColor: 'rgba(0, 0, 0, 0.6)',
-																color: 'white',
-																padding: '3px 10px',
-																borderRadius: '5px',
-																fontSize: '10px',
-																whiteSpace: 'nowrap',
-																transition: 'transform 0.2s ease',
-															}}
-														>
-															{Math.round(getDisplayVolume(clientID) * 100)}%
-														</div>
-													)}
+													{hoveredMicClientId === clientID &&
+														getDisplayVolume(clientID) > 0 && (
+															<div
+																data-volume-indicator={clientID}
+																style={{
+																	position: 'absolute',
+																	bottom: '16px',
+																	left: '50%',
+																	transform: 'translateX(-50%)',
+																	backgroundColor: 'rgba(0, 0, 0, 0.6)',
+																	color: 'white',
+																	padding: '3px 10px',
+																	borderRadius: '5px',
+																	fontSize: '10px',
+																	whiteSpace: 'nowrap',
+																	transition: 'transform 0.2s ease',
+																}}
+															>
+																{Math.round(getDisplayVolume(clientID) * 100)}%
+															</div>
+														)}
 												</div>
 											)
 										) : participantInfo[clientID]?.isMicrophoneDisabled ? (
@@ -513,7 +514,7 @@ export default function UserList({
 										) : (
 											<div style={{ position: 'relative' }}>
 												<FaMicrophoneAlt style={{ color: 'rgba(165, 247, 65, 0.7)' }} />
-												{hoveredMicClientId === clientID && (
+												{hoveredMicClientId === clientID && getDisplayVolume(clientID) > 0 && (
 													<div
 														data-volume-indicator={clientID}
 														style={{
