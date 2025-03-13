@@ -187,12 +187,26 @@ export default function ClientVideo({
 			if (currentVolume > 0) {
 				previousVolumesRef.current[clientID] = currentVolume
 			}
-			// Mute the participant
-			handleVolumeChange(0)
+
+			// Instead of changing volume to 0, just mute the video element
+			if (videoRef.current) {
+				videoRef.current.muted = true
+			}
+
+			// Update UI state to show as muted
+			setMuted(true)
 		} else if (previousVolumesRef.current[clientID]) {
 			// Restore previous volume when microphone is enabled again
 			const previousVolume = previousVolumesRef.current[clientID]
-			handleVolumeChange(previousVolume)
+
+			// Unmute the video element while keeping the volume
+			if (videoRef.current) {
+				videoRef.current.muted = false
+				videoRef.current.volume = previousVolume
+			}
+
+			// Update UI state
+			setMuted(false)
 		}
 	}, [isMicrophoneDisabled, clientID])
 	// Add a function to handle camera opacity changes after the handleVolumeChange function
