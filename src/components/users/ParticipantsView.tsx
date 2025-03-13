@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import ClientVideo from './ClientVideo'
 
 export default function ParticipantsView({
@@ -24,13 +24,24 @@ export default function ParticipantsView({
 	onHighlightChange,
 	setHideMe,
 }) {
+	// Use a ref to track if we're currently updating from this component
+	// This helps prevent circular updates
+	const isUpdatingRef = useRef(false)
+
 	// This effect ensures that when clientVolumes changes, all video elements are updated
+	// But only if the change didn't originate from within this component
 	useEffect(() => {
+		// Skip if we're the ones who initiated the update
+		if (isUpdatingRef.current) {
+			isUpdatingRef.current = false
+			return
+		}
+
 		Object.entries(clientVolumes).forEach(([clientId, volume]) => {
 			const videoElement = document.querySelector(`video[data-client-id="${clientId}"]`) as HTMLVideoElement
 			if (videoElement) {
-				console.log(`ParticipantsView: Setting volume for ${clientId} to ${volume}`)
-				// videoElement.volume = volume
+				// Set volume directly on the video element
+				videoElement.volume = typeof volume === 'number' ? volume : 0
 
 				// Determine if the video should be muted based on volume and microphone state
 				const isMuted =
@@ -38,11 +49,19 @@ export default function ParticipantsView({
 					(clientId === localVideoId && isMicrophoneDisabled) ||
 					participantInfo[clientId]?.isMicrophoneDisabled
 
-				videoElement.muted = isMuted
-				console.log(`ParticipantsView: Setting muted for ${clientId} to ${isMuted}`)
+				// Only update if the muted state is different to avoid unnecessary re-renders
+				if (videoElement.muted !== isMuted) {
+					videoElement.muted = isMuted
+				}
 			}
 		})
 	}, [clientVolumes, localVideoId, isMicrophoneDisabled, participantInfo])
+
+	// Wrapper for onVolumeChange that sets the updating flag
+	const handleVolumeChange = (id, vol) => {
+		isUpdatingRef.current = true
+		onVolumeChange(id, vol)
+	}
 
 	return (
 		<div
@@ -70,7 +89,6 @@ export default function ParticipantsView({
 						isLocal={clientID === localVideoId}
 						participantVolume={clientVolumes}
 						toggleCamera={() => toggleRemoteCamera(clientID)}
-						// username={participantData.username || 'Anonymous'}
 						isCameraMuted={isCameraMuted}
 						isMicrophoneMuted={
 							clientID === localVideoId ? isMicrophoneDisabled : participantData.isMicrophoneDisabled
@@ -79,10 +97,10 @@ export default function ParticipantsView({
 						size={clientSizes[clientID] || { width: 150, height: 100 }}
 						onPositionChange={(id, pos) => onPositionChange(id, pos)}
 						onSizeChange={(id, size) => onSizeChange(id, size)}
-						onVolumeChange={(id, vol) => onVolumeChange(id, vol)}
+						onVolumeChange={(id, vol) => handleVolumeChange(id, vol)}
 						onCoverToggle={id => onCoverToggle(id)}
 						isCovered={coveredClients[clientID]}
-						volume={clientVolumes[clientID] || 0} // Default to 0.5 instead of 1
+						volume={clientVolumes[clientID] || 0}
 						highlightedUser={highlightedUser}
 						onMouseEnter={() => onHighlightChange(clientID)}
 						onMouseLeave={() => onHighlightChange(null)}

@@ -42,6 +42,8 @@ export default function ClientVideo({
 	const [mutedBySlider, setMutedBySlider] = useState(false)
 	const videoRef = useRef<HTMLVideoElement>(null)
 	const DEFAULT_VOLUME = 0.5
+	// Add a ref to track if we're in the middle of a volume update
+	const isUpdatingVolumeRef = useRef(false)
 
 	// Helper function to get effective volume
 	const getEffectiveVolume = () => {
@@ -66,7 +68,7 @@ export default function ClientVideo({
 		}
 	}, [clientID, provideMediaRef])
 
-	// Initialize new users with default volume
+	// Initialize new users with default volume - only runs once when the component mounts
 	useEffect(() => {
 		// If this client doesn't have a volume set in participantVolume, initialize it
 		if (participantVolume && !(clientID in participantVolume)) {
@@ -74,7 +76,7 @@ export default function ClientVideo({
 			// If volume prop is greater than 0, use it, otherwise use DEFAULT_VOLUME
 			const initialVolume = volume !== undefined && volume !== null && volume > 0 ? volume : DEFAULT_VOLUME
 
-			console.log(`Initializing volume for ${clientID} to ${initialVolume}`)
+			// Update the parent state
 			onVolumeChange(clientID, initialVolume)
 
 			// Ensure muted state is false for new users
@@ -86,124 +88,71 @@ export default function ClientVideo({
 				videoRef.current.muted = isLocal || isMicrophoneMuted
 			}
 		}
-	}, [clientID, participantVolume, onVolumeChange, volume, isLocal, isMicrophoneMuted])
-
-	useEffect(() => {
-		if (videoRef.current) {
-			// Get effective volume
-			const effectiveVolume = getEffectiveVolume()
-
-			// Set muted state based on volume
-			setMuted(effectiveVolume === 0)
-
-			// Apply volume and muted state to video element
-			videoRef.current.volume = effectiveVolume
-			videoRef.current.muted = effectiveVolume === 0 || isLocal || isMicrophoneMuted
-
-			console.log(
-				`Setting video element: volume=${effectiveVolume}, muted=${
-					effectiveVolume === 0 || isLocal || isMicrophoneMuted
-				}`
-			)
-		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [volume, participantVolume, clientID, isLocal, isMicrophoneMuted])
+	}, []) // Empty dependency array means this only runs once
 
+	// This effect updates the UI state based on the current volume
+	// It doesn't modify the video element directly to avoid loops
 	useEffect(() => {
-		// This effect specifically handles changes to participantVolume
-		if (participantVolume && clientID in participantVolume) {
-			const newVolume = participantVolume[clientID]
-			console.log(`ClientVideo: Volume for ${clientID} changed to ${newVolume}`)
-
-			// Update muted state based on participantVolume
-			setMuted(newVolume === 0)
-
-			// Update video element directly
-			if (videoRef.current) {
-				videoRef.current.volume = newVolume
-				videoRef.current.muted = newVolume === 0 || isLocal || isMicrophoneMuted
-				console.log(
-					`Updated video ref: volume=${newVolume}, muted=${newVolume === 0 || isLocal || isMicrophoneMuted}`
-				)
-			}
+		// Skip if we're in the middle of updating volume
+		if (isUpdatingVolumeRef.current) {
+			isUpdatingVolumeRef.current = false
+			return
 		}
-	}, [participantVolume, clientID, isLocal, isMicrophoneMuted])
 
-	// Add this new useEffect to handle the isCovered state
+		const effectiveVolume = getEffectiveVolume()
+
+		// Update local state based on the effective volume
+		setMuted(effectiveVolume === 0)
+
+		// Don't update the video element here - that's handled by the parent
+	}, [participantVolume, clientID, volume])
+
+	// Add this effect to handle the isCovered state
 	useEffect(() => {
-		if (isCovered) {
+		if (isCovered && !isUpdatingVolumeRef.current) {
 			// When covered, set volume to 0 in participantVolume
+			isUpdatingVolumeRef.current = true
 			onVolumeChange(clientID, 0)
 			setMuted(true)
-
-			// Directly mute the video element
-			if (videoRef.current) {
-				videoRef.current.muted = true
-			}
 		}
 	}, [isCovered, clientID, onVolumeChange])
 
+	// Handle local mute/unmute
 	const handleToggleMuted = () => {
-		console.log(`handleToggleMuted called, current muted state: ${muted}`)
+		isUpdatingVolumeRef.current = true
 
 		if (mutedBySlider) {
 			setMuted(false)
 			setMutedBySlider(false)
 			onVolumeChange(clientID, DEFAULT_VOLUME) // Update participantVolume
-			console.log(`Unmuting from slider: setting volume to ${DEFAULT_VOLUME}`)
-
-			// Directly update the video element
-			if (videoRef.current) {
-				videoRef.current.volume = DEFAULT_VOLUME
-				videoRef.current.muted = isLocal || isMicrophoneMuted
-			}
 			return
 		}
 
 		if (muted) {
 			// Unmuting - update participantVolume
 			const newVolume = volumeBeforeMute > 0 ? volumeBeforeMute : DEFAULT_VOLUME
-			console.log(`Unmuting: setting volume to ${newVolume}`)
 			onVolumeChange(clientID, newVolume) // This updates participantVolume
-
-			// Directly update the video element
-			if (videoRef.current) {
-				videoRef.current.volume = newVolume
-				videoRef.current.muted = isLocal || isMicrophoneMuted
-			}
 		} else {
 			// Muting - save current volume and update participantVolume
 			const currentVolume = getEffectiveVolume()
 			setVolumeBeforeMute(currentVolume > 0 ? currentVolume : DEFAULT_VOLUME)
-			console.log(`Muting: saving volume ${currentVolume > 0 ? currentVolume : DEFAULT_VOLUME} and setting to 0`)
 			onVolumeChange(clientID, 0) // This updates participantVolume
-
-			// Directly update the video element
-			if (videoRef.current) {
-				videoRef.current.muted = true
-			}
 		}
 	}
 
+	// Handle volume slider changes
 	const handleVolumeChange = (newVolume: number) => {
+		isUpdatingVolumeRef.current = true
+
 		if (newVolume === 0) {
 			setMuted(true)
 			setMutedBySlider(true)
-
-			// Directly mute the video element
-			if (videoRef.current) {
-				videoRef.current.muted = true
-			}
 		} else {
 			setMuted(false)
 			setMutedBySlider(false)
-
-			// Directly update the video element
-			if (videoRef.current) {
-				videoRef.current.volume = newVolume
-				videoRef.current.muted = isLocal || isMicrophoneMuted
-			}
 		}
+
 		onVolumeChange(clientID, newVolume) // This updates participantVolume
 	}
 
