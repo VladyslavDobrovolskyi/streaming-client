@@ -6,7 +6,7 @@ import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
 import { IoChatbox } from 'react-icons/io5'
 import { ImCross } from 'react-icons/im'
 import { LiaUsersCogSolid } from 'react-icons/lia'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 // import { FaUsers } from 'react-icons/fa'
 // import type { UserListProps } from '../../types/room-types'
 
@@ -49,6 +49,35 @@ export default function UserList({
 	showUserListButton,
 	privateChats,
 }) {
+	// Store previous volumes to remember them between toggles
+	const previousVolumesRef = useRef(new Map())
+
+	// Enhanced toggleRemoteMic function that preserves previous volume
+	const handleToggleRemoteMic = clientID => {
+		console.log(`UserList: Toggling mic for ${clientID}, current volume: ${participantVolume[clientID]}`)
+
+		// If the participant is currently not muted (volume > 0)
+		if (participantVolume[clientID] > 0) {
+			// Store the current volume before muting
+			previousVolumesRef.current.set(clientID, participantVolume[clientID])
+
+			// Call the original toggleRemoteMic with additional context
+			toggleRemoteMic(clientID, {
+				previousVolume: participantVolume[clientID],
+				action: 'mute',
+			})
+		} else {
+			// Unmute: Get the previous volume if available, otherwise use default (0.5)
+			const previousVolume = previousVolumesRef.current.get(clientID) || 0.5
+
+			// Call the original toggleRemoteMic with additional context
+			toggleRemoteMic(clientID, {
+				previousVolume: previousVolume,
+				action: 'unmute',
+			})
+		}
+	}
+
 	useEffect(() => {
 		const saveHighlightedUser = highlightedUser
 		if (!showUserList) {
@@ -173,12 +202,8 @@ export default function UserList({
 									</div>
 									<span
 										onClick={event => {
-											console.log(
-												`UserList: Toggling mic for ${clientID}, current volume: ${participantVolume[clientID]}`
-											)
-
-											// Call toggleRemoteMic with the current state
-											toggleRemoteMic(clientID)
+											// Use the enhanced toggleRemoteMic handler
+											handleToggleRemoteMic(clientID)
 
 											// Add a visual feedback for the click
 											const element = event.currentTarget
