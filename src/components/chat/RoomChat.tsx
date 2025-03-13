@@ -68,7 +68,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	const [lastSeenMessageCount, setLastSeenMessageCount] = useState(0)
 	const prevMessagesCountRef = useRef(messages.length)
 	const [isAtTop, setIsAtTop] = useState(false)
-
+	const [loadedAvatars, setLoadedAvatars] = useState<Record<string, boolean>>({})
 	// State for tracking sequence start messages
 	const [sequenceStartRefs, setSequenceStartRefs] = useState<Record<number, React.RefObject<HTMLDivElement>>>({})
 	const [sequenceEndRefs, setSequenceEndRefs] = useState<Record<number, React.RefObject<HTMLDivElement>>>({})
@@ -77,6 +77,40 @@ const RoomChat: React.FC<RoomChatProps> = ({
 	const [floatingAvatarSender, setFloatingAvatarSender] = useState<string | null>(null)
 	const [onlyLocalMessagesVisible, setOnlyLocalMessagesVisible] = useState(false)
 	const [isPreviousUserAvatar, setIsPreviousUserAvatar] = useState(false)
+
+	// Function to check if an avatar is loaded
+	const isAvatarLoaded = (sender: string) => {
+		if (!sender || !participantInfo[sender] || !participantInfo[sender].avatar) {
+			return false
+		}
+
+		// If we've already checked this avatar, return the cached result
+		if (loadedAvatars[sender] !== undefined) {
+			return loadedAvatars[sender]
+		}
+
+		// Otherwise, check if the avatar can be loaded
+		const img = new Image()
+		img.src = participantInfo[sender].avatar
+
+		// When the image loads, update the state
+		img.onload = () => {
+			setLoadedAvatars(prev => ({
+				...prev,
+				[sender]: true,
+			}))
+		}
+
+		img.onerror = () => {
+			setLoadedAvatars(prev => ({
+				...prev,
+				[sender]: false,
+			}))
+		}
+
+		// Return false initially until onload fires
+		return loadedAvatars[sender] || false
+	}
 
 	// Find all sequence start and end indices
 	const findSequenceIndices = () => {
@@ -479,6 +513,18 @@ const RoomChat: React.FC<RoomChatProps> = ({
 		}
 	}
 
+	// Preload avatars when participant info changes
+	useEffect(() => {
+		if (!participantInfo) return
+
+		// Check all participant avatars
+		Object.keys(participantInfo).forEach(id => {
+			if (participantInfo[id]?.avatar) {
+				isAvatarLoaded(id)
+			}
+		})
+	}, [participantInfo])
+
 	return (
 		<DraggableResizable
 			initialSize={{ width: 320, height: 480 }}
@@ -676,7 +722,8 @@ const RoomChat: React.FC<RoomChatProps> = ({
 						!isAtTop &&
 						floatingAvatarSender &&
 						participantInfo[floatingAvatarSender] &&
-						participantInfo[floatingAvatarSender].avatar && (
+						participantInfo[floatingAvatarSender].avatar &&
+						isAvatarLoaded(floatingAvatarSender) && (
 							<Box
 								style={{
 									position: 'absolute',
