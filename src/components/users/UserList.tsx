@@ -713,37 +713,9 @@ export default function UserList({
 										}}
 										onMouseEnter={() => {
 											setHoveredCameraClientId(clientID)
-
-											// Add visual hint for camera hover
-											const cameraIndicator = document.querySelector(
-												`[data-camera-indicator="${clientID}"]`
-											)
-											if (cameraIndicator) {
-												cameraIndicator.classList.add('camera-hover')
-												if (getDisplayCameraStatus(clientID)) {
-													const opacity = getDisplayCameraOpacity(clientID)
-													cameraIndicator.textContent = `${Math.round(opacity * 100)}%`
-												} else {
-													cameraIndicator.textContent = `0%`
-												}
-											}
 										}}
 										onMouseLeave={() => {
 											setHoveredCameraClientId(null)
-
-											// Remove visual hint
-											const cameraIndicator = document.querySelector(
-												`[data-camera-indicator="${clientID}"]`
-											)
-											if (cameraIndicator) {
-												cameraIndicator.classList.remove('camera-hover')
-												if (getDisplayCameraStatus(clientID)) {
-													const opacity = getDisplayCameraOpacity(clientID)
-													cameraIndicator.textContent = `${Math.round(opacity * 100)}%`
-												} else {
-													cameraIndicator.textContent = `0%`
-												}
-											}
 										}}
 										style={{
 											cursor: 'pointer',
@@ -778,26 +750,27 @@ export default function UserList({
 										) : (
 											<div style={{ position: 'relative' }}>
 												<BsCameraVideoFill />
-												<div
-													data-camera-indicator={clientID}
-													style={{
-														position: 'absolute',
-														bottom: '16px',
-														left: '50%',
-														transform: 'translateX(-50%)',
-														backgroundColor: 'rgba(0, 0, 0, 0.6)',
-														color: 'white',
-														padding: '3px 10px',
-														borderRadius: '5px',
-														fontSize: '10px',
-														whiteSpace: 'nowrap',
-														transition: 'transform 0.2s ease',
-													}}
-												>
-													{participantCameras[clientID] === false
-														? '0%'
-														: `${Math.round(getDisplayCameraOpacity(clientID) * 100)}%`}
-												</div>
+												{hoveredCameraClientId === clientID &&
+													getDisplayCameraStatus(clientID) && (
+														<div
+															data-camera-indicator={clientID}
+															style={{
+																position: 'absolute',
+																bottom: '16px',
+																left: '50%',
+																transform: 'translateX(-50%)',
+																backgroundColor: 'rgba(0, 0, 0, 0.6)',
+																color: 'white',
+																padding: '3px 10px',
+																borderRadius: '5px',
+																fontSize: '10px',
+																whiteSpace: 'nowrap',
+																transition: 'transform 0.2s ease',
+															}}
+														>
+															{Math.round(getDisplayCameraOpacity(clientID) * 100)}%
+														</div>
+													)}
 											</div>
 										)}
 									</span>
