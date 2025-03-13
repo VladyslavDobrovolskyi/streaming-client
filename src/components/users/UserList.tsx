@@ -65,10 +65,11 @@ export default function UserList({
 	// Direct access to video elements for volume control
 	const updateVideoElementVolume = (clientID, volume) => {
 		try {
-			// Find the video element for this client
-			const videoElement = document.getElementById(`video-${clientID}`)
-			if (videoElement && videoElement instanceof HTMLVideoElement) {
+			// Find the video element for this client using the correct selector
+			const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
+			if (videoElement) {
 				videoElement.volume = volume
+				// Don't set muted to true even if volume is 0
 				console.log(`Directly updated video element for ${clientID} to volume=${volume}`)
 				return true
 			}
@@ -102,18 +103,7 @@ export default function UserList({
 		}))
 
 		// Try to directly update the video element volume
-		const updated = updateVideoElementVolume(clientID, newVolume)
-
-		// If direct update failed, fall back to toggleRemoteMic
-		if (!updated) {
-			console.log('Direct volume update failed, using toggleRemoteMic as fallback')
-			toggleRemoteMic(clientID, {
-				previousVolume: currentVolume,
-				action: 'adjustVolume',
-				newVolume: newVolume,
-				preventMute: true,
-			})
-		}
+		updateVideoElementVolume(clientID, newVolume)
 	}
 
 	useEffect(() => {
