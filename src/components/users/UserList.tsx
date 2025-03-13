@@ -66,8 +66,8 @@ export default function UserList({
 		// Get current volume
 		const currentVolume = participantVolume[clientID] || 0
 
-		// Calculate new volume (0.05 = 5% change per wheel tick)
-		let newVolume = Math.max(0, Math.min(1, currentVolume + direction * 0.05))
+		// Calculate new volume (0.01 = 1% change per wheel tick)
+		let newVolume = Math.max(0, Math.min(1, currentVolume + direction * 0.01))
 		newVolume = Math.round(newVolume * 100) / 100 // Round to 2 decimal places
 
 		// Update volume
@@ -292,45 +292,48 @@ export default function UserList({
 												<FaMicrophoneAltSlash />
 											) : (
 												<div style={{ position: 'relative' }}>
-													<FaMicrophoneAlt style={{ color: 'rgba(165, 247, 65, 0.7)' }} />
+													<FaMicrophoneAlt
+														style={{
+															color:
+																hoveredMicClientId === clientID
+																	? `linear-gradient(to top, rgba(165, 247, 65, 0.7) ${
+																			(participantVolume[clientID] || 0) * 100
+																	  }%, rgba(128, 128, 128, 0.7) ${
+																			(participantVolume[clientID] || 0) * 100
+																	  }%)`
+																	: 'rgba(165, 247, 65, 0.7)',
+															background:
+																hoveredMicClientId === clientID
+																	? `linear-gradient(to top, rgba(165, 247, 65, 0.7) ${
+																			(participantVolume[clientID] || 0) * 100
+																	  }%, rgba(128, 128, 128, 0.7) ${
+																			(participantVolume[clientID] || 0) * 100
+																	  }%)`
+																	: 'transparent',
+															WebkitBackgroundClip:
+																hoveredMicClientId === clientID ? 'text' : 'unset',
+															WebkitTextFillColor:
+																hoveredMicClientId === clientID
+																	? 'transparent'
+																	: 'unset',
+														}}
+													/>
 													{hoveredMicClientId === clientID && (
 														<div
 															style={{
 																position: 'absolute',
-																bottom: 0,
-																left: 0,
-																right: 0,
-																height: '100%',
-																overflow: 'hidden',
-																pointerEvents: 'none',
+																top: '-20px',
+																left: '50%',
+																transform: 'translateX(-50%)',
+																backgroundColor: 'rgba(0, 0, 0, 0.7)',
+																color: 'white',
+																padding: '2px 4px',
+																borderRadius: '3px',
+																fontSize: '10px',
+																whiteSpace: 'nowrap',
 															}}
 														>
-															<div
-																style={{
-																	position: 'absolute',
-																	bottom: 0,
-																	left: 0,
-																	right: 0,
-																	height: `${
-																		(participantVolume[clientID] || 0) * 100
-																	}%`,
-																	backgroundColor: 'rgba(165, 247, 65, 0.7)',
-																	zIndex: -1,
-																}}
-															/>
-															<FaMicrophoneAlt
-																style={{
-																	position: 'absolute',
-																	bottom: 0,
-																	left: 0,
-																	color: 'rgba(128, 128, 128, 0.7)',
-																	clipPath: `polygon(0 0, 100% 0, 100% ${
-																		100 - (participantVolume[clientID] || 0) * 100
-																	}%, 0 ${
-																		100 - (participantVolume[clientID] || 0) * 100
-																	}%)`,
-																}}
-															/>
+															{Math.round((participantVolume[clientID] || 0) * 100)}%
 														</div>
 													)}
 												</div>
@@ -352,43 +355,37 @@ export default function UserList({
 											</>
 										) : (
 											<div style={{ position: 'relative' }}>
-												<FaMicrophoneAlt style={{ color: 'rgba(165, 247, 65, 0.7)' }} />
+												<FaMicrophoneAlt
+													style={{
+														color: 'transparent',
+														background:
+															hoveredMicClientId === clientID
+																? `linear-gradient(to top, rgba(165, 247, 65, 0.7) ${
+																		(participantVolume[clientID] || 0) * 100
+																  }%, rgba(128, 128, 128, 0.7) ${
+																		(participantVolume[clientID] || 0) * 100
+																  }%)`
+																: 'rgba(165, 247, 65, 0.7)',
+														WebkitBackgroundClip: 'text',
+														WebkitTextFillColor: 'transparent',
+													}}
+												/>
 												{hoveredMicClientId === clientID && (
 													<div
 														style={{
 															position: 'absolute',
-															bottom: 0,
-															left: 0,
-															right: 0,
-															height: '100%',
-															overflow: 'hidden',
-															pointerEvents: 'none',
+															top: '-20px',
+															left: '50%',
+															transform: 'translateX(-50%)',
+															backgroundColor: 'rgba(0, 0, 0, 0.7)',
+															color: 'white',
+															padding: '2px 4px',
+															borderRadius: '3px',
+															fontSize: '10px',
+															whiteSpace: 'nowrap',
 														}}
 													>
-														<div
-															style={{
-																position: 'absolute',
-																bottom: 0,
-																left: 0,
-																right: 0,
-																height: `${(participantVolume[clientID] || 0) * 100}%`,
-																backgroundColor: 'rgba(165, 247, 65, 0.7)',
-																zIndex: -1,
-															}}
-														/>
-														<FaMicrophoneAlt
-															style={{
-																position: 'absolute',
-																bottom: 0,
-																left: 0,
-																color: 'rgba(128, 128, 128, 0.7)',
-																clipPath: `polygon(0 0, 100% 0, 100% ${
-																	100 - (participantVolume[clientID] || 0) * 100
-																}%, 0 ${
-																	100 - (participantVolume[clientID] || 0) * 100
-																}%)`,
-															}}
-														/>
+														{Math.round((participantVolume[clientID] || 0) * 100)}%
 													</div>
 												)}
 											</div>
