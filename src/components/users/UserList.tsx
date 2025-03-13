@@ -578,7 +578,7 @@ export default function UserList({
 												volumeIndicator.classList.add('mic-hover')
 												volumeIndicator.textContent = `${Math.round(
 													getDisplayVolume(clientID) * 100
-												)}% (прокрутите)`
+												)}%`
 											}
 										}}
 										onMouseLeave={() => {
@@ -722,11 +722,9 @@ export default function UserList({
 												cameraIndicator.classList.add('camera-hover')
 												if (getDisplayCameraStatus(clientID)) {
 													const opacity = getDisplayCameraOpacity(clientID)
-													cameraIndicator.textContent = `${Math.round(
-														opacity * 100
-													)}% (прокрутите)`
+													cameraIndicator.textContent = `${Math.round(opacity * 100)}% `
 												} else {
-													cameraIndicator.textContent = `0% (прокрутите вверх)`
+													cameraIndicator.textContent = `0%`
 												}
 											}
 										}}
@@ -780,24 +778,26 @@ export default function UserList({
 										) : (
 											<div style={{ position: 'relative' }}>
 												<BsCameraVideoFill />
-												{hoveredCameraClientId === clientID && (
-													<div
-														data-camera-indicator={clientID}
-														style={{
-															position: 'absolute',
-															bottom: '16px',
-															left: '50%',
-															transform: 'translateX(-50%)',
-															backgroundColor: 'rgba(0, 0, 0, 0.6)',
-															color: 'white',
-															padding: '3px 10px',
-															borderRadius: '5px',
-															fontSize: '10px',
-															whiteSpace: 'nowrap',
-															transition: 'transform 0.2s ease',
-														}}
-													></div>
-												)}
+												<div
+													data-camera-indicator={clientID}
+													style={{
+														position: 'absolute',
+														bottom: '16px',
+														left: '50%',
+														transform: 'translateX(-50%)',
+														backgroundColor: 'rgba(0, 0, 0, 0.6)',
+														color: 'white',
+														padding: '3px 10px',
+														borderRadius: '5px',
+														fontSize: '10px',
+														whiteSpace: 'nowrap',
+														transition: 'transform 0.2s ease',
+													}}
+												>
+													{participantCameras[clientID] === false
+														? '0%'
+														: `${Math.round(getDisplayCameraOpacity(clientID) * 100)}%`}
+												</div>
 											</div>
 										)}
 									</span>
