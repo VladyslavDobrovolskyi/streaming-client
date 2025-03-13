@@ -51,9 +51,32 @@ export default function UserList({
 }) {
 	// Store previous volumes to remember them between toggles
 	const previousVolumesRef = useRef(new Map())
+	// Store our own volume state to avoid using toggleRemoteMic for volume changes
+	const [localVolumes, setLocalVolumes] = useState({})
 
 	const [hoveredMicClientId, setHoveredMicClientId] = useState(null)
 	const [volumeChangeMode, setVolumeChangeMode] = useState(false)
+
+	// Initialize local volumes from participantVolume when it changes
+	useEffect(() => {
+		setLocalVolumes(participantVolume)
+	}, [participantVolume])
+
+	// Direct access to video elements for volume control
+	const updateVideoElementVolume = (clientID, volume) => {
+		try {
+			// Find the video element for this client
+			const videoElement = document.getElementById(`video-${clientID}`)
+			if (videoElement && videoElement instanceof HTMLVideoElement) {
+				videoElement.volume = volume
+				console.log(`Directly updated video element for ${clientID} to volume=${volume}`)
+				return true
+			}
+		} catch (error) {
+			console.error('Error updating video element volume:', error)
+		}
+		return false
+	}
 
 	const handleVolumeWheel = (event, clientID) => {
 		event.preventDefault()
@@ -63,23 +86,34 @@ export default function UserList({
 		// Determine direction (up or down)
 		const direction = event.deltaY < 0 ? 1 : -1
 
-		// Get current volume
-		const currentVolume = participantVolume[clientID] || 0
+		// Get current volume from our local state
+		const currentVolume = localVolumes[clientID] || 0
 
 		// Calculate new volume (0.01 = 1% change per wheel tick)
-		// Ensure volume stays between 0.0 and 1.0
 		let newVolume = Math.max(0, Math.min(1, currentVolume + direction * 0.01))
 		newVolume = Math.round(newVolume * 100) / 100 // Round to 2 decimal places
 
 		console.log(`Adjusting volume: ${Math.round(currentVolume * 100)}% → ${Math.round(newVolume * 100)}%`)
 
-		// Update volume - ONLY adjust volume, never mute
-		toggleRemoteMic(clientID, {
-			previousVolume: currentVolume,
-			action: 'adjustVolume', // Specific action for volume adjustment only
-			newVolume: newVolume,
-			preventMute: true, // Add this flag to prevent muting
-		})
+		// Update our local volume state
+		setLocalVolumes(prev => ({
+			...prev,
+			[clientID]: newVolume,
+		}))
+
+		// Try to directly update the video element volume
+		const updated = updateVideoElementVolume(clientID, newVolume)
+
+		// If direct update failed, fall back to toggleRemoteMic
+		if (!updated) {
+			console.log('Direct volume update failed, using toggleRemoteMic as fallback')
+			toggleRemoteMic(clientID, {
+				previousVolume: currentVolume,
+				action: 'adjustVolume',
+				newVolume: newVolume,
+				preventMute: true,
+			})
+		}
 	}
 
 	useEffect(() => {
@@ -128,6 +162,11 @@ export default function UserList({
 	}, [showUserList, highlightedUser, setHighlightedUser])
 
 	const filteredClients = clients.filter(clientID => clientID !== 'LOCAL_VIDEO')
+
+	// Get the volume to display - prefer our local volume state, fall back to participantVolume
+	const getDisplayVolume = clientID => {
+		return localVolumes[clientID] !== undefined ? localVolumes[clientID] : participantVolume[clientID] || 0
+	}
 
 	return (
 		<>
@@ -312,7 +351,7 @@ export default function UserList({
 																whiteSpace: 'nowrap',
 															}}
 														>
-															{Math.round((participantVolume[clientID] || 0) * 100)}%
+															{Math.round(getDisplayVolume(clientID) * 100)}%
 														</div>
 													)}
 												</div>
@@ -350,7 +389,7 @@ export default function UserList({
 															whiteSpace: 'nowrap',
 														}}
 													>
-														{Math.round((participantVolume[clientID] || 0) * 100)}%
+														{Math.round(getDisplayVolume(clientID) * 100)}%
 													</div>
 												)}
 											</div>
