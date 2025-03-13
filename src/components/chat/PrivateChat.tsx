@@ -260,6 +260,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 							</Text>
 						</Flex>
 						<Button
+							className='disable-zoom-on-scroll'
 							variant='ghost'
 							onMouseDown={() => {
 								onClose()
@@ -299,7 +300,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 							background: 'linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(250,250,250,0.98))',
 						}}
 						ref={scrollAreaRef}
-						className='scroll-area'
+						className='disable-zoom-on-scroll'
 						scrollbars='vertical'
 						onScroll={handleScroll}
 					>
@@ -365,6 +366,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 							}}
 						>
 							<Button
+								className='disable-zoom-on-scroll'
 								size='1'
 								variant='soft'
 								onClick={handleScrollToBottom}

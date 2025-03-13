@@ -774,6 +774,7 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							}}
 						>
 							<Button
+								className='disable-zoom-on-scroll'
 								size='1'
 								variant='soft'
 								onClick={handleScrollToBottom}
