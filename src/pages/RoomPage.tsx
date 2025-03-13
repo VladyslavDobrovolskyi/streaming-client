@@ -892,6 +892,7 @@ export default function RoomPage() {
 		const storedCamerasOpacity = Object.entries(userData).reduce((acc, [clientId, data]) => {
 			if (data.cameraOpacity !== undefined) {
 				acc[clientId] = data.cameraOpacity
+				console.log('Setting camera opacity:', clientId, data.cameraOpacity)
 			}
 			return acc
 		}, {} as Record<string, number>)
