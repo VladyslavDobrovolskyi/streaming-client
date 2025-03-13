@@ -578,7 +578,7 @@ export default function UserList({
 												volumeIndicator.classList.add('mic-hover')
 												volumeIndicator.textContent = `${Math.round(
 													getDisplayVolume(clientID) * 100
-												)}%`
+												)}% (прокрутите)`
 											}
 										}}
 										onMouseLeave={() => {
@@ -722,7 +722,7 @@ export default function UserList({
 												cameraIndicator.classList.add('camera-hover')
 												if (getDisplayCameraStatus(clientID)) {
 													const opacity = getDisplayCameraOpacity(clientID)
-													cameraIndicator.textContent = `${Math.round(opacity * 100)}% `
+													cameraIndicator.textContent = `${Math.round(opacity * 100)}%`
 												} else {
 													cameraIndicator.textContent = `0%`
 												}
