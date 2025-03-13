@@ -13,7 +13,7 @@ import {
 	SpeakerLoudIcon,
 } from '@radix-ui/react-icons'
 import { Slider } from '@radix-ui/themes'
-import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
+// import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
 
 export default function ClientVideo({
 	clientID,
@@ -48,7 +48,7 @@ export default function ClientVideo({
 	// Add a ref to track if we're in the middle of a volume update
 	const isUpdatingVolumeRef = useRef(false)
 	// Add a state for camera opacity after the existing state declarations
-	const [cameraOpacity, setCameraOpacity] = useState(1.0)
+	// const [cameraOpacity, setCameraOpacity] = useState(1.0)
 
 	// Helper function to get effective volume
 	const getEffectiveVolume = () => {
@@ -196,25 +196,25 @@ export default function ClientVideo({
 		}
 	}, [isMicrophoneDisabled, clientID])
 	// Add a function to handle camera opacity changes after the handleVolumeChange function
-	const handleCameraOpacityChange = (newOpacity: number) => {
-		setCameraOpacity(newOpacity)
+	// const handleCameraOpacityChange = (newOpacity: number) => {
+	// 	setCameraOpacity(newOpacity)
 
-		// If opacity reaches 0, disable the camera
-		if (newOpacity === 0 && cameraStatus !== false) {
-			toggleCamera(clientID)
-		}
+	// 	// If opacity reaches 0, disable the camera
+	// 	if (newOpacity === 0 && cameraStatus !== false) {
+	// 		toggleCamera(clientID)
+	// 	}
 
-		// If opacity increases from 0, enable the camera
-		if (newOpacity > 0 && cameraStatus === false) {
-			toggleCamera(clientID)
-		}
+	// 	// If opacity increases from 0, enable the camera
+	// 	if (newOpacity > 0 && cameraStatus === false) {
+	// 		toggleCamera(clientID)
+	// 	}
 
-		// Dispatch event to update opacity in other components
-		const event = new CustomEvent('camera-opacity-change', {
-			detail: { clientID, opacity: newOpacity },
-		})
-		document.dispatchEvent(event)
-	}
+	// 	// Dispatch event to update opacity in other components
+	// 	const event = new CustomEvent('camera-opacity-change', {
+	// 		detail: { clientID, opacity: newOpacity },
+	// 	})
+	// 	document.dispatchEvent(event)
+	// }
 
 	// Also update the effect that listens for volume changes from UserList
 	useEffect(() => {
@@ -258,25 +258,25 @@ export default function ClientVideo({
 	}, [clientID])
 
 	// Add an effect to listen for opacity changes from other components
-	useEffect(() => {
-		const handleOpacityChange = e => {
-			const { clientID: changedClientID, opacity } = e.detail
-			if (changedClientID === clientID) {
-				setCameraOpacity(opacity)
+	// useEffect(() => {
+	// 	const handleOpacityChange = e => {
+	// 		const { clientID: changedClientID, opacity } = e.detail
+	// 		if (changedClientID === clientID) {
+	// 			setCameraOpacity(opacity)
 
-				// Update video element opacity
-				if (videoRef.current) {
-					videoRef.current.style.opacity = opacity.toString()
-				}
-			}
-		}
+	// 			// Update video element opacity
+	// 			if (videoRef.current) {
+	// 				videoRef.current.style.opacity = opacity.toString()
+	// 			}
+	// 		}
+	// 	}
 
-		document.addEventListener('camera-opacity-change', handleOpacityChange)
+	// 	document.addEventListener('camera-opacity-change', handleOpacityChange)
 
-		return () => {
-			document.removeEventListener('camera-opacity-change', handleOpacityChange)
-		}
-	}, [clientID])
+	// 	return () => {
+	// 		document.removeEventListener('camera-opacity-change', handleOpacityChange)
+	// 	}
+	// }, [clientID])
 
 	const getVolumeIcon = () => {
 		const IconStyles = {
@@ -353,7 +353,6 @@ export default function ClientVideo({
 							borderRadius: 'var(--radius-4)',
 							zIndex: 11001,
 							cursor: isDragging ? 'grabbing' : 'move',
-							opacity: cameraOpacity,
 						}}
 					/>
 					{hoveredClient === clientID && (
@@ -452,7 +451,7 @@ export default function ClientVideo({
 									</div>
 								</div>
 							)}
-							{!isLocal && (
+							{/* {!isLocal && (
 								<div
 									style={{
 										position: 'absolute',
@@ -522,7 +521,7 @@ export default function ClientVideo({
 										</div>
 									</div>
 								</div>
-							)}
+							)} */}
 						</>
 					)}
 					{isCovered && (
