@@ -712,56 +712,6 @@ const RoomChat: React.FC<RoomChatProps> = ({
 							</Box>
 						)}
 
-					{/* Scroll to bottom button in the same position as floating avatar */}
-					{isAtTop && !hasNewMessages && (
-						<Box
-							style={{
-								position: 'absolute',
-								top: '60px',
-								left: '42%',
-								transform: 'translateX(-50%)',
-								zIndex: 20,
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								padding: '4px 8px',
-								borderRadius: '999px',
-								backgroundColor: 'rgba(255, 255, 255, 0.9)',
-								boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-								animation: 'pulse 1.5s infinite',
-							}}
-						>
-							<Button
-								size='1'
-								variant='ghost'
-								onClick={handleScrollToBottom}
-								style={{
-									borderRadius: '999px',
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'center',
-									width: '42px',
-									height: '42px',
-									padding: '0',
-									cursor: 'pointer',
-									border: '2px solid var(--gray-4)',
-								}}
-								title='Scroll to bottom'
-							>
-								<svg
-									width='16'
-									height='16'
-									viewBox='0 0 24 24'
-									fill='none'
-									xmlns='http://www.w3.org/2000/svg'
-								>
-									<path d='M12 16L6 10H18L12 16Z' fill='currentColor' />
-								</svg>
-							</Button>
-						</Box>
-					)}
-
-					{/* Add new messages indicator */}
 					{!isAtBottom && (
 						<Flex
 							justify='center'
