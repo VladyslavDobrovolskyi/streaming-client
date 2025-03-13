@@ -859,17 +859,7 @@ export default function UserList({
 											}
 										}}
 									>
-										{participantCameras[clientID] === false && (
-											<ImCross
-												style={{
-													position: 'absolute',
-													top: '0px',
-													right: '0px',
-													color: 'white',
-													transform: 'scale(0.7)',
-												}}
-											/>
-										)}
+										{/* Removed the cross icon for camera when it's turned off */}
 										{participantInfo[clientID].isCameraDisabled ||
 										(clientID === localVideoId && isCameraDisabled) ? (
 											<BsCameraVideoOffFill />
