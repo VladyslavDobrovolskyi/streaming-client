@@ -9,7 +9,7 @@ import { Box } from '@radix-ui/themes'
 
 interface DraggableResizableProps {
 	children: (props: { isDragging: boolean; scale: number }) => ReactNode
-	initialSize?: { width: number; height: number }
+	initialSize?: { width: number; height: number; scale?: number }
 	initialPosition?: { x: number; y: number }
 	minConstraints?: [number, number]
 	maxConstraints?: [number, number]
@@ -26,7 +26,7 @@ interface DraggableResizableProps {
 
 const DraggableResizable: React.FC<DraggableResizableProps> = ({
 	children,
-	initialSize = { width: 300, height: 400 },
+	initialSize = { width: 300, height: 400, scale: 1 },
 	initialPosition = { x: 0, y: 0 },
 	minConstraints = [200, 300],
 	maxConstraints = [500, 600],
@@ -44,7 +44,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 	const [isDragging, setIsDragging] = useState(false)
 	const [isResizing, setIsResizing] = useState(false)
 	const [actionCursor, setActionCursor] = useState<string>('default')
-	const [scale, setScale] = useState(1)
+	const [scale, setScale] = useState(initialSize?.scale || 1)
 	const contentRef = useRef<HTMLDivElement>(null)
 
 	const handleWheel = useCallback(
@@ -80,7 +80,7 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 			const unscaledWidth = Math.round((newSize.width - 20) / scale)
 			const unscaledHeight = Math.round((newSize.height - 20) / scale)
 
-			setSize({ width: unscaledWidth, height: unscaledHeight })
+			setSize({ width: unscaledWidth, height: unscaledHeight, scale })
 			if (onSizeChange) onSizeChange({ width: unscaledWidth, height: unscaledHeight, scale })
 
 			setPosition(prev => {

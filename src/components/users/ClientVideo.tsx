@@ -320,7 +320,7 @@ export default function ClientVideo({
 
 	return (
 		<DraggableResizable
-			initialSize={{ width: size.width, height: size.height }}
+			initialSize={{ width: size.width, height: size.height, scale: size.scale }}
 			initialPosition={position}
 			bounds='parent'
 			minConstraints={[100, 75]}
