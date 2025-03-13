@@ -157,9 +157,6 @@ export default function ClientVideo({
 		if (!muted && isMicrophoneDisabled) {
 			setMuted(true)
 		}
-		if (muted && !isMicrophoneDisabled) {
-			setMuted(false)
-		}
 	}, [isMicrophoneDisabled, muted])
 
 	// Update the handleVolumeChange function to handle muting at 0 volume
