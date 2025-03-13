@@ -134,13 +134,11 @@ export default function ClientVideo({
 
 	useEffect(() => {
 		// Only update if scale is different from the current size.scale
-		if (scale !== size.scale) {
-			onSizeChange(clientID, {
-				width: size.width,
-				height: size.height,
-				scale,
-			})
-		}
+		onSizeChange(clientID, {
+			width: size.width,
+			height: size.height,
+			scale,
+		})
 	}, [scale, size, clientID, onSizeChange])
 
 	// Handle local mute/unmute
