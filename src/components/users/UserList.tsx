@@ -66,6 +66,25 @@ const micHoverAnimation = `
   }
 `
 
+// Add this after the micHoverAnimation
+const cameraHoverAnimation = `
+  @keyframes cameraHover {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  
+  .camera-hover {
+    animation: cameraHover 1s infinite ease-in-out;
+  }
+`
+
 export default function UserList({
 	showUserList,
 	toggleUserList,
@@ -95,6 +114,9 @@ export default function UserList({
 
 	const [hoveredMicClientId, setHoveredMicClientId] = useState(null)
 	const [isVolumeChanging, setIsVolumeChanging] = useState(false)
+
+	// Add state for camera hover
+	const [hoveredCameraClientId, setHoveredCameraClientId] = useState(null)
 
 	// Добавляем глобальный обработчик для предотвращения стандартного поведения колесика
 	// useEffect(() => {
@@ -276,11 +298,17 @@ export default function UserList({
 		return localVolumes[clientID] !== undefined ? localVolumes[clientID] : participantVolume[clientID] || 0
 	}
 
+	// Add this function to get camera status display
+	const getDisplayCameraStatus = clientID => {
+		return participantCameras[clientID] !== false
+	}
+
 	return (
 		<>
 			<style>{pulseAnimation}</style>
 			<style>{volumeChangeAnimation}</style>
 			<style>{micHoverAnimation}</style>
+			<style>{cameraHoverAnimation}</style>
 
 			{filteredClients.length >= 1 && filteredClients.length !== 0 && (
 				<div
@@ -547,6 +575,34 @@ export default function UserList({
 												element.style.transform = 'scale(1)'
 											}, 100)
 										}}
+										onMouseEnter={() => {
+											setHoveredCameraClientId(clientID)
+
+											// Add visual hint for camera hover
+											const cameraIndicator = document.querySelector(
+												`[data-camera-indicator="${clientID}"]`
+											)
+											if (cameraIndicator) {
+												cameraIndicator.classList.add('camera-hover')
+												cameraIndicator.textContent = getDisplayCameraStatus(clientID)
+													? 'Камера включена (нажмите)'
+													: 'Камера выключена (нажмите)'
+											}
+										}}
+										onMouseLeave={() => {
+											setHoveredCameraClientId(null)
+
+											// Remove visual hint
+											const cameraIndicator = document.querySelector(
+												`[data-camera-indicator="${clientID}"]`
+											)
+											if (cameraIndicator) {
+												cameraIndicator.classList.remove('camera-hover')
+												cameraIndicator.textContent = getDisplayCameraStatus(clientID)
+													? 'Камера включена'
+													: 'Камера выключена'
+											}
+										}}
 										style={{
 											cursor: 'pointer',
 											color:
@@ -578,7 +634,31 @@ export default function UserList({
 										(clientID === localVideoId && isCameraDisabled) ? (
 											<BsCameraVideoOffFill />
 										) : (
-											<BsCameraVideoFill />
+											<div style={{ position: 'relative' }}>
+												<BsCameraVideoFill />
+												{hoveredCameraClientId === clientID && (
+													<div
+														data-camera-indicator={clientID}
+														style={{
+															position: 'absolute',
+															bottom: '16px',
+															left: '50%',
+															transform: 'translateX(-50%)',
+															backgroundColor: 'rgba(0, 0, 0, 0.6)',
+															color: 'white',
+															padding: '3px 10px',
+															borderRadius: '5px',
+															fontSize: '10px',
+															whiteSpace: 'nowrap',
+															transition: 'transform 0.2s ease',
+														}}
+													>
+														{getDisplayCameraStatus(clientID)
+															? 'Камера включена'
+															: 'Камера выключена'}
+													</div>
+												)}
+											</div>
 										)}
 									</span>
 									<button
