@@ -68,17 +68,14 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	// Add a new state variable to track the last seen message count
 	const [lastSeenMessageCount, setLastSeenMessageCount] = useState(0)
 	const prevMessagesCountRef = useRef(privateMessages.length)
-	const [isAtTop, setIsAtTop] = useState(false)
 
 	const handleScroll = () => {
 		const filteredMessages = privateMessages.filter(msg => msg.from !== realClientID)
 		const scrollArea = scrollAreaRef.current
 		if (scrollArea) {
 			const isScrolledToBottom = scrollArea.scrollHeight - scrollArea.scrollTop <= scrollArea.clientHeight + 10 // Добавляем небольшой запас
-			const isScrolledToTop = scrollArea.scrollTop <= 10 // Add a small buffer for "at top" detection
 
 			setIsAtBottom(isScrolledToBottom)
-			setIsAtTop(isScrolledToTop)
 
 			// When user scrolls to bottom, update the last seen message count
 			if (isScrolledToBottom) {
@@ -178,7 +175,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 	useEffect(() => {
 		// Add animation styles to document
 		const styleElement = document.createElement('style')
-		styleElement.innerHTML = animationStyles
+		styleElement.innerHTML = animationStyles + pulseAnimation
 		document.head.appendChild(styleElement)
 
 		return () => {
@@ -356,54 +353,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 							</Box>
 						))}
 					</ScrollArea>
-					{isAtTop && (
-						<Box
-							style={{
-								position: 'absolute',
-								top: '15%',
-								left: '42%',
-								transform: 'translateX(-50%)',
-								zIndex: 20,
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								padding: '4px 8px',
-								borderRadius: '999px',
-								backgroundColor: 'rgba(255, 255, 255, 0.9)',
-								boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-								animation: 'pulse 1.5s infinite',
-							}}
-						>
-							<Button
-								size='1'
-								variant='ghost'
-								onClick={handleScrollToBottom}
-								style={{
-									borderRadius: '999px',
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'center',
-									width: '42px',
-									height: '42px',
-									padding: '0',
-									cursor: 'pointer',
-									border: '2px solid var(--gray-4)',
-								}}
-								title='Scroll to bottom'
-							>
-								<svg
-									width='16'
-									height='16'
-									viewBox='0 0 24 24'
-									fill='none'
-									xmlns='http://www.w3.org/2000/svg'
-								>
-									<path d='M12 16L6 10H18L12 16Z' fill='currentColor' />
-								</svg>
-							</Button>
-						</Box>
-					)}
-					{hasNewMessages && !isAtBottom && (
+					{!isAtBottom && (
 						<Flex
 							justify='center'
 							style={{
@@ -414,7 +364,6 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 								zIndex: 10,
 							}}
 						>
-							<style>{pulseAnimation}</style>
 							<Button
 								size='1'
 								variant='soft'
@@ -439,7 +388,7 @@ const PrivateChat: React.FC<PrivateChatProps> = ({
 								>
 									<path d='M12 16L6 10H18L12 16Z' fill='currentColor' />
 								</svg>
-								New messages
+								{!hasNewMessages ? '' : 'New messages'}
 							</Button>
 						</Flex>
 					)}
