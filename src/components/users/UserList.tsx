@@ -569,15 +569,23 @@ export default function UserList({
 									</div>
 									<span
 										onClick={event => {
-											// Use the enhanced toggleRemoteMic handler
-											handleToggleRemoteMic(clientID)
+											// Check if microphone is disabled before handling click
+											const isMicDisabled =
+												clientID === localVideoId
+													? isMicrophoneDisabled
+													: participantInfo[clientID]?.isMicrophoneDisabled
 
-											// Add a visual feedback for the click
-											const element = event.currentTarget
-											element.style.transform = 'scale(0.9)'
-											setTimeout(() => {
-												element.style.transform = 'scale(1)'
-											}, 100)
+											if (!isMicDisabled) {
+												// Only toggle if not disabled
+												handleToggleRemoteMic(clientID)
+
+												// Add a visual feedback for the click
+												const element = event.currentTarget
+												element.style.transform = 'scale(0.9)'
+												setTimeout(() => {
+													element.style.transform = 'scale(1)'
+												}, 100)
+											}
 										}}
 										onWheel={event => {
 											if (hoveredMicClientId === clientID) {
@@ -630,14 +638,57 @@ export default function UserList({
 													? 'rgba(247, 65, 101, 0.7)'
 													: 'rgba(165, 247, 65, 0.7)',
 											opacity: getDisplayVolume(clientID) === 0 ? 0.3 : 1,
-											cursor: 'pointer',
+											cursor:
+												clientID === localVideoId
+													? isMicrophoneDisabled
+														? 'default'
+														: 'pointer'
+													: participantInfo[clientID]?.isMicrophoneDisabled
+													? 'default'
+													: 'pointer',
 											position: 'relative',
 											transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 										}}
-										onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.2)')}
-										onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
-										onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
-										onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.2)')}
+										onMouseOver={e => {
+											const isMicDisabled =
+												clientID === localVideoId
+													? isMicrophoneDisabled
+													: participantInfo[clientID]?.isMicrophoneDisabled
+
+											if (!isMicDisabled) {
+												e.currentTarget.style.transform = 'scale(1.2)'
+											}
+										}}
+										onMouseOut={e => {
+											const isMicDisabled =
+												clientID === localVideoId
+													? isMicrophoneDisabled
+													: participantInfo[clientID]?.isMicrophoneDisabled
+
+											if (!isMicDisabled) {
+												e.currentTarget.style.transform = 'scale(1)'
+											}
+										}}
+										onMouseDown={e => {
+											const isMicDisabled =
+												clientID === localVideoId
+													? isMicrophoneDisabled
+													: participantInfo[clientID]?.isMicrophoneDisabled
+
+											if (!isMicDisabled) {
+												e.currentTarget.style.transform = 'scale(0.9)'
+											}
+										}}
+										onMouseUp={e => {
+											const isMicDisabled =
+												clientID === localVideoId
+													? isMicrophoneDisabled
+													: participantInfo[clientID]?.isMicrophoneDisabled
+
+											if (!isMicDisabled) {
+												e.currentTarget.style.transform = 'scale(1.2)'
+											}
+										}}
 									>
 										{getDisplayVolume(clientID) === 0 && (
 											<ImCross
@@ -722,13 +773,20 @@ export default function UserList({
 									</span>
 									<span
 										onClick={event => {
-											toggleRemoteCamera(clientID)
-											// Add a visual feedback for the click
-											const element = event.currentTarget
-											element.style.transform = 'scale(0.9)'
-											setTimeout(() => {
-												element.style.transform = 'scale(1)'
-											}, 100)
+											// Check if camera is disabled before handling click
+											const isCamDisabled =
+												participantInfo[clientID]?.isCameraDisabled ||
+												(clientID === localVideoId && isCameraDisabled)
+
+											if (!isCamDisabled) {
+												toggleRemoteCamera(clientID)
+												// Add a visual feedback for the click
+												const element = event.currentTarget
+												element.style.transform = 'scale(0.9)'
+												setTimeout(() => {
+													element.style.transform = 'scale(1)'
+												}, 100)
+											}
 										}}
 										onWheel={event => {
 											// Allow wheel events on camera icon even when camera is off
@@ -750,9 +808,13 @@ export default function UserList({
 											setHoveredCameraClientId(null)
 										}}
 										style={{
-											cursor: 'pointer',
+											cursor:
+												participantInfo[clientID]?.isCameraDisabled ||
+												(clientID === localVideoId && isCameraDisabled)
+													? 'default'
+													: 'pointer',
 											color:
-												participantInfo[clientID].isCameraDisabled ||
+												participantInfo[clientID]?.isCameraDisabled ||
 												(clientID === localVideoId && isCameraDisabled)
 													? 'rgba(247, 65, 101, 0.7)'
 													: 'rgba(165, 247, 65, 0.7)',
@@ -760,10 +822,42 @@ export default function UserList({
 											position: 'relative',
 											transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
 										}}
-										onMouseOver={e => (e.currentTarget.style.transform = 'scale(1.2)')}
-										onMouseOut={e => (e.currentTarget.style.transform = 'scale(1)')}
-										onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.9)')}
-										onMouseUp={e => (e.currentTarget.style.transform = 'scale(1.2)')}
+										onMouseOver={e => {
+											const isCamDisabled =
+												participantInfo[clientID]?.isCameraDisabled ||
+												(clientID === localVideoId && isCameraDisabled)
+
+											if (!isCamDisabled) {
+												e.currentTarget.style.transform = 'scale(1.2)'
+											}
+										}}
+										onMouseOut={e => {
+											const isCamDisabled =
+												participantInfo[clientID]?.isCameraDisabled ||
+												(clientID === localVideoId && isCameraDisabled)
+
+											if (!isCamDisabled) {
+												e.currentTarget.style.transform = 'scale(1)'
+											}
+										}}
+										onMouseDown={e => {
+											const isCamDisabled =
+												participantInfo[clientID]?.isCameraDisabled ||
+												(clientID === localVideoId && isCameraDisabled)
+
+											if (!isCamDisabled) {
+												e.currentTarget.style.transform = 'scale(0.9)'
+											}
+										}}
+										onMouseUp={e => {
+											const isCamDisabled =
+												participantInfo[clientID]?.isCameraDisabled ||
+												(clientID === localVideoId && isCameraDisabled)
+
+											if (!isCamDisabled) {
+												e.currentTarget.style.transform = 'scale(1.2)'
+											}
+										}}
 									>
 										{participantCameras[clientID] === false && (
 											<ImCross
