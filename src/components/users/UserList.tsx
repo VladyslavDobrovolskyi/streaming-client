@@ -208,7 +208,7 @@ export default function UserList({
 		// Add visual feedback for opacity change
 		const opacityIndicator = document.querySelector(`[data-camera-indicator="${clientID}"]`)
 		if (opacityIndicator) {
-			opacityIndicator.textContent = `Прозрачность: ${Math.round(newOpacity * 100)}%`
+			opacityIndicator.textContent = `${Math.round(newOpacity * 100)}%`
 			opacityIndicator.classList.add('volume-change')
 			setTimeout(() => opacityIndicator.classList.remove('volume-change'), 300)
 		}
