@@ -677,9 +677,7 @@ export default function UserList({
 												cameraIndicator.classList.remove('camera-hover')
 												if (getDisplayCameraStatus(clientID)) {
 													const opacity = getDisplayCameraOpacity(clientID)
-													cameraIndicator.textContent = `Прозрачность: ${Math.round(
-														opacity * 100
-													)}%`
+													cameraIndicator.textContent = `${Math.round(opacity * 100)}%`
 												} else {
 													cameraIndicator.textContent = 'Камера выключена'
 												}
