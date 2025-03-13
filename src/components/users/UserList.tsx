@@ -677,12 +677,12 @@ export default function UserList({
 														data-volume-indicator={clientID}
 														style={{
 															position: 'absolute',
-															bottom: '16px',
+															bottom: '17px',
 															left: '50%',
 															transform: 'translateX(-50%)',
-															backgroundColor: 'rgba(0, 0, 0, 0.6)',
+															backgroundColor: 'rgba(0, 0, 0, 0.7)',
 															color: 'white',
-															padding: '3px 10px',
+															padding: '2px 6px',
 															borderRadius: '5px',
 															fontSize: '10px',
 															whiteSpace: 'nowrap',
