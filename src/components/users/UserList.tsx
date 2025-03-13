@@ -67,7 +67,8 @@ export default function UserList({
 		const currentVolume = participantVolume[clientID] || 0
 
 		// Calculate new volume (0.01 = 1% change per wheel tick)
-		let newVolume = Math.max(0.01, Math.min(1, currentVolume + direction * 0.01))
+		// Ensure volume stays between 0.0 and 1.0
+		let newVolume = Math.max(0, Math.min(1, currentVolume + direction * 0.01))
 		newVolume = Math.round(newVolume * 100) / 100 // Round to 2 decimal places
 
 		console.log(`Adjusting volume: ${Math.round(currentVolume * 100)}% → ${Math.round(newVolume * 100)}%`)
