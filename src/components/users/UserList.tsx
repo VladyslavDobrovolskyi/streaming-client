@@ -796,11 +796,7 @@ export default function UserList({
 															whiteSpace: 'nowrap',
 															transition: 'transform 0.2s ease',
 														}}
-													>
-														{getDisplayCameraStatus(clientID)
-															? 'Камера включена'
-															: 'Камера выключена'}
-													</div>
+													></div>
 												)}
 											</div>
 										)}
