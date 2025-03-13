@@ -1,3 +1,5 @@
+'use client'
+
 import type React from 'react'
 import { useState, useRef, useCallback, useEffect, type ReactNode } from 'react'
 import { Resizable, type ResizeCallbackData } from 'react-resizable'
@@ -16,7 +18,7 @@ interface DraggableResizableProps {
 	onPositionChange?: (position: { x: number; y: number }) => void
 	onSizeChange?: (size: { width: number; height: number }) => void
 	resizeHandleStyles?: React.CSSProperties
-	disableWheelZoomClass?: string
+	disableWheelZoomClass?: string | string[]
 	hide?: boolean
 	focused?: boolean
 }
@@ -46,8 +48,21 @@ const DraggableResizable: React.FC<DraggableResizableProps> = ({
 
 	const handleWheel = useCallback(
 		(e: React.WheelEvent<HTMLDivElement>) => {
-			if (disableWheelZoomClass && (e.target as Element).closest(`.${disableWheelZoomClass}`)) {
-				return
+			if (disableWheelZoomClass) {
+				const target = e.target as Element
+				// Handle both string and array cases
+				if (typeof disableWheelZoomClass === 'string') {
+					if (target.closest(`.${disableWheelZoomClass}`)) {
+						return
+					}
+				} else if (Array.isArray(disableWheelZoomClass)) {
+					// Check if the target matches any of the classes in the array
+					for (const className of disableWheelZoomClass) {
+						if (target.closest(`.${className}`)) {
+							return
+						}
+					}
+				}
 			}
 
 			e.preventDefault()
