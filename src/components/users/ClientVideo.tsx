@@ -35,6 +35,7 @@ export default function ClientVideo({
 	onMouseLeave,
 	toggleCamera,
 	cameraStatus,
+	isMicrophoneDisabled,
 	setHideMe,
 }) {
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
@@ -151,6 +152,15 @@ export default function ClientVideo({
 			onVolumeChange(clientID, 0) // This updates participantVolume
 		}
 	}
+
+	useEffect(() => {
+		if (!muted && isMicrophoneDisabled) {
+			setMuted(true)
+		}
+		if (muted && !isMicrophoneDisabled) {
+			setMuted(false)
+		}
+	}, [isMicrophoneDisabled, muted])
 
 	// Update the handleVolumeChange function to handle muting at 0 volume
 	const handleVolumeChange = (newVolume: number) => {

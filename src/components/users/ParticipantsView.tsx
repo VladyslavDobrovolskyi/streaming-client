@@ -106,6 +106,7 @@ export default function ParticipantsView({
 						onMouseLeave={() => onHighlightChange(null)}
 						setHideMe={setHideMe}
 						cameraStatus={clientCameras[clientID]}
+						isMicrophoneDisabled={participantData.isMicrophoneDisabled}
 					/>
 				)
 			})}
