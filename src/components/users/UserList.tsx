@@ -431,6 +431,40 @@ export default function UserList({
 		}
 	}, [showUserList, highlightedUser, setHighlightedUser])
 
+	// Reset mic hover state when microphone is disabled by another user
+	useEffect(() => {
+		if (hoveredMicClientId && participantInfo[hoveredMicClientId]?.isMicrophoneDisabled) {
+			// Reset the hover state
+			setHoveredMicClientId(null)
+
+			// Find the element and reset its transform
+			const micElement = document.querySelector(`[data-mic-element="${hoveredMicClientId}"]`) as HTMLElement
+			if (micElement) {
+				micElement.style.transform = 'scale(1)'
+			}
+		}
+	}, [hoveredMicClientId, participantInfo])
+
+	// Reset camera hover state when camera is disabled by another user
+	useEffect(() => {
+		if (
+			hoveredCameraClientId &&
+			(participantInfo[hoveredCameraClientId]?.isCameraDisabled ||
+				(hoveredCameraClientId === localVideoId && isCameraDisabled))
+		) {
+			// Reset the hover state
+			setHoveredCameraClientId(null)
+
+			// Find the element and reset its transform
+			const cameraElement = document.querySelector(
+				`[data-camera-element="${hoveredCameraClientId}"]`
+			) as HTMLElement
+			if (cameraElement) {
+				cameraElement.style.transform = 'scale(1)'
+			}
+		}
+	}, [hoveredCameraClientId, participantInfo, localVideoId, isCameraDisabled])
+
 	const filteredClients = clients.filter(clientID => clientID !== 'LOCAL_VIDEO')
 
 	// Get the volume to display - prefer our local volume state, fall back to participantVolume
@@ -572,6 +606,7 @@ export default function UserList({
 										</p>
 									</div>
 									<span
+										data-mic-element={clientID}
 										onClick={event => {
 											// Check if microphone is disabled before handling click
 											if (!isMicDisabled) {
@@ -727,6 +762,7 @@ export default function UserList({
 										)}
 									</span>
 									<span
+										data-camera-element={clientID}
 										onClick={event => {
 											// Check if camera is disabled before handling click
 											const isCamDisabled =
