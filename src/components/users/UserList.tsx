@@ -126,6 +126,9 @@ export default function UserList({
 	// Add local camera opacities state similar to localVolumes
 	const [localCameraOpacities, setLocalCameraOpacities] = useState({})
 
+	// Store previous camera opacities to remember them between toggles
+	const previousCameraOpacitiesRef = useRef(new Map())
+
 	// Добавляем глобальный обработчик для предотвращения стандартного поведения колесика
 	// useEffect(() => {
 	//   const preventDefaultWheel = (e) => {
@@ -186,44 +189,93 @@ export default function UserList({
 
 		// Determine direction (up or down)
 		const direction = event.deltaY < 0 ? 1 : -1
+		const isScrollingUp = direction > 0
 
-		// Get current opacity from our local state, default to 1 if not set
-		const currentOpacity = localCameraOpacities[clientID] !== undefined ? localCameraOpacities[clientID] : 1
+		// Check if camera is currently off
+		const isCameraOff = participantCameras[clientID] === false
 
-		// Adjust opacity by 0.05 (5%) per wheel tick
-		let newOpacity = Math.max(0.1, Math.min(1, currentOpacity + direction * 0.05))
-		newOpacity = Math.round(newOpacity * 100) / 100 // Round to 2 decimal places
+		// If camera is off and user is scrolling up, turn it back on
+		if (isCameraOff && isScrollingUp) {
+			console.log(`Camera is off and scrolling up, turning camera back on for ${clientID}`)
 
-		console.log(`Adjusting camera opacity: ${Math.round(currentOpacity * 100)}% → ${Math.round(newOpacity * 100)}%`)
+			// Get the previous opacity if available, otherwise use default (0.2)
+			const previousOpacity = previousCameraOpacitiesRef.current.get(clientID) || 0.2
 
-		// If opacity is going below 10%, turn off the camera
-		if (newOpacity <= 0.1 && currentOpacity > 0.1) {
-			console.log(`Camera opacity below 10%, turning off camera for ${clientID}`)
+			// Turn camera back on
 			toggleRemoteCamera(clientID)
 
-			// Add visual feedback
-			const opacityIndicator = document.querySelector(`[data-camera-indicator="${clientID}"]`)
-			if (opacityIndicator) {
-				opacityIndicator.textContent = 'Камера выключена'
-				opacityIndicator.classList.add('volume-change')
-				setTimeout(() => opacityIndicator.classList.remove('volume-change'), 300)
-			}
-		} else {
-			// Call the function to change camera opacity
-			changeCameraOpacity(clientID, newOpacity)
+			// Set opacity to previous value
+			changeCameraOpacity(clientID, previousOpacity)
 
 			// Update local state for immediate feedback
 			setLocalCameraOpacities(prev => ({
 				...prev,
-				[clientID]: newOpacity,
+				[clientID]: previousOpacity,
 			}))
 
-			// Add visual feedback for opacity change
+			// Add visual feedback
 			const opacityIndicator = document.querySelector(`[data-camera-indicator="${clientID}"]`)
 			if (opacityIndicator) {
-				opacityIndicator.textContent = `${Math.round(newOpacity * 100)}%`
+				opacityIndicator.textContent = `Прозрачность: ${Math.round(previousOpacity * 100)}%`
 				opacityIndicator.classList.add('volume-change')
 				setTimeout(() => opacityIndicator.classList.remove('volume-change'), 300)
+			}
+
+			// Reset the changing flag after a short delay
+			setTimeout(() => {
+				setIsCameraOpacityChanging(false)
+			}, 100)
+
+			return
+		}
+
+		// If camera is on, proceed with normal opacity adjustment
+		if (!isCameraOff) {
+			// Get current opacity from our local state, default to 1 if not set
+			const currentOpacity = localCameraOpacities[clientID] !== undefined ? localCameraOpacities[clientID] : 1
+
+			// Adjust opacity by 0.05 (5%) per wheel tick
+			let newOpacity = Math.max(0.1, Math.min(1, currentOpacity + direction * 0.05))
+			newOpacity = Math.round(newOpacity * 100) / 100 // Round to 2 decimal places
+
+			console.log(
+				`Adjusting camera opacity: ${Math.round(currentOpacity * 100)}% → ${Math.round(newOpacity * 100)}%`
+			)
+
+			// If opacity is going below 10%, turn off the camera
+			if (newOpacity <= 0.1 && currentOpacity > 0.1) {
+				console.log(`Camera opacity below 10%, turning off camera for ${clientID}`)
+
+				// Save the current opacity before turning off
+				previousCameraOpacitiesRef.current.set(clientID, currentOpacity)
+
+				// Turn off camera
+				toggleRemoteCamera(clientID)
+
+				// Add visual feedback
+				const opacityIndicator = document.querySelector(`[data-camera-indicator="${clientID}"]`)
+				if (opacityIndicator) {
+					opacityIndicator.textContent = 'Камера выключена'
+					opacityIndicator.classList.add('volume-change')
+					setTimeout(() => opacityIndicator.classList.remove('volume-change'), 300)
+				}
+			} else {
+				// Call the function to change camera opacity
+				changeCameraOpacity(clientID, newOpacity)
+
+				// Update local state for immediate feedback
+				setLocalCameraOpacities(prev => ({
+					...prev,
+					[clientID]: newOpacity,
+				}))
+
+				// Add visual feedback for opacity change
+				const opacityIndicator = document.querySelector(`[data-camera-indicator="${clientID}"]`)
+				if (opacityIndicator) {
+					opacityIndicator.textContent = `Прозрачность: ${Math.round(newOpacity * 100)}%`
+					opacityIndicator.classList.add('volume-change')
+					setTimeout(() => opacityIndicator.classList.remove('volume-change'), 300)
+				}
 			}
 		}
 
@@ -654,10 +706,8 @@ export default function UserList({
 											}, 100)
 										}}
 										onWheel={event => {
-											if (
-												hoveredCameraClientId === clientID &&
-												getDisplayCameraStatus(clientID)
-											) {
+											// Allow wheel events on camera icon even when camera is off
+											if (hoveredCameraClientId === clientID) {
 												handleCameraOpacityWheel(event, clientID)
 											}
 										}}
@@ -676,7 +726,8 @@ export default function UserList({
 														opacity * 100
 													)}% (прокрутите)`
 												} else {
-													cameraIndicator.textContent = 'Камера выключена (нажмите)'
+													cameraIndicator.textContent =
+														'Камера выключена (прокрутите вверх для включения)'
 												}
 											}
 										}}
