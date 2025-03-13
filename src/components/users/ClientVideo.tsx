@@ -162,7 +162,48 @@ export default function ClientVideo({
 		}
 
 		onVolumeChange(clientID, newVolume) // This updates participantVolume
+
+		// Dispatch custom event for synchronization
+		const event = new CustomEvent('client-volume-change', {
+			detail: { clientID, volume: newVolume },
+		})
+		document.dispatchEvent(event)
 	}
+
+	// Add this effect to listen for volume changes from UserList
+	useEffect(() => {
+		const handleUserListVolumeChange = e => {
+			const { clientID: changedClientID, volume } = e.detail
+			if (changedClientID === clientID && !isUpdatingVolumeRef.current) {
+				// Only update if this is the target client and we're not already updating
+				isUpdatingVolumeRef.current = true
+
+				// Update UI state based on new volume
+				if (volume === 0) {
+					setMuted(true)
+				} else {
+					setMuted(false)
+					setMutedBySlider(false)
+				}
+
+				// Update the video element directly if it exists
+				if (videoRef.current) {
+					videoRef.current.volume = volume
+				}
+
+				// Reset the updating flag after a short delay
+				setTimeout(() => {
+					isUpdatingVolumeRef.current = false
+				}, 50)
+			}
+		}
+
+		document.addEventListener('update-user-volume', handleUserListVolumeChange)
+
+		return () => {
+			document.removeEventListener('update-user-volume', handleUserListVolumeChange)
+		}
+	}, [clientID])
 
 	const getVolumeIcon = () => {
 		const IconStyles = {

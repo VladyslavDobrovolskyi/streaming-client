@@ -28,6 +28,25 @@ const pulseAnimation = `
   }
 `
 
+// Add this after the pulseAnimation
+const volumeChangeAnimation = `
+  @keyframes volumeChange {
+    0% {
+      transform: translateX(-50%) scale(1);
+    }
+    50% {
+      transform: translateX(-50%) scale(1.2);
+    }
+    100% {
+      transform: translateX(-50%) scale(1);
+    }
+  }
+  
+  .volume-change {
+    animation: volumeChange 0.3s ease;
+  }
+`
+
 export default function UserList({
 	showUserList,
 	toggleUserList,
@@ -69,11 +88,9 @@ export default function UserList({
 			const videoElement = document.querySelector(`video[data-client-id="${clientID}"]`) as HTMLVideoElement
 			if (videoElement) {
 				videoElement.volume = volume
-				// Don't set muted to true even if volume is 0
 				console.log(`Directly updated video element for ${clientID} to volume=${volume}`)
 
-				// Update the parent component's state using a custom event
-				// This is a workaround since we don't have direct access to updateUserVolume
+				// Dispatch event for ClientVideo components to listen to
 				const event = new CustomEvent('update-user-volume', {
 					detail: { clientID, volume },
 				})
@@ -112,6 +129,14 @@ export default function UserList({
 
 		// Try to directly update the video element volume
 		updateVideoElementVolume(clientID, newVolume)
+
+		// Add visual feedback for volume change
+		const volumeIndicator = document.querySelector(`[data-volume-indicator="${clientID}"]`)
+		if (volumeIndicator) {
+			volumeIndicator.textContent = `${Math.round(newVolume * 100)}%`
+			volumeIndicator.classList.add('volume-change')
+			setTimeout(() => volumeIndicator.classList.remove('volume-change'), 300)
+		}
 	}
 
 	// Add an effect to listen for the custom event in the parent component
@@ -128,6 +153,25 @@ export default function UserList({
 
 		return () => {
 			document.removeEventListener('update-user-volume', handleUpdateUserVolume)
+		}
+	}, [])
+
+	// Add this effect to listen for volume changes from ClientVideo
+	useEffect(() => {
+		const handleClientVideoVolumeChange = e => {
+			const { clientID, volume } = e.detail
+
+			// Update our local volume state
+			setLocalVolumes(prev => ({
+				...prev,
+				[clientID]: volume,
+			}))
+		}
+
+		document.addEventListener('client-volume-change', handleClientVideoVolumeChange)
+
+		return () => {
+			document.removeEventListener('client-volume-change', handleClientVideoVolumeChange)
 		}
 	}, [])
 
@@ -353,6 +397,7 @@ export default function UserList({
 													<FaMicrophoneAlt style={{ color: 'rgba(165, 247, 65, 0.7)' }} />
 													{hoveredMicClientId === clientID && (
 														<div
+															data-volume-indicator={clientID}
 															style={{
 																position: 'absolute',
 																bottom: '-18px',
@@ -364,6 +409,7 @@ export default function UserList({
 																borderRadius: '3px',
 																fontSize: '10px',
 																whiteSpace: 'nowrap',
+																transition: 'transform 0.2s ease',
 															}}
 														>
 															{Math.round(getDisplayVolume(clientID) * 100)}%
@@ -391,6 +437,7 @@ export default function UserList({
 												<FaMicrophoneAlt style={{ color: 'rgba(165, 247, 65, 0.7)' }} />
 												{hoveredMicClientId === clientID && (
 													<div
+														data-volume-indicator={clientID}
 														style={{
 															position: 'absolute',
 															bottom: '-18px',
@@ -402,6 +449,7 @@ export default function UserList({
 															borderRadius: '3px',
 															fontSize: '10px',
 															whiteSpace: 'nowrap',
+															transition: 'transform 0.2s ease',
 														}}
 													>
 														{Math.round(getDisplayVolume(clientID) * 100)}%
@@ -489,17 +537,21 @@ export default function UserList({
 											}}
 										/>
 										{privateChats[clientID] && (
-											<IoChatbox
-												style={{
-													fill: 'rgba(165, 247, 65, 0.7)',
-													position: 'absolute',
-													transform: 'scale(1.15)',
-													zIndex: 20,
-													top: '8px',
-													left: '5px',
-													opacity: privateChats[clientID] ? 1 : 0.7,
-												}}
-											/>
+											<>
+												<style>{pulseAnimation}</style>
+												<style>{volumeChangeAnimation}</style>
+												<IoChatbox
+													style={{
+														fill: 'rgba(165, 247, 65, 0.7)',
+														position: 'absolute',
+														transform: 'scale(1.15)',
+														zIndex: 20,
+														top: '8px',
+														left: '5px',
+														opacity: privateChats[clientID] ? 1 : 0.7,
+													}}
+												/>
+											</>
 										)}
 
 										{unreadMessages[clientID] > 0 && (
