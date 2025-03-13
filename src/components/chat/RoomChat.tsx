@@ -736,8 +736,8 @@ const RoomChat: React.FC<RoomChatProps> = ({
 									boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
 									display: 'flex',
 									alignItems: 'center',
-									gap: '4px',
-									padding: '6px 12px',
+									gap: '0px',
+									padding: '2px 5px',
 									animation: 'fadeIn 0.3s ease, pulse 1.5s infinite',
 									cursor: 'pointer',
 								}}
