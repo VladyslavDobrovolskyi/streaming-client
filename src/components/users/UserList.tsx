@@ -658,7 +658,7 @@ export default function UserList({
 												cameraIndicator.classList.add('camera-hover')
 												if (getDisplayCameraStatus(clientID)) {
 													const opacity = getDisplayCameraOpacity(clientID)
-													cameraIndicator.textContent = `Прозрачность: ${Math.round(
+													cameraIndicator.textContent = `${Math.round(
 														opacity * 100
 													)}% (прокрутите)`
 												} else {
