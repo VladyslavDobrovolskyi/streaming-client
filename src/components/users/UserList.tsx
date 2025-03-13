@@ -94,24 +94,23 @@ export default function UserList({
 	const [localVolumes, setLocalVolumes] = useState({})
 
 	const [hoveredMicClientId, setHoveredMicClientId] = useState(null)
-	const [volumeChangeMode, setVolumeChangeMode] = useState(false)
 	const [isVolumeChanging, setIsVolumeChanging] = useState(false)
 
 	// Добавляем глобальный обработчик для предотвращения стандартного поведения колесика
 	// useEffect(() => {
-	// 	const preventDefaultWheel = e => {
-	// 		if (volumeChangeMode && hoveredMicClientId) {
-	// 			e.preventDefault()
-	// 			return false
-	// 		}
-	// 	}
+	//   const preventDefaultWheel = (e) => {
+	//     if (volumeChangeMode && hoveredMicClientId) {
+	//       e.preventDefault()
+	//       return false
+	//     }
+	//   }
 
-	// 	// Используем passive: false для возможности вызова preventDefault()
-	// 	window.addEventListener('wheel', preventDefaultWheel, { passive: false })
+	//   // Используем passive: false для возможности вызова preventDefault()
+	//   window.addEventListener("wheel", preventDefaultWheel, { passive: false })
 
-	// 	return () => {
-	// 		window.removeEventListener('wheel', preventDefaultWheel)
-	// 	}
+	//   return () => {
+	//     window.removeEventListener("wheel", preventDefaultWheel)
+	//   }
 	// }, [volumeChangeMode, hoveredMicClientId])
 
 	// Initialize local volumes from participantVolume when it changes
@@ -212,29 +211,29 @@ export default function UserList({
 		}, 100)
 	}
 
-	useEffect(() => {
-		if (volumeChangeMode && hoveredMicClientId) {
-			const wheelHandler = e => handleVolumeWheel(e, hoveredMicClientId)
+	// useEffect(() => {
+	//   if (volumeChangeMode && hoveredMicClientId) {
+	//     const wheelHandler = (e) => handleVolumeWheel(e, hoveredMicClientId)
 
-			// Используем capture phase для гарантии перехвата события
-			window.addEventListener('wheel', wheelHandler, { passive: false, capture: true })
+	//     // Используем capture phase для гарантии перехвата события
+	//     window.addEventListener("wheel", wheelHandler, { passive: false, capture: true })
 
-			// Добавим обработчик для предотвращения потери фокуса
-			const preventBlur = e => {
-				if (volumeChangeMode) {
-					e.preventDefault()
-					e.stopPropagation()
-				}
-			}
+	//     // Добавим обработчик для предотвращения потери фокуса
+	//     const preventBlur = (e) => {
+	//       if (volumeChangeMode) {
+	//         e.preventDefault()
+	//         e.stopPropagation()
+	//       }
+	//     }
 
-			window.addEventListener('blur', preventBlur, { capture: true })
+	//     window.addEventListener("blur", preventBlur, { capture: true })
 
-			return () => {
-				window.removeEventListener('wheel', wheelHandler, { capture: true })
-				window.removeEventListener('blur', preventBlur, { capture: true })
-			}
-		}
-	}, [volumeChangeMode, hoveredMicClientId])
+	//     return () => {
+	//       window.removeEventListener("wheel", wheelHandler, { capture: true })
+	//       window.removeEventListener("blur", preventBlur, { capture: true })
+	//     }
+	//   }
+	// }, [volumeChangeMode, hoveredMicClientId])
 
 	// Enhanced toggleRemoteMic function that preserves previous volume
 	const handleToggleRemoteMic = clientID => {
@@ -405,9 +404,13 @@ export default function UserList({
 												element.style.transform = 'scale(1)'
 											}, 100)
 										}}
+										onWheel={event => {
+											if (hoveredMicClientId === clientID) {
+												handleVolumeWheel(event, clientID)
+											}
+										}}
 										onMouseEnter={() => {
 											setHoveredMicClientId(clientID)
-											setVolumeChangeMode(true)
 
 											// Добавляем визуальную подсказку о возможности прокрутки
 											const volumeIndicator = document.querySelector(
@@ -422,7 +425,6 @@ export default function UserList({
 										}}
 										onMouseLeave={() => {
 											setHoveredMicClientId(null)
-											setVolumeChangeMode(false)
 
 											// Удаляем визуальную подсказку
 											const volumeIndicator = document.querySelector(
