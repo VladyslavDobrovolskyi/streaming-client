@@ -7,6 +7,15 @@ import ACTIONS from '../socket/actions'
 
 export const LOCAL_VIDEO = 'LOCAL_VIDEO'
 
+// Add this helper function near the top of the file
+const stopVideoTracks = (videoElement: HTMLVideoElement | null) => {
+	if (videoElement && videoElement.srcObject) {
+		const stream = videoElement.srcObject as MediaStream
+		stream.getTracks().forEach(track => track.stop())
+		videoElement.srcObject = null
+	}
+}
+
 function createMockAudioStream(): MediaStreamTrack {
 	const audioContext = new AudioContext()
 	const silenceBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 1, audioContext.sampleRate)
@@ -170,11 +179,21 @@ export default function useWebRTC(roomID: string) {
 		let isMockedVideo = false
 		let isMockedAudio = false
 
+		// Stop all existing tracks before reinitializing
+		if (localMediaStream.current) {
+			localMediaStream.current.getTracks().forEach(track => track.stop())
+		}
+
 		try {
-			localMediaStream.current = await navigator.mediaDevices.getUserMedia({
-				audio: true,
-				video: true,
-			})
+			localMediaStream.current = await navigator.mediaDevices
+				.getUserMedia({
+					audio: true,
+					video: true,
+				})
+				.catch(e => {
+					console.error('TrackStartError or other getUserMedia error:', e)
+					throw e
+				})
 			console.log('Successfully obtained local media stream:', localMediaStream.current?.getTracks())
 		} catch (error) {
 			console.error('Error getting media: ', error)
@@ -184,6 +203,10 @@ export default function useWebRTC(roomID: string) {
 				const audioTrack = await navigator.mediaDevices
 					.getUserMedia({ audio: true })
 					.then(stream => stream.getAudioTracks()[0])
+					.catch(e => {
+						console.error('Audio track start error:', e)
+						throw e
+					})
 				localMediaStream.current.addTrack(audioTrack)
 			} catch (audioError) {
 				console.error('Error getting audio: ', audioError)
@@ -195,6 +218,10 @@ export default function useWebRTC(roomID: string) {
 				const videoTrack = await navigator.mediaDevices
 					.getUserMedia({ video: true })
 					.then(stream => stream.getVideoTracks()[0])
+					.catch(e => {
+						console.error('Video track start error:', e)
+						throw e
+					})
 				localMediaStream.current.addTrack(videoTrack)
 			} catch (videoError) {
 				console.error('Error getting video: ', videoError)
@@ -379,10 +406,20 @@ export default function useWebRTC(roomID: string) {
 			let isMockedAudio = false
 
 			try {
-				localMediaStream.current = await navigator.mediaDevices.getUserMedia({
-					audio: true,
-					video: true,
-				})
+				// Stop any existing tracks before requesting new ones
+				if (localMediaStream.current) {
+					localMediaStream.current.getTracks().forEach(track => track.stop())
+				}
+
+				localMediaStream.current = await navigator.mediaDevices
+					.getUserMedia({
+						audio: true,
+						video: true,
+					})
+					.catch(e => {
+						console.error('TrackStartError or other getUserMedia error:', e)
+						throw e // Re-throw to be handled by the outer catch
+					})
 				console.log('Successfully obtained local media stream:', localMediaStream.current?.getTracks())
 			} catch (error) {
 				console.error('Error getting media: ', error)
@@ -392,6 +429,10 @@ export default function useWebRTC(roomID: string) {
 					const audioTrack = await navigator.mediaDevices
 						.getUserMedia({ audio: true })
 						.then(stream => stream.getAudioTracks()[0])
+						.catch(e => {
+							console.error('Audio track start error:', e)
+							throw e
+						})
 					localMediaStream.current.addTrack(audioTrack)
 				} catch (audioError) {
 					console.error('Error getting audio: ', audioError)
@@ -403,6 +444,10 @@ export default function useWebRTC(roomID: string) {
 					const videoTrack = await navigator.mediaDevices
 						.getUserMedia({ video: true })
 						.then(stream => stream.getVideoTracks()[0])
+						.catch(e => {
+							console.error('Video track start error:', e)
+							throw e
+						})
 					localMediaStream.current.addTrack(videoTrack)
 				} catch (videoError) {
 					console.error('Error getting video: ', videoError)
@@ -455,10 +500,18 @@ export default function useWebRTC(roomID: string) {
 
 		return () => {
 			console.log('Cleaning up media stream')
-			localMediaStream.current?.getTracks().forEach(track => {
-				console.log(`Stopping track: ${track.kind}`)
-				track.stop()
+			if (localMediaStream.current) {
+				localMediaStream.current.getTracks().forEach(track => {
+					console.log(`Stopping track: ${track.kind}`)
+					track.stop()
+				})
+			}
+
+			// Stop tracks on all video elements
+			Object.values(peerMediaElements.current).forEach(videoEl => {
+				if (videoEl) stopVideoTracks(videoEl)
 			})
+
 			console.log('Leaving room:', roomID)
 			socket.emit(ACTIONS.LEAVE)
 		}
