@@ -329,7 +329,7 @@ export default function useWebRTC(roomID: string) {
 		}) {
 			console.log(`Setting remote description for ${peerID}`, remoteDescription)
 
-			// Проверяем, существует ли соединение
+			// Check if connection exists
 			const peerConnection = peerConnections.current[peerID]
 			if (!peerConnection) {
 				console.error(`No peer connection found for ${peerID}`)
@@ -337,18 +337,32 @@ export default function useWebRTC(roomID: string) {
 			}
 
 			try {
-				// Устанавливаем удаленное описание
+				// Set remote description first
 				await peerConnection.setRemoteDescription(new RTCSessionDescription(remoteDescription))
 
-				// Создаем ответ только если получили предложение и находимся в правильном состоянии
+				// Create answer only if we received an offer and are in the correct state
 				if (remoteDescription.type === 'offer') {
 					console.log(`Creating answer for ${peerID}`)
 
-					// Проверяем состояние сигнализации перед созданием ответа
+					// Ensure we're in the right signaling state before creating an answer
 					if (peerConnection.signalingState === 'have-remote-offer') {
+						// Make sure local tracks are added to the connection
+						if (localMediaStream.current) {
+							localMediaStream.current.getTracks().forEach(track => {
+								// Check if track is already added to avoid duplicates
+								const senders = peerConnection.getSenders()
+								const trackAlreadyAdded = senders.some(sender => sender.track === track)
+
+								if (!trackAlreadyAdded) {
+									console.log(`Adding local ${track.kind} track to peer connection ${peerID}`)
+									peerConnection.addTrack(track, localMediaStream.current!)
+								}
+							})
+						}
+
 						const answer = await peerConnection.createAnswer()
 
-						// Проверяем состояние сигнализации перед установкой локального описания
+						// Check signaling state before setting local description
 						if (peerConnection.signalingState === 'have-remote-offer') {
 							await peerConnection.setLocalDescription(answer)
 							console.log(`Sending answer to ${peerID}`)
