@@ -85,6 +85,8 @@ export default function useWebRTC(roomID: string) {
 
 	// Add this at the beginning of your useWebRTC function, after the state declarations
 	const pendingIceCandidates = useRef<Record<string, RTCIceCandidateInit[]>>({})
+	// Track processed SDP messages to avoid duplicates
+	const processedSdps = useRef<Record<string, Set<string>>>({})
 
 	const addNewClient = useCallback(
 		(newClient: string, cb: () => void) => {
@@ -107,7 +109,7 @@ export default function useWebRTC(roomID: string) {
 		[LOCAL_VIDEO]: null,
 	})
 
-	const iceRetryTimeout = 10000 // 2 seconds timeout
+	const iceRetryTimeout = 10000 // 10 seconds timeout
 
 	const configuration = {
 		iceServers: [
@@ -338,67 +340,105 @@ export default function useWebRTC(roomID: string) {
 			return
 		}
 
+		// Create a unique identifier for this SDP message
+		const sdpId = `${peerID}-${remoteDescription.type}-${remoteDescription.sdp?.substring(0, 100)}`
+
+		// Initialize the set for this peer if it doesn't exist
+		if (!processedSdps.current[peerID]) {
+			processedSdps.current[peerID] = new Set()
+		}
+
+		// Check if we've already processed this SDP message
+		if (processedSdps.current[peerID].has(sdpId)) {
+			console.log(`Already processed this SDP message for ${peerID}, ignoring duplicate`)
+			return
+		}
+
+		// Mark this SDP as processed
+		processedSdps.current[peerID].add(sdpId)
+
 		try {
-			// Set remote description first
-			await peerConnection.setRemoteDescription(new RTCSessionDescription(remoteDescription))
+			// Check signaling state before setting remote description
+			const { signalingState } = peerConnection
+			console.log(`Current signaling state for ${peerID}: ${signalingState}`)
 
-			// Apply any buffered ICE candidates now that remote description is set
-			if (pendingIceCandidates.current[peerID] && pendingIceCandidates.current[peerID].length > 0) {
-				console.log(
-					`Applying ${pendingIceCandidates.current[peerID].length} buffered ICE candidates for ${peerID}`
-				)
-				const candidates = pendingIceCandidates.current[peerID]
-				pendingIceCandidates.current[peerID] = []
-
-				for (const candidate of candidates) {
-					try {
-						await peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
-						console.log(`Applied buffered ICE candidate for ${peerID}`)
-					} catch (err) {
-						console.error(`Error applying buffered ICE candidate for ${peerID}:`, err)
-					}
-				}
-			}
-
-			// Create answer only if we received an offer and are in the correct state
+			// Handle based on the type of session description
 			if (remoteDescription.type === 'offer') {
-				console.log(`Creating answer for ${peerID}`)
-
-				// Ensure we're in the right signaling state before creating an answer
-				if (peerConnection.signalingState === 'have-remote-offer') {
-					// Make sure local tracks are added to the connection
-					if (localMediaStream.current) {
-						localMediaStream.current.getTracks().forEach(track => {
-							// Check if track is already added to avoid duplicates
-							const senders = peerConnection.getSenders()
-							const trackAlreadyAdded = senders.some(sender => sender.track === track)
-
-							if (!trackAlreadyAdded) {
-								console.log(`Adding local ${track.kind} track to peer connection ${peerID}`)
-								peerConnection.addTrack(track, localMediaStream.current!)
-							}
-						})
-					}
-
-					const answer = await peerConnection.createAnswer()
-
-					// Check signaling state before setting local description
-					if (peerConnection.signalingState === 'have-remote-offer') {
-						await peerConnection.setLocalDescription(answer)
-						console.log(`Sending answer to ${peerID}`)
-						socket.emit(ACTIONS.RELAY_SDP, {
-							peerID,
-							sessionDescription: answer,
-						})
-					} else {
-						console.warn(`Unexpected signaling state: ${peerConnection.signalingState} for ${peerID}`)
-					}
-				} else {
-					console.warn(`Unexpected signaling state: ${peerConnection.signalingState} for ${peerID}`)
+				// For offers, we can set them when in "stable" state
+				if (signalingState !== 'stable') {
+					console.warn(`Cannot set remote offer in ${signalingState} state for ${peerID}`)
+					return
 				}
+
+				// Set remote description (offer)
+				await peerConnection.setRemoteDescription(new RTCSessionDescription(remoteDescription))
+
+				// Apply any buffered ICE candidates
+				await applyBufferedIceCandidates(peerID, peerConnection)
+
+				// Make sure local tracks are added to the connection
+				addLocalTracksToConnection(peerID, peerConnection)
+
+				// Create and set local answer
+				const answer = await peerConnection.createAnswer()
+				await peerConnection.setLocalDescription(answer)
+
+				console.log(`Sending answer to ${peerID}`)
+				socket.emit(ACTIONS.RELAY_SDP, {
+					peerID,
+					sessionDescription: answer,
+				})
+			} else if (remoteDescription.type === 'answer') {
+				// For answers, we can only set them when in "have-local-offer" state
+				if (signalingState !== 'have-local-offer') {
+					console.warn(`Cannot set remote answer in ${signalingState} state for ${peerID}`)
+					return
+				}
+
+				// Set remote description (answer)
+				await peerConnection.setRemoteDescription(new RTCSessionDescription(remoteDescription))
+
+				// Apply any buffered ICE candidates
+				await applyBufferedIceCandidates(peerID, peerConnection)
+			} else {
+				console.warn(`Unsupported session description type: ${remoteDescription.type}`)
 			}
 		} catch (error) {
 			console.error(`Error handling session description for ${peerID}:`, error)
+		}
+	}
+
+	// Helper function to apply buffered ICE candidates
+	async function applyBufferedIceCandidates(peerID: string, peerConnection: RTCPeerConnection) {
+		if (pendingIceCandidates.current[peerID] && pendingIceCandidates.current[peerID].length > 0) {
+			console.log(`Applying ${pendingIceCandidates.current[peerID].length} buffered ICE candidates for ${peerID}`)
+			const candidates = pendingIceCandidates.current[peerID]
+			pendingIceCandidates.current[peerID] = []
+
+			for (const candidate of candidates) {
+				try {
+					await peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+					console.log(`Applied buffered ICE candidate for ${peerID}`)
+				} catch (err) {
+					console.error(`Error applying buffered ICE candidate for ${peerID}:`, err)
+				}
+			}
+		}
+	}
+
+	// Helper function to add local tracks to a connection
+	function addLocalTracksToConnection(peerID: string, peerConnection: RTCPeerConnection) {
+		if (localMediaStream.current) {
+			localMediaStream.current.getTracks().forEach(track => {
+				// Check if track is already added to avoid duplicates
+				const senders = peerConnection.getSenders()
+				const trackAlreadyAdded = senders.some(sender => sender.track === track)
+
+				if (!trackAlreadyAdded) {
+					console.log(`Adding local ${track.kind} track to peer connection ${peerID}`)
+					peerConnection.addTrack(track, localMediaStream.current!)
+				}
+			})
 		}
 	}
 
@@ -451,6 +491,10 @@ export default function useWebRTC(roomID: string) {
 				peerConnections.current[peerID].close()
 				delete peerConnections.current[peerID]
 				delete peerMediaElements.current[peerID]
+				// Also clean up any stored SDP messages for this peer
+				if (processedSdps.current[peerID]) {
+					delete processedSdps.current[peerID]
+				}
 				updateClients(list => {
 					console.log(`Updating client list after removing ${peerID}`)
 					return list.filter(c => c !== peerID)
