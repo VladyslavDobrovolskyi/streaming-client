@@ -398,6 +398,46 @@ export default function useWebRTC(roomID: string) {
 				// Set remote description (answer)
 				await peerConnection.setRemoteDescription(new RTCSessionDescription(remoteDescription))
 
+				// Get user media and add tracks AFTER setting remote description
+				try {
+					const stream = await navigator.mediaDevices.getUserMedia({
+						video: true,
+						audio: !initialMicrophoneDisabledState,
+					})
+
+					// Use addTrack instead of addStream (which is deprecated)
+					stream.getTracks().forEach(track => {
+						// Check if we already have this track
+						const senders = peerConnection.getSenders()
+						const trackAlreadyAdded = senders.some(
+							sender => sender.track && sender.track.kind === track.kind
+						)
+
+						if (!trackAlreadyAdded) {
+							console.log(
+								`Adding ${track.kind} track to peer connection ${peerID} after setting remote answer`
+							)
+							peerConnection.addTrack(track, stream)
+						}
+					})
+
+					// Update local media stream
+					if (localMediaStream.current) {
+						// Remove old tracks
+						localMediaStream.current.getTracks().forEach(track => track.stop())
+					}
+					localMediaStream.current = stream
+
+					// Update local video display
+					const localVideoElement = peerMediaElements.current[LOCAL_VIDEO]
+					if (localVideoElement) {
+						localVideoElement.srcObject = stream
+						localVideoElement.volume = 0
+					}
+				} catch (err) {
+					console.error(`Error getting media after setting remote answer for ${peerID}:`, err)
+				}
+
 				// Apply any buffered ICE candidates
 				await applyBufferedIceCandidates(peerID, peerConnection)
 			} else {
