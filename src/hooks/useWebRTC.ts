@@ -83,6 +83,9 @@ export default function useWebRTC(roomID: string) {
 	const [initialMicrophoneDisabledState, setInitialMicrophoneDisabledState] = useState<boolean>(false)
 	const [initialCameraDisabledState, setInitialCameraDisabledState] = useState<boolean>(false)
 
+	// Add this at the beginning of your useWebRTC function, after the state declarations
+	const pendingIceCandidates = useRef<Record<string, RTCIceCandidateInit[]>>({})
+
 	const addNewClient = useCallback(
 		(newClient: string, cb: () => void) => {
 			console.log(`Attempting to add new client: ${newClient}`)
@@ -319,82 +322,119 @@ export default function useWebRTC(roomID: string) {
 	})
 
 	// Handle remote session description
-	useEffect(() => {
-		async function setRemoteMedia({
-			peerID,
-			sessionDescription: remoteDescription,
-		}: {
-			peerID: string
-			sessionDescription: RTCSessionDescriptionInit
-		}) {
-			console.log(`Setting remote description for ${peerID}`, remoteDescription)
+	async function setRemoteMedia({
+		peerID,
+		sessionDescription: remoteDescription,
+	}: {
+		peerID: string
+		sessionDescription: RTCSessionDescriptionInit
+	}) {
+		console.log(`Setting remote description for ${peerID}`, remoteDescription)
 
-			// Check if connection exists
-			const peerConnection = peerConnections.current[peerID]
-			if (!peerConnection) {
-				console.error(`No peer connection found for ${peerID}`)
-				return
+		// Check if connection exists
+		const peerConnection = peerConnections.current[peerID]
+		if (!peerConnection) {
+			console.error(`No peer connection found for ${peerID}`)
+			return
+		}
+
+		try {
+			// Set remote description first
+			await peerConnection.setRemoteDescription(new RTCSessionDescription(remoteDescription))
+
+			// Apply any buffered ICE candidates now that remote description is set
+			if (pendingIceCandidates.current[peerID] && pendingIceCandidates.current[peerID].length > 0) {
+				console.log(
+					`Applying ${pendingIceCandidates.current[peerID].length} buffered ICE candidates for ${peerID}`
+				)
+				const candidates = pendingIceCandidates.current[peerID]
+				pendingIceCandidates.current[peerID] = []
+
+				for (const candidate of candidates) {
+					try {
+						await peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
+						console.log(`Applied buffered ICE candidate for ${peerID}`)
+					} catch (err) {
+						console.error(`Error applying buffered ICE candidate for ${peerID}:`, err)
+					}
+				}
 			}
 
-			try {
-				// Set remote description first
-				await peerConnection.setRemoteDescription(new RTCSessionDescription(remoteDescription))
+			// Create answer only if we received an offer and are in the correct state
+			if (remoteDescription.type === 'offer') {
+				console.log(`Creating answer for ${peerID}`)
 
-				// Create answer only if we received an offer and are in the correct state
-				if (remoteDescription.type === 'offer') {
-					console.log(`Creating answer for ${peerID}`)
+				// Ensure we're in the right signaling state before creating an answer
+				if (peerConnection.signalingState === 'have-remote-offer') {
+					// Make sure local tracks are added to the connection
+					if (localMediaStream.current) {
+						localMediaStream.current.getTracks().forEach(track => {
+							// Check if track is already added to avoid duplicates
+							const senders = peerConnection.getSenders()
+							const trackAlreadyAdded = senders.some(sender => sender.track === track)
 
-					// Ensure we're in the right signaling state before creating an answer
+							if (!trackAlreadyAdded) {
+								console.log(`Adding local ${track.kind} track to peer connection ${peerID}`)
+								peerConnection.addTrack(track, localMediaStream.current!)
+							}
+						})
+					}
+
+					const answer = await peerConnection.createAnswer()
+
+					// Check signaling state before setting local description
 					if (peerConnection.signalingState === 'have-remote-offer') {
-						// Make sure local tracks are added to the connection
-						if (localMediaStream.current) {
-							localMediaStream.current.getTracks().forEach(track => {
-								// Check if track is already added to avoid duplicates
-								const senders = peerConnection.getSenders()
-								const trackAlreadyAdded = senders.some(sender => sender.track === track)
-
-								if (!trackAlreadyAdded) {
-									console.log(`Adding local ${track.kind} track to peer connection ${peerID}`)
-									peerConnection.addTrack(track, localMediaStream.current!)
-								}
-							})
-						}
-
-						const answer = await peerConnection.createAnswer()
-
-						// Check signaling state before setting local description
-						if (peerConnection.signalingState === 'have-remote-offer') {
-							await peerConnection.setLocalDescription(answer)
-							console.log(`Sending answer to ${peerID}`)
-							socket.emit(ACTIONS.RELAY_SDP, {
-								peerID,
-								sessionDescription: answer,
-							})
-						} else {
-							console.warn(`Unexpected signaling state: ${peerConnection.signalingState} for ${peerID}`)
-						}
+						await peerConnection.setLocalDescription(answer)
+						console.log(`Sending answer to ${peerID}`)
+						socket.emit(ACTIONS.RELAY_SDP, {
+							peerID,
+							sessionDescription: answer,
+						})
 					} else {
 						console.warn(`Unexpected signaling state: ${peerConnection.signalingState} for ${peerID}`)
 					}
+				} else {
+					console.warn(`Unexpected signaling state: ${peerConnection.signalingState} for ${peerID}`)
 				}
-			} catch (error) {
-				console.error(`Error handling session description for ${peerID}:`, error)
 			}
+		} catch (error) {
+			console.error(`Error handling session description for ${peerID}:`, error)
 		}
+	}
 
+	useEffect(() => {
 		socket.on(ACTIONS.SESSION_DESCRIPTION, setRemoteMedia)
 		return () => {
 			socket.off(ACTIONS.SESSION_DESCRIPTION)
 		}
 	}, [])
 
-	// Handle ICE candidates
+	// Replace the ICE candidate handler effect with this updated version
 	useEffect(() => {
 		socket.on(
 			ACTIONS.ICE_CANDIDATE,
 			({ peerID, iceCandidate }: { peerID: string; iceCandidate: RTCIceCandidateInit }) => {
 				console.log(`Received ICE candidate for ${peerID}:`, iceCandidate)
-				peerConnections.current[peerID]?.addIceCandidate(new RTCIceCandidate(iceCandidate))
+				const peerConnection = peerConnections.current[peerID]
+
+				if (!peerConnection) {
+					console.warn(`No peer connection found for ${peerID} when receiving ICE candidate`)
+					return
+				}
+
+				// If remote description is not set yet, buffer the candidate
+				if (!peerConnection.remoteDescription) {
+					console.log(`Buffering ICE candidate for ${peerID} as remote description is not set yet`)
+					if (!pendingIceCandidates.current[peerID]) {
+						pendingIceCandidates.current[peerID] = []
+					}
+					pendingIceCandidates.current[peerID].push(iceCandidate)
+				} else {
+					// Remote description is set, add the candidate immediately
+					peerConnection
+						.addIceCandidate(new RTCIceCandidate(iceCandidate))
+						.catch(err => console.error(`Error adding ICE candidate for ${peerID}:`, err))
+				}
 			}
 		)
 
@@ -528,6 +568,9 @@ export default function useWebRTC(roomID: string) {
 
 		startCapture()
 
+		// Store ref value in a variable to use in cleanup
+		const mediaElements = peerMediaElements.current
+
 		return () => {
 			console.log('Cleaning up media stream')
 			if (localMediaStream.current) {
@@ -537,8 +580,8 @@ export default function useWebRTC(roomID: string) {
 				})
 			}
 
-			// Stop tracks on all video elements
-			Object.values(peerMediaElements.current).forEach(videoEl => {
+			// Stop tracks on all video elements using the stored variable
+			Object.values(mediaElements).forEach(videoEl => {
 				if (videoEl) stopVideoTracks(videoEl)
 			})
 
