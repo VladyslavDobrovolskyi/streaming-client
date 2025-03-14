@@ -1,7 +1,7 @@
 'use client'
 
 import type React from 'react'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import DraggableResizable from '../DraggableResizable'
 import {
@@ -14,6 +14,14 @@ import {
 } from '@radix-ui/react-icons'
 import { Slider } from '@radix-ui/themes'
 // import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
+
+// Add this near the top of the component, with the other hooks
+const useForceUpdate = () => {
+	const [, setTick] = useState(0)
+	return useCallback(() => {
+		setTick(tick => tick + 1)
+	}, [])
+}
 
 export default function ClientVideo({
 	clientID,
@@ -40,6 +48,8 @@ export default function ClientVideo({
 	previousVolumesRef,
 	reinitializeStream,
 }) {
+	// Add this inside the component function
+	const forceUpdate = useForceUpdate()
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
 	const [volumeBeforeMute, setVolumeBeforeMute] = useState(0)
 	const [muted, setMuted] = useState(false)
@@ -292,6 +302,8 @@ export default function ClientVideo({
 				if (!hasVideoTracks && !isCameraMuted && cameraStatus !== false) {
 					console.log(`No video stream detected for client ${clientID}, reinitializing...`)
 					reinitializeStream(clientID)
+					// Force a re-render after reinitializing the stream
+					forceUpdate()
 				}
 			}
 		}
@@ -305,7 +317,7 @@ export default function ClientVideo({
 		return () => {
 			clearInterval(intervalId)
 		}
-	}, [clientID, reinitializeStream, isCameraMuted, cameraStatus, isLocal])
+	}, [clientID, reinitializeStream, isCameraMuted, cameraStatus, isLocal, forceUpdate])
 
 	// Replace the handleVideoError function with a simpler version that just logs
 	const handleVideoError = e => {
