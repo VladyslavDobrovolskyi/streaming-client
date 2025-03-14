@@ -51,6 +51,10 @@ export default function ClientVideo({
 	// Add a state for camera opacity after the existing state declarations
 	// const [cameraOpacity, setCameraOpacity] = useState(1.0)
 	const [scale, setScale] = useState(1)
+	// Add a ref to track retry attempts
+	const retryAttemptsRef = useRef(0)
+	const MAX_RETRY_ATTEMPTS = 3
+	const RETRY_DELAY = 1000 // 1 second delay between retries
 
 	// Helper function to get effective volume
 	const getEffectiveVolume = () => {
@@ -219,27 +223,7 @@ export default function ClientVideo({
 			// Update UI state
 			setMuted(false)
 		}
-	}, [isMicrophoneDisabled, clientID])
-	// Add a function to handle camera opacity changes after the handleVolumeChange function
-	// const handleCameraOpacityChange = (newOpacity: number) => {
-	// 	setCameraOpacity(newOpacity)
-
-	// 	// If opacity reaches 0, disable the camera
-	// 	if (newOpacity === 0 && cameraStatus !== false) {
-	// 		toggleCamera(clientID)
-	// 	}
-
-	// 	// If opacity increases from 0, enable the camera
-	// 	if (newOpacity > 0 && cameraStatus === false) {
-	// 		toggleCamera(clientID)
-	// 	}
-
-	// 	// Dispatch event to update opacity in other components
-	// 	const event = new CustomEvent('camera-opacity-change', {
-	// 		detail: { clientID, opacity: newOpacity },
-	// 	})
-	// 	document.dispatchEvent(event)
-	// }
+	}, [isMicrophoneDisabled, clientID, previousVolumesRef])
 
 	// Also update the effect that listens for volume changes from UserList
 	useEffect(() => {
@@ -282,26 +266,38 @@ export default function ClientVideo({
 		}
 	}, [clientID])
 
-	// Add an effect to listen for opacity changes from other components
-	// useEffect(() => {
-	// 	const handleOpacityChange = e => {
-	// 		const { clientID: changedClientID, opacity } = e.detail
-	// 		if (changedClientID === clientID) {
-	// 			setCameraOpacity(opacity)
+	// Enhanced error handling for video element
+	const handleVideoError = e => {
+		console.error(`Video loading error for client ${clientID}:`, e)
 
-	// 			// Update video element opacity
-	// 			if (videoRef.current) {
-	// 				videoRef.current.style.opacity = opacity.toString()
-	// 			}
-	// 		}
-	// 	}
+		// Check if we've exceeded max retry attempts
+		if (retryAttemptsRef.current < MAX_RETRY_ATTEMPTS) {
+			retryAttemptsRef.current += 1
+			console.log(
+				`Attempting to reinitialize stream for client ${clientID} (Attempt ${retryAttemptsRef.current}/${MAX_RETRY_ATTEMPTS})`
+			)
 
-	// 	document.addEventListener('camera-opacity-change', handleOpacityChange)
+			// Add a delay before retrying to avoid rapid retry loops
+			setTimeout(() => {
+				reinitializeStream(clientID)
+			}, RETRY_DELAY)
+		} else {
+			console.warn(
+				`Max retry attempts (${MAX_RETRY_ATTEMPTS}) reached for client ${clientID}. Manual intervention may be required.`
+			)
 
-	// 	return () => {
-	// 		document.removeEventListener('camera-opacity-change', handleOpacityChange)
-	// 	}
-	// }, [clientID])
+			// Dispatch an event to notify the application about the persistent failure
+			const event = new CustomEvent('video-stream-failure', {
+				detail: { clientID, attempts: retryAttemptsRef.current },
+			})
+			document.dispatchEvent(event)
+
+			// Reset retry counter after a longer delay to allow for another set of retries if user interacts again
+			setTimeout(() => {
+				retryAttemptsRef.current = 0
+			}, RETRY_DELAY * 5)
+		}
+	}
 
 	const getVolumeIcon = () => {
 		const IconStyles = {
@@ -382,10 +378,7 @@ export default function ClientVideo({
 							zIndex: 11001,
 							cursor: isDragging ? 'grabbing' : 'move',
 						}}
-						onError={e => {
-							console.error('Video loading error:', e)
-							reinitializeStream(clientID)
-						}}
+						onError={handleVideoError}
 					/>
 					{hoveredClient === clientID && (
 						<>
@@ -483,77 +476,6 @@ export default function ClientVideo({
 									</div>
 								</div>
 							)}
-							{/* {!isLocal && (
-								<div
-									style={{
-										position: 'absolute',
-										bottom: '-40px',
-										left: '-11px',
-										right: '0px',
-										display: 'flex',
-										alignItems: 'center',
-										pointerEvents: 'auto',
-										zIndex: 11003,
-									}}
-								>
-									<div
-										style={{
-											position: 'relative',
-											display: 'flex',
-											alignItems: 'center',
-										}}
-									>
-										<button
-											onClick={() => toggleCamera(clientID)}
-											style={{
-												color: 'white',
-												border: 'none',
-												padding: '0.5rem',
-												borderRadius: 'var(--radius-4)',
-												cursor: 'pointer',
-												background: 'none',
-												display: 'flex',
-												alignItems: 'center',
-											}}
-										>
-											{cameraStatus ? <BsCameraVideoFill /> : <BsCameraVideoOffFill />}
-										</button>
-										<div
-											style={{
-												position: 'absolute',
-												left: '85%',
-												display: 'flex',
-												alignItems: 'center',
-												height: '100%',
-											}}
-										>
-											<Slider
-												orientation='horizontal'
-												min={0}
-												max={1}
-												step={0.01}
-												value={[cameraOpacity]}
-												onValueChange={value => handleCameraOpacityChange(value[0])}
-												style={
-													{
-														width: size.width - 45,
-														'--slider-thumb-size': '12px',
-													} as React.CSSProperties
-												}
-											/>
-											<div
-												style={{
-													marginLeft: '10px',
-													color: 'white',
-													fontSize: '12px',
-												}}
-											>
-												{Math.round(cameraOpacity * 100)}%
-											</div>
-										</div>
-									</div>
-								</div>
-							)} */}
 						</>
 					)}
 					{isCovered && (
