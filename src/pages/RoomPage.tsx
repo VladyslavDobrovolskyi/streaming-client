@@ -54,6 +54,7 @@ export default function RoomPage() {
 		localStream,
 		localPeerId,
 		reinitializeStream,
+		reinitializeStreamWithRemoteUser,
 		chatMessages,
 		sendChatMessage,
 		privateMessages,
@@ -1013,6 +1014,7 @@ export default function RoomPage() {
 			/>
 			{isLoading && <Loader />}
 			<ParticipantsView
+				reinitializeStream={reinitializeStreamWithRemoteUser}
 				previousVolumesRef={previousUsersVolumesRef}
 				clients={clients}
 				setHideMe={setHideMe}

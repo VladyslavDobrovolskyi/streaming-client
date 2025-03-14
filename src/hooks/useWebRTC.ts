@@ -262,6 +262,22 @@ export default function useWebRTC(roomID: string) {
 		}
 	}
 
+	const reinitializeStreamWithRemoteUser = async (remotePeerID: string) => {
+		console.log(`Reinitializing stream with remote user ${remotePeerID}`)
+		await reinitializeStream()
+
+		const connection = createPeerConnection(remotePeerID)
+		peerConnections.current[remotePeerID] = connection
+
+		const offer = await connection.createOffer()
+		await connection.setLocalDescription(offer)
+		console.log(`Sending offer to ${remotePeerID}`)
+		socket.emit(ACTIONS.RELAY_SDP, {
+			peerID: remotePeerID,
+			sessionDescription: offer,
+		})
+	}
+
 	// Handle new peer connection
 	socket.on(ACTIONS.ADD_PEER, async ({ peerID, createOffer }: { peerID: string; createOffer: boolean }) => {
 		console.log(`Received ADD_PEER for ${peerID}, createOffer: ${createOffer}`)
@@ -606,6 +622,7 @@ export default function useWebRTC(roomID: string) {
 		localStream: localMediaStream.current,
 		localPeerId,
 		reinitializeStream,
+		reinitializeStreamWithRemoteUser,
 		chatMessages,
 		sendChatMessage,
 		privateMessages,

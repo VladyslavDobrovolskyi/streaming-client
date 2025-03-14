@@ -24,6 +24,7 @@ export default function ParticipantsView({
 	onHighlightChange,
 	setHideMe,
 	previousVolumesRef,
+	reinitializeStream,
 }) {
 	// Use a ref to track if we're currently updating from this component
 	// This helps prevent circular updates
@@ -84,6 +85,7 @@ export default function ParticipantsView({
 
 				return (
 					<ClientVideo
+						reinitializeStream={reinitializeStream}
 						previousVolumesRef={previousVolumesRef}
 						key={clientID}
 						clientID={clientID}

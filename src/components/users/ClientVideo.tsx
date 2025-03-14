@@ -38,6 +38,7 @@ export default function ClientVideo({
 	isMicrophoneDisabled,
 	setHideMe,
 	previousVolumesRef,
+	reinitializeStream,
 }) {
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
 	const [volumeBeforeMute, setVolumeBeforeMute] = useState(0)
@@ -380,6 +381,10 @@ export default function ClientVideo({
 							borderRadius: 'var(--radius-4)',
 							zIndex: 11001,
 							cursor: isDragging ? 'grabbing' : 'move',
+						}}
+						onError={e => {
+							console.error('Video loading error:', e)
+							reinitializeStream(clientID)
 						}}
 					/>
 					{hoveredClient === clientID && (
