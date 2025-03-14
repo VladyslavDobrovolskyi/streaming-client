@@ -16,11 +16,20 @@ import { Slider } from '@radix-ui/themes'
 // import { BsCameraVideoFill, BsCameraVideoOffFill } from 'react-icons/bs'
 
 // Add this near the top of the component, with the other hooks
-const useForceUpdate = () => {
-	const [, setTick] = useState(0)
-	return useCallback(() => {
-		setTick(tick => tick + 1)
+
+// Replace with this implementation that includes DOM removal/re-addition
+const useForceRemountUpdate = () => {
+	const [isVisible, setIsVisible] = useState(true)
+
+	const forceRemountUpdate = useCallback(() => {
+		setIsVisible(false)
+		// Add back to DOM after a short delay
+		setTimeout(() => {
+			setIsVisible(true)
+		}, 50) // 50ms delay should be enough for DOM cleanup
 	}, [])
+
+	return { isVisible, forceRemountUpdate }
 }
 
 export default function ClientVideo({
@@ -48,8 +57,8 @@ export default function ClientVideo({
 	previousVolumesRef,
 	reinitializeStream,
 }) {
-	// Add this inside the component function
-	const forceUpdate = useForceUpdate()
+	// Replace the forceUpdate with forceRemountUpdate
+	const { isVisible, forceRemountUpdate } = useForceRemountUpdate()
 	const [hoveredClient, setHoveredClient] = useState<string | null>(null)
 	const [volumeBeforeMute, setVolumeBeforeMute] = useState(0)
 	const [muted, setMuted] = useState(false)
@@ -302,8 +311,8 @@ export default function ClientVideo({
 				if (!hasVideoTracks && !isCameraMuted && cameraStatus !== false) {
 					console.log(`No video stream detected for client ${clientID}, reinitializing...`)
 					reinitializeStream(clientID)
-					// Force a re-render after reinitializing the stream
-					forceUpdate()
+					// Remove from DOM and add back instead of just forcing a re-render
+					forceRemountUpdate()
 				}
 			}
 		}
@@ -317,7 +326,7 @@ export default function ClientVideo({
 		return () => {
 			clearInterval(intervalId)
 		}
-	}, [clientID, reinitializeStream, isCameraMuted, cameraStatus, isLocal, forceUpdate])
+	}, [clientID, reinitializeStream, isCameraMuted, cameraStatus, isLocal, forceRemountUpdate])
 
 	// Replace the handleVideoError function with a simpler version that just logs
 	const handleVideoError = e => {
@@ -343,212 +352,215 @@ export default function ClientVideo({
 	}
 
 	return (
-		<DraggableResizable
-			initialSize={{ width: size.width, height: size.height, scale: size.scale }}
-			initialPosition={position}
-			bounds='parent'
-			minConstraints={[100, 75]}
-			maxConstraints={[300, 200]}
-			onPositionChange={newPosition => onPositionChange(clientID, newPosition)}
-			onSizeChange={newSize => {
-				if (newSize.scale !== undefined) {
-					setScale(newSize.scale)
-				}
-				onSizeChange(clientID, newSize)
-			}}
-			dragHandleClassName='video-drag-handle'
-			resizeHandleStyles={{
-				zIndex: 12000,
-				pointerEvents: 'auto',
-			}}
-			hide={isCameraMuted || cameraStatus === false}
-			focused={highlightedUser === clientID || hoveredClient === clientID}
-		>
-			{({ isDragging }) => (
-				<div
-					style={{
-						width: '100%',
-						height: '100%',
-						position: 'relative',
-						pointerEvents: 'auto',
-						transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-						cursor: 'default',
-						display: isCameraMuted ? 'none' : 'block',
-						border:
-							highlightedUser === clientID
-								? '3px solid var(--accent-color-main'
-								: '3px solid transparent',
-						boxShadow: highlightedUser === clientID ? '0 0 10px cyan' : 'none',
-						borderRadius: 'var(--radius-4)',
-						zIndex: hoveredClient === clientID ? 2147483647 : 11000,
-					}}
-					onMouseEnter={() => {
-						setHoveredClient(clientID)
-						onMouseEnter(clientID)
-					}}
-					onMouseLeave={() => {
-						setHoveredClient(null)
-						onMouseLeave()
-					}}
-				>
-					<video
-						width='100%'
-						height='100%'
-						ref={videoRef}
-						data-client-id={clientID}
-						autoPlay
-						playsInline
-						className='video-drag-handle'
+		// Only render if isVisible is true
+		isVisible ? (
+			<DraggableResizable
+				initialSize={{ width: size.width, height: size.height, scale: size.scale }}
+				initialPosition={position}
+				bounds='parent'
+				minConstraints={[100, 75]}
+				maxConstraints={[300, 200]}
+				onPositionChange={newPosition => onPositionChange(clientID, newPosition)}
+				onSizeChange={newSize => {
+					if (newSize.scale !== undefined) {
+						setScale(newSize.scale)
+					}
+					onSizeChange(clientID, newSize)
+				}}
+				dragHandleClassName='video-drag-handle'
+				resizeHandleStyles={{
+					zIndex: 12000,
+					pointerEvents: 'auto',
+				}}
+				hide={isCameraMuted || cameraStatus === false}
+				focused={highlightedUser === clientID || hoveredClient === clientID}
+			>
+				{({ isDragging }) => (
+					<div
 						style={{
-							objectFit: 'cover',
+							width: '100%',
+							height: '100%',
+							position: 'relative',
+							pointerEvents: 'auto',
+							transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+							cursor: 'default',
+							display: isCameraMuted ? 'none' : 'block',
+							border:
+								highlightedUser === clientID
+									? '3px solid var(--accent-color-main'
+									: '3px solid transparent',
+							boxShadow: highlightedUser === clientID ? '0 0 10px cyan' : 'none',
 							borderRadius: 'var(--radius-4)',
-							zIndex: 11001,
-							cursor: isDragging ? 'grabbing' : 'move',
+							zIndex: hoveredClient === clientID ? 2147483647 : 11000,
 						}}
-						onError={handleVideoError}
-					/>
-					{hoveredClient === clientID && (
-						<>
-							<div
-								style={{
-									position: 'absolute',
-									top: '50%',
-									left: '50%',
-									transform: 'translate(-50%, -50%)',
-									cursor: 'pointer',
-									pointerEvents: 'auto',
-									zIndex: 11003,
-								}}
-							>
-								<motion.div
-									initial={{ scale: 0.8, opacity: 0 }}
-									animate={{ scale: 1, opacity: 1 }}
-									whileHover={{ scale: 1.2 }}
-									whileTap={{ scale: 0.9 }}
-									transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-								>
-									<EyeOpenIcon
-										style={{ color: 'white', transform: 'scale(1)' }}
-										onClick={() => {
-											toggleCamera(clientID)
-											if (isLocal) {
-												setHideMe(true)
-											}
-										}}
-									/>
-								</motion.div>
-							</div>
-							{!isLocal && (
+						onMouseEnter={() => {
+							setHoveredClient(clientID)
+							onMouseEnter(clientID)
+						}}
+						onMouseLeave={() => {
+							setHoveredClient(null)
+							onMouseLeave()
+						}}
+					>
+						<video
+							width='100%'
+							height='100%'
+							ref={videoRef}
+							data-client-id={clientID}
+							autoPlay
+							playsInline
+							className='video-drag-handle'
+							style={{
+								objectFit: 'cover',
+								borderRadius: 'var(--radius-4)',
+								zIndex: 11001,
+								cursor: isDragging ? 'grabbing' : 'move',
+							}}
+							onError={handleVideoError}
+						/>
+						{hoveredClient === clientID && (
+							<>
 								<div
 									style={{
 										position: 'absolute',
-										bottom: '-10px',
-										left: '-11px',
-										right: '0px',
-										display: 'flex',
-										alignItems: 'center',
+										top: '50%',
+										left: '50%',
+										transform: 'translate(-50%, -50%)',
+										cursor: 'pointer',
 										pointerEvents: 'auto',
 										zIndex: 11003,
 									}}
 								>
+									<motion.div
+										initial={{ scale: 0.8, opacity: 0 }}
+										animate={{ scale: 1, opacity: 1 }}
+										whileHover={{ scale: 1.2 }}
+										whileTap={{ scale: 0.9 }}
+										transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+									>
+										<EyeOpenIcon
+											style={{ color: 'white', transform: 'scale(1)' }}
+											onClick={() => {
+												toggleCamera(clientID)
+												if (isLocal) {
+													setHideMe(true)
+												}
+											}}
+										/>
+									</motion.div>
+								</div>
+								{!isLocal && (
 									<div
 										style={{
-											position: 'relative',
+											position: 'absolute',
+											bottom: '-10px',
+											left: '-11px',
+											right: '0px',
 											display: 'flex',
 											alignItems: 'center',
+											pointerEvents: 'auto',
+											zIndex: 11003,
 										}}
 									>
-										<button
-											onClick={isMicrophoneDisabled ? undefined : handleToggleMuted}
+										<div
 											style={{
-												color: 'white',
-												border: 'none',
-												padding: '0.5rem',
-												borderRadius: 'var(--radius-4)',
-												cursor: isMicrophoneDisabled ? 'default' : 'pointer',
-												background: 'none',
+												position: 'relative',
 												display: 'flex',
 												alignItems: 'center',
-												opacity: isMicrophoneDisabled ? 0.5 : 1,
 											}}
 										>
-											{getVolumeIcon()}
-										</button>
-										{!muted && !isMicrophoneDisabled && getEffectiveVolume() > 0 && (
-											<div
+											<button
+												onClick={isMicrophoneDisabled ? undefined : handleToggleMuted}
 												style={{
-													position: 'absolute',
-													left: '85%',
+													color: 'white',
+													border: 'none',
+													padding: '0.5rem',
+													borderRadius: 'var(--radius-4)',
+													cursor: isMicrophoneDisabled ? 'default' : 'pointer',
+													background: 'none',
 													display: 'flex',
 													alignItems: 'center',
-													height: '100%',
+													opacity: isMicrophoneDisabled ? 0.5 : 1,
 												}}
 											>
-												<Slider
-													orientation='horizontal'
-													min={0}
-													max={1}
-													step={0.01}
-													value={[getEffectiveVolume()]}
-													onValueChange={value => handleVolumeChange(value[0])}
-													style={
-														{
-															width: size.width - 45,
-															'--slider-thumb-size': '12px',
-														} as React.CSSProperties
-													}
-												/>
-											</div>
-										)}
+												{getVolumeIcon()}
+											</button>
+											{!muted && !isMicrophoneDisabled && getEffectiveVolume() > 0 && (
+												<div
+													style={{
+														position: 'absolute',
+														left: '85%',
+														display: 'flex',
+														alignItems: 'center',
+														height: '100%',
+													}}
+												>
+													<Slider
+														orientation='horizontal'
+														min={0}
+														max={1}
+														step={0.01}
+														value={[getEffectiveVolume()]}
+														onValueChange={value => handleVolumeChange(value[0])}
+														style={
+															{
+																width: size.width - 45,
+																'--slider-thumb-size': '12px',
+															} as React.CSSProperties
+														}
+													/>
+												</div>
+											)}
+										</div>
 									</div>
-								</div>
-							)}
-						</>
-					)}
-					{isCovered && (
-						<AnimatePresence>
-							<motion.div
-								className='video-drag-handle'
-								initial={{ opacity: 0, scale: 0.8 }}
-								animate={{ opacity: 1, scale: 1 }}
-								exit={{ opacity: 0, scale: 0.8 }}
-								transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-								style={{
-									position: 'absolute',
-									top: 0,
-									left: 0,
-									width: '100%',
-									height: '100%',
-									backgroundColor: 'rgba(0, 0, 0, 0.85)',
-									cursor: isDragging ? 'grabbing' : 'move',
-									borderRadius: 'var(--radius-4)',
-									display: 'flex',
-									justifyContent: 'center',
-									alignItems: 'center',
-									pointerEvents: 'auto',
-									zIndex: 11004,
-								}}
-							>
+								)}
+							</>
+						)}
+						{isCovered && (
+							<AnimatePresence>
 								<motion.div
-									initial={{ rotate: -180, opacity: 0 }}
-									animate={{ rotate: 0, opacity: 1 }}
-									whileHover={{ scale: 1.2 }}
-									whileTap={{ scale: 0.9 }}
-									transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+									className='video-drag-handle'
+									initial={{ opacity: 0, scale: 0.8 }}
+									animate={{ opacity: 1, scale: 1 }}
+									exit={{ opacity: 0, scale: 0.8 }}
+									transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+									style={{
+										position: 'absolute',
+										top: 0,
+										left: 0,
+										width: '100%',
+										height: '100%',
+										backgroundColor: 'rgba(0, 0, 0, 0.85)',
+										cursor: isDragging ? 'grabbing' : 'move',
+										borderRadius: 'var(--radius-4)',
+										display: 'flex',
+										justifyContent: 'center',
+										alignItems: 'center',
+										pointerEvents: 'auto',
+										zIndex: 11004,
+									}}
 								>
-									<EyeClosedIcon
-										style={{ color: 'white', transform: 'scale(1)', cursor: 'pointer' }}
-										onClick={() => {
-											onCoverToggle(clientID)
-											handleToggleMuted()
-										}}
-									/>
+									<motion.div
+										initial={{ rotate: -180, opacity: 0 }}
+										animate={{ rotate: 0, opacity: 1 }}
+										whileHover={{ scale: 1.2 }}
+										whileTap={{ scale: 0.9 }}
+										transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+									>
+										<EyeClosedIcon
+											style={{ color: 'white', transform: 'scale(1)', cursor: 'pointer' }}
+											onClick={() => {
+												onCoverToggle(clientID)
+												handleToggleMuted()
+											}}
+										/>
+									</motion.div>
 								</motion.div>
-							</motion.div>
-						</AnimatePresence>
-					)}
-				</div>
-			)}
-		</DraggableResizable>
+							</AnimatePresence>
+						)}
+					</div>
+				)}
+			</DraggableResizable>
+		) : null
 	)
 }
