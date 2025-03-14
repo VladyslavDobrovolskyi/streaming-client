@@ -52,9 +52,6 @@ export default function ClientVideo({
 	// const [cameraOpacity, setCameraOpacity] = useState(1.0)
 	const [scale, setScale] = useState(1)
 	// Add a ref to track retry attempts
-	const retryAttemptsRef = useRef(0)
-	const MAX_RETRY_ATTEMPTS = 3
-	const RETRY_DELAY = 1000 // 1 second delay between retries
 
 	// Helper function to get effective volume
 	const getEffectiveVolume = () => {
@@ -266,37 +263,55 @@ export default function ClientVideo({
 		}
 	}, [clientID])
 
-	// Enhanced error handling for video element
+	// Add a new useEffect to periodically check if the video stream exists
+	// Place this after the other useEffect hooks
+
+	// Add a ref to track the last time we checked for a stream
+	const lastStreamCheckRef = useRef(Date.now())
+	const STREAM_CHECK_INTERVAL = 5000 // Check every 5 seconds
+
+	// Add this useEffect to periodically check if the stream exists
+	useEffect(() => {
+		// Only run this check for remote participants (not local)
+		if (isLocal) return
+
+		const checkVideoStream = () => {
+			// Skip if we've checked recently
+			const now = Date.now()
+			if (now - lastStreamCheckRef.current < STREAM_CHECK_INTERVAL) return
+
+			lastStreamCheckRef.current = now
+
+			// Check if video element exists and has active tracks
+			if (videoRef.current) {
+				const hasVideoTracks =
+					videoRef.current.srcObject instanceof MediaStream &&
+					(videoRef.current.srcObject as MediaStream).getVideoTracks().length > 0
+
+				// If camera is enabled but no video tracks, reinitialize
+				if (!hasVideoTracks && !isCameraMuted && cameraStatus !== false) {
+					console.log(`No video stream detected for client ${clientID}, reinitializing...`)
+					reinitializeStream(clientID)
+				}
+			}
+		}
+
+		// Check immediately on mount
+		checkVideoStream()
+
+		// Set up interval to check periodically
+		const intervalId = setInterval(checkVideoStream, STREAM_CHECK_INTERVAL)
+
+		return () => {
+			clearInterval(intervalId)
+		}
+	}, [clientID, reinitializeStream, isCameraMuted, cameraStatus, isLocal])
+
+	// Replace the handleVideoError function with a simpler version that just logs
 	const handleVideoError = e => {
 		console.error(`Video loading error for client ${clientID}:`, e)
-
-		// Check if we've exceeded max retry attempts
-		if (retryAttemptsRef.current < MAX_RETRY_ATTEMPTS) {
-			retryAttemptsRef.current += 1
-			console.log(
-				`Attempting to reinitialize stream for client ${clientID} (Attempt ${retryAttemptsRef.current}/${MAX_RETRY_ATTEMPTS})`
-			)
-
-			// Add a delay before retrying to avoid rapid retry loops
-			setTimeout(() => {
-				reinitializeStream(clientID)
-			}, RETRY_DELAY)
-		} else {
-			console.warn(
-				`Max retry attempts (${MAX_RETRY_ATTEMPTS}) reached for client ${clientID}. Manual intervention may be required.`
-			)
-
-			// Dispatch an event to notify the application about the persistent failure
-			const event = new CustomEvent('video-stream-failure', {
-				detail: { clientID, attempts: retryAttemptsRef.current },
-			})
-			document.dispatchEvent(event)
-
-			// Reset retry counter after a longer delay to allow for another set of retries if user interacts again
-			setTimeout(() => {
-				retryAttemptsRef.current = 0
-			}, RETRY_DELAY * 5)
-		}
+		// We're not automatically reinitializing on error anymore
+		// since we're doing proactive checks instead
 	}
 
 	const getVolumeIcon = () => {
