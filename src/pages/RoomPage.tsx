@@ -989,7 +989,7 @@ export default function RoomPage() {
 			<ReactPlayer
 				ref={playerRef}
 				className='react-player'
-				url='/music/beat.mp4'
+				url='https://abra--5fa8a051.api.brilliant-bittern.buzz/08ada5a7a6183aae1e09d831df6748d566095a10/Sintel/Sintel.mp4?api-key=8acbcf1e-732c-4574-a3bf-27e6a85b86f1&download=true&request-id=30183b7c3eb1b18e8d628189bdf31b11&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyYXRlIjoiMjBNIiwiY29ubmVjdGlvbnMiOjIsInJvbGUiOiJiYXNpYyIsInNlc3Npb25JRCI6IjMxZmVhNmU1MDIyZTYxNDJmODI2MDk2YjA1MDkwYTU0ZTE5NzRhNmIiLCJkb21haW4iOiJyYXBpZGFwaS5jb20iLCJleHAiOjE3NDUxNzc4MDF9.ydP5CCruTcCkxwOwGPXsV6idt8DsrHI55-f7btKlZF8'
 				controls={false}
 				playing={isPlaying}
 				volume={volume}
