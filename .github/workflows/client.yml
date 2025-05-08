@@ -17,7 +17,7 @@ jobs:
                 key: ${{ secrets.KEY }}
                 port: ${{ secrets.PORT }}
                 script: |
-                      cd /home/ubuntu/
+                      cd /home/vdobrovolskyi/watchtogether.io
                       echo "🔄 Cтягиваем код с github"
                       echo "🗑 Очищаем следы прошлых запусков, если имеются"
                       if [ -d "streaming-client" ]; then
