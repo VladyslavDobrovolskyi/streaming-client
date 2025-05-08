@@ -68,7 +68,7 @@ jobs:
                       fi
 
 
-                       cd /home/ubuntu/
+                       cd /home/vdobrovolskyi/watchtogether.fun
 
                       echo "🔍 Проверка наличия контейнеров postgres и nginx"
                       if [ ! $(docker ps -q -f name=postgres) ]; then
