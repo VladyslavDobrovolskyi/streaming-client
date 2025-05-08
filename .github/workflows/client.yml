@@ -9,14 +9,14 @@ jobs:
         name: Build and Deploy
         runs-on: ubuntu-latest
         steps:
-            - name: Executing remote SSH commands using password
-              uses: appleboy/ssh-action@v1.0.3
-              with:
-                  host: ${{ secrets.HOST }}
-                  username: ${{ secrets.USERNAME }}
-                  password: ${{ secrets.PASSWORD }}
-                  port: ${{ secrets.PORT }}
-                  script: |
+           - name: Executing remote SSH commands using key
+             uses: appleboy/ssh-action@v1.0.3
+             with:
+                host: ${{ secrets.HOST }}
+                username: ${{ secrets.USERNAME }}
+                key: ${{ secrets.KEY }}
+                port: ${{ secrets.PORT }}
+                script: |
                       cd /home/ubuntu/
                       echo "🔄 Cтягиваем код с github"
                       echo "🗑 Очищаем следы прошлых запусков, если имеются"
