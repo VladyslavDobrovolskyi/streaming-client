@@ -6,7 +6,7 @@ export default defineConfig({
 	plugins: [react()],
 	server: {
 		host: '0.0.0.0',
-		port: 7777, // Задайте нужный порт
-		allowedHosts: ['streaming.vladyslavdobrovolskyi.tech'],
+		port: 20777, // Задайте нужный порт
+		allowedHosts: ['watchtogether.fun'],
 	},
 })

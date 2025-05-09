@@ -45,7 +45,7 @@ const MainPage: React.FC = () => {
 	const initializePlayer = useCallback(async () => {
 		try {
 			setIsLoading(true)
-			const response = await fetch('https://streaming.vladyslavdobrovolskyi.tech/stream/playlist.m3u8', {
+			const response = await fetch('https://watchtogether.fun/stream/playlist.m3u8', {
 				cache: 'no-cache',
 				headers: {
 					Pragma: 'no-cache',
@@ -168,7 +168,7 @@ const MainPage: React.FC = () => {
 	const testGetUsers = useCallback(async () => {
 		try {
 			const token = localStorage.getItem('token')
-			const response = await fetch('https://streaming.vladyslavdobrovolskyi.tech/api/users', {
+			const response = await fetch('https://watchtogether.fun/api/users', {
 				headers: { Authorization: `Bearer ${token}` },
 			})
 			console.log('Users:', await response.json())
@@ -180,7 +180,7 @@ const MainPage: React.FC = () => {
 	const testGetRooms = useCallback(async () => {
 		try {
 			const token = localStorage.getItem('token')
-			const response = await fetch('https://streaming.vladyslavdobrovolskyi.tech/api/room_reservations', {
+			const response = await fetch('https://watchtogether.fun/api/room_reservations', {
 				headers: { Authorization: `Bearer ${token}` },
 			})
 			console.log('Rooms:', await response.json())
