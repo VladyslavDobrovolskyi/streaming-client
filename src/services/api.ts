@@ -2,7 +2,7 @@ import axios from 'axios'
 import { refreshToken, clearAuthState } from '../features/auth/authSlice'
 
 const api = axios.create({
-	baseURL: 'https://watchtogether.fun/api/',
+	baseURL: '/api/',
 	headers: {
 		'Content-Type': 'application/json',
 	},
