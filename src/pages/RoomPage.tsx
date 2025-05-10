@@ -760,7 +760,7 @@ export default function RoomPage() {
 
 	useEffect(() => {
 		console.log('Fetching avatar...')
-		fetch('https://watchtogether.fun/get/emoji/')
+		fetch('/get/emoji/')
 			.then(res => res.json())
 			.then(data => {
 				setAvatar(data.url)
