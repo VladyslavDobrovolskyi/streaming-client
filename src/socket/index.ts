@@ -13,7 +13,7 @@ class SocketClient {
 
 	static getInstance() {
 		if (!this.instance) {
-			this.instance = io('/', this.options)
+			this.instance = io(this.options)
 		}
 		return this.instance
 	}
