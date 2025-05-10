@@ -989,7 +989,7 @@ export default function RoomPage() {
 			<ReactPlayer
 				ref={playerRef}
 				className='react-player'
-				url='https://abra--5fa8a051.api.brilliant-bittern.buzz/d91dc26055670f78d96fd7fd8e7077d97a76e4dd/%D0%9E%D0%B4%D0%B8%D0%BD%D0%BE%D0%BA%D0%B8%D0%B5%20%D0%B2%D0%BE%D0%BB%D0%BA%D0%B8_2024_WEB-DLRip-AVC.mkv?api-key=8acbcf1e-732c-4574-a3bf-27e6a85b86f1&download=true&request-id=9a7e80ebd9ef2dabebb784ecf5449d4f&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyYXRlIjoiMjBNIiwiY29ubmVjdGlvbnMiOjIsInJvbGUiOiJiYXNpYyIsInNlc3Npb25JRCI6IjMxZmVhNmU1MDIyZTYxNDJmODI2MDk2YjA1MDkwYTU0ZTE5NzRhNmIiLCJkb21haW4iOiJyYXBpZGFwaS5jb20iLCJleHAiOjE3NDUzMjIwMTZ9.A17XPsZaI-GXeXB8RTualof4sGfKmvV3aoR_TZcjlr0'
+				url='https://watchtogether.fun/movies/Flow/segments.m3u8'
 				controls={false}
 				playing={isPlaying}
 				volume={volume}
