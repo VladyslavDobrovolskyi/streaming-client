@@ -119,8 +119,8 @@ export default function useWebRTC(roomID: string) {
 				bundlePolicy: 'max-bundle',
 				rtcpMuxPolicy: 'require',
 				urls: [
-					'turn:92.112.180.234:3478', // URL for TURN server (UDP)
-					'turns:92.112.180.234:3478', // URL for TURN server (TLS)
+					'turn:85.89.171.35:3478', // URL for TURN server (UDP)
+					'turns:85.89.171.35:5349', // URL for TURN server (TLS)
 				],
 				username: roomID, // Use roomID as the username
 				credential: '9S2T4U0N5', // Specify the password
