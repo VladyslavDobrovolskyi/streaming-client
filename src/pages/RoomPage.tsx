@@ -883,7 +883,7 @@ export default function RoomPage() {
 
 		const storedVolumes = Object.entries(userData).reduce((acc, [clientId, data]) => {
 			if (data.volume !== undefined) {
-				acc[clientId] = data.volume
+				acc[clientId] = clientId === LOCAL_VIDEO ? 0 : data.volume
 			}
 			return acc
 		}, {} as Record<string, number>)
