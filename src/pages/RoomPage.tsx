@@ -770,7 +770,17 @@ export default function RoomPage() {
 			.catch(() => {
 				console.log('Failed to fetch avatar')
 			})
-		const username = prompt('Please enter your username:')
+
+		let username
+		const storedUsername = localStorage.getItem('username')
+		if (storedUsername) {
+			username = storedUsername
+			setLocalUsername(username)
+		}else{
+			username = prompt('Please enter your username:')
+			
+		}
+		
 		const filmname = prompt('Please select a movie:')
 		if (username) {
 			setLocalUsername(username)
