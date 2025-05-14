@@ -41,6 +41,9 @@ const MainV2: React.FC = () => {
 		if (localStorage.getItem('seenWelcomePage')) {
 			setStep('name')
 		}
+		if (localStorage.getItem('username')) {
+			setStep('room')
+		}
 	}, [])
 
 	const handleNameSubmit = (e: React.FormEvent) => {
