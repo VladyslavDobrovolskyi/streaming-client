@@ -37,6 +37,12 @@ const MainV2: React.FC = () => {
 		}
 	}, [])
 
+	useEffect(() => {
+		if (localStorage.getItem('seenWelcomePage')) {
+			setStep('name')
+		}
+	}, [])
+
 	const handleNameSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
 		if (username.trim()) {
@@ -56,6 +62,7 @@ const MainV2: React.FC = () => {
 	}
 
 	if (!isAuthenticated) return null
+	// Move user to next step if welcome page has been seen
 
 	return (
 		<div className='main-container'>
@@ -91,7 +98,13 @@ const MainV2: React.FC = () => {
 						</p>
 					</div>
 
-					<button onClick={() => setStep('name')} className='primary-button'>
+					<button
+						onClick={() => {
+							localStorage.setItem('seenWelcomePage', 'true')
+							setStep('name')
+						}}
+						className='primary-button'
+					>
 						I Get It
 					</button>
 				</div>
