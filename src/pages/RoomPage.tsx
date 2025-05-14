@@ -78,6 +78,7 @@ export default function RoomPage() {
 	const [showChat, setShowChat] = useState(false)
 	const [chatInput, setChatInput] = useState('')
 	const [localUsername, setLocalUsername] = useState('')
+	const [filmName, setFilmName] = useState('')
 	const [avatar, setAvatar] = useState('')
 	const [privateChats, setPrivateChats] = useState<Record<string, boolean>>({})
 	const [clientSizes, setClientSizes] = useState<Record<string, { width: number; height: number; scale?: number }>>(
@@ -770,8 +771,12 @@ export default function RoomPage() {
 				console.log('Failed to fetch avatar')
 			})
 		const username = prompt('Please enter your username:')
+		const filmname = prompt('Please select a movie:')
 		if (username) {
 			setLocalUsername(username)
+		}
+		if (filmname) {
+			setFilmName(filmname)
 		}
 	}, [])
 
@@ -989,7 +994,7 @@ export default function RoomPage() {
 			<ReactPlayer
 				ref={playerRef}
 				className='react-player'
-				url='https://watchtogether.fun/movies/Flow/segments.m3u8'
+				url={`https://watchtogether.fun/movies/${filmName}/segments.m3u8`}
 				controls={false}
 				playing={isPlaying}
 				volume={volume}
