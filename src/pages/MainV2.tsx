@@ -1,16 +1,36 @@
-import React, { useState, useEffect } from 'react'
+'use client'
+
+import type React from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import socket from '../socket/index.ts'
 import { v4 } from 'uuid'
 import ACTIONS from '../socket/actions.ts'
 import './mainv2.css' // Import the CSS file
 
+interface Movie {
+	id: string
+	title: string
+	posterPath: string
+}
+
 const MainV2: React.FC = () => {
 	const navigate = useNavigate()
-	const [step, setStep] = useState<'welcome' | 'name' | 'room'>('welcome')
+	const [step, setStep] = useState<'welcome' | 'name' | 'movie' | 'room'>('welcome')
 	const [username, setUsername] = useState('')
 	const [rooms, setRooms] = useState<string[]>([])
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
+	const [selectedMovie, setSelectedMovie] = useState<string | null>(null)
+
+	// Available movies
+	const movies: Movie[] = [
+		{
+			id: 'flow',
+			title: 'Flow',
+			posterPath: '/posters/Flow.webp',
+		},
+		// You can add more movies here later
+	]
 
 	// Save current page to session storage
 	useEffect(() => {
@@ -42,7 +62,14 @@ const MainV2: React.FC = () => {
 			setStep('name')
 		}
 		if (localStorage.getItem('username')) {
-			setStep('room')
+			// Check if movie is selected
+			const savedMovie = localStorage.getItem('selectedMovie')
+			if (savedMovie) {
+				setSelectedMovie(savedMovie)
+				setStep('room')
+			} else {
+				setStep('movie')
+			}
 		}
 	}, [])
 
@@ -51,8 +78,18 @@ const MainV2: React.FC = () => {
 		if (username.trim()) {
 			// Store username in localStorage or context
 			localStorage.setItem('username', username)
-			setStep('room')
+			setStep('movie')
 		}
+	}
+
+	const handleSelectMovie = (movieId: string) => {
+		setSelectedMovie(movieId)
+		localStorage.setItem('selectedMovie', movieId)
+		setStep('room')
+	}
+
+	const changeMovie = () => {
+		setStep('movie')
 	}
 
 	const createRoom = () => {
@@ -136,9 +173,52 @@ const MainV2: React.FC = () => {
 				</div>
 			)}
 
+			{step === 'movie' && (
+				<div className='card movie-selection-card'>
+					<h2 className='card-title'>Select a Movie to Watch</h2>
+
+					<div className='movie-grid'>
+						{movies.map(movie => (
+							<div
+								key={movie.id}
+								className={`movie-poster-container ${selectedMovie === movie.id ? 'selected' : ''}`}
+								onClick={() => handleSelectMovie(movie.id)}
+							>
+								<img
+									src={movie.posterPath || '/placeholder.svg'}
+									alt={movie.title}
+									className='movie-poster'
+								/>
+								<div className='movie-title'>{movie.title}</div>
+								{selectedMovie === movie.id && (
+									<div className='selected-indicator'>
+										<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'>
+											<path
+												fillRule='evenodd'
+												d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
+												clipRule='evenodd'
+											/>
+										</svg>
+									</div>
+								)}
+							</div>
+						))}
+					</div>
+				</div>
+			)}
+
 			{step === 'room' && (
 				<div className='card'>
 					<h2 className='card-title'>Join or Create a Room</h2>
+
+					{selectedMovie && (
+						<div className='selected-movie-info'>
+							<h3>Selected Movie: {selectedMovie === 'flow' ? 'Flow' : selectedMovie}</h3>
+							<button onClick={changeMovie} className='secondary-button'>
+								Change Movie
+							</button>
+						</div>
+					)}
 
 					<div className='create-room-container'>
 						<button onClick={createRoom} className='primary-button create-button'>
