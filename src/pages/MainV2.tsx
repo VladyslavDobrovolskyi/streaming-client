@@ -27,7 +27,7 @@ const MainV2: React.FC = () => {
 		{
 			id: 'flow',
 			title: 'Flow',
-			posterPath: '/posters/Flow.webp',
+			posterPath: 'https://image.tmdb.org/t/p/original/d0BSyEAGvMmG26ixr9Z6381Vaxg.jpg',
 		},
 		// You can add more movies here later
 	]
