@@ -1,0 +1,181 @@
+/* Main container styles */
+.main-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 100vh;
+	padding: 24px;
+	background: linear-gradient(to bottom, #0f172a, #1e293b);
+	color: white;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans',
+		'Helvetica Neue', sans-serif;
+}
+
+/* Card styles */
+.welcome-card,
+.card {
+	max-width: 450px;
+	width: 100%;
+	background-color: #1e293b;
+	border-radius: 12px;
+	box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+	padding: 32px;
+	text-align: center;
+}
+
+/* Welcome screen styles */
+.welcome-title,
+.card-title {
+	font-size: 24px;
+	font-weight: bold;
+	margin-bottom: 24px;
+	text-align: center;
+}
+
+.welcome-content {
+	margin-bottom: 32px;
+}
+
+.icon-container {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 24px;
+}
+
+.welcome-icon {
+	height: 96px;
+	width: 96px;
+	color: #22d3ee;
+}
+
+.welcome-text {
+	font-size: 18px;
+	margin-bottom: 16px;
+}
+
+.welcome-subtext {
+	color: #94a3b8;
+	margin-bottom: 16px;
+}
+
+/* Button styles */
+.primary-button {
+	width: 100%;
+	padding: 12px 24px;
+	background-color: #06b6d4;
+	color: white;
+	border: none;
+	border-radius: 8px;
+	font-size: 16px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.primary-button:hover {
+	background-color: #0891b2;
+}
+
+/* Name input styles */
+.form-group {
+	margin-bottom: 24px;
+}
+
+.text-input {
+	width: 100%;
+	padding: 12px;
+	background-color: #334155;
+	color: white;
+	border: 1px solid #475569;
+	border-radius: 8px;
+	outline: none;
+	transition: border-color 0.2s;
+	font-size: 16px;
+}
+
+.text-input:focus {
+	border-color: #06b6d4;
+	box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+}
+
+.text-input::placeholder {
+	color: #94a3b8;
+}
+
+/* Room selection styles */
+.create-room-container {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	margin-bottom: 32px;
+}
+
+.create-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 16px 24px;
+}
+
+.button-icon {
+	height: 20px;
+	width: 20px;
+}
+
+.rooms-container {
+	text-align: left;
+}
+
+.rooms-title {
+	font-size: 18px;
+	font-weight: 500;
+	margin-bottom: 12px;
+}
+
+.rooms-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.room-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px;
+	background-color: #334155;
+	border-radius: 8px;
+}
+
+.room-id {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 200px;
+}
+
+.join-button {
+	padding: 6px 16px;
+	background-color: #06b6d4;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.join-button:hover {
+	background-color: #0891b2;
+}
+
+.no-rooms {
+	text-align: center;
+	padding: 16px;
+	background-color: #334155;
+	border-radius: 8px;
+	color: #94a3b8;
+}
