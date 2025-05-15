@@ -94,6 +94,17 @@ const MainV2: React.FC = () => {
 
 	const createRoom = () => {
 		const roomId = v4()
+		fetch('https://watchtogether.fun/api/room/create', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				roomUUID: '550e8400-e29b-41d4-a716-446655440000',
+				movieName: 12345,
+				password: 'securePassword123',
+			}),
+		})
 		navigate(`/room/${roomId}`)
 	}
 
