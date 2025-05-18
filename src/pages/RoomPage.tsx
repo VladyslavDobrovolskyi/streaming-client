@@ -779,13 +779,13 @@ export default function RoomPage() {
 	useEffect(() => {
 		console.log('Local init movie/userdata')
 
-		if (document.cookie.includes('userID')) {
-			const userIDCookie = document.cookie.split(';').find(c => c.trim().startsWith('userID='))
+		if (document.cookie.includes('userId')) {
+			const userIDCookie = document.cookie.split(';').find(c => c.trim().startsWith('userId='))
 			if (userIDCookie) {
-				console.log('UserID cookie found:', userIDCookie.split('=')[1])
+				console.log('UserId cookie found:', userIDCookie.split('=')[1])
 			}
 		} else {
-			console.log('UserID cookie not found.')
+			console.log('UserId cookie not found.')
 			window.location.href = '/'
 		}
 
