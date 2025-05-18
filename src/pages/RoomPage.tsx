@@ -806,7 +806,10 @@ export default function RoomPage() {
 		fetchUserData().catch(() => (window.location.href = '/'))
 		fetchMovieInfo().catch(() => (window.location.href = '/'))
 		joinRoom().catch(() => {
-			window.location.reload()
+			const pass = prompt('Enter the password to join the room:')
+			if (pass) {
+				joinRoom(pass).catch(() => window.location.reload)
+			}
 		})
 	}, [])
 
