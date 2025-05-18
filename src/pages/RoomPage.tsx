@@ -18,6 +18,7 @@ import ParticipantsView from '../components/users/ParticipantsView'
 import ToastNotifications from '../components/toast/ToastNotifications'
 import { formatTime } from '../utils/formatTime'
 import type { ToastNotification, UserPosition } from '../types/room-types'
+import { apiClient, Movie } from '../api/ApiClient'
 import Loader from '../components/player/Loader'
 
 // Add this after your imports
@@ -30,7 +31,9 @@ const spinKeyframes = `
 
 export default function RoomPage() {
 	const [toasts, setToasts] = useState<ToastNotification[]>([])
-	const { id: roomID } = useParams<{ id: string }>()
+	const { id: roomID } = useParams<{ id: string }>() // Брать отсюда, не дублировать получение
+	const [movieInfo, setMovieInfo] = useState<Movie>()
+
 	const [isDragging, setIsDragging] = useState(false)
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [volume, setVolume] = useState(0.8)
@@ -78,7 +81,6 @@ export default function RoomPage() {
 	const [showChat, setShowChat] = useState(false)
 	const [chatInput, setChatInput] = useState('')
 	const [localUsername, setLocalUsername] = useState('')
-	const [filmName, setFilmName] = useState('')
 	const [avatar, setAvatar] = useState('')
 	const [privateChats, setPrivateChats] = useState<Record<string, boolean>>({})
 	const [clientSizes, setClientSizes] = useState<Record<string, { width: number; height: number; scale?: number }>>(
@@ -758,36 +760,22 @@ export default function RoomPage() {
 			setChatInput('')
 		}
 	}
+	async function fetchMovieInfo() {
+		const roomUUID = new URL(window.location.href).pathname.split('/').pop() || ''
+		const movieID = await apiClient.roomInfo(roomUUID)
+		setMovieInfo(await apiClient.getMovieInfo(Number(movieID)))
+	}
+	async function fetchUserData() {
+		const username = await apiClient.getUserInfo()
+		const avatar = await apiClient.getAvatar()
+		setLocalUsername(String(username))
+		setAvatar(String(avatar.url))
+	}
 
 	useEffect(() => {
-		console.log('Fetching avatar...')
-		fetch('/get/emoji/')
-			.then(res => res.json())
-			.then(data => {
-				setAvatar(data.url)
-				console.log('Avatar fetched')
-			})
-			.catch(() => {
-				console.log('Failed to fetch avatar')
-			})
-
-		let username
-		const storedUsername = localStorage.getItem('username')
-		if (storedUsername) {
-			username = storedUsername
-			setLocalUsername(username)
-		}else{
-			username = prompt('Please enter your username:')
-			
-		}
-		
-		const filmname = prompt('Please select a movie:')
-		if (username) {
-			setLocalUsername(username)
-		}
-		if (filmname) {
-			setFilmName(filmname)
-		}
+		console.log('Local init movie/userdata')
+		fetchUserData()
+		fetchMovieInfo()
 	}, [])
 
 	useEffect(() => {
@@ -1004,7 +992,7 @@ export default function RoomPage() {
 			<ReactPlayer
 				ref={playerRef}
 				className='react-player'
-				url={`https://watchtogether.fun/movies/${filmName}/segments.m3u8`}
+				url={`https://watchtogether.fun/movies/${movieInfo!.title}/segments.m3u8`}
 				controls={false}
 				playing={isPlaying}
 				volume={volume}

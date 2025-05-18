@@ -71,9 +71,19 @@ export class ApiClient {
 		return await this.request<User>('/users/login', 'POST', data)
 	}
 
+	async getUserInfo() {
+		return await this.request<User>('/users/me', 'GET')
+	}
+
+	async getAvatar() {
+		return await this.request<{ url: string }>('/get/emoji', 'GET')
+	}
 	// === Методы для фильмов ===
 	async getMovies() {
 		return await this.request<Movie[]>(`/movies/all`, 'GET')
+	}
+	async getMovieInfo(id: number) {
+		return await this.request<Movie>(`/movies/${id}`, 'GET')
 	}
 
 	// === Методы для комнат ===
@@ -86,6 +96,9 @@ export class ApiClient {
 		return await this.request<string>('/room/join', 'POST', data)
 	}
 
+	async roomInfo(roomUUID: string) {
+		return await this.request<Room>(`/room/info?roomUUID=${roomUUID}`, 'GET')
+	}
 	// === Методы для сеансов ===
 
 	async openSeance(data: { roomUUID: string; movieID: number }) {
