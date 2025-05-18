@@ -772,7 +772,7 @@ export default function RoomPage() {
 		const userInfo = await apiClient.getUserInfo()
 		const avatar = await apiClient.getAvatar()
 		console.log('Avatar:', avatar)
-	
+
 		setLocalUsername(userInfo.username)
 		setAvatar(String(avatar.url))
 	}
@@ -997,7 +997,7 @@ export default function RoomPage() {
 			<ReactPlayer
 				ref={playerRef}
 				className='react-player'
-				url={`https://watchtogether.fun/movies/Other/segments.m3u8`}
+				url={`https://watchtogether.fun/movies/${movieInfo?.title}/segments.m3u8`}
 				controls={false}
 				playing={isPlaying}
 				volume={volume}
