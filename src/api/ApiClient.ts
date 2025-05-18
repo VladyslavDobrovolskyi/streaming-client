@@ -76,7 +76,7 @@ export class ApiClient {
 	}
 
 	async getAvatar() {
-		return await this.request<{ url: string }>('/get/emoji', 'GET')
+		return await this.request<{ url: string }>('/emoji', 'GET')
 	}
 	// === Методы для фильмов ===
 	async getMovies() {
