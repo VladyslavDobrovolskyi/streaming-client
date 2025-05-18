@@ -771,6 +771,8 @@ export default function RoomPage() {
 	async function fetchUserData() {
 		const username = await apiClient.getUserInfo()
 		const avatar = await apiClient.getAvatar()
+		console.log('Avatar:', avatar)
+		console.log('Username:', username)
 		setLocalUsername(String(username))
 		setAvatar(String(avatar.url))
 	}
