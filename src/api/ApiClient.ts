@@ -6,6 +6,13 @@ export interface User {
 	username: string
 }
 
+export interface Movie {
+	id: number
+	title: string
+	poster: string
+	resource: string
+}
+
 export interface Room {
 	id?: string
 	name: string
@@ -62,6 +69,11 @@ export class ApiClient {
 
 	async login(data: { username: string; password: string }) {
 		return await this.request<User>('/users/login', 'POST', data)
+	}
+
+	// === Методы для фильмов ===
+	async getMovies() {
+		return await this.request<Movie[]>(`/movies/all`, 'GET')
 	}
 
 	// === Методы для комнат ===

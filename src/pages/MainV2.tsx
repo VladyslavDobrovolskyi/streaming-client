@@ -3,34 +3,34 @@
 import type React from 'react'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { apiClient } from '../api/ApiClient.ts'
 import socket from '../socket/index.ts'
+import type { Movie } from '../api/ApiClient.ts'
 import { v4 } from 'uuid'
 import ACTIONS from '../socket/actions.ts'
 import './mainv2.css' // Import the CSS file
 
-interface Movie {
-	id: string
-	title: string
-	posterPath: string
-}
-
 const MainV2: React.FC = () => {
 	const navigate = useNavigate()
 	const [step, setStep] = useState<'welcome' | 'name' | 'movie' | 'room'>('welcome')
+	const [movies, setMovies] = useState<Movie[]>([])
 	const [username, setUsername] = useState('')
 	const [rooms, setRooms] = useState<string[]>([])
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
-	const [selectedMovie, setSelectedMovie] = useState<string | null>(null)
+	const [selectedMovieId, setSelectedMovieId] = useState<number | null>(null)
 
 	// Available movies
-	const movies: Movie[] = [
-		{
-			id: 'flow',
-			title: 'Flow',
-			posterPath: 'https://image.tmdb.org/t/p/original/d0BSyEAGvMmG26ixr9Z6381Vaxg.jpg',
-		},
-		// You can add more movies here later
-	]
+	const fetchMovies = async () => {
+		try {
+			const movies = await apiClient.getMovies()
+			setMovies(movies)
+		} catch (error) {
+			console.error('Error fetching movies:', error)
+		}
+	}
+	useEffect(() => {
+		fetchMovies()
+	}, [])
 
 	// Save current page to session storage
 	useEffect(() => {
@@ -65,7 +65,7 @@ const MainV2: React.FC = () => {
 			// Check if movie is selected
 			const savedMovie = localStorage.getItem('selectedMovie')
 			if (savedMovie) {
-				setSelectedMovie(savedMovie)
+				setSelectedMovieId(Number(savedMovie))
 				setStep('room')
 			} else {
 				setStep('movie')
@@ -82,9 +82,9 @@ const MainV2: React.FC = () => {
 		}
 	}
 
-	const handleSelectMovie = (movieId: string) => {
-		setSelectedMovie(movieId)
-		localStorage.setItem('selectedMovie', movieId)
+	const handleSelectMovie = (movieId: number) => {
+		setSelectedMovieId(movieId)
+		localStorage.setItem('selectedMovie', String(movieId))
 		setStep('room')
 	}
 
@@ -95,17 +95,8 @@ const MainV2: React.FC = () => {
 	const createRoom = () => {
 		const roomId = v4()
 		const pass = prompt('Enter a password for the room:')
-		fetch('https://watchtogether.fun/api/room/create', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				roomUUID: roomId,
-				movieName: selectedMovie,
-				password: pass ? pass : '',
-			}),
-		})
+
+		apiClient.createRoom({ id: roomId, movie: { id: Number(selectedMovieId) }, password: pass ? pass : undefined })
 		navigate(`/room/${roomId}`)
 	}
 
@@ -193,16 +184,23 @@ const MainV2: React.FC = () => {
 						{movies.map(movie => (
 							<div
 								key={movie.id}
-								className={`movie-poster-container ${selectedMovie === movie.id ? 'selected' : ''}`}
+								className={`movie-poster-container ${
+									Number(selectedMovieId) === movie.id ? 'selected' : ''
+								}`}
 								onClick={() => handleSelectMovie(movie.id)}
+								role='button'
+								tabIndex={0}
+								onKeyPress={e => {
+									if (e.key === 'Enter') handleSelectMovie(movie.id)
+								}}
 							>
 								<img
-									src={movie.posterPath || '/placeholder.svg'}
+									src={movie.poster || '/placeholder.svg'}
 									alt={movie.title}
 									className='movie-poster'
 								/>
 								<div className='movie-title'>{movie.title}</div>
-								{selectedMovie === movie.id && (
+								{selectedMovieId === movie.id && (
 									<div className='selected-indicator'>
 										<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'>
 											<path
@@ -223,9 +221,12 @@ const MainV2: React.FC = () => {
 				<div className='card'>
 					<h2 className='card-title'>Join or Create a Room</h2>
 
-					{selectedMovie && (
+					{selectedMovieId && (
 						<div className='selected-movie-info'>
-							<h3>Selected Movie: {selectedMovie === 'flow' ? 'Flow' : selectedMovie}</h3>
+							<h3>
+								Selected Movie:{' '}
+								{movies.find(movie => movie.id === Number(selectedMovieId))?.title || ''}
+							</h3>
 							<button onClick={changeMovie} className='secondary-button'>
 								Change Movie
 							</button>
