@@ -33,7 +33,6 @@ export default function RoomPage() {
 	const [toasts, setToasts] = useState<ToastNotification[]>([])
 	const { id: roomID } = useParams<{ id: string }>() // Брать отсюда, не дублировать получение
 	const [movieInfo, setMovieInfo] = useState<Movie>()
-
 	const [isDragging, setIsDragging] = useState(false)
 	const [isPlaying, setIsPlaying] = useState(false)
 	const [volume, setVolume] = useState(0.8)
@@ -792,9 +791,23 @@ export default function RoomPage() {
 		setAvatar(String(avatar.url))
 	}
 
+	async function joinRoom(pass?: string) {
+		const roomUUID = new URL(window.location.href).pathname.split('/').pop() || ''
+		if (!pass) {
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const response = await apiClient.joinRoom({ roomUUID: roomUUID })
+		} else {
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const response = await apiClient.joinRoom({ roomUUID: roomUUID, password: pass })
+		}
+	}
+
 	useEffect(() => {
 		fetchUserData().catch(() => (window.location.href = '/'))
 		fetchMovieInfo().catch(() => (window.location.href = '/'))
+		joinRoom().catch(() => {
+			window.location.reload()
+		})
 	}, [])
 
 	useEffect(() => {
