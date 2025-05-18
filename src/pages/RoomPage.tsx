@@ -768,11 +768,7 @@ export default function RoomPage() {
 		setMovieInfo(movieInfoResponse)
 	}
 	async function fetchUserData() {
-		const userInfo = await apiClient.getUserInfo()
-		console.log('User Info:', userInfo)
-		if (!userInfo.username) {
-			window.location.href = '/'
-		}
+		const userInfo = await apiClient.getUserInfo()	
 		const avatar = await apiClient.getAvatar()
 		console.log('Avatar:', avatar)
 
