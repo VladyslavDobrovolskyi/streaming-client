@@ -769,6 +769,10 @@ export default function RoomPage() {
 	}
 	async function fetchUserData() {
 		const userInfo = await apiClient.getUserInfo()
+
+		if (!userInfo.username) {
+			window.location.href = '/'
+		}
 		const avatar = await apiClient.getAvatar()
 		console.log('Avatar:', avatar)
 
@@ -777,13 +781,8 @@ export default function RoomPage() {
 	}
 
 	useEffect(() => {
-		try {
-			fetchUserData()
-			fetchMovieInfo()
-		} catch (e) {
-			console.error('Error fetching user data or movie info:', e)
-			window.location.href = '/'
-		}
+		fetchUserData()
+		fetchMovieInfo()
 	}, [])
 
 	useEffect(() => {
