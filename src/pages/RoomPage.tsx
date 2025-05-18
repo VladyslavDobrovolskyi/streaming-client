@@ -995,32 +995,34 @@ export default function RoomPage() {
 			}}
 		>
 			<style>{spinKeyframes}</style>
-			<ReactPlayer
-				ref={playerRef}
-				className='react-player'
-				url={`https://watchtogether.fun/movies/${movieInfo?.title}/segments.m3u8`}
-				controls={false}
-				playing={isPlaying}
-				volume={volume}
-				muted={muted}
-				onPlay={() => setIsPlaying(true)}
-				onPause={() => setIsPlaying(false)}
-				onProgress={handleProgress}
-				onDuration={duration => setDuration(duration)}
-				onReady={handleReady}
-				width='100%'
-				height='100%'
-				style={{
-					backgroundColor: '#1a1a1a',
-					objectFit: isMovieMode ? 'cover' : 'contain',
-					position: 'absolute',
-					top: 0,
-					left: 0,
-					width: '100%',
-					height: '100%',
-					zIndex: 1,
-				}}
-			/>
+			{movieInfo && (
+				<ReactPlayer
+					ref={playerRef}
+					className='react-player'
+					url={`https://watchtogether.fun/movies/${movieInfo.title}/segments.m3u8`}
+					controls={false}
+					playing={isPlaying}
+					volume={volume}
+					muted={muted}
+					onPlay={() => setIsPlaying(true)}
+					onPause={() => setIsPlaying(false)}
+					onProgress={handleProgress}
+					onDuration={duration => setDuration(duration)}
+					onReady={handleReady}
+					width='100%'
+					height='100%'
+					style={{
+						backgroundColor: '#1a1a1a',
+						objectFit: isMovieMode ? 'cover' : 'contain',
+						position: 'absolute',
+						top: 0,
+						left: 0,
+						width: '100%',
+						height: '100%',
+						zIndex: 1,
+					}}
+				/>
+			)}
 			{isLoading && <Loader />}
 			<ParticipantsView
 				reinitializeStream={reinitializeStreamWithRemoteUser}
