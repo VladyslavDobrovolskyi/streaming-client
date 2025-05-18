@@ -777,20 +777,13 @@ export default function RoomPage() {
 	}
 
 	useEffect(() => {
-		console.log('Local init movie/userdata')
-
-		if (document.cookie.includes('userId')) {
-			const userIDCookie = document.cookie.split(';').find(c => c.trim().startsWith('userId='))
-			if (userIDCookie) {
-				console.log('UserId cookie found:', userIDCookie.split('=')[1])
-			}
-		} else {
-			console.log('UserId cookie not found.')
+		try {
+			fetchUserData()
+			fetchMovieInfo()
+		} catch (e) {
+			console.error('Error fetching user data or movie info:', e)
 			window.location.href = '/'
 		}
-
-		fetchUserData()
-		fetchMovieInfo()
 	}, [])
 
 	useEffect(() => {
