@@ -769,7 +769,7 @@ export default function RoomPage() {
 	}
 	async function fetchUserData() {
 		const userInfo = await apiClient.getUserInfo()
-
+		console.log('User Info:', userInfo)
 		if (!userInfo.username) {
 			window.location.href = '/'
 		}
