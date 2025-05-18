@@ -8,18 +8,39 @@ import socket from '../socket/index.ts'
 import type { Movie } from '../api/ApiClient.ts'
 import { v4 } from 'uuid'
 import ACTIONS from '../socket/actions.ts'
-import './mainv2.css' // Import the CSS file
+import './mainv2.css'
 
 const MainV2: React.FC = () => {
 	const navigate = useNavigate()
-	const [step, setStep] = useState<'welcome' | 'name' | 'movie' | 'room'>('welcome')
+	const [step, setStep] = useState<'welcome' | 'auth' | 'room' | 'movie'>('welcome')
 	const [movies, setMovies] = useState<Movie[]>([])
-	const [username, setUsername] = useState('')
 	const [rooms, setRooms] = useState<string[]>([])
 	const [isAuthenticated, setIsAuthenticated] = useState(false)
 	const [selectedMovieId, setSelectedMovieId] = useState<number | null>(null)
+	const [authMode, setAuthMode] = useState<'login' | 'register'>('login')
+	const [authData, setAuthData] = useState({
+		username: '',
+		password: '',
+	})
+	const [authError, setAuthError] = useState('')
 
-	// Available movies
+	// Проверка аутентификации
+	const checkAuth = async () => {
+		try {
+			// В реальном приложении здесь должен быть запрос к /auth/check или аналогичному эндпоинту
+			// Для демонстрации просто проверяем наличие кук (в реальном приложении нужен запрос к серверу)
+			const hasAuthCookie = document.cookie.includes('session-id')
+			setIsAuthenticated(hasAuthCookie)
+
+			if (hasAuthCookie && localStorage.getItem('seenWelcomePage')) {
+				setStep('room')
+			}
+		} catch (error) {
+			console.error('Auth check error:', error)
+		}
+	}
+
+	// Загрузка фильмов
 	const fetchMovies = async () => {
 		try {
 			const movies = await apiClient.getMovies()
@@ -28,24 +49,13 @@ const MainV2: React.FC = () => {
 			console.error('Error fetching movies:', error)
 		}
 	}
+
 	useEffect(() => {
 		fetchMovies()
+		checkAuth()
 	}, [])
 
-	// Save current page to session storage
-	useEffect(() => {
-		const currentEndpoint = window.location.pathname
-		sessionStorage.setItem('previousPage', currentEndpoint)
-	}, [])
-
-	// Authentication check
-	useEffect(() => {
-		const token = localStorage.getItem('accessToken')
-		setIsAuthenticated(!!token)
-		if (!token) navigate('/login')
-	}, [navigate])
-
-	// Rooms management
+	// Управление комнатами
 	useEffect(() => {
 		const handleShareRooms = ({ rooms = [] }: { rooms: string[] }) => {
 			setRooms(rooms)
@@ -57,46 +67,52 @@ const MainV2: React.FC = () => {
 		}
 	}, [])
 
-	useEffect(() => {
-		if (localStorage.getItem('seenWelcomePage')) {
-			setStep('name')
-		}
-		if (localStorage.getItem('username')) {
-			// Check if movie is selected
-			const savedMovie = localStorage.getItem('selectedMovie')
-			if (savedMovie) {
-				setSelectedMovieId(Number(savedMovie))
-				setStep('room')
-			} else {
-				setStep('movie')
-			}
-		}
-	}, [])
-
-	const handleNameSubmit = (e: React.FormEvent) => {
+	const handleAuthSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
-		if (username.trim()) {
-			// Store username in localStorage or context
-			localStorage.setItem('username', username)
-			setStep('movie')
+		setAuthError('')
+
+		try {
+			if (authMode === 'login') {
+				await apiClient.login(authData)
+			} else {
+				await apiClient.register(authData)
+			}
+
+			// После успешной аутентификации проверяем статус
+			await checkAuth()
+			setStep('room')
+		} catch (error) {
+			console.error('Authentication error:', error)
+			setAuthError(error instanceof Error ? error.message : 'Authentication failed')
+		}
+	}
+
+	const handleLogout = async () => {
+		try {
+			// В реальном приложении здесь должен быть запрос к /auth/logout
+			// Для демонстрации просто очищаем куки
+			document.cookie = 'session-id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
+			setIsAuthenticated(false)
+			setStep('welcome')
+		} catch (error) {
+			console.error('Logout error:', error)
 		}
 	}
 
 	const handleSelectMovie = (movieId: number) => {
 		setSelectedMovieId(movieId)
-		localStorage.setItem('selectedMovie', String(movieId))
-		setStep('room')
-	}
-
-	const changeMovie = () => {
-		setStep('movie')
+		createRoom()
 	}
 
 	const createRoom = () => {
 		const roomId = v4()
-		const pass = prompt('Enter a password for the room:')
+		const pass = prompt('Enter a password for the room (optional):')
 
-		apiClient.createRoom({ id: roomId, movie: { id: Number(selectedMovieId) }, password: pass ? pass : undefined })
+		apiClient.createRoom({
+			id: roomId,
+			movie: { id: Number(selectedMovieId) },
+			password: pass || undefined,
+		})
 		navigate(`/room/${roomId}`)
 	}
 
@@ -104,15 +120,13 @@ const MainV2: React.FC = () => {
 		navigate(`/room/${roomId}`)
 	}
 
-	if (!isAuthenticated) return null
-	// Move user to next step if welcome page has been seen
+	if (!isAuthenticated && step !== 'welcome' && step !== 'auth') return null
 
 	return (
 		<div className='main-container'>
 			{step === 'welcome' && (
 				<div className='welcome-card'>
 					<h1 className='welcome-title'>Welcome to SyncWatch</h1>
-
 					<div className='welcome-content'>
 						<div className='icon-container'>
 							<svg
@@ -130,21 +144,18 @@ const MainV2: React.FC = () => {
 								/>
 							</svg>
 						</div>
-
 						<p className='welcome-text'>
 							This app allows you to watch videos together with friends, synchronized in real-time.
 						</p>
-
 						<p className='welcome-subtext'>
 							Create a room or join an existing one to start watching together. Everyone in the room will
 							see the same content at the same time.
 						</p>
 					</div>
-
 					<button
 						onClick={() => {
 							localStorage.setItem('seenWelcomePage', 'true')
-							setStep('name')
+							setStep('auth')
 						}}
 						className='primary-button'
 					>
@@ -153,33 +164,97 @@ const MainV2: React.FC = () => {
 				</div>
 			)}
 
-			{step === 'name' && (
+			{step === 'auth' && (
 				<div className='card'>
-					<h2 className='card-title'>Enter Your Name</h2>
-
-					<form onSubmit={handleNameSubmit}>
+					<h2 className='card-title'>{authMode === 'login' ? 'Login' : 'Register'}</h2>
+					{authError && <div className='error-message'>{authError}</div>}
+					<form onSubmit={handleAuthSubmit}>
 						<div className='form-group'>
 							<input
 								type='text'
-								value={username}
-								onChange={e => setUsername(e.target.value)}
-								placeholder='Your display name'
+								value={authData.username}
+								onChange={e => setAuthData({ ...authData, username: e.target.value })}
+								placeholder='Username'
 								className='text-input'
 								required
 							/>
 						</div>
-
+						<div className='form-group'>
+							<input
+								type='password'
+								value={authData.password}
+								onChange={e => setAuthData({ ...authData, password: e.target.value })}
+								placeholder='Password'
+								className='text-input'
+								required
+							/>
+						</div>
 						<button type='submit' className='primary-button'>
-							Continue
+							{authMode === 'login' ? 'Login' : 'Register'}
+						</button>
+						<button
+							type='button'
+							className='secondary-button'
+							onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
+						>
+							{authMode === 'login' ? 'Need an account? Register' : 'Have an account? Login'}
 						</button>
 					</form>
 				</div>
 			)}
 
+			{step === 'room' && (
+				<div className='card'>
+					<div className='auth-status'>
+						<span>Logged in as: {authData.username}</span>
+						<button onClick={handleLogout} className='logout-button'>
+							Logout
+						</button>
+					</div>
+
+					<h2 className='card-title'>Join or Create a Room</h2>
+
+					<div className='create-room-container'>
+						<button onClick={() => setStep('movie')} className='primary-button create-button'>
+							<svg
+								xmlns='http://www.w3.org/2000/svg'
+								className='button-icon'
+								viewBox='0 0 20 20'
+								fill='currentColor'
+							>
+								<path
+									fillRule='evenodd'
+									d='M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z'
+									clipRule='evenodd'
+								/>
+							</svg>
+							Create a New Room
+						</button>
+					</div>
+
+					<div className='rooms-container'>
+						<h3 className='rooms-title'>Available Rooms</h3>
+						{rooms.length > 0 ? (
+							<div className='rooms-list'>
+								{rooms.map(roomID => (
+									<div key={roomID} className='room-item'>
+										<span className='room-id'>{roomID}</span>
+										<button onClick={() => joinRoom(roomID)} className='join-button'>
+											Join
+										</button>
+									</div>
+								))}
+							</div>
+						) : (
+							<div className='no-rooms'>No rooms available</div>
+						)}
+					</div>
+				</div>
+			)}
+
 			{step === 'movie' && (
 				<div className='card movie-selection-card'>
-					<h2 className='card-title'>Select a Movie to Watch</h2>
-
+					<h2 className='card-title'>Select a Movie for Your Room</h2>
 					<div className='movie-grid'>
 						{movies.map(movie => (
 							<div
@@ -214,61 +289,9 @@ const MainV2: React.FC = () => {
 							</div>
 						))}
 					</div>
-				</div>
-			)}
-
-			{step === 'room' && (
-				<div className='card'>
-					<h2 className='card-title'>Join or Create a Room</h2>
-
-					{selectedMovieId && (
-						<div className='selected-movie-info'>
-							<h3>
-								Selected Movie:{' '}
-								{movies.find(movie => movie.id === Number(selectedMovieId))?.title || ''}
-							</h3>
-							<button onClick={changeMovie} className='secondary-button'>
-								Change Movie
-							</button>
-						</div>
-					)}
-
-					<div className='create-room-container'>
-						<button onClick={createRoom} className='primary-button create-button'>
-							<svg
-								xmlns='http://www.w3.org/2000/svg'
-								className='button-icon'
-								viewBox='0 0 20 20'
-								fill='currentColor'
-							>
-								<path
-									fillRule='evenodd'
-									d='M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z'
-									clipRule='evenodd'
-								/>
-							</svg>
-							Create a New Room
-						</button>
-					</div>
-
-					<div className='rooms-container'>
-						<h3 className='rooms-title'>Available Rooms</h3>
-
-						{rooms.length > 0 ? (
-							<div className='rooms-list'>
-								{rooms.map(roomID => (
-									<div key={roomID} className='room-item'>
-										<span className='room-id'>{roomID}</span>
-										<button onClick={() => joinRoom(roomID)} className='join-button'>
-											Join
-										</button>
-									</div>
-								))}
-							</div>
-						) : (
-							<div className='no-rooms'>No rooms available</div>
-						)}
-					</div>
+					<button onClick={() => setStep('room')} className='secondary-button back-button'>
+						Back to Room Selection
+					</button>
 				</div>
 			)}
 		</div>
