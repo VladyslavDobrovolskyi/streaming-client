@@ -763,13 +763,29 @@ export default function RoomPage() {
 	async function fetchMovieInfo() {
 		const roomUUID = new URL(window.location.href).pathname.split('/').pop() || ''
 		const movieID = await apiClient.roomInfo(roomUUID)
+		if (!movieID) {
+			window.location.href = '/'
+			return
+		}
 		const movieInfoResponse = await apiClient.getMovieInfo(Number(movieID))
+		if (!movieInfoResponse) {
+			window.location.href = '/'
+			return
+		}
 		console.log('Movie Info:', movieInfoResponse)
 		setMovieInfo(movieInfoResponse)
 	}
 	async function fetchUserData() {
-		const userInfo = await apiClient.getUserInfo()	
+		const userInfo = await apiClient.getUserInfo()
+		if (!userInfo) {
+			window.location.href = '/'
+			return
+		}
 		const avatar = await apiClient.getAvatar()
+		if (!avatar) {
+			window.location.href = '/'
+			return
+		}
 		console.log('Avatar:', avatar)
 
 		setLocalUsername(userInfo.username)
@@ -777,8 +793,8 @@ export default function RoomPage() {
 	}
 
 	useEffect(() => {
-		fetchUserData()
-		fetchMovieInfo()
+		fetchUserData().catch(() => (window.location.href = '/'))
+		fetchMovieInfo().catch(() => (window.location.href = '/'))
 	}, [])
 
 	useEffect(() => {
