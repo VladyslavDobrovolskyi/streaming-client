@@ -763,10 +763,9 @@ export default function RoomPage() {
 	async function fetchMovieInfo() {
 		const roomUUID = new URL(window.location.href).pathname.split('/').pop() || ''
 		const movieID = await apiClient.roomInfo(roomUUID)
-		console.log(roomUUID)
-		console.log('Movie ID:', movieID)
-
-		setMovieInfo(await apiClient.getMovieInfo(Number(movieID)))
+		const movieInfoResponse = await apiClient.getMovieInfo(Number(movieID))
+		console.log('Movie Info:', movieInfoResponse)
+		setMovieInfo(movieInfoResponse)
 	}
 	async function fetchUserData() {
 		const userInfo = await apiClient.getUserInfo()
