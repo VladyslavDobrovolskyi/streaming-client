@@ -769,11 +769,11 @@ export default function RoomPage() {
 		setMovieInfo(await apiClient.getMovieInfo(Number(movieID)))
 	}
 	async function fetchUserData() {
-		const username = await apiClient.getUserInfo()
+		const userInfo = await apiClient.getUserInfo()
 		const avatar = await apiClient.getAvatar()
 		console.log('Avatar:', avatar)
-		console.log('Username:', username)
-		setLocalUsername(String(username))
+	
+		setLocalUsername(userInfo.username)
 		setAvatar(String(avatar.url))
 	}
 
