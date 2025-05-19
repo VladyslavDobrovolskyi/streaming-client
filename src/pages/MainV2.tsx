@@ -66,9 +66,9 @@ const MainV2 = () => {
 
 		try {
 			if (authMode === 'login') {
-				await apiClient.login(authData)
+				await apiClient.getTicket(authData)
 			} else {
-				await apiClient.register(authData)
+				await apiClient.getTicket(authData)
 			}
 
 			// После успешной аутентификации сервер установит куки
