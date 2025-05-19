@@ -16,7 +16,7 @@ function App() {
 					<Route path='/' element={<MainV2 />} />
 					<Route path='/login' element={<LoginPage />} />
 					<Route path='/registration' element={<RegistrationPage />} />
-					<Route path='/join/:id' element={<JoinRoomPage />} />
+					<Route path='/join/:roomId' element={<JoinRoomPage />} />
 					<Route path='/room/:id' element={<RoomPage />} />
 				</Routes>
 			</BrowserRouter>
