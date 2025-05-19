@@ -816,6 +816,7 @@ export default function RoomPage() {
 			return
 		}
 	}
+
 	// async function joinRoom(pass?: string) {
 	// 	const roomUUID = new URL(window.location.href).pathname.split('/').pop() || ''
 	// 	if (!pass) {
@@ -844,6 +845,14 @@ export default function RoomPage() {
 			emitInfoSync(localUsername, avatar, isCameraDisabled, isMicrophoneDisabled)
 		}
 	}, [roomID, localUsername, avatar, emitInfoSync, isCameraDisabled, isMicrophoneDisabled])
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+			apiClient.continueSeance()
+		}, 300000) // 300000 milliseconds = 5 minutes
+
+		return () => clearInterval(interval)
+	}, [])
 
 	useEffect(() => {
 		const newUnreadMessages: Record<string, number> = {}

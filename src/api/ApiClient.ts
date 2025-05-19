@@ -38,7 +38,7 @@ export class ApiClient {
 	 */
 	private async request<T>(
 		endpoint: string,
-		method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+		method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
 		body?: unknown,
 		options: RequestInit = {}
 	): Promise<T> {
@@ -106,6 +106,10 @@ export class ApiClient {
 			room: { id: data.roomUUID },
 			movie: { id: data.movieID },
 		})
+	}
+
+	async continueSeance() {
+		return await this.request('/seances/continue', 'PATCH')
 	}
 	async handshakeSeance(data: { roomUUID: string }) {
 		return await this.request<{ status: boolean }>(`/seances/handshake/${data.roomUUID}`, 'GET')
