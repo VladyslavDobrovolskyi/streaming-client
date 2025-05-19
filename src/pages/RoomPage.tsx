@@ -791,6 +791,17 @@ export default function RoomPage() {
 		setAvatar(String(avatar.url))
 	}
 
+	async function amIAuthorized() {
+		try {
+			const response = await apiClient.getUserInfo()
+			if (response) {
+				return true
+			}
+		} catch {
+			window.location.href = '/'
+		}
+	}
+
 	async function joinRoom(pass?: string) {
 		const roomUUID = new URL(window.location.href).pathname.split('/').pop() || ''
 		if (!pass) {
@@ -803,8 +814,9 @@ export default function RoomPage() {
 	}
 
 	useEffect(() => {
-		fetchUserData().catch(() => (window.location.href = '/'))
-		fetchMovieInfo().catch(() => (window.location.href = '/'))
+		amIAuthorized()
+		fetchUserData()
+		fetchMovieInfo()
 		joinRoom().catch(() => {
 			const pass = prompt('Enter the password to join the room:')
 			if (pass) {
