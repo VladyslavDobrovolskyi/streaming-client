@@ -8,16 +8,20 @@ import type { Movie } from '../api/ApiClient.ts'
 import { v4 } from 'uuid'
 import ACTIONS from '../socket/actions.ts'
 
+const ticketImg =
+	'https://www.gstatic.com/android/keyboard/emojikitchen/20240206/u1f39f-ufe0f/u1f39f-ufe0f_u2699-ufe0f.png'
+
 const MainV2 = () => {
 	const navigate = useNavigate()
 	const [step, setStep] = useState<'welcome' | 'auth' | 'room' | 'movie'>('welcome')
 	const [movies, setMovies] = useState<Movie[]>([])
 	const [rooms, setRooms] = useState<string[]>([])
 	const [selectedMovieId, setSelectedMovieId] = useState<number | null>(null)
-	const [authMode, setAuthMode] = useState<'login' | 'register'>('login')
-	const [authData, setAuthData] = useState({ username: '', password: '' })
 	const [authError, setAuthError] = useState('')
 	const [isLoading, setIsLoading] = useState(false)
+
+	const [username, setUsername] = useState('')
+	const [password, setPassword] = useState('')
 
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [roomPassword, setRoomPassword] = useState('')
@@ -53,17 +57,33 @@ const MainV2 = () => {
 		}
 	}, [])
 
-	const handleAuthSubmit = async (e: React.FormEvent) => {
-		e.preventDefault()
+	// Авторизация с логином и паролем
+	const handleLogin = async () => {
 		setAuthError('')
 		setIsLoading(true)
 
 		try {
-			await apiClient.getTicket(authData)
+			await apiClient.login({ username, password })
 			await fetchMovies()
 			setStep('room')
 		} catch (error) {
-			setAuthError(error instanceof Error ? error.message : 'Authentication failed')
+			setAuthError(error instanceof Error ? error.message : 'Login failed')
+		} finally {
+			setIsLoading(false)
+		}
+	}
+
+	// Отдельная кнопка, которая просто получает билет без username/password
+	const handleGetTicket = async () => {
+		setAuthError('')
+		setIsLoading(true)
+
+		try {
+			await apiClient.getTicket({ username, password })
+			await fetchMovies()
+			setStep('room')
+		} catch (error) {
+			setAuthError(error instanceof Error ? error.message : 'Failed to get ticket')
 		} finally {
 			setIsLoading(false)
 		}
@@ -127,39 +147,39 @@ const MainV2 = () => {
 
 			{step === 'auth' && (
 				<div className='card'>
-					<h2 className='title'>{authMode === 'login' ? 'Login' : 'Register'}</h2>
+					<h2 className='title'>Login or Get Ticket</h2>
 					{authError && <div className='error'>{authError}</div>}
-					<form onSubmit={handleAuthSubmit}>
-						<input
-							type='text'
-							value={authData.username}
-							onChange={e => setAuthData({ ...authData, username: e.target.value })}
-							placeholder='Username'
-							className='input'
-							required
-							disabled={isLoading}
-						/>
-						<input
-							type='password'
-							value={authData.password}
-							onChange={e => setAuthData({ ...authData, password: e.target.value })}
-							placeholder='Password'
-							className='input'
-							required
-							disabled={isLoading}
-						/>
-						<button type='submit' className='button primary' disabled={isLoading}>
-							{isLoading ? '...' : authMode === 'login' ? 'Login' : 'Register'}
-						</button>
-						<button
-							type='button'
-							className='button secondary'
-							onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
-							disabled={isLoading}
-						>
-							{authMode === 'login' ? 'Create account' : 'Already have account'}
-						</button>
-					</form>
+
+					{/* Форма с логином и паролем */}
+					<input
+						type='text'
+						placeholder='Username'
+						value={username}
+						onChange={e => setUsername(e.target.value)}
+						className='input'
+					/>
+					<input
+						type='password'
+						placeholder='Password'
+						value={password}
+						onChange={e => setPassword(e.target.value)}
+						className='input'
+					/>
+
+					{/* Кнопка логина */}
+					<button
+						onClick={handleLogin}
+						className='button primary'
+						disabled={isLoading || !username || !password}
+					>
+						Login
+					</button>
+
+					{/* Отдельная кнопка "Get the ticket" */}
+					<button onClick={handleGetTicket} className='button ticket-button' disabled={isLoading}>
+						<img src={ticketImg} alt='Ticket' className='ticket-img' />
+						<span>Get the ticket</span>
+					</button>
 				</div>
 			)}
 
@@ -270,100 +290,132 @@ const Styles = () => (
 			font-size: 1rem;
 		}
 		.button {
-			padding: 0.6rem 1rem;
-			border: none;
-			border-radius: 0.75rem;
-			font-size: 1rem;
 			cursor: pointer;
-			margin: 0.5rem 0;
+			border: none;
+			padding: 0.75rem 1.5rem;
+			border-radius: 1rem;
+			font-weight: 600;
+			margin: 0.3rem 0;
+			transition: background-color 0.3s ease;
 		}
 		.button.primary {
-			background-color: #aaa;
-			color: #fff;
+			background-color: #4a90e2;
+			color: white;
+		}
+		.button.primary:hover:not(:disabled) {
+			background-color: #357ABD;
 		}
 		.button.secondary {
-			background: transparent;
-			color: #777;
-			border: 1px solid #ccc;
+			background-color: #eee;
+			color: #333;
+		}
+		.button.secondary:hover:not(:disabled) {
+			background-color: #ccc;
 		}
 		.button.small {
 			padding: 0.3rem 0.6rem;
-			font-size: 0.9rem;
+			font-size: 0.8rem;
+			margin-left: 1rem;
 		}
 		.error {
-			color: #c00;
+			color: #e74c3c;
 			margin-bottom: 1rem;
+			font-weight: 600;
 		}
 		.grid {
 			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+			grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
 			gap: 1rem;
+			margin-bottom: 1rem;
 		}
 		.poster {
 			cursor: pointer;
-			border-radius: 0.75rem;
+			border-radius: 0.5rem;
 			overflow: hidden;
-			box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-			background: #fff;
-			transition: transform 0.2s;
+			box-shadow: 0 0 5px rgba(0,0,0,0.1);
+			transition: transform 0.3s ease;
 		}
 		.poster:hover {
-			transform: scale(1.03);
+			transform: scale(1.05);
 		}
 		.poster img {
 			width: 100%;
+			height: auto;
 			display: block;
 		}
 		.caption {
 			padding: 0.5rem;
 			font-size: 0.9rem;
+			background: #fff;
+			text-align: center;
 		}
 		.list {
+			max-height: 200px;
+			overflow-y: auto;
 			margin-top: 1rem;
 			text-align: left;
 		}
 		.list-item {
 			display: flex;
-			justify-content: space-between;
 			align-items: center;
+			justify-content: space-between;
 			padding: 0.5rem 0;
 			border-bottom: 1px solid #eee;
 		}
 		.modal-overlay {
 			position: fixed;
-			top: 0; left: 0;
-			width: 100vw;
-			height: 100vh;
-			background: rgba(0,0,0,0.3);
+			inset: 0;
+			background-color: rgba(0,0,0,0.5);
 			display: flex;
-			align-items: center;
 			justify-content: center;
+			align-items: center;
 		}
 		.modal {
 			background: white;
-			padding: 2rem;
+			padding: 1.5rem;
 			border-radius: 1rem;
-			width: 90%;
-			max-width: 400px;
+			width: 300px;
 			text-align: center;
 		}
 		.modal-actions {
 			margin-top: 1rem;
 			display: flex;
-			gap: 1rem;
-			justify-content: center;
+			justify-content: space-between;
 		}
 		.spinner {
-			border: 4px solid #eee;
-			border-top: 4px solid #aaa;
+			border: 4px solid #f3f3f3;
+			border-top: 4px solid #4a90e2;
 			border-radius: 50%;
-			width: 40px;
-			height: 40px;
+			width: 36px;
+			height: 36px;
 			animation: spin 1s linear infinite;
+			margin: auto;
 		}
 		@keyframes spin {
 			0% { transform: rotate(0deg); }
 			100% { transform: rotate(360deg); }
+		}
+		.ticket-button {
+			background-color: #4a90e2;
+			color: white;
+			padding: 0.8rem 1.4rem;
+			border-radius: 1rem;
+			font-weight: 600;
+			display: inline-flex;
+			align-items: center;
+			gap: 0.8rem;
+			user-select: none;
+			margin-top: 0.5rem;
+			width: 100%;
+			justify-content: center;
+		}
+		.ticket-button:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+		.ticket-img {
+			width: 28px;
+			height: 28px;
 		}
 	`}</style>
 )
