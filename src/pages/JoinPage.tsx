@@ -51,9 +51,9 @@ const JoinRoomPage = () => {
 
 		try {
 			if (authMode === 'login') {
-				await apiClient.login(authData)
+				await apiClient.getTicket(authData)
 			} else {
-				await apiClient.register(authData)
+				await apiClient.getTicket(authData)
 			}
 
 			// После успешной аутентификации проверяем пароль комнаты
@@ -85,7 +85,7 @@ const JoinRoomPage = () => {
 		}
 
 		checkRoomOwnership()
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 
 	const handleRoomJoin = async (e?: React.FormEvent) => {

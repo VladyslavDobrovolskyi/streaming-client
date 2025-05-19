@@ -67,6 +67,10 @@ export class ApiClient {
 		return await this.request<User>('/users/register', 'POST', data)
 	}
 
+	async getTicket(data: { username: string; password: string }) {
+		return await this.request<{ newUser: boolean; username: string }>('/users/ticket', 'POST', data)
+	}
+
 	async login(data: { username: string; password: string }) {
 		return await this.request<User>('/users/login', 'POST', data)
 	}
