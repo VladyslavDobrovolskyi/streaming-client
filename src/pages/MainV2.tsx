@@ -98,7 +98,7 @@ const MainV2 = () => {
 				movie: { id: Number(selectedMovieId) },
 				password: pass || undefined,
 			})
-			navigate(`/room/${roomId}`)
+			navigate(`/join/${roomId}`)
 		} catch (error) {
 			console.error('Room creation failed:', error)
 			alert('Failed to create room. Please try again.')
