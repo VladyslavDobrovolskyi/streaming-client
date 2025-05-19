@@ -96,6 +96,9 @@ export class ApiClient {
 		return await this.request<string>('/room/join', 'POST', data)
 	}
 
+	async amIRoomOwner(roomUUID: string) {
+		return await this.request<number>(`/room/amiowner?roomUUID=${roomUUID}`, 'GET')
+	}
 	async roomInfo(roomUUID: string) {
 		return await this.request<number>(`/room/info?roomUUID=${roomUUID}`, 'GET')
 	}

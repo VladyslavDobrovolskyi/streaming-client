@@ -70,13 +70,22 @@ const JoinRoomPage = () => {
 		setError('')
 		setIsLoading(true)
 
+		const isOwner = await apiClient.amIRoomOwner(roomId!)
+		const movieId = await apiClient.roomInfo(roomId!)
+
+		if (isOwner) {
+			await apiClient.openSeance({
+				roomUUID: roomId!,
+				movieID: movieId,
+			})
+			navigate(`/room/${roomId}`)
+		}
+
 		try {
 			await apiClient.joinRoom({
 				roomUUID: roomId!,
 				password: roomPassword || undefined,
 			})
-
-			const movieId = await apiClient.roomInfo(roomId!)
 
 			await apiClient.openSeance({
 				roomUUID: roomId!,
