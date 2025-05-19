@@ -76,6 +76,13 @@ const JoinRoomPage = () => {
 				password: roomPassword || undefined,
 			})
 
+			const movieId = await apiClient.roomInfo(roomId!)
+
+			await apiClient.openSeance({
+				roomUUID: roomId!,
+				movieID: movieId,
+			})
+
 			// Успешное подключение - переходим в комнату
 			navigate(`/room/${roomId}`)
 		} catch (err) {

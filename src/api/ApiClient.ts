@@ -97,7 +97,7 @@ export class ApiClient {
 	}
 
 	async roomInfo(roomUUID: string) {
-		return await this.request<Room>(`/room/info?roomUUID=${roomUUID}`, 'GET')
+		return await this.request<number>(`/room/info?roomUUID=${roomUUID}`, 'GET')
 	}
 	// === Методы для сеансов ===
 
