@@ -23,14 +23,17 @@ const MainV2 = () => {
 	const [authError, setAuthError] = useState('')
 	const [isLoading, setIsLoading] = useState(false)
 
-	// Загрузка фильмов (доступно только аутентифицированным)
+	// Modal state
+	const [isModalOpen, setIsModalOpen] = useState(false)
+	const [roomPassword, setRoomPassword] = useState('')
+	const [pendingRoomId, setPendingRoomId] = useState<string | null>(null)
+
 	const fetchMovies = async () => {
 		try {
 			const movies = await apiClient.getMovies()
 			setMovies(movies)
 		} catch (error) {
 			console.error('Error fetching movies:', error)
-			// Если ошибка 401 - куки невалидные
 			if ((error as Error).message.includes('401')) {
 				setStep('auth')
 			}
@@ -38,16 +41,12 @@ const MainV2 = () => {
 	}
 
 	useEffect(() => {
-		// Проверяем, видел ли пользователь welcome-экран
 		if (localStorage.getItem('seenWelcomePage')) {
 			setStep('auth')
 		}
-
-		// Загружаем фильмы если пользователь уже аутентифицирован
 		fetchMovies()
 	}, [])
 
-	// Управление комнатами
 	useEffect(() => {
 		const handleShareRooms = ({ rooms = [] }: { rooms: string[] }) => {
 			setRooms(rooms)
@@ -65,13 +64,7 @@ const MainV2 = () => {
 		setIsLoading(true)
 
 		try {
-			if (authMode === 'login') {
-				await apiClient.getTicket(authData)
-			} else {
-				await apiClient.getTicket(authData)
-			}
-
-			// После успешной аутентификации сервер установит куки
+			await apiClient.getTicket(authData)
 			await fetchMovies()
 			setStep('room')
 		} catch (error) {
@@ -83,22 +76,23 @@ const MainV2 = () => {
 
 	const handleSelectMovie = (movieId: number) => {
 		setSelectedMovieId(movieId)
-		createRoom()
+		const newRoomId = v4()
+		setPendingRoomId(newRoomId)
+		setIsModalOpen(true)
 	}
 
-	const createRoom = async () => {
-		if (!selectedMovieId) return
-
-		const roomId = v4()
-		const pass = prompt('Enter a password for the room (optional):')
+	const confirmCreateRoom = async () => {
+		if (!selectedMovieId || !pendingRoomId) return
 
 		try {
 			await apiClient.createRoom({
-				id: roomId,
-				movie: { id: Number(selectedMovieId) },
-				password: pass || undefined,
+				id: pendingRoomId,
+				movie: { id: selectedMovieId },
+				password: roomPassword || undefined,
 			})
-			navigate(`/join/${roomId}`)
+			setIsModalOpen(false)
+			setRoomPassword('')
+			navigate(`/join/${pendingRoomId}`)
 		} catch (error) {
 			console.error('Room creation failed:', error)
 			alert('Failed to create room. Please try again.')
@@ -209,6 +203,36 @@ const MainV2 = () => {
 					<button onClick={() => setStep('room')} className='secondary-button'>
 						Back
 					</button>
+				</div>
+			)}
+
+			{isModalOpen && (
+				<div className='modal-overlay'>
+					<div className='modal'>
+						<h3>Set Room Password (optional)</h3>
+						<input
+							type='text'
+							value={roomPassword}
+							onChange={e => setRoomPassword(e.target.value)}
+							placeholder='Enter password...'
+							className='text-input'
+						/>
+						<div className='modal-actions'>
+							<button className='primary-button' onClick={confirmCreateRoom}>
+								Create Room
+							</button>
+							<button
+								className='secondary-button'
+								onClick={() => {
+									setIsModalOpen(false)
+									setRoomPassword('')
+									setPendingRoomId(null)
+								}}
+							>
+								Cancel
+							</button>
+						</div>
+					</div>
 				</div>
 			)}
 		</div>
