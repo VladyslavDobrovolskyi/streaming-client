@@ -5,6 +5,7 @@ import MainV2 from './pages/MainV2'
 import LoginPage from './pages/LoginPage'
 import RegistrationPage from './pages/RegistrationPage'
 import RoomPage from './pages/RoomPage'
+import JoinRoomPage from './pages/JoinPage'
 
 function App() {
 	return (
@@ -15,6 +16,7 @@ function App() {
 					<Route path='/' element={<MainV2 />} />
 					<Route path='/login' element={<LoginPage />} />
 					<Route path='/registration' element={<RegistrationPage />} />
+					<Route path='/join/:id' element={<JoinRoomPage />} />
 					<Route path='/room/:id' element={<RoomPage />} />
 				</Routes>
 			</BrowserRouter>
