@@ -71,6 +71,7 @@ const JoinRoomPage = () => {
 		setIsLoading(true)
 
 		const isOwner = await apiClient.amIRoomOwner(roomId!)
+		console.log('isOwner', isOwner)
 		const movieId = await apiClient.roomInfo(roomId!)
 
 		if (isOwner) {
