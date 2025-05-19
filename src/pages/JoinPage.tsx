@@ -64,25 +64,38 @@ const JoinRoomPage = () => {
 			setIsLoading(false)
 		}
 	}
+	useEffect(() => {
+		const checkRoomOwnership = async () => {
+			try {
+				const isOwner = await apiClient.amIRoomOwner(roomId!)
+				console.log('isOwner', isOwner)
+
+				if (isOwner) {
+					const movieId = await apiClient.roomInfo(roomId!)
+
+					await apiClient.openSeance({
+						roomUUID: roomId!,
+						movieID: movieId,
+					})
+					navigate(`/room/${roomId}`)
+				}
+			} catch (error) {
+				console.error('Failed to check room ownership:', error)
+			}
+		}
+
+		checkRoomOwnership()
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 
 	const handleRoomJoin = async (e?: React.FormEvent) => {
 		e?.preventDefault()
 		setError('')
 		setIsLoading(true)
 
-		const isOwner = await apiClient.amIRoomOwner(roomId!)
-		console.log('isOwner', isOwner)
-		const movieId = await apiClient.roomInfo(roomId!)
-
-		if (isOwner) {
-			await apiClient.openSeance({
-				roomUUID: roomId!,
-				movieID: movieId,
-			})
-			navigate(`/room/${roomId}`)
-		}
-
 		try {
+			const movieId = await apiClient.roomInfo(roomId!)
+
 			await apiClient.joinRoom({
 				roomUUID: roomId!,
 				password: roomPassword || undefined,
