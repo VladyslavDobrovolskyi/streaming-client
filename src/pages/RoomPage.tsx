@@ -802,6 +802,20 @@ export default function RoomPage() {
 		}
 	}
 
+	async function handshakeSeance() {
+		const roomUUID = new URL(window.location.href).pathname.split('/').pop() || ''
+		const response = await apiClient.handshakeSeance({ roomUUID: roomUUID })
+
+		if (!response) {
+			window.location.href = '/'
+			return
+		}
+
+		if (response.status === false) {
+			window.location.href = '/'
+			return
+		}
+	}
 	// async function joinRoom(pass?: string) {
 	// 	const roomUUID = new URL(window.location.href).pathname.split('/').pop() || ''
 	// 	if (!pass) {
@@ -815,10 +829,9 @@ export default function RoomPage() {
 
 	useEffect(() => {
 		amIAuthorized()
+		handshakeSeance()
 		fetchUserData()
 		fetchMovieInfo()
-		
-		
 	}, [])
 
 	useEffect(() => {

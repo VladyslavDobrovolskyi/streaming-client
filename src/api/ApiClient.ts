@@ -107,6 +107,9 @@ export class ApiClient {
 			movie: { id: data.movieID },
 		})
 	}
+	async handshakeSeance(data: { roomUUID: string }) {
+		return await this.request<{ status: boolean }>(`/seances/handshake/${data.roomUUID}`, 'GET')
+	}
 
 	async closeSeance() {
 		return await this.request(`/seances/close`, 'DELETE')
