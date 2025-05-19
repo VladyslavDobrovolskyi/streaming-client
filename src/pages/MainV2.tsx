@@ -106,7 +106,7 @@ const MainV2 = () => {
 	}
 
 	const joinRoom = (roomId: string) => {
-		navigate(`/room/${roomId}`)
+		navigate(`/join/${roomId}`)
 	}
 
 	if (isLoading) {
