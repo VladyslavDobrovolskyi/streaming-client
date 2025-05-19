@@ -3,7 +3,103 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { apiClient } from '../api/ApiClient.ts'
-import './mainv2.css'
+
+const styles = {
+	mainContainer: {
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+		height: '100vh',
+		backgroundColor: '#121212',
+		fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+		padding: '1rem',
+	},
+	card: {
+		backgroundColor: '#1f1f1f',
+		borderRadius: '12px',
+		padding: '2rem 2.5rem',
+		boxShadow: '0 4px 15px rgba(0, 0, 0, 0.7)',
+		width: '100%',
+		maxWidth: 420,
+		color: '#eeeeee',
+		display: 'flex',
+		flexDirection: 'column' as const,
+		gap: '1.2rem',
+	},
+	errorCard: {
+		border: '2px solid #ff4c4c',
+		backgroundColor: '#330000',
+		color: '#ff4c4c',
+	},
+	cardTitle: {
+		fontSize: '1.75rem',
+		fontWeight: 700,
+		marginBottom: '1rem',
+		textAlign: 'center' as const,
+		color: '#fafafa',
+	},
+	errorMessage: {
+		backgroundColor: '#ff4c4c',
+		color: '#fff',
+		padding: '0.7rem 1rem',
+		borderRadius: 6,
+		fontWeight: 600,
+		textAlign: 'center' as const,
+	},
+	textInput: {
+		width: '100%',
+		padding: '0.8rem 1rem',
+		borderRadius: 8,
+		border: 'none',
+		outline: 'none',
+		fontSize: '1rem',
+		backgroundColor: '#2a2a2a',
+		color: '#fafafa',
+		transition: 'background 0.3s ease',
+		marginBottom: '1rem',
+	},
+	textInputFocus: {
+		backgroundColor: '#3a3a3a',
+		boxShadow: '0 0 6px #3a86ff',
+	},
+	primaryButton: {
+		backgroundColor: '#3a86ff',
+		color: 'white',
+		border: 'none',
+		padding: '0.85rem 1rem',
+		borderRadius: 8,
+		fontWeight: 600,
+		fontSize: '1.1rem',
+		cursor: 'pointer',
+		transition: 'background 0.25s ease',
+		marginBottom: '0.5rem',
+	},
+	secondaryButton: {
+		backgroundColor: 'transparent',
+		color: '#3a86ff',
+		border: 'none',
+		cursor: 'pointer',
+		fontWeight: 600,
+		fontSize: '1rem',
+		textDecoration: 'underline',
+	},
+	loadingSpinner: {
+		width: 48,
+		height: 48,
+		border: '5px solid #3a86ff',
+		borderTop: '5px solid transparent',
+		borderRadius: '50%',
+		animation: 'spin 1s linear infinite',
+	},
+}
+
+// Добавим keyframes для спиннера
+const spinnerStyle = `
+@keyframes spin {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
+}
+`
 
 const JoinRoomPage = () => {
 	const navigate = useNavigate()
@@ -18,7 +114,6 @@ const JoinRoomPage = () => {
 	const [error, setError] = useState('')
 	const [isLoading, setIsLoading] = useState(false)
 
-	// Проверяем валидность roomId при загрузке
 	useEffect(() => {
 		if (!roomId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(roomId)) {
 			setError('Invalid room ID')
@@ -26,15 +121,12 @@ const JoinRoomPage = () => {
 		}
 	}, [roomId])
 
-	// Проверяем авторизацию пользователя
 	useEffect(() => {
 		const checkAuth = async () => {
 			try {
 				await apiClient.getUserInfo()
-				// Если пользователь уже авторизован, проверяем пароль комнаты
 				setStep('password')
 			} catch {
-				// Пользователь не авторизован - показываем форму входа
 				setStep('auth')
 			}
 		}
@@ -50,13 +142,8 @@ const JoinRoomPage = () => {
 		setIsLoading(true)
 
 		try {
-			if (authMode === 'login') {
-				await apiClient.getTicket(authData)
-			} else {
-				await apiClient.getTicket(authData)
-			}
+			await apiClient.getTicket(authData) // одинаково для login и register?
 
-			// После успешной аутентификации проверяем пароль комнаты
 			setStep('password')
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Authentication failed')
@@ -64,15 +151,13 @@ const JoinRoomPage = () => {
 			setIsLoading(false)
 		}
 	}
+
 	useEffect(() => {
 		const checkRoomOwnership = async () => {
 			try {
 				const isOwner = await apiClient.amIRoomOwner(roomId!)
-				console.log('isOwner', isOwner)
-
 				if (isOwner) {
 					const movieId = await apiClient.roomInfo(roomId!)
-
 					await apiClient.openSeance({
 						roomUUID: roomId!,
 						movieID: movieId,
@@ -83,10 +168,8 @@ const JoinRoomPage = () => {
 				console.error('Failed to check room ownership:', error)
 			}
 		}
-
 		checkRoomOwnership()
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [])
+	}, [navigate, roomId])
 
 	const handleRoomJoin = async (e?: React.FormEvent) => {
 		e?.preventDefault()
@@ -106,7 +189,6 @@ const JoinRoomPage = () => {
 				movieID: movieId,
 			})
 
-			// Успешное подключение - переходим в комнату
 			navigate(`/room/${roomId}`)
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Failed to join room')
@@ -117,90 +199,107 @@ const JoinRoomPage = () => {
 
 	if (step === 'error') {
 		return (
-			<div className='main-container'>
-				<div className='card error-card'>
-					<h2>Error</h2>
-					<p>{error || 'Invalid room link'}</p>
-					<button onClick={() => navigate('/')} className='primary-button'>
-						Go to Home
-					</button>
+			<>
+				<style>{spinnerStyle}</style>
+				<div style={styles.mainContainer}>
+					<div style={{ ...styles.card, ...styles.errorCard }}>
+						<h2 style={styles.cardTitle}>Error</h2>
+						<p>{error || 'Invalid room link'}</p>
+						<button style={styles.primaryButton} onClick={() => navigate('/')} disabled={isLoading}>
+							Go to Home
+						</button>
+					</div>
 				</div>
-			</div>
+			</>
 		)
 	}
 
 	if (step === 'loading') {
 		return (
-			<div className='main-container'>
-				<div className='loading-spinner'></div>
-			</div>
+			<>
+				<style>{spinnerStyle}</style>
+				<div style={styles.mainContainer}>
+					<div style={styles.loadingSpinner}></div>
+				</div>
+			</>
 		)
 	}
 
 	if (step === 'auth') {
 		return (
-			<div className='main-container'>
-				<div className='card'>
-					<h2 className='card-title'>{authMode === 'login' ? 'Login to Join Room' : 'Create Account'}</h2>
-					{error && <div className='error-message'>{error}</div>}
-					<form onSubmit={handleAuthSubmit}>
-						<input
-							type='text'
-							value={authData.username}
-							onChange={e => setAuthData({ ...authData, username: e.target.value })}
-							placeholder='Username'
-							className='text-input'
-							required
-							disabled={isLoading}
-						/>
-						<input
-							type='password'
-							value={authData.password}
-							onChange={e => setAuthData({ ...authData, password: e.target.value })}
-							placeholder='Password'
-							className='text-input'
-							required
-							disabled={isLoading}
-						/>
-						<button type='submit' className='primary-button' disabled={isLoading}>
-							{isLoading ? '...' : authMode === 'login' ? 'Login' : 'Register'}
-						</button>
-						<button
-							type='button'
-							className='secondary-button'
-							onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
-							disabled={isLoading}
-						>
-							{authMode === 'login' ? 'Create account' : 'Already have account'}
-						</button>
-					</form>
+			<>
+				<style>{spinnerStyle}</style>
+				<div style={styles.mainContainer}>
+					<div style={styles.card}>
+						<h2 style={styles.cardTitle}>
+							{authMode === 'login' ? 'Login to Join Room' : 'Create Account'}
+						</h2>
+						{error && <div style={styles.errorMessage}>{error}</div>}
+						<form onSubmit={handleAuthSubmit}>
+							<input
+								type='text'
+								value={authData.username}
+								onChange={e => setAuthData({ ...authData, username: e.target.value })}
+								placeholder='Username'
+								style={styles.textInput}
+								required
+								disabled={isLoading}
+								autoComplete='username'
+							/>
+							<input
+								type='password'
+								value={authData.password}
+								onChange={e => setAuthData({ ...authData, password: e.target.value })}
+								placeholder='Password'
+								style={styles.textInput}
+								required
+								disabled={isLoading}
+								autoComplete={authMode === 'login' ? 'current-password' : 'new-password'}
+							/>
+							<button type='submit' style={styles.primaryButton} disabled={isLoading}>
+								{isLoading ? '...' : authMode === 'login' ? 'Login' : 'Register'}
+							</button>
+							<button
+								type='button'
+								style={styles.secondaryButton}
+								onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
+								disabled={isLoading}
+							>
+								{authMode === 'login' ? 'Create account' : 'Already have account'}
+							</button>
+						</form>
+					</div>
 				</div>
-			</div>
+			</>
 		)
 	}
 
 	if (step === 'password') {
 		return (
-			<div className='main-container'>
-				<div className='card'>
-					<h2 className='card-title'>Join Room</h2>
-					<p>You're joining room: {roomId}</p>
-					{error && <div className='error-message'>{error}</div>}
-					<form onSubmit={handleRoomJoin}>
-						<input
-							type='password'
-							value={roomPassword}
-							onChange={e => setRoomPassword(e.target.value)}
-							placeholder='Room password (if required)'
-							className='text-input'
-							disabled={isLoading}
-						/>
-						<button type='submit' className='primary-button' disabled={isLoading}>
-							{isLoading ? 'Joining...' : 'Join Room'}
-						</button>
-					</form>
+			<>
+				<style>{spinnerStyle}</style>
+				<div style={styles.mainContainer}>
+					<div style={styles.card}>
+						<h2 style={styles.cardTitle}>Join Room</h2>
+						<p>You're joining room: {roomId}</p>
+						{error && <div style={styles.errorMessage}>{error}</div>}
+						<form onSubmit={handleRoomJoin}>
+							<input
+								type='password'
+								value={roomPassword}
+								onChange={e => setRoomPassword(e.target.value)}
+								placeholder='Room password (if required)'
+								style={styles.textInput}
+								disabled={isLoading}
+								autoComplete='off'
+							/>
+							<button type='submit' style={styles.primaryButton} disabled={isLoading}>
+								{isLoading ? 'Joining...' : 'Join Room'}
+							</button>
+						</form>
+					</div>
 				</div>
-			</div>
+			</>
 		)
 	}
 
