@@ -1058,7 +1058,7 @@ export default function RoomPage() {
 				<ReactPlayer
 					ref={playerRef}
 					className='react-player'
-					url={`https://watchtogether.fun/movies/${movieInfo.title}/segments.m3u8`}
+					url={`${movieInfo.resource}`}
 					controls={false}
 					playing={isPlaying}
 					volume={volume}
