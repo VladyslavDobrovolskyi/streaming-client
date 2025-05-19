@@ -1,112 +1,12 @@
 'use client'
 
+import type React from 'react'
+
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { apiClient } from '../api/ApiClient.ts'
 
-const styles = {
-	mainContainer: {
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'center',
-		height: '100vh',
-		backgroundColor: '#121212',
-		fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-		padding: '1rem',
-	},
-	card: {
-		backgroundColor: '#1f1f1f',
-		borderRadius: '12px',
-		padding: '2rem 2.5rem',
-		boxShadow: '0 4px 15px rgba(0, 0, 0, 0.7)',
-		width: '100%',
-		maxWidth: 420,
-		color: '#eeeeee',
-		display: 'flex',
-		flexDirection: 'column' as const,
-		gap: '1.2rem',
-	},
-	errorCard: {
-		border: '2px solid #ff4c4c',
-		backgroundColor: '#330000',
-		color: '#ff4c4c',
-	},
-	cardTitle: {
-		fontSize: '1.75rem',
-		fontWeight: 700,
-		marginBottom: '1rem',
-		textAlign: 'center' as const,
-		color: '#fafafa',
-	},
-	errorMessage: {
-		backgroundColor: '#ff4c4c',
-		color: '#fff',
-		padding: '0.7rem 1rem',
-		borderRadius: 6,
-		fontWeight: 600,
-		textAlign: 'center' as const,
-	},
-	textInput: {
-		width: '100%',
-		padding: '0.8rem 1rem',
-		borderRadius: 8,
-		border: 'none',
-		outline: 'none',
-		fontSize: '1rem',
-		backgroundColor: '#2a2a2a',
-		color: '#fafafa',
-		transition: 'background 0.3s ease',
-		marginBottom: '1rem',
-	},
-	textInputFocus: {
-		backgroundColor: '#3a3a3a',
-		boxShadow: '0 0 6px #3a86ff',
-	},
-	primaryButton: {
-		backgroundColor: '#3a86ff',
-		color: 'white',
-		border: 'none',
-		padding: '0.85rem 1rem',
-		borderRadius: 8,
-		fontWeight: 600,
-		fontSize: '1.1rem',
-		cursor: 'pointer',
-		transition: 'background 0.25s ease',
-		marginBottom: '0.5rem',
-	},
-	primaryButtonDisabled: {
-		backgroundColor: '#5a98ff',
-		cursor: 'not-allowed',
-	},
-	secondaryButton: {
-		backgroundColor: 'transparent',
-		color: '#3a86ff',
-		border: 'none',
-		cursor: 'pointer',
-		fontWeight: 600,
-		fontSize: '1rem',
-		textDecoration: 'underline',
-	},
-	loadingSpinner: {
-		width: 48,
-		height: 48,
-		border: '5px solid #3a86ff',
-		borderTop: '5px solid transparent',
-		borderRadius: '50%',
-		animation: 'spin 1s linear infinite',
-		margin: 'auto',
-	},
-}
-
-// Спиннер — CSS анимация
-const spinnerStyle = `
-@keyframes spin {
-  0% { transform: rotate(0deg);}
-  100% { transform: rotate(360deg);}
-}
-`
-
-const JoinRoomPage = () => {
+const JoinPage = () => {
 	const navigate = useNavigate()
 	const { roomId } = useParams<{ roomId: string }>()
 	const [step, setStep] = useState<'auth' | 'password' | 'loading' | 'error'>('auth')
@@ -147,8 +47,7 @@ const JoinRoomPage = () => {
 		setIsLoading(true)
 
 		try {
-			await apiClient.getTicket(authData) // login и register один и тот же метод? Возможно, надо различать
-
+			await apiClient.getTicket(authData)
 			setStep('password')
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Authentication failed')
@@ -202,119 +101,180 @@ const JoinRoomPage = () => {
 		}
 	}
 
-	if (step === 'error') {
+	if (isLoading) {
 		return (
-			<>
-				<style>{spinnerStyle}</style>
-				<div style={styles.mainContainer}>
-					<div style={{ ...styles.card, ...styles.errorCard }}>
-						<h2 style={styles.cardTitle}>Error</h2>
-						<p>{error || 'Invalid room link'}</p>
+			<div className='main-container'>
+				<div className='spinner' />
+				<Styles />
+			</div>
+		)
+	}
+
+	return (
+		<div className='main-container'>
+			<Styles />
+
+			{step === 'error' && (
+				<div className='card error-card'>
+					<h2 className='title'>Error</h2>
+					<p>{error || 'Invalid room link'}</p>
+					<button onClick={() => navigate('/')} className='button primary' disabled={isLoading}>
+						Go to Home
+					</button>
+				</div>
+			)}
+
+			{step === 'auth' && (
+				<div className='card'>
+					<h2 className='title'>{authMode === 'login' ? 'Login to Join Room' : 'Create Account'}</h2>
+					{error && <div className='error'>{error}</div>}
+					<form onSubmit={handleAuthSubmit}>
+						<input
+							type='text'
+							value={authData.username}
+							onChange={e => setAuthData({ ...authData, username: e.target.value })}
+							placeholder='Username'
+							className='input'
+							required
+							disabled={isLoading}
+							autoComplete='username'
+						/>
+						<input
+							type='password'
+							value={authData.password}
+							onChange={e => setAuthData({ ...authData, password: e.target.value })}
+							placeholder='Password'
+							className='input'
+							required
+							disabled={isLoading}
+							autoComplete={authMode === 'login' ? 'current-password' : 'new-password'}
+						/>
+						<button type='submit' className='button primary' disabled={isLoading}>
+							{isLoading ? '...' : authMode === 'login' ? 'Login' : 'Register'}
+						</button>
 						<button
-							style={{ ...styles.primaryButton, ...(isLoading ? styles.primaryButtonDisabled : {}) }}
-							onClick={() => navigate('/')}
+							type='button'
+							className='button secondary'
+							onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
 							disabled={isLoading}
 						>
-							Go to Home
+							{authMode === 'login' ? 'Create account' : 'Already have account'}
 						</button>
-					</div>
+					</form>
 				</div>
-			</>
-		)
-	}
+			)}
 
-	if (step === 'loading') {
-		return (
-			<>
-				<style>{spinnerStyle}</style>
-				<div style={styles.mainContainer}>
-					<div style={styles.loadingSpinner}></div>
+			{step === 'password' && (
+				<div className='card'>
+					<h2 className='title'>Join Room</h2>
+					<p className='room-info'>
+						You're joining room: <strong>{roomId}</strong>
+					</p>
+					{error && <div className='error'>{error}</div>}
+					<form onSubmit={handleRoomJoin}>
+						<input
+							type='password'
+							value={roomPassword}
+							onChange={e => setRoomPassword(e.target.value)}
+							placeholder='Room password (if required)'
+							className='input'
+							disabled={isLoading}
+							autoComplete='off'
+						/>
+						<button type='submit' className='button primary' disabled={isLoading}>
+							{isLoading ? 'Joining...' : 'Join Room'}
+						</button>
+					</form>
 				</div>
-			</>
-		)
-	}
-
-	if (step === 'auth') {
-		return (
-			<>
-				<style>{spinnerStyle}</style>
-				<div style={styles.mainContainer}>
-					<div style={styles.card}>
-						<h2 style={styles.cardTitle}>
-							{authMode === 'login' ? 'Login to Join Room' : 'Create Account'}
-						</h2>
-						{error && <div style={styles.errorMessage}>{error}</div>}
-						<form onSubmit={handleAuthSubmit}>
-							<input
-								type='text'
-								value={authData.username}
-								onChange={e => setAuthData({ ...authData, username: e.target.value })}
-								placeholder='Username'
-								style={styles.textInput}
-								required
-								disabled={isLoading}
-								autoComplete='username'
-							/>
-							<input
-								type='password'
-								value={authData.password}
-								onChange={e => setAuthData({ ...authData, password: e.target.value })}
-								placeholder='Password'
-								style={styles.textInput}
-								required
-								disabled={isLoading}
-								autoComplete={authMode === 'login' ? 'current-password' : 'new-password'}
-							/>
-							<button type='submit' style={styles.primaryButton} disabled={isLoading}>
-								{isLoading ? '...' : authMode === 'login' ? 'Login' : 'Register'}
-							</button>
-							<button
-								type='button'
-								style={styles.secondaryButton}
-								onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
-								disabled={isLoading}
-							>
-								{authMode === 'login' ? 'Create account' : 'Already have account'}
-							</button>
-						</form>
-					</div>
-				</div>
-			</>
-		)
-	}
-
-	if (step === 'password') {
-		return (
-			<>
-				<style>{spinnerStyle}</style>
-				<div style={styles.mainContainer}>
-					<div style={styles.card}>
-						<h2 style={styles.cardTitle}>Join Room</h2>
-						<p style={{ textAlign: 'center', marginBottom: '1rem' }}>
-							You're joining room: <strong>{roomId}</strong>
-						</p>
-						{error && <div style={styles.errorMessage}>{error}</div>}
-						<form onSubmit={handleRoomJoin}>
-							<input
-								type='password'
-								value={roomPassword}
-								onChange={e => setRoomPassword(e.target.value)}
-								placeholder='Room password (if required)'
-								style={styles.textInput}
-								disabled={isLoading}
-								autoComplete='off'
-							/>
-							<button type='submit' style={styles.primaryButton} disabled={isLoading}>
-								{isLoading ? 'Joining...' : 'Join Room'}
-							</button>
-						</form>
-					</div>
-				</div>
-			</>
-		)
-	}
-
-	return null
+			)}
+		</div>
+	)
 }
 
-export default JoinRoomPage
+const Styles = () => (
+	<style>{`
+		* {
+			box-sizing: border-box;
+		}
+		body, html, .main-container {
+			margin: 0;
+			padding: 0;
+			font-family: sans-serif;
+			background-color: #f5f5f5;
+			color: #333;
+			min-height: 100vh;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+		.card {
+			background: #fff;
+			padding: 2rem;
+			border-radius: 1rem;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+			width: 100%;
+			max-width: 420px;
+			text-align: center;
+		}
+		.error-card {
+			border: 2px solid #c00;
+			background-color: #fff0f0;
+		}
+		.title {
+			font-size: 1.5rem;
+			margin-bottom: 1rem;
+		}
+		.room-info {
+			text-align: center;
+			margin-bottom: 1rem;
+		}
+		.input {
+			width: 100%;
+			padding: 0.75rem;
+			margin-bottom: 1rem;
+			border: 1px solid #ccc;
+			border-radius: 0.75rem;
+			font-size: 1rem;
+		}
+		.button {
+			padding: 0.6rem 1rem;
+			border: none;
+			border-radius: 0.75rem;
+			font-size: 1rem;
+			cursor: pointer;
+			margin: 0.5rem 0;
+			width: 100%;
+		}
+		.button.primary {
+			background-color: #aaa;
+			color: #fff;
+		}
+		.button.primary:disabled {
+			opacity: 0.7;
+			cursor: not-allowed;
+		}
+		.button.secondary {
+			background: transparent;
+			color: #777;
+			border: 1px solid #ccc;
+		}
+		.error {
+			color: #c00;
+			margin-bottom: 1rem;
+		}
+		.spinner {
+			border: 4px solid #eee;
+			border-top: 4px solid #aaa;
+			border-radius: 50%;
+			width: 40px;
+			height: 40px;
+			animation: spin 1s linear infinite;
+		}
+		@keyframes spin {
+			0% { transform: rotate(0deg); }
+			100% { transform: rotate(360deg); }
+		}
+	`}</style>
+)
+
+export default JoinPage
