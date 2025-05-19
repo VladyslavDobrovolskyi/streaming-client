@@ -802,27 +802,23 @@ export default function RoomPage() {
 		}
 	}
 
-	async function joinRoom(pass?: string) {
-		const roomUUID = new URL(window.location.href).pathname.split('/').pop() || ''
-		if (!pass) {
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const response = await apiClient.joinRoom({ roomUUID: roomUUID })
-		} else {
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const response = await apiClient.joinRoom({ roomUUID: roomUUID, password: pass })
-		}
-	}
+	// async function joinRoom(pass?: string) {
+	// 	const roomUUID = new URL(window.location.href).pathname.split('/').pop() || ''
+	// 	if (!pass) {
+	// 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	// 		const response = await apiClient.joinRoom({ roomUUID: roomUUID })
+	// 	} else {
+	// 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	// 		const response = await apiClient.joinRoom({ roomUUID: roomUUID, password: pass })
+	// 	}
+	// }
 
 	useEffect(() => {
 		amIAuthorized()
 		fetchUserData()
 		fetchMovieInfo()
-		joinRoom().catch(() => {
-			const pass = prompt('Enter the password to join the room:')
-			if (pass) {
-				joinRoom(pass).catch(() => window.location.reload)
-			}
-		})
+		
+		
 	}, [])
 
 	useEffect(() => {
