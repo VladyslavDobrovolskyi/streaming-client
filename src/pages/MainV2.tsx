@@ -58,20 +58,6 @@ const MainV2 = () => {
 	}, [])
 
 	// Авторизация с логином и паролем
-	const handleLogin = async () => {
-		setAuthError('')
-		setIsLoading(true)
-
-		try {
-			await apiClient.login({ username, password })
-			await fetchMovies()
-			setStep('room')
-		} catch (error) {
-			setAuthError(error instanceof Error ? error.message : 'Login failed')
-		} finally {
-			setIsLoading(false)
-		}
-	}
 
 	// Отдельная кнопка, которая просто получает билет без username/password
 	const handleGetTicket = async () => {
@@ -147,7 +133,7 @@ const MainV2 = () => {
 
 			{step === 'auth' && (
 				<div className='card'>
-					<h2 className='title'>Login or Get Ticket</h2>
+					<h2 className='title'>Get Ticket</h2>
 					{authError && <div className='error'>{authError}</div>}
 
 					{/* Форма с логином и паролем */}
@@ -167,13 +153,7 @@ const MainV2 = () => {
 					/>
 
 					{/* Кнопка логина */}
-					<button
-						onClick={handleLogin}
-						className='button primary'
-						disabled={isLoading || !username || !password}
-					>
-						Login
-					</button>
+				
 
 					{/* Отдельная кнопка "Get the ticket" */}
 					<button onClick={handleGetTicket} className='button ticket-button' disabled={isLoading}>
