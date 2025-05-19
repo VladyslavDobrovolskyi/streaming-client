@@ -74,6 +74,10 @@ const styles = {
 		transition: 'background 0.25s ease',
 		marginBottom: '0.5rem',
 	},
+	primaryButtonDisabled: {
+		backgroundColor: '#5a98ff',
+		cursor: 'not-allowed',
+	},
 	secondaryButton: {
 		backgroundColor: 'transparent',
 		color: '#3a86ff',
@@ -90,10 +94,11 @@ const styles = {
 		borderTop: '5px solid transparent',
 		borderRadius: '50%',
 		animation: 'spin 1s linear infinite',
+		margin: 'auto',
 	},
 }
 
-// Добавим keyframes для спиннера
+// Спиннер — CSS анимация
 const spinnerStyle = `
 @keyframes spin {
   0% { transform: rotate(0deg);}
@@ -142,7 +147,7 @@ const JoinRoomPage = () => {
 		setIsLoading(true)
 
 		try {
-			await apiClient.getTicket(authData) // одинаково для login и register?
+			await apiClient.getTicket(authData) // login и register один и тот же метод? Возможно, надо различать
 
 			setStep('password')
 		} catch (err) {
@@ -205,7 +210,11 @@ const JoinRoomPage = () => {
 					<div style={{ ...styles.card, ...styles.errorCard }}>
 						<h2 style={styles.cardTitle}>Error</h2>
 						<p>{error || 'Invalid room link'}</p>
-						<button style={styles.primaryButton} onClick={() => navigate('/')} disabled={isLoading}>
+						<button
+							style={{ ...styles.primaryButton, ...(isLoading ? styles.primaryButtonDisabled : {}) }}
+							onClick={() => navigate('/')}
+							disabled={isLoading}
+						>
 							Go to Home
 						</button>
 					</div>
@@ -281,7 +290,9 @@ const JoinRoomPage = () => {
 				<div style={styles.mainContainer}>
 					<div style={styles.card}>
 						<h2 style={styles.cardTitle}>Join Room</h2>
-						<p>You're joining room: {roomId}</p>
+						<p style={{ textAlign: 'center', marginBottom: '1rem' }}>
+							You're joining room: <strong>{roomId}</strong>
+						</p>
 						{error && <div style={styles.errorMessage}>{error}</div>}
 						<form onSubmit={handleRoomJoin}>
 							<input
