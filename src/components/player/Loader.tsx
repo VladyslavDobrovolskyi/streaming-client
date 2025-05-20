@@ -1,7 +1,10 @@
 import React from 'react'
 import { GearIcon } from '@radix-ui/react-icons' // Adjust the import path as necessary
 
-const Loader: React.FC = () => {
+interface LoaderProps {
+	color?: string
+}
+const Loader: React.FC<LoaderProps> = ({ color = 'white' }) => {
 	return (
 		<div
 			style={{
@@ -31,7 +34,7 @@ const Loader: React.FC = () => {
 						height: '3rem',
 						animation: 'spin 1s linear infinite',
 						transform: 'scale(4)',
-						color: 'white',
+						color: color,
 						zIndex: 2147483647,
 					}}
 				/>

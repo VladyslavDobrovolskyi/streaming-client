@@ -126,7 +126,7 @@ const MainV2 = () => {
 	if (isLoading) {
 		return (
 			<div className='main-container'>
-				<Loader />
+				<Loader color='#4a90e2' />
 				<Styles />
 			</div>
 		)
