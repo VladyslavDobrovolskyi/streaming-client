@@ -244,19 +244,20 @@ const MainV2 = () => {
 							placeholder='Enter password...'
 							className='input'
 						/>
-						<button
-							className='button secondary'
-							onClick={() => {
-								setIsModalOpen(false)
-								setRoomPassword('')
-								setPendingRoomId(null)
-							}}
-						>
-							Cancel
-						</button>
+
 						<div className='modal-actions'>
 							<button className='button primary' onClick={confirmCreateRoom}>
 								Create Room
+							</button>
+							<button
+								className='button secondary'
+								onClick={() => {
+									setIsModalOpen(false)
+									setRoomPassword('')
+									setPendingRoomId(null)
+								}}
+							>
+								Cancel
 							</button>
 						</div>
 					</div>
@@ -387,7 +388,7 @@ const Styles = () => (
 		.modal {
 			background: white;
 			padding: 1.5rem;
-			border-radius: 1rem;
+			border-radius: 100%;
 			width: 375px;
 			height: 376px;
 			box-shadow: 0 2px 8px rgba(0,0,0,0.1);
