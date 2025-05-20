@@ -209,7 +209,6 @@ const MainV2 = () => {
 
 			{step === 'movie' && (
 				<div className='movie-card'>
-					<h2 className='title'>Select Movie</h2>
 					<div className='grid'>
 						{movies.map(movie => (
 							<div key={movie.id} className='poster' onClick={() => handleSelectMovie(movie.id)}>
@@ -218,9 +217,6 @@ const MainV2 = () => {
 							</div>
 						))}
 					</div>
-					<button onClick={() => setStep('room')} className='button secondary'>
-						Back
-					</button>
 				</div>
 			)}
 
