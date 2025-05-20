@@ -780,7 +780,7 @@ export default function RoomPage() {
 			window.location.href = '/'
 			return
 		}
-		const avatar = await apiClient.getAvatar()
+		const avatar = await apiClient.getAvatarImg()
 		if (!avatar) {
 			window.location.href = '/'
 			return

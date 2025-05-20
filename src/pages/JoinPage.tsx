@@ -5,14 +5,13 @@ import type React from 'react'
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { apiClient } from '../api/ApiClient.ts'
-const LockImg =
-	'https://www.gstatic.com/android/keyboard/emojikitchen/20240206/u1f39f-ufe0f/u1f39f-ufe0f_u2699-ufe0f.png'
 
 const JoinPage = () => {
 	const navigate = useNavigate()
 	const { roomId } = useParams<{ roomId: string }>()
 	const [step, setStep] = useState<'auth' | 'password' | 'loading' | 'error'>('auth')
 	const [authMode, setAuthMode] = useState<'login' | 'register'>('login')
+	const [lockImg, setLockImg] = useState('')
 	const [authData, setAuthData] = useState({
 		username: '',
 		password: '',
@@ -20,6 +19,18 @@ const JoinPage = () => {
 	const [roomPassword, setRoomPassword] = useState('')
 	const [error, setError] = useState('')
 	const [isLoading, setIsLoading] = useState(false)
+
+	const getLockImg = async () => {
+		const response = await apiClient.getLockImg()
+
+		if (response) {
+			setLockImg(response.url)
+		}
+	}
+
+	useEffect(() => {
+		getLockImg()
+	}, [])
 
 	useEffect(() => {
 		if (!roomId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(roomId)) {
@@ -168,7 +179,7 @@ const JoinPage = () => {
 
 			{step === 'password' && (
 				<div className='card'>
-					<img src={LockImg} alt='Lock' className='lock-img' />
+					<img src={lockImg} alt='Lock' className='lock-img' />
 					<h2 className='title'>Join Room</h2>
 					<p className='room-info'>
 						You're joining room: <strong>{roomId}</strong>
