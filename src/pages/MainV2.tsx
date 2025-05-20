@@ -395,8 +395,8 @@ const Styles = () => (
 			cursor: not-allowed;
 		}
 		.ticket-img {
-			width: 28px;
-			height: 28px;
+			width: 78px;
+			height: 56px;
 		}
 	`}</style>
 )
