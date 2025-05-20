@@ -116,9 +116,9 @@ const MainV2 = () => {
 	return (
 		<div className='main-container'>
 			<Styles />
+			<img src={ticketImg} alt='Ticket' className='ticket-img' />
 			{step === 'welcome' && (
 				<div className='card'>
-					<img src={ticketImg} alt='Ticket' className='ticket-img' />
 					<h1 className='title'>Welcome to SyncWatch</h1>
 					<button
 						onClick={() => {
