@@ -150,7 +150,7 @@ const MainV2 = () => {
 			)}
 
 			{step === 'auth' && (
-				<div className='card'>
+				<div className='auth-card'>
 					{/* Картинка с билетом */}
 
 					<div className='inline'>
@@ -432,6 +432,15 @@ const Styles = () => (
 			gap: 0rem;
 			flex-wrap: nowrap;
 		}
+		.auth-card {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 375px;
+      text-align: center;
+    }
 		
 	`}</style>
 )
