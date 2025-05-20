@@ -1,5 +1,3 @@
-'use client'
-
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiClient } from '../api/ApiClient.ts'
@@ -26,16 +24,33 @@ const MainV2 = () => {
 	const [roomPassword, setRoomPassword] = useState('')
 	const [pendingRoomId, setPendingRoomId] = useState<string | null>(null)
 	const [imagesLoaded, setImagesLoaded] = useState(false)
+	const [postersLoaded, setPostersLoaded] = useState(false)
 
 	const fetchMovies = async () => {
 		try {
+			setIsLoading(true)
 			const movies = await apiClient.getMovies()
 			setMovies(movies)
+
+			// Загружаем постеры для всех фильмов
+			const posterPromises = movies.map(movie => {
+				return new Promise<void>(resolve => {
+					const img = new Image()
+					img.src = movie.poster
+					img.onload = () => resolve()
+					img.onerror = () => resolve() // Продолжаем даже если какое-то изображение не загрузилось
+				})
+			})
+
+			await Promise.all(posterPromises)
+			setPostersLoaded(true)
 		} catch (error) {
 			console.error('Error fetching movies:', error)
 			if ((error as Error).message.includes('401')) {
 				setStep('auth')
 			}
+		} finally {
+			setIsLoading(false)
 		}
 	}
 
@@ -138,7 +153,7 @@ const MainV2 = () => {
 		navigate(`/join/${roomId}`)
 	}
 
-	if (isLoading || !imagesLoaded) {
+	if (isLoading || !imagesLoaded || (step === 'movie' && !postersLoaded)) {
 		return (
 			<div className='main-container'>
 				<Loader color='#4a90e2' />
