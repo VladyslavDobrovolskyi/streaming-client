@@ -119,6 +119,7 @@ const MainV2 = () => {
 			{step === 'welcome' && (
 				<div className='card'>
 					<h1 className='title'>Welcome to SyncWatch</h1>
+					<img src={ticketImg} alt='Ticket' className='ticket-img' />
 					<button
 						onClick={() => {
 							localStorage.setItem('seenWelcomePage', 'true')
@@ -153,7 +154,6 @@ const MainV2 = () => {
 					/>
 
 					{/* Кнопка логина */}
-				
 
 					{/* Отдельная кнопка "Get the ticket" */}
 					<button onClick={handleGetTicket} className='button ticket-button' disabled={isLoading}>
