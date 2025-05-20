@@ -246,9 +246,6 @@ const MainV2 = () => {
 						/>
 
 						<div className='modal-actions'>
-							<button className='button primary' onClick={confirmCreateRoom}>
-								Create Room
-							</button>
 							<button
 								className='button secondary'
 								onClick={() => {
@@ -258,6 +255,9 @@ const MainV2 = () => {
 								}}
 							>
 								Cancel
+							</button>
+							<button className='button primary' onClick={confirmCreateRoom}>
+								Create Room
 							</button>
 						</div>
 					</div>
@@ -395,9 +395,10 @@ const Styles = () => (
 			text-align: center;
 		}
 		.modal-actions {
-			margin-top: 1rem;
+			margin-top: 0.4rem;
 			display: flex;
-			justify-content: space-between;
+			justify-content: center;
+			padding: 0.5rem;
 		}
 		.spinner {
 			border: 4px solid #f3f3f3;
