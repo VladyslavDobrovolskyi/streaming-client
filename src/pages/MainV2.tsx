@@ -25,6 +25,7 @@ const MainV2 = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [roomPassword, setRoomPassword] = useState('')
 	const [pendingRoomId, setPendingRoomId] = useState<string | null>(null)
+	const [imagesLoaded, setImagesLoaded] = useState(false)
 
 	const fetchMovies = async () => {
 		try {
@@ -40,34 +41,39 @@ const MainV2 = () => {
 
 	const getLockImg = async () => {
 		const response = await apiClient.getLockImg()
-
 		if (response) {
 			setLockImg(response.url)
 		}
 	}
 
-	useEffect(() => {
-		getLockImg()
-	}, [])
-
 	const getTicketImg = async () => {
 		const response = await apiClient.getTicketImg()
-
 		if (response) {
 			setTicketImg(response.url)
 		}
 	}
+
 	const getSearchImg = async () => {
 		const response = await apiClient.getSearchImg()
-
 		if (response) {
 			setSearchImg(response.url)
 		}
 	}
 
 	useEffect(() => {
-		getTicketImg()
-		getSearchImg()
+		const loadAllImages = async () => {
+			setIsLoading(true)
+			try {
+				await Promise.all([getLockImg(), getTicketImg(), getSearchImg()])
+				setImagesLoaded(true)
+			} catch (error) {
+				console.error('Error loading images:', error)
+			} finally {
+				setIsLoading(false)
+			}
+		}
+
+		loadAllImages()
 	}, [])
 
 	useEffect(() => {
@@ -88,9 +94,6 @@ const MainV2 = () => {
 		}
 	}, [])
 
-	// Авторизация с логином и паролем
-
-	// Отдельная кнопка, которая просто получает билет без username/password
 	const handleGetTicket = async () => {
 		setAuthError('')
 		setIsLoading(true)
@@ -135,7 +138,7 @@ const MainV2 = () => {
 		navigate(`/join/${roomId}`)
 	}
 
-	if (isLoading) {
+	if (isLoading || !imagesLoaded) {
 		return (
 			<div className='main-container'>
 				<Loader color='#4a90e2' />
@@ -164,16 +167,13 @@ const MainV2 = () => {
 
 			{step === 'auth' && (
 				<div className='auth-card'>
-					{/* Картинка с билетом */}
-
 					<div className='inline'>
 						<h2 className='title'>Watch</h2>
-						<img src={ticketImg} alt='Ticket' className='ticket-img' />
+						{ticketImg && <img src={ticketImg} alt='Ticket' className='ticket-img' />}
 						<h2 className='title'>Together</h2>
 					</div>
 					{authError && <div className='error'>{authError}</div>}
 
-					{/* Форма с логином и паролем */}
 					<input
 						type='text'
 						placeholder='Username'
@@ -189,9 +189,6 @@ const MainV2 = () => {
 						className='input'
 					/>
 
-					{/* Кнопка логина */}
-
-					{/* Отдельная кнопка "Get the ticket" */}
 					<button onClick={handleGetTicket} className='button ticket-button' disabled={isLoading}>
 						<span>Get yout ticket!</span>
 					</button>
@@ -200,7 +197,7 @@ const MainV2 = () => {
 
 			{step === 'room' && (
 				<div className='selection-card'>
-					<img src={searchImg} alt='Search' className='search-img' />
+					{searchImg && <img src={searchImg} alt='Search' className='search-img' />}
 					<h2 className='title'>Room Selection</h2>
 
 					<button onClick={() => setStep('movie')} className='button primary'>
@@ -235,7 +232,7 @@ const MainV2 = () => {
 			{isModalOpen && (
 				<div className='modal-overlay'>
 					<div className='modal'>
-						<img src={lockImg} alt='Lock' className='lock-img' />
+						{lockImg && <img src={lockImg} alt='Lock' className='lock-img' />}
 						<h3 className='setpass'>Set Room Password</h3>
 						<input
 							type='text'
