@@ -436,7 +436,7 @@ const Styles = () => (
       background: #fff;
       padding: 2rem;
       border-radius: 100%;
-      box-shadow: 3px 30px 13px rgba(0,0,0,0.1)
+      box-shadow: 3px 30px 13px rgba(0,0,0,0.1);
       width: 100%;
       max-width: 375px;
       text-align: center;
