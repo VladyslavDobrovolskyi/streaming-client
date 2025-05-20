@@ -7,6 +7,7 @@ import socket from '../socket/index.ts'
 import type { Movie } from '../api/ApiClient.ts'
 import { v4 } from 'uuid'
 import ACTIONS from '../socket/actions.ts'
+import Loader from '../components/player/Loader.tsx'
 
 const MainV2 = () => {
 	const navigate = useNavigate()
@@ -125,7 +126,7 @@ const MainV2 = () => {
 	if (isLoading) {
 		return (
 			<div className='main-container'>
-				<div className='spinner' />
+				<Loader />
 				<Styles />
 			</div>
 		)

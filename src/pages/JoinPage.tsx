@@ -5,6 +5,7 @@ import type React from 'react'
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { apiClient } from '../api/ApiClient.ts'
+import Loader from '../components/player/Loader.tsx'
 
 const JoinPage = () => {
 	const navigate = useNavigate()
@@ -117,7 +118,7 @@ const JoinPage = () => {
 	if (isLoading) {
 		return (
 			<div className='main-container'>
-				<div className='spinner' />
+				<Loader />
 				<Styles />
 			</div>
 		)
