@@ -186,7 +186,7 @@ const MainV2 = () => {
 			)}
 
 			{step === 'room' && (
-				<div className='card'>
+				<div className='selection-card'>
 					<img src={searchImg} alt='Search' className='search-img' />
 					<h2 className='title'>Room Selection</h2>
 
@@ -439,6 +439,15 @@ const Styles = () => (
       box-shadow: 3px 30px 13px rgba(0,0,0,0.1);
       width: 100%;
       max-width: 375px;
+      text-align: center;
+    }
+
+	.card {
+      background: transparent;
+      padding: 2rem;
+      border-radius: 1rem;
+      width: 100%;
+      max-width: 720px;
       text-align: center;
     }
 		
