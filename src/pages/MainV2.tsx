@@ -387,12 +387,11 @@ const Styles = () => (
 			align-items: center;
 		}
 		.modal {
-			background: white;
+			background: transparent;
 			padding: 1.5rem;
 			border-radius: 100%;
 			width: 375px;
 			height: 376px;
-			box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 			text-align: center;
 		}
 		.modal-actions {
