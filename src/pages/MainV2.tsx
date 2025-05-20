@@ -208,7 +208,7 @@ const MainV2 = () => {
 			)}
 
 			{step === 'movie' && (
-				<div className='card'>
+				<div className='movie-card'>
 					<h2 className='title'>Select Movie</h2>
 					<div className='grid'>
 						{movies.map(movie => (
@@ -444,6 +444,14 @@ const Styles = () => (
     }
 
 	.selection-card {
+      background: transparent;
+      padding: 2rem;
+      border-radius: 1rem;
+      width: 100%;
+      max-width: 720px;
+      text-align: center;
+    }
+	.movie-card {
       background: transparent;
       padding: 2rem;
       border-radius: 1rem;
