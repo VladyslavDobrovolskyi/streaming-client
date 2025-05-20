@@ -118,8 +118,8 @@ const MainV2 = () => {
 			<Styles />
 			{step === 'welcome' && (
 				<div className='card'>
-					<h1 className='title'>Welcome to SyncWatch</h1>
 					<img src={ticketImg} alt='Ticket' className='ticket-img' />
+					<h1 className='title'>Welcome to SyncWatch</h1>
 					<button
 						onClick={() => {
 							localStorage.setItem('seenWelcomePage', 'true')
