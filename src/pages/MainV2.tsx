@@ -269,14 +269,14 @@ const Styles = () => (
 			align-items: center;
 		}
 		.card {
-			background: #fff;
-			padding: 2rem;
-			border-radius: 1rem;
-			box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-			width: 100%;
-			max-width: 420px;
-			text-align: center;
-		}
+      background: #fff;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 720px;
+      text-align: center;
+    }
 		.title {
 			font-size: 1.5rem;
 			margin-bottom: 1rem;
@@ -322,27 +322,27 @@ const Styles = () => (
 			margin-bottom: 1rem;
 			font-weight: 600;
 		}
-		.grid {
-			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-			gap: 1rem;
-			margin-bottom: 1rem;
-		}
-		.poster {
-			cursor: pointer;
-			border-radius: 0.5rem;
-			overflow: hidden;
-			box-shadow: 0 0 5px rgba(0,0,0,0.1);
-			transition: transform 0.3s ease;
-		}
+		   .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+		  .poster {
+      cursor: pointer;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
 		.poster:hover {
 			transform: scale(1.05);
 		}
-		.poster img {
-			width: 300px;
-			height: 700px;
-			display: block;
-		}
+		  .poster img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
 		.caption {
 			padding: 0.5rem;
 			font-size: 0.9rem;
