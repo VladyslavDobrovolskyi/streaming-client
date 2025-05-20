@@ -116,7 +116,6 @@ const MainV2 = () => {
 	return (
 		<div className='main-container'>
 			<Styles />
-			<img src={ticketImg} alt='Ticket' className='ticket-img' />
 			{step === 'welcome' && (
 				<div className='card'>
 					<h1 className='title'>Welcome to SyncWatch</h1>
@@ -127,7 +126,8 @@ const MainV2 = () => {
 						}}
 						className='button primary'
 					>
-						I Get It
+						<img src={ticketImg} alt='Ticket' className='ticket-img' />
+						<span>Get the ticket</span>
 					</button>
 				</div>
 			)}
