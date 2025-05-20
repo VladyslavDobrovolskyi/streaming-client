@@ -236,7 +236,7 @@ const MainV2 = () => {
 				<div className='modal-overlay'>
 					<div className='modal'>
 						<img src={lockImg} alt='Lock' className='lock-img' />
-						<h3>Set Room Password</h3>
+						<h3 className='setpass'>Set Room Password</h3>
 						<input
 							type='text'
 							value={roomPassword}
@@ -475,6 +475,9 @@ const Styles = () => (
 	.lock-img {
 			width: 96px;
 			height: 96px;
+		}
+	.setpass {
+			color: white;
 		}
 		
 	`}</style>
