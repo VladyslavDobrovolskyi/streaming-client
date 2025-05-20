@@ -154,8 +154,8 @@ const MainV2 = () => {
 					{/* Картинка с билетом */}
 					<h2 className='title'>Watch</h2>
 					<img src={ticketImg} alt='Ticket' className='ticket-img' />
-					{authError && <div className='error'>{authError}</div>}
 					<h2 className='title'>Together</h2>
+					{authError && <div className='error'>{authError}</div>}
 
 					{/* Форма с логином и паролем */}
 					<input
