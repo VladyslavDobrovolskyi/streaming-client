@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { apiClient } from '../api/ApiClient.ts'
@@ -24,7 +26,7 @@ const MainV2 = () => {
 	const [roomPassword, setRoomPassword] = useState('')
 	const [pendingRoomId, setPendingRoomId] = useState<string | null>(null)
 	const [imagesLoaded, setImagesLoaded] = useState(false)
-	const [postersLoaded, setPostersLoaded] = useState(false)
+	const [loadedPosters, setLoadedPosters] = useState<Record<number, boolean>>({})
 
 	const fetchMovies = async () => {
 		try {
@@ -32,18 +34,22 @@ const MainV2 = () => {
 			const movies = await apiClient.getMovies()
 			setMovies(movies)
 
-			// Загружаем постеры для всех фильмов
-			const posterPromises = movies.map(movie => {
-				return new Promise<void>(resolve => {
-					const img = new Image()
-					img.src = movie.poster
-					img.onload = () => resolve()
-					img.onerror = () => resolve() // Продолжаем даже если какое-то изображение не загрузилось
-				})
-			})
+			const initialLoadedState = movies.reduce((acc, movie) => {
+				acc[movie.id] = false
+				return acc
+			}, {} as Record<number, boolean>)
+			setLoadedPosters(initialLoadedState)
 
-			await Promise.all(posterPromises)
-			setPostersLoaded(true)
+			movies.forEach(movie => {
+				const img = new Image()
+				img.src = movie.poster
+				img.onload = () => {
+					setLoadedPosters(prev => ({ ...prev, [movie.id]: true }))
+				}
+				img.onerror = () => {
+					setLoadedPosters(prev => ({ ...prev, [movie.id]: true }))
+				}
+			})
 		} catch (error) {
 			console.error('Error fetching movies:', error)
 			if ((error as Error).message.includes('401')) {
@@ -153,7 +159,7 @@ const MainV2 = () => {
 		navigate(`/join/${roomId}`)
 	}
 
-	if (isLoading || !imagesLoaded || (step === 'movie' && !postersLoaded)) {
+	if (isLoading || !imagesLoaded) {
 		return (
 			<div className='main-container'>
 				<Loader color='#4a90e2' />
@@ -205,7 +211,7 @@ const MainV2 = () => {
 					/>
 
 					<button onClick={handleGetTicket} className='button ticket-button' disabled={isLoading}>
-						<span>Get yout ticket!</span>
+						<span>Get your ticket!</span>
 					</button>
 				</div>
 			)}
@@ -236,7 +242,11 @@ const MainV2 = () => {
 					<div className='grid'>
 						{movies.map(movie => (
 							<div key={movie.id} className='poster' onClick={() => handleSelectMovie(movie.id)}>
-								<img src={movie.poster} alt={movie.title} />
+								{loadedPosters[movie.id] ? (
+									<img src={movie.poster} alt={movie.title} />
+								) : (
+									<div className='poster-skeleton'></div>
+								)}
 								<div className='caption'>{movie.title}</div>
 							</div>
 						))}
@@ -281,21 +291,21 @@ const MainV2 = () => {
 
 const Styles = () => (
 	<style>{`
-		* {
-			box-sizing: border-box;
-		}
-		body, html, .main-container {
-			margin: 0;
-			padding: 0;
-			font-family: sans-serif;
-			background-color: #f5f5f5;
-			color: #333;
-			min-height: 100vh;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-		}
-		.card {
+    * {
+      box-sizing: border-box;
+    }
+    body, html, .main-container {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .card {
       background: #fff;
       padding: 2rem;
       border-radius: 1rem;
@@ -304,162 +314,180 @@ const Styles = () => (
       max-width: 720px;
       text-align: center;
     }
-		.title {
-			font-size: 1.5rem;
-			margin-bottom: 1rem;
-		}
-		.input {
-			width: 100%;
-			padding: 0.75rem;
-			margin-bottom: 0.5rem;
-			border: 2.5px solid rgba(111, 107, 107, 0.54);
-			border-radius: 0.75rem;
-			font-size: 1rem;
-		}
-		.button {
-			cursor: pointer;
-			border: none;
-			padding: 0.75rem 1.5rem;
-			border-radius: 1rem;
-			font-weight: 600;
-			margin: 0.3rem 0;
-			transition: background-color 0.3s ease;
-		}
-		.button.primary {
-			background-color: #4a90e2;
-			color: white;
-		}
-		.button.primary:hover:not(:disabled) {
-			background-color: #357ABD;
-		}
-		.button.secondary {
-			background-color: #eee;
-			color: #333;
-			margin-right: 10px;
-		}
-		.button.secondary:hover:not(:disabled) {
-			background-color: #ccc;
-		}
-		.button.small {
-			padding: 0.3rem 0.6rem;
-			font-size: 0.8rem;
-			margin-left: 1rem;
-		}
-		.error {
-			color: #e74c3c;
-			margin-bottom: 1rem;
-			font-weight: 600;
-		}
-		.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); /* ← вот это */
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-		  .poster {
+    .title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .input {
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      border: 2.5px solid rgba(111, 107, 107, 0.54);
+      border-radius: 0.75rem;
+      font-size: 1rem;
+    }
+    .button {
+      cursor: pointer;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 1rem;
+      font-weight: 600;
+      margin: 0.3rem 0;
+      transition: background-color 0.3s ease;
+    }
+    .button.primary {
+      background-color: #4a90e2;
+      color: white;
+    }
+    .button.primary:hover:not(:disabled) {
+      background-color: #357ABD;
+    }
+    .button.secondary {
+      background-color: #eee;
+      color: #333;
+      margin-right: 10px;
+    }
+    .button.secondary:hover:not(:disabled) {
+      background-color: #ccc;
+    }
+    .button.small {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.8rem;
+      margin-left: 1rem;
+    }
+    .error {
+      color: #e74c3c;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .poster {
       cursor: pointer;
       border-radius: 0.5rem;
       overflow: hidden;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
       transition: transform 0.3s;
     }
-		.poster:hover {
-			transform: scale(1.05);
-		}
-		  .poster img {
+    .poster:hover {
+      transform: scale(1.05);
+    }
+    .poster img {
       width: 100%;
       height: auto;
       display: block;
+      aspect-ratio: 2/3;
+      object-fit: cover;
     }
-		.caption {
-			padding: 0.5rem;
-			font-size: 0.9rem;
-			background: #fff;
-			text-align: center;
-		}
-		.list {
-			max-height: 200px;
-			overflow-y: auto;
-			margin-top: 1rem;
-			text-align: left;
-		}
-		.list-item {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			padding: 0.5rem 0;
-			border-bottom: 1px solid #eee;
-		}
-		.modal-overlay {
-			position: fixed;
-			inset: 0;
-			background-color: rgba(0,0,0,0.5);
-			backdrop-filter: blur(2px);
-			display: flex;
-			justify-content: center;
-			align-items: center;
-		}
-		.modal {
-			background: transparent;
-			padding: 1.5rem;
-			border-radius: 100%;
-			width: 375px;
-			height: 376px;
-			text-align: center;
-		}
-		.modal-actions {
-			margin-top: 0.4rem;
-			display: flex;
-			justify-content: center;
-			padding: 0.5rem;
-		}
-		.spinner {
-			border: 4px solid #f3f3f3;
-			border-top: 4px solid #4a90e2;
-			border-radius: 50%;
-			width: 36px;
-			height: 36px;
-			animation: spin 1s linear infinite;
-			margin: auto;
-		}
-		@keyframes spin {
-			0% { transform: rotate(0deg); }
-			100% { transform: rotate(360deg); }
-		}
-		.ticket-button {
-			background-color: #4a90e2;
-			color: white;
-			padding: 0.8rem 1.4rem;
-			border-radius: 1rem;
-			font-weight: 600;
-			display: inline-flex;
-			align-items: center;
-			gap: 0.8rem;
-			user-select: none;
-			margin-top: 0.5rem;
-			justify-content: center;
-		}
-		.ticket-button:disabled {
-			opacity: 0.5;
-			cursor: not-allowed;
-		}
-		.ticket-img {
-			width: 96px;
-			height: 96px;
-		}
-		.search-img {
-			width: 96px;
-			height: 96px;
-		}
-		.inline {
-			display: flex;
-			padding-left: 12px;
-			align-items: flex-end;
-			justify-content: center;
-			gap: 0rem;
-			flex-wrap: nowrap;
-		}
-		.auth-card {
+    .poster-skeleton {
+      width: 100%;
+      aspect-ratio: 2/3;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 0.5rem;
+    }
+    @keyframes shimmer {
+      0% {
+        background-position: -200% 0;
+      }
+      100% {
+        background-position: 200% 0;
+      }
+    }
+    .caption {
+      padding: 0.5rem;
+      font-size: 0.9rem;
+      background: #fff;
+      text-align: center;
+    }
+    .list {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 1rem;
+      text-align: left;
+    }
+    .list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #eee;
+    }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0,0,0,0.5);
+      backdrop-filter: blur(2px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal {
+      background: transparent;
+      padding: 1.5rem;
+      border-radius: 100%;
+      width: 375px;
+      height: 376px;
+      text-align: center;
+    }
+    .modal-actions {
+      margin-top: 0.4rem;
+      display: flex;
+      justify-content: center;
+      padding: 0.5rem;
+    }
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #4a90e2;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      animation: spin 1s linear infinite;
+      margin: auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .ticket-button {
+      background-color: #4a90e2;
+      color: white;
+      padding: 0.8rem 1.4rem;
+      border-radius: 1rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      user-select: none;
+      margin-top: 0.5rem;
+      justify-content: center;
+    }
+    .ticket-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .ticket-img {
+      width: 96px;
+      height: 96px;
+    }
+    .search-img {
+      width: 96px;
+      height: 96px;
+    }
+    .inline {
+      display: flex;
+      padding-left: 12px;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 0rem;
+      flex-wrap: nowrap;
+    }
+    .auth-card {
       background: transparent;
       padding: 2rem;
       border-radius: 100%;
@@ -468,8 +496,7 @@ const Styles = () => (
       max-width: 375px;
       text-align: center;
     }
-
-	.selection-card {
+    .selection-card {
       background: transparent;
       padding: 2rem;
       border-radius: 1rem;
@@ -477,7 +504,7 @@ const Styles = () => (
       max-width: 720px;
       text-align: center;
     }
-	.movie-card {
+    .movie-card {
       background: transparent;
       padding: 2rem;
       border-radius: 1rem;
@@ -485,15 +512,14 @@ const Styles = () => (
       max-width: 720px;
       text-align: center;
     }
-	.lock-img {
-			width: 96px;
-			height: 96px;
-		}
-	.setpass {
-			color: white;
-		}
-		
-	`}</style>
+    .lock-img {
+      width: 96px;
+      height: 96px;
+    }
+    .setpass {
+      color: white;
+    }
+  `}</style>
 )
 
 export default MainV2
