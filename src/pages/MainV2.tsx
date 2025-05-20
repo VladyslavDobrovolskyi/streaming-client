@@ -8,9 +8,6 @@ import type { Movie } from '../api/ApiClient.ts'
 import { v4 } from 'uuid'
 import ACTIONS from '../socket/actions.ts'
 
-const ticketImg =
-	'https://www.gstatic.com/android/keyboard/emojikitchen/20240206/u1f39f-ufe0f/u1f39f-ufe0f_u2699-ufe0f.png'
-
 const MainV2 = () => {
 	const navigate = useNavigate()
 	const [step, setStep] = useState<'welcome' | 'auth' | 'room' | 'movie'>('welcome')
@@ -19,7 +16,7 @@ const MainV2 = () => {
 	const [selectedMovieId, setSelectedMovieId] = useState<number | null>(null)
 	const [authError, setAuthError] = useState('')
 	const [isLoading, setIsLoading] = useState(false)
-
+	const [ticketImg, setTicketImg] = useState('')
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 
@@ -38,6 +35,18 @@ const MainV2 = () => {
 			}
 		}
 	}
+
+	const getTicketImg = async () => {
+		const response = await apiClient.getTicketImg()
+
+		if (response) {
+			setTicketImg(response.url)
+		}
+	}
+
+	useEffect(() => {
+		getTicketImg()
+	}, [])
 
 	useEffect(() => {
 		if (localStorage.getItem('seenWelcomePage')) {
