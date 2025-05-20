@@ -152,9 +152,12 @@ const MainV2 = () => {
 			{step === 'auth' && (
 				<div className='card'>
 					{/* Картинка с билетом */}
-					<h2 className='title'>Watch</h2>
-					<img src={ticketImg} alt='Ticket' className='ticket-img' />
-					<h2 className='title'>Together</h2>
+
+					<div className='inline'>
+						<h2 className='title'>Watch</h2>
+						<img src={ticketImg} alt='Ticket' className='ticket-img' />
+						<h2 className='title'>Together</h2>
+					</div>
 					{authError && <div className='error'>{authError}</div>}
 
 					{/* Форма с логином и паролем */}
@@ -421,6 +424,12 @@ const Styles = () => (
 		.search-img {
 			width: 96px;
 			height: 96px;
+		}
+		.inline {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 1rem;
 		}
 		
 	`}</style>
