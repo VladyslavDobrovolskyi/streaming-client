@@ -158,7 +158,6 @@ const MainV2 = () => {
 
 					{/* Отдельная кнопка "Get the ticket" */}
 					<button onClick={handleGetTicket} className='button ticket-button' disabled={isLoading}>
-						<img src={ticketImg} alt='Ticket' className='ticket-img' />
 						<span>Get the ticket</span>
 					</button>
 				</div>
