@@ -178,7 +178,7 @@ const JoinPage = () => {
 			)}
 
 			{step === 'password' && (
-				<div className='card'>
+				<div className='join-card'>
 					<img src={lockImg} alt='Lock' className='lock-img' />
 					<h2 className='title'>Join Room</h2>
 					<p className='room-info'>
@@ -291,6 +291,15 @@ const Styles = () => (
 		@keyframes spin {
 			0% { transform: rotate(0deg); }
 			100% { transform: rotate(360deg); }
+		}
+		.card {
+			background: transparent;
+			padding: 2rem;
+			border-radius: 100%;
+			box-shadow: 3px 30px 13px rgba(0,0,0,0.1);
+			width: 100%;
+			max-width: 420px;
+			text-align: center;
 		}
 	`}</style>
 )
