@@ -292,7 +292,7 @@ const Styles = () => (
 			0% { transform: rotate(0deg); }
 			100% { transform: rotate(360deg); }
 		}
-		.card {
+		.join-card {
 			background: transparent;
 			padding: 2rem;
 			border-radius: 100%;
