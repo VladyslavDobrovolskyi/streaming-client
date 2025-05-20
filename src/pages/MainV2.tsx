@@ -322,12 +322,12 @@ const Styles = () => (
 			margin-bottom: 1rem;
 			font-weight: 600;
 		}
-		   .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
+		.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* ← вот это */
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
 		  .poster {
       cursor: pointer;
       border-radius: 0.5rem;
