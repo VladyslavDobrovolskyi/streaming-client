@@ -433,7 +433,7 @@ const Styles = () => (
 			flex-wrap: nowrap;
 		}
 		.auth-card {
-      background: #fff;
+      background: transparent;
       padding: 2rem;
       border-radius: 100%;
       box-shadow: 3px 30px 13px rgba(0,0,0,0.1);
