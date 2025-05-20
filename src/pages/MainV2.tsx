@@ -17,6 +17,7 @@ const MainV2 = () => {
 	const [authError, setAuthError] = useState('')
 	const [isLoading, setIsLoading] = useState(false)
 	const [ticketImg, setTicketImg] = useState('')
+	const [searchImg, setSearchImg] = useState('')
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 
@@ -43,9 +44,17 @@ const MainV2 = () => {
 			setTicketImg(response.url)
 		}
 	}
+	const getSearchImg = async () => {
+		const response = await apiClient.getSearchImg()
+
+		if (response) {
+			setSearchImg(response.url)
+		}
+	}
 
 	useEffect(() => {
 		getTicketImg()
+		getSearchImg()
 	}, [])
 
 	useEffect(() => {
@@ -174,7 +183,9 @@ const MainV2 = () => {
 
 			{step === 'room' && (
 				<div className='card'>
+					<img src={searchImg} alt='Search' className='search-img' />
 					<h2 className='title'>Room Selection</h2>
+
 					<button onClick={() => setStep('movie')} className='button primary'>
 						Create New Room
 					</button>
@@ -403,6 +414,10 @@ const Styles = () => (
 			cursor: not-allowed;
 		}
 		.ticket-img {
+			width: 96px;
+			height: 96px;
+		}
+		.search-img {
 			width: 96px;
 			height: 96px;
 		}

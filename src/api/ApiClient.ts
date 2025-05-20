@@ -88,6 +88,10 @@ export class ApiClient {
 	async getTicketImg() {
 		return await this.request<{ url: string }>('/emoji/ticket', 'GET')
 	}
+
+	async getSearchImg() {
+		return await this.request<{ url: string }>('/emoji/search', 'GET')
+	}
 	// === Методы для фильмов ===
 	async getMovies() {
 		return await this.request<Movie[]>(`/movies/all`, 'GET')
