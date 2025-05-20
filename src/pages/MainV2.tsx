@@ -21,7 +21,7 @@ const MainV2 = () => {
 	const [searchImg, setSearchImg] = useState('')
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
-
+	const [lockImg, setLockImg] = useState('')
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [roomPassword, setRoomPassword] = useState('')
 	const [pendingRoomId, setPendingRoomId] = useState<string | null>(null)
@@ -37,6 +37,18 @@ const MainV2 = () => {
 			}
 		}
 	}
+
+	const getLockImg = async () => {
+		const response = await apiClient.getLockImg()
+
+		if (response) {
+			setLockImg(response.url)
+		}
+	}
+
+	useEffect(() => {
+		getLockImg()
+	}, [])
 
 	const getTicketImg = async () => {
 		const response = await apiClient.getTicketImg()
@@ -223,6 +235,7 @@ const MainV2 = () => {
 			{isModalOpen && (
 				<div className='modal-overlay'>
 					<div className='modal'>
+						<img src={lockImg} alt='Lock' className='lock-img' />
 						<h3>Set Room Password (optional)</h3>
 						<input
 							type='text'
@@ -231,19 +244,19 @@ const MainV2 = () => {
 							placeholder='Enter password...'
 							className='input'
 						/>
+						<button
+							className='button secondary'
+							onClick={() => {
+								setIsModalOpen(false)
+								setRoomPassword('')
+								setPendingRoomId(null)
+							}}
+						>
+							Cancel
+						</button>
 						<div className='modal-actions'>
 							<button className='button primary' onClick={confirmCreateRoom}>
 								Create Room
-							</button>
-							<button
-								className='button secondary'
-								onClick={() => {
-									setIsModalOpen(false)
-									setRoomPassword('')
-									setPendingRoomId(null)
-								}}
-							>
-								Cancel
 							</button>
 						</div>
 					</div>
@@ -375,7 +388,9 @@ const Styles = () => (
 			background: white;
 			padding: 1.5rem;
 			border-radius: 1rem;
-			width: 300px;
+			width: 375px;
+			height: 376px;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 			text-align: center;
 		}
 		.modal-actions {
@@ -455,6 +470,10 @@ const Styles = () => (
       max-width: 720px;
       text-align: center;
     }
+	.lock-img {
+			width: 96px;
+			height: 96px;
+		}
 		
 	`}</style>
 )
