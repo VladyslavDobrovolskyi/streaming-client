@@ -442,7 +442,7 @@ const Styles = () => (
       text-align: center;
     }
 
-	.card {
+	.selection-card {
       background: transparent;
       padding: 2rem;
       border-radius: 1rem;
