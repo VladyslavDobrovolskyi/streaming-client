@@ -126,7 +126,7 @@ const MainV2 = () => {
 						}}
 						className='button primary'
 					>
-						<img src={ticketImg} alt='Ticket' className='ticket-img' />
+						
 						<span>Get the ticket</span>
 					</button>
 				</div>
@@ -134,7 +134,6 @@ const MainV2 = () => {
 
 			{step === 'auth' && (
 				<div className='card'>
-					<h2 className='title'>Get Ticket</h2>
 					<img src={ticketImg} alt='Ticket' className='ticket-img' />
 					{authError && <div className='error'>{authError}</div>}
 
@@ -395,8 +394,8 @@ const Styles = () => (
 			cursor: not-allowed;
 		}
 		.ticket-img {
-			width: 78px;
-			height: 56px;
+			width: 96px;
+			height: 96px;
 		}
 	`}</style>
 )
