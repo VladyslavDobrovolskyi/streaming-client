@@ -144,7 +144,7 @@ const MainV2 = () => {
 						}}
 						className='button primary'
 					>
-						<span>Get the ticket</span>
+						<span>Get your ticket!</span>
 					</button>
 				</div>
 			)}
