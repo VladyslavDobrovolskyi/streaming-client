@@ -427,9 +427,10 @@ const Styles = () => (
 		}
 		.inline {
 			display: flex;
-			align-items: center;
+			align-items: flex-end;
 			justify-content: center;
-			gap: 1rem;
+			gap: 0rem;
+			flex-wrap: nowrap;
 		}
 		
 	`}</style>
