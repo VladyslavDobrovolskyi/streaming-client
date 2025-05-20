@@ -288,8 +288,8 @@ const Styles = () => (
 		.input {
 			width: 100%;
 			padding: 0.75rem;
-			margin-bottom: 1rem;
-			border: 1px solid #ccc;
+			margin-bottom: 0.5rem;
+			border: 2.5px solid rgba(111, 107, 107, 0.54);
 			border-radius: 0.75rem;
 			font-size: 1rem;
 		}
