@@ -180,7 +180,7 @@ const MainV2 = () => {
 
 					{/* Отдельная кнопка "Get the ticket" */}
 					<button onClick={handleGetTicket} className='button ticket-button' disabled={isLoading}>
-						<span>Get the ticket</span>
+						<span>Get yout ticket!</span>
 					</button>
 				</div>
 			)}
