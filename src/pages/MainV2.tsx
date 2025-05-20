@@ -236,7 +236,7 @@ const MainV2 = () => {
 				<div className='modal-overlay'>
 					<div className='modal'>
 						<img src={lockImg} alt='Lock' className='lock-img' />
-						<h3>Set Room Password (optional)</h3>
+						<h3>Set Room Password</h3>
 						<input
 							type='text'
 							value={roomPassword}
@@ -323,6 +323,7 @@ const Styles = () => (
 		.button.secondary {
 			background-color: #eee;
 			color: #333;
+			margin-right: 10px;
 		}
 		.button.secondary:hover:not(:disabled) {
 			background-color: #ccc;
