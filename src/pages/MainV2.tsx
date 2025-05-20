@@ -152,9 +152,10 @@ const MainV2 = () => {
 			{step === 'auth' && (
 				<div className='card'>
 					{/* Картинка с билетом */}
+					<h2 className='title'>Watch</h2>
 					<img src={ticketImg} alt='Ticket' className='ticket-img' />
 					{authError && <div className='error'>{authError}</div>}
-					<h2 className='title'>Watch Together</h2>
+					<h2 className='title'>Together</h2>
 
 					{/* Форма с логином и паролем */}
 					<input
