@@ -208,7 +208,7 @@ const MainV2 = () => {
 					<div className='grid'>
 						{movies.map(movie => (
 							<div key={movie.id} className='poster' onClick={() => handleSelectMovie(movie.id)}>
-								<img src={movie.poster} alt={movie.title} />
+								<img src={movie.poster} alt={movie.title} className='movie-poster' />
 								<div className='caption'>{movie.title}</div>
 							</div>
 						))}
@@ -420,6 +420,10 @@ const Styles = () => (
 		.search-img {
 			width: 96px;
 			height: 96px;
+		}
+		.movie-poster {
+			width: 300px;
+			height: 700px;
 		}
 	`}</style>
 )
