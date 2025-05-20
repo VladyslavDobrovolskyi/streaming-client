@@ -262,6 +262,7 @@ const Styles = () => (
 		.button.primary {
 			background-color: #aaa;
 			color: #fff;
+			width: 40%;
 		}
 		.button.primary:disabled {
 			opacity: 0.7;
