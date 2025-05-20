@@ -410,7 +410,6 @@ const Styles = () => (
 			gap: 0.8rem;
 			user-select: none;
 			margin-top: 0.5rem;
-			width: 100%;
 			justify-content: center;
 		}
 		.ticket-button:disabled {
@@ -435,7 +434,7 @@ const Styles = () => (
 		.auth-card {
       background: #fff;
       padding: 2rem;
-      border-radius: 1rem;
+      border-radius: 100%;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       width: 100%;
       max-width: 375px;
