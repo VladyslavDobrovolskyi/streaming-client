@@ -208,7 +208,7 @@ const MainV2 = () => {
 					<div className='grid'>
 						{movies.map(movie => (
 							<div key={movie.id} className='poster' onClick={() => handleSelectMovie(movie.id)}>
-								<img src={movie.poster} alt={movie.title} className='movie-poster' />
+								<img src={movie.poster} alt={movie.title} />
 								<div className='caption'>{movie.title}</div>
 							</div>
 						))}
@@ -339,8 +339,8 @@ const Styles = () => (
 			transform: scale(1.05);
 		}
 		.poster img {
-			width: 100%;
-			height: auto;
+			width: 300px;
+			height: 700px;
 			display: block;
 		}
 		.caption {
@@ -421,10 +421,7 @@ const Styles = () => (
 			width: 96px;
 			height: 96px;
 		}
-		.movie-poster {
-			width: 300px;
-			height: 700px;
-		}
+		
 	`}</style>
 )
 
