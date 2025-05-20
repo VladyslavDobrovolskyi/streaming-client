@@ -126,7 +126,6 @@ const MainV2 = () => {
 						}}
 						className='button primary'
 					>
-						
 						<span>Get the ticket</span>
 					</button>
 				</div>
@@ -134,8 +133,10 @@ const MainV2 = () => {
 
 			{step === 'auth' && (
 				<div className='card'>
+					{/* Картинка с билетом */}
 					<img src={ticketImg} alt='Ticket' className='ticket-img' />
 					{authError && <div className='error'>{authError}</div>}
+					<h2 className='title'>Watch Together</h2>
 
 					{/* Форма с логином и паролем */}
 					<input
