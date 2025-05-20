@@ -382,6 +382,7 @@ const Styles = () => (
 			position: fixed;
 			inset: 0;
 			background-color: rgba(0,0,0,0.5);
+			backdrop-filter: blur(2px);
 			display: flex;
 			justify-content: center;
 			align-items: center;
