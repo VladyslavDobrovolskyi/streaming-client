@@ -5,6 +5,8 @@ import type React from 'react'
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { apiClient } from '../api/ApiClient.ts'
+const LockImg =
+	'https://www.gstatic.com/android/keyboard/emojikitchen/20240206/u1f39f-ufe0f/u1f39f-ufe0f_u2699-ufe0f.png'
 
 const JoinPage = () => {
 	const navigate = useNavigate()
@@ -166,6 +168,7 @@ const JoinPage = () => {
 
 			{step === 'password' && (
 				<div className='card'>
+					<img src={LockImg} alt='Lock' className='lock-img' />
 					<h2 className='title'>Join Room</h2>
 					<p className='room-info'>
 						You're joining room: <strong>{roomId}</strong>
@@ -269,6 +272,10 @@ const Styles = () => (
 			width: 40px;
 			height: 40px;
 			animation: spin 1s linear infinite;
+		}
+		.lock-img {
+			width: 96px;
+			height: 96px;
 		}
 		@keyframes spin {
 			0% { transform: rotate(0deg); }
