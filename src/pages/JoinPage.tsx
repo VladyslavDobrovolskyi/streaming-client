@@ -185,7 +185,7 @@ const JoinPage = () => {
 				</div>
 			)}
 
-			{step === 'password' && isOwner && (
+			{step === 'password' && !isOwner && (
 				<div className='join-card'>
 					<img src={lockImg} alt='Lock' className='lock-img' />
 					<h2 className='title'>Join Room</h2>
