@@ -1034,7 +1034,11 @@ export default function RoomPage() {
 
 	// Check if the user is authenticated before rendering the player
 	if (!isAuthenticated) {
-		return <Loader color='#4a90e2' />
+		return (
+			<div className='player-wrapper'>
+				<Loader color='#4a90e2' />
+			</div>
+		)
 	}
 
 	return (
