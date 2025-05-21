@@ -97,10 +97,21 @@ const MainV2 = () => {
 		loadAllImages()
 	}, [])
 
+	const autchCheck = async () => {
+		try {
+			await apiClient.getUserInfo()
+			setStep('room')
+			return true
+		} catch {
+			setStep('auth')
+			return false
+		}
+	}
 	useEffect(() => {
 		if (localStorage.getItem('seenWelcomePage')) {
 			setStep('auth')
 		}
+		autchCheck()
 		fetchMovies()
 	}, [])
 
