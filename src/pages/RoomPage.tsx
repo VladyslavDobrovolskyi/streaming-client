@@ -70,7 +70,7 @@ export default function RoomPage() {
 	const [isCameraDisabled, setCameraMuted] = useState(initialCameraDisabledState)
 	const [isMicrophoneDisabled, setMicMuted] = useState(initialMicrophoneDisabledState)
 	const [coveredClients, setCoveredClients] = useState<Record<string, boolean>>({})
-	const [isMovieMode, setIsMovieMode] = useState(true)
+	const [isMovieMode, setIsMovieMode] = useState(false)
 	const [clientPositions, setClientPositions] = useState<Record<string, { x: number; y: number }>>({})
 	const [hideMe, setHideMe] = useState(false)
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
