@@ -45,6 +45,7 @@ export default function RoomPage() {
 	const [duration, setDuration] = useState(0)
 	const [isVolumeActive, setIsVolumeActive] = useState(false)
 	const [mutedBySlider, setMutedBySlider] = useState(false)
+	const [isAuthenticated, setIsAuthenticated] = useState(false)
 	// Add loading state variables
 	const [isLoading, setIsLoading] = useState(true)
 	const [currentAction, setCurrentAction] = useState<
@@ -795,9 +796,11 @@ export default function RoomPage() {
 		try {
 			const response = await apiClient.getUserInfo()
 			if (response) {
+				setIsAuthenticated(true)
 				return true
 			}
 		} catch {
+			setIsAuthenticated(false)
 			window.location.href = '/'
 		}
 	}
@@ -1028,6 +1031,15 @@ export default function RoomPage() {
 		requestTimeAndState()
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isLoading, requestTimeAndState])
+
+	// Check if the user is authenticated before rendering the player
+	if (!isAuthenticated) {
+		return (
+			<div className='main-container'>
+				<Loader color='#4a90e2' />
+			</div>
+		)
+	}
 
 	return (
 		<div
