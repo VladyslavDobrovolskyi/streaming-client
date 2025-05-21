@@ -122,6 +122,15 @@ const JoinPage = () => {
 		)
 	}
 
+	if (isOwner) {
+		return (
+			<div className='main-container'>
+				<Loader color='#4a90e2' />
+				<Styles />
+			</div>
+		)
+	}
+
 	return (
 		<div className='main-container'>
 			<Styles />
@@ -176,7 +185,7 @@ const JoinPage = () => {
 				</div>
 			)}
 
-			{step === 'password' && !isOwner && (
+			{step === 'password' && isOwner && (
 				<div className='join-card'>
 					<img src={lockImg} alt='Lock' className='lock-img' />
 					<h2 className='title'>Join Room</h2>
