@@ -1034,7 +1034,7 @@ export default function RoomPage() {
 
 	// Check if the user is authenticated before rendering the player
 	if (!isAuthenticated) {
-		return null
+		return <Loader />
 	}
 
 	return (
