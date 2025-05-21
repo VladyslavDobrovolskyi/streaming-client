@@ -145,7 +145,7 @@ const JoinPage = () => {
 				</div>
 			)}
 
-			{step === 'auth' && (
+			{step === 'auth' && !isOwner && (
 				<div className='card'>
 					<h2 className='title'>{authMode === 'login' ? 'Login to Join Room' : 'Create Account'}</h2>
 					{error && <div className='error'>{error}</div>}
