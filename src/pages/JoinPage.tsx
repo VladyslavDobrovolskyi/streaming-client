@@ -20,6 +20,7 @@ const JoinPage = () => {
 	const [roomPassword, setRoomPassword] = useState('')
 	const [error, setError] = useState('')
 	const [isLoading, setIsLoading] = useState(false)
+	const [isOwner, setIsOwner] = useState(false)
 
 	const getLockImg = async () => {
 		const response = await apiClient.getLockImg()
@@ -32,13 +33,6 @@ const JoinPage = () => {
 	useEffect(() => {
 		getLockImg()
 	}, [])
-
-	useEffect(() => {
-		if (!roomId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(roomId)) {
-			setError('Invalid room ID')
-			setStep('error')
-		}
-	}, [roomId])
 
 	useEffect(() => {
 		const checkAuth = async () => {
@@ -74,13 +68,17 @@ const JoinPage = () => {
 		const checkRoomOwnership = async () => {
 			try {
 				const isOwner = await apiClient.amIRoomOwner(roomId!)
+
 				if (isOwner) {
+					setIsOwner(true)
 					const movieId = await apiClient.roomInfo(roomId!)
 					await apiClient.openSeance({
 						roomUUID: roomId!,
 						movieID: movieId,
 					})
 					navigate(`/room/${roomId}`)
+				} else {
+					setIsOwner(false)
 				}
 			} catch (error) {
 				console.error('Failed to check room ownership:', error)
@@ -178,7 +176,7 @@ const JoinPage = () => {
 				</div>
 			)}
 
-			{step === 'password' && (
+			{step === 'password' && !isOwner && (
 				<div className='join-card'>
 					<img src={lockImg} alt='Lock' className='lock-img' />
 					<h2 className='title'>Join Room</h2>
