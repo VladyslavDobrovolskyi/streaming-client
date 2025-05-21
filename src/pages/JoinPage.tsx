@@ -1,7 +1,6 @@
 'use client'
 
 import type React from 'react'
-
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { apiClient } from '../api/ApiClient.ts'
@@ -10,7 +9,7 @@ import Loader from '../components/player/Loader.tsx'
 const JoinPage = () => {
 	const navigate = useNavigate()
 	const { roomId } = useParams<{ roomId: string }>()
-	const [step, setStep] = useState<'auth' | 'password' | 'loading' | 'error'>('auth')
+	const [step, setStep] = useState<'init' | 'auth' | 'password' | 'loading' | 'error'>('init')
 	const [authMode, setAuthMode] = useState<'login' | 'register'>('login')
 	const [lockImg, setLockImg] = useState('')
 	const [authData, setAuthData] = useState({
@@ -19,12 +18,9 @@ const JoinPage = () => {
 	})
 	const [roomPassword, setRoomPassword] = useState('')
 	const [error, setError] = useState('')
-	const [isLoading, setIsLoading] = useState(false)
-	const [isOwner, setIsOwner] = useState(false)
 
 	const getLockImg = async () => {
 		const response = await apiClient.getLockImg()
-
 		if (response) {
 			setLockImg(response.url)
 		}
@@ -35,42 +31,16 @@ const JoinPage = () => {
 	}, [])
 
 	useEffect(() => {
-		const checkAuth = async () => {
+		const checkAuthAndOwnership = async () => {
 			try {
+				// Check user authentication
 				await apiClient.getUserInfo()
-				setStep('password')
-			} catch {
-				setStep('auth')
-			}
-		}
 
-		if (roomId) {
-			checkAuth()
-		}
-	}, [roomId])
-
-	const handleAuthSubmit = async (e: React.FormEvent) => {
-		e.preventDefault()
-		setError('')
-		setIsLoading(true)
-
-		try {
-			await apiClient.getTicket(authData)
-			setStep('password')
-		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Authentication failed')
-		} finally {
-			setIsLoading(false)
-		}
-	}
-
-	useEffect(() => {
-		const checkRoomOwnership = async () => {
-			try {
+				// Check room ownership
 				const isOwner = await apiClient.amIRoomOwner(roomId!)
 
 				if (isOwner) {
-					setIsOwner(true)
+					// If owner, go directly to room
 					const movieId = await apiClient.roomInfo(roomId!)
 					await apiClient.openSeance({
 						roomUUID: roomId!,
@@ -78,42 +48,73 @@ const JoinPage = () => {
 					})
 					navigate(`/room/${roomId}`)
 				} else {
-					setIsOwner(false)
+					// If not owner, show password form
+					setStep('password')
 				}
 			} catch (error) {
-				console.error('Failed to check room ownership:', error)
+				// If not authenticated, show auth form
+				setStep('auth')
 			}
 		}
-		checkRoomOwnership()
+
+		if (roomId) {
+			setStep('loading')
+			checkAuthAndOwnership()
+		} else {
+			setStep('error')
+			setError('Invalid room link')
+		}
 	}, [navigate, roomId])
 
-	const handleRoomJoin = async (e?: React.FormEvent) => {
-		e?.preventDefault()
+	const handleAuthSubmit = async (e: React.FormEvent) => {
+		e.preventDefault()
 		setError('')
-		setIsLoading(true)
+		setStep('loading')
+
+		try {
+			await apiClient.getTicket(authData)
+			// After auth, check ownership again
+			const isOwner = await apiClient.amIRoomOwner(roomId!)
+
+			if (isOwner) {
+				const movieId = await apiClient.roomInfo(roomId!)
+				await apiClient.openSeance({
+					roomUUID: roomId!,
+					movieID: movieId,
+				})
+				navigate(`/room/${roomId}`)
+			} else {
+				setStep('password')
+			}
+		} catch (err) {
+			setStep('auth')
+			setError(err instanceof Error ? err.message : 'Authentication failed')
+		}
+	}
+
+	const handleRoomJoin = async (e: React.FormEvent) => {
+		e.preventDefault()
+		setError('')
+		setStep('loading')
 
 		try {
 			const movieId = await apiClient.roomInfo(roomId!)
-
 			await apiClient.joinRoom({
 				roomUUID: roomId!,
 				password: roomPassword || undefined,
 			})
-
 			await apiClient.openSeance({
 				roomUUID: roomId!,
 				movieID: movieId,
 			})
-
 			navigate(`/room/${roomId}`)
 		} catch (err) {
+			setStep('password')
 			setError(err instanceof Error ? err.message : 'Failed to join room')
-		} finally {
-			setIsLoading(false)
 		}
 	}
 
-	if (isLoading) {
+	if (step === 'init' || step === 'loading') {
 		return (
 			<div className='main-container'>
 				<Loader color='#4a90e2' />
@@ -122,10 +123,16 @@ const JoinPage = () => {
 		)
 	}
 
-	if (isOwner) {
+	if (step === 'error') {
 		return (
 			<div className='main-container'>
-				<Loader color='#4a90e2' />
+				<div className='card error-card'>
+					<h2 className='title'>Error</h2>
+					<p>{error}</p>
+					<button onClick={() => navigate('/')} className='button primary'>
+						Go to Home
+					</button>
+				</div>
 				<Styles />
 			</div>
 		)
@@ -135,17 +142,7 @@ const JoinPage = () => {
 		<div className='main-container'>
 			<Styles />
 
-			{step === 'error' && (
-				<div className='card error-card'>
-					<h2 className='title'>Error</h2>
-					<p>{error || 'Invalid room link'}</p>
-					<button onClick={() => navigate('/')} className='button primary' disabled={isLoading}>
-						Go to Home
-					</button>
-				</div>
-			)}
-
-			{step === 'auth' && !isOwner && (
+			{step === 'auth' && (
 				<div className='card'>
 					<h2 className='title'>{authMode === 'login' ? 'Login to Join Room' : 'Create Account'}</h2>
 					{error && <div className='error'>{error}</div>}
@@ -157,7 +154,7 @@ const JoinPage = () => {
 							placeholder='Username'
 							className='input'
 							required
-							disabled={isLoading}
+							disabled={step === 'loading'}
 							autoComplete='username'
 						/>
 						<input
@@ -167,17 +164,17 @@ const JoinPage = () => {
 							placeholder='Password'
 							className='input'
 							required
-							disabled={isLoading}
+							disabled={step === 'loading'}
 							autoComplete={authMode === 'login' ? 'current-password' : 'new-password'}
 						/>
-						<button type='submit' className='button primary' disabled={isLoading}>
-							{isLoading ? '...' : authMode === 'login' ? 'Login' : 'Register'}
+						<button type='submit' className='button primary' disabled={step === 'loading'}>
+							{step === 'loading' ? '...' : authMode === 'login' ? 'Login' : 'Register'}
 						</button>
 						<button
 							type='button'
 							className='button secondary'
 							onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
-							disabled={isLoading}
+							disabled={step === 'loading'}
 						>
 							{authMode === 'login' ? 'Create account' : 'Already have account'}
 						</button>
@@ -185,7 +182,7 @@ const JoinPage = () => {
 				</div>
 			)}
 
-			{step === 'password' && !isOwner && (
+			{step === 'password' && (
 				<div className='join-card'>
 					<img src={lockImg} alt='Lock' className='lock-img' />
 					<h2 className='title'>Join Room</h2>
@@ -200,11 +197,11 @@ const JoinPage = () => {
 							onChange={e => setRoomPassword(e.target.value)}
 							placeholder='Room password (if required)'
 							className='input'
-							disabled={isLoading}
+							disabled={step === 'loading'}
 							autoComplete='off'
 						/>
-						<button type='submit' className='button primary' disabled={isLoading}>
-							{isLoading ? 'Joining...' : 'Join Room'}
+						<button type='submit' className='button primary' disabled={step === 'loading'}>
+							{step === 'loading' ? 'Joining...' : 'Join Room'}
 						</button>
 					</form>
 				</div>
@@ -215,102 +212,102 @@ const JoinPage = () => {
 
 const Styles = () => (
 	<style>{`
-		* {
-			box-sizing: border-box;
-		}
-		body, html, .main-container {
-			margin: 0;
-			padding: 0;
-			font-family: sans-serif;
-			background-color: #f5f5f5;
-			color: #333;
-			min-height: 100vh;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-		}
-		.card {
-			background: #fff;
-			padding: 2rem;
-			border-radius: 1rem;
-			box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-			width: 100%;
-			max-width: 420px;
-			text-align: center;
-		}
-		.error-card {
-			border: 2px solid #c00;
-			background-color: #fff0f0;
-		}
-		.title {
-			font-size: 1.5rem;
-			margin-bottom: 1rem;
-		}
-		.room-info {
-			text-align: center;
-			margin-bottom: 1rem;
-		}
-		.input {
-			width: 92%;
-			padding: 0.75rem;
-			margin-bottom: 1rem;
-			border: 1px solid #ccc;
-			border-radius: 0.75rem;
-			font-size: 1rem;
-		}
-		.button {
-			padding: 0.6rem 1rem;
-			border: none;
-			border-radius: 0.75rem;
-			font-size: 1rem;
-			cursor: pointer;
-			margin: 0.5rem 0;
-			width: 100%;
-		}
-		.button.primary {
-			background-color: #aaa;
-			color: #fff;
-			width: 40%;
-		}
-		.button.primary:disabled {
-			opacity: 0.7;
-			cursor: not-allowed;
-		}
-		.button.secondary {
-			background: transparent;
-			color: #777;
-			border: 1px solid #ccc;
-		}
-		.error {
-			color: #c00;
-			margin-bottom: 1rem;
-		}
-		.spinner {
-			border: 4px solid #eee;
-			border-top: 4px solid #aaa;
-			border-radius: 50%;
-			width: 40px;
-			height: 40px;
-			animation: spin 1s linear infinite;
-		}
-		.lock-img {
-			width: 96px;
-			height: 96px;
-		}
-		@keyframes spin {
-			0% { transform: rotate(0deg); }
-			100% { transform: rotate(360deg); }
-		}
-		.join-card {
-			background: transparent;
-			padding: 2rem;
-			border-radius: 100%;
-			box-shadow: 3px 30px 13px rgba(0,0,0,0.1);
-			width: 100%;
-			max-width: 420px;
-			text-align: center;
-		}
-	`}</style>
+        * {
+            box-sizing: border-box;
+        }
+        body, html, .main-container {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+        .error-card {
+            border: 2px solid #c00;
+            background-color: #fff0f0;
+        }
+        .title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .room-info {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .input {
+            width: 92%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+        }
+        .button {
+            padding: 0.6rem 1rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 0.5rem 0;
+            width: 100%;
+        }
+        .button.primary {
+            background-color: #aaa;
+            color: #fff;
+            width: 40%;
+        }
+        .button.primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .button.secondary {
+            background: transparent;
+            color: #777;
+            border: 1px solid #ccc;
+        }
+        .error {
+            color: #c00;
+            margin-bottom: 1rem;
+        }
+        .spinner {
+            border: 4px solid #eee;
+            border-top: 4px solid #aaa;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        .lock-img {
+            width: 96px;
+            height: 96px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .join-card {
+            background: transparent;
+            padding: 2rem;
+            border-radius: 100%;
+            box-shadow: 3px 30px 13px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+    `}</style>
 )
 
 export default JoinPage
