@@ -6,10 +6,12 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { apiClient } from '../api/ApiClient.ts'
 import Loader from '../components/player/Loader.tsx'
 
+type Step = 'init' | 'auth' | 'password' | 'loading' | 'error'
+
 const JoinPage = () => {
 	const navigate = useNavigate()
 	const { roomId } = useParams<{ roomId: string }>()
-	const [step, setStep] = useState<'init' | 'auth' | 'password' | 'loading' | 'error'>('init')
+	const [step, setStep] = useState<Step>('init')
 	const [authMode, setAuthMode] = useState<'login' | 'register'>('login')
 	const [lockImg, setLockImg] = useState('')
 	const [authData, setAuthData] = useState({
@@ -18,6 +20,7 @@ const JoinPage = () => {
 	})
 	const [roomPassword, setRoomPassword] = useState('')
 	const [error, setError] = useState('')
+	const [isLoading, setIsLoading] = useState(false) // New loading state
 
 	const getLockImg = async () => {
 		const response = await apiClient.getLockImg()
@@ -33,14 +36,12 @@ const JoinPage = () => {
 	useEffect(() => {
 		const checkAuthAndOwnership = async () => {
 			try {
-				// Check user authentication
+				setIsLoading(true)
 				await apiClient.getUserInfo()
 
-				// Check room ownership
 				const isOwner = await apiClient.amIRoomOwner(roomId!)
 
 				if (isOwner) {
-					// If owner, go directly to room
 					const movieId = await apiClient.roomInfo(roomId!)
 					await apiClient.openSeance({
 						roomUUID: roomId!,
@@ -48,17 +49,16 @@ const JoinPage = () => {
 					})
 					navigate(`/room/${roomId}`)
 				} else {
-					// If not owner, show password form
 					setStep('password')
 				}
-			} catch (error) {
-				// If not authenticated, show auth form
+			} catch {
 				setStep('auth')
+			} finally {
+				setIsLoading(false)
 			}
 		}
 
 		if (roomId) {
-			setStep('loading')
 			checkAuthAndOwnership()
 		} else {
 			setStep('error')
@@ -69,11 +69,10 @@ const JoinPage = () => {
 	const handleAuthSubmit = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setError('')
-		setStep('loading')
+		setIsLoading(true)
 
 		try {
 			await apiClient.getTicket(authData)
-			// After auth, check ownership again
 			const isOwner = await apiClient.amIRoomOwner(roomId!)
 
 			if (isOwner) {
@@ -89,13 +88,15 @@ const JoinPage = () => {
 		} catch (err) {
 			setStep('auth')
 			setError(err instanceof Error ? err.message : 'Authentication failed')
+		} finally {
+			setIsLoading(false)
 		}
 	}
 
 	const handleRoomJoin = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setError('')
-		setStep('loading')
+		setIsLoading(true)
 
 		try {
 			const movieId = await apiClient.roomInfo(roomId!)
@@ -111,10 +112,12 @@ const JoinPage = () => {
 		} catch (err) {
 			setStep('password')
 			setError(err instanceof Error ? err.message : 'Failed to join room')
+		} finally {
+			setIsLoading(false)
 		}
 	}
 
-	if (step === 'init' || step === 'loading') {
+	if (step === 'init' || isLoading) {
 		return (
 			<div className='main-container'>
 				<Loader color='#4a90e2' />
@@ -154,7 +157,7 @@ const JoinPage = () => {
 							placeholder='Username'
 							className='input'
 							required
-							disabled={step === 'loading'}
+							disabled={isLoading}
 							autoComplete='username'
 						/>
 						<input
@@ -164,17 +167,17 @@ const JoinPage = () => {
 							placeholder='Password'
 							className='input'
 							required
-							disabled={step === 'loading'}
+							disabled={isLoading}
 							autoComplete={authMode === 'login' ? 'current-password' : 'new-password'}
 						/>
-						<button type='submit' className='button primary' disabled={step === 'loading'}>
-							{step === 'loading' ? '...' : authMode === 'login' ? 'Login' : 'Register'}
+						<button type='submit' className='button primary' disabled={isLoading}>
+							{isLoading ? '...' : authMode === 'login' ? 'Login' : 'Register'}
 						</button>
 						<button
 							type='button'
 							className='button secondary'
 							onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
-							disabled={step === 'loading'}
+							disabled={isLoading}
 						>
 							{authMode === 'login' ? 'Create account' : 'Already have account'}
 						</button>
@@ -197,11 +200,11 @@ const JoinPage = () => {
 							onChange={e => setRoomPassword(e.target.value)}
 							placeholder='Room password (if required)'
 							className='input'
-							disabled={step === 'loading'}
+							disabled={isLoading}
 							autoComplete='off'
 						/>
-						<button type='submit' className='button primary' disabled={step === 'loading'}>
-							{step === 'loading' ? 'Joining...' : 'Join Room'}
+						<button type='submit' className='button primary' disabled={isLoading}>
+							{isLoading ? 'Joining...' : 'Join Room'}
 						</button>
 					</form>
 				</div>
