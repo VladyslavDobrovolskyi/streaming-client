@@ -338,6 +338,7 @@ const MainV2 = () => {
 					</div>
 				</div>
 			)}
+			<div className='connection-tip'>Tip: Refresh the page if connection fails on first attempt</div>
 		</div>
 	)
 }
@@ -358,6 +359,20 @@ const Styles = () => (
       justify-content: center;
       align-items: center;
     }
+
+	.connection-tip {
+			position: fixed;
+			bottom: 20px;
+			left: 50%;
+			transform: translateX(-50%);
+			background-color: rgba(0,0,0,0.7);
+			color: white;
+			padding: 8px 16px;
+			border-radius: 4px;
+			font-size: 14px;
+			z-index: 1000;
+			animation: fadeIn 0.5s;
+	}
     .card {
       background: #fff;
       padding: 2rem;

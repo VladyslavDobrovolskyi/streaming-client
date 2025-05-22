@@ -196,7 +196,7 @@ const JoinPage = () => {
 							type='password'
 							value={roomPassword}
 							onChange={e => setRoomPassword(e.target.value)}
-							placeholder='Room password (if required)'
+							placeholder='Room password (required)'
 							className={`input ${inputError ? 'error-input' : ''}`}
 							disabled={isLoading}
 							autoComplete='off'
