@@ -262,14 +262,17 @@ const MainV2 = () => {
 							</button>
 						</div>
 					)}
-					{rooms.map(roomID => (
-						<div key={roomID} className='list-item'>
-							<span>{roomID}</span>
-							<button onClick={() => joinRoom(roomID)} className='button small'>
-								Join
-							</button>
-						</div>
-					))}
+					{rooms.map(
+						roomID =>
+							roomID !== activeSeance && (
+								<div key={roomID} className='list-item'>
+									<span>{roomID}</span>
+									<button onClick={() => joinRoom(roomID)} className='button small'>
+										Join
+									</button>
+								</div>
+							)
+					)}
 				</div>
 			)}
 
