@@ -243,6 +243,7 @@ const MainV2 = () => {
 					>
 						<span>{!username ? 'Username?' : !password ? 'Password?' : 'Take your Ticket!'}</span>
 					</button>
+					<div className='footer-text'>All rights reserved © {new Date().getFullYear()}</div>
 				</div>
 			)}
 
@@ -569,6 +570,12 @@ const Styles = () => (
   background-color: #eee;
   color: #333;
 }
+   .footer-text {
+      margin-top: 2rem;
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.6);
+      text-align: center;
+    }
   `}</style>
 )
 
