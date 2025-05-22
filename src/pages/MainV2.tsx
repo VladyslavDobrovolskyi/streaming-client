@@ -334,11 +334,13 @@ const MainV2 = () => {
 							>
 								Create Room
 							</button>
+							<div className='connection-tip'>
+								⚠️: Refresh the page if connection fails on first attempt
+							</div>
 						</div>
 					</div>
 				</div>
 			)}
-			<div className='connection-tip'>⚠️: Refresh the page if connection fails on first attempt</div>
 		</div>
 	)
 }
