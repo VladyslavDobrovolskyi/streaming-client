@@ -205,6 +205,9 @@ const JoinPage = () => {
 							{isLoading ? 'Joining...' : 'Join Room'}
 						</button>
 					</form>
+					<div className='connection-tip'>
+						⚠️ If you don't see your friends in the room, just refresh the page.
+					</div>
 				</div>
 			)}
 		</div>
@@ -227,6 +230,19 @@ const Styles = () => (
             justify-content: center;
             align-items: center;
         }
+		.connection-tip {
+			position: fixed;
+			bottom: 20px;
+			left: 50%;
+			transform: translateX(-50%);
+			background-color: rgb(0 0 0 / 41%);
+			color: white;
+			padding: 8px 16px;
+			border-radius: 12px;
+			font-size: 14px;
+			z-index: 1000;
+			animation: fadeIn 0.5s;
+	}
         .card {
             background: #fff;
             padding: 2rem;
