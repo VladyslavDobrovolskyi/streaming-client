@@ -424,17 +424,17 @@ const Styles = () => (
       transform: scale(1.05);
     }
     .poster img {
-      width: 100%;
-      height: auto;
+      width: 208px;
+      height: 312px;
       display: block;
       aspect-ratio: 2/3;
       object-fit: cover;
     }
     .poster-skeleton {
-      width: 100%;
-	height: auto;
+      width: 208px;
+	height: 312px;
       aspect-ratio: 2/3;
-	  background-color:rgb(181, 35, 35);
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
       border-radius: 0.5rem;
