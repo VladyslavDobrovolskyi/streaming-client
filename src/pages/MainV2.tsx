@@ -243,6 +243,14 @@ const MainV2 = () => {
 					>
 						<span>{!username ? 'Username?' : !password ? 'Password?' : 'Take your Ticket!'}</span>
 					</button>
+					<div className='footer-text'>
+						PoC - Created by{' '}
+						<a href='https://github.com/VladyslavDobrovolskyi' target='_blank' rel='noopener noreferrer'>
+							Vladyslav Dobrovolskyi
+						</a>{' '}
+						<br />
+						All rights reserved © {new Date().getFullYear()}
+					</div>
 				</div>
 			)}
 
@@ -324,15 +332,6 @@ const MainV2 = () => {
 					</div>
 				</div>
 			)}
-
-			<div className='footer-text'>
-				PoC - Created by{' '}
-				<a href='https://github.com/VladyslavDobrovolskyi' target='_blank' rel='noopener noreferrer'>
-					Vladyslav Dobrovolskyi
-				</a>{' '}
-				<br />
-				All rights reserved © {new Date().getFullYear()}
-			</div>
 		</div>
 	)
 }
