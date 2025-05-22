@@ -266,7 +266,7 @@ const MainV2 = () => {
 						<div key={roomID} className='list-item'>
 							<span>{roomID}</span>
 							<button onClick={() => joinRoom(roomID)} className='button small'>
-								Join to Room
+								Join
 							</button>
 						</div>
 					))}
