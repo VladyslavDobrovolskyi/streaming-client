@@ -254,22 +254,22 @@ const MainV2 = () => {
 					<button onClick={() => setStep('movie')} className='button primary'>
 						Create New Room
 					</button>
-					<div className='list'>
+					{activeSeance && (
 						<div key={activeSeance} className='list-item'>
 							<span>{activeSeance}</span>
 							<button onClick={() => joinRoom(activeSeance!)} className='button small'>
 								Active Seance
 							</button>
 						</div>
-						{rooms.map(roomID => (
-							<div key={roomID} className='list-item'>
-								<span>{roomID}</span>
-								<button onClick={() => joinRoom(roomID)} className='button small'>
-									Join to Room
-								</button>
-							</div>
-						))}
-					</div>
+					)}
+					{rooms.map(roomID => (
+						<div key={roomID} className='list-item'>
+							<span>{roomID}</span>
+							<button onClick={() => joinRoom(roomID)} className='button small'>
+								Join to Room
+							</button>
+						</div>
+					))}
 				</div>
 			)}
 
