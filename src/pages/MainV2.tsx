@@ -330,6 +330,7 @@ const MainV2 = () => {
 				<a href='https://github.com/VladyslavDobrovolskyi' target='_blank' rel='noopener noreferrer'>
 					Vladyslav Dobrovolskyi
 				</a>{' '}
+				<br />
 				All rights reserved © {new Date().getFullYear()}
 			</div>
 		</div>
