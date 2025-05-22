@@ -325,7 +325,11 @@ const MainV2 = () => {
 							>
 								Cancel
 							</button>
-							<button className='button primary' onClick={confirmCreateRoom}>
+							<button
+								className='button primary'
+								onClick={confirmCreateRoom}
+								disabled={isLoading || !roomPassword}
+							>
 								Create Room
 							</button>
 						</div>
@@ -413,7 +417,7 @@ const Styles = () => (
       gap: 1rem;
       margin-bottom: 1rem;
 	  animation: fadeIn 0.8s;
-	  
+
     }
     .poster {
       cursor: pointer;
