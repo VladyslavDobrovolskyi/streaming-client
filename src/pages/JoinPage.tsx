@@ -283,15 +283,15 @@ const Styles = () => (
             10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
             20%, 40%, 60%, 80% { transform: translateX(5px); }
         }
-        .button {
-            padding: 0.6rem 1rem;
-            border: none;
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            cursor: pointer;
-            margin: 0.5rem 0;
-            width: 100%;
-        }
+      .button {
+      cursor: pointer;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 1rem;
+      font-weight: 600;
+      margin: 0.3rem 0;
+      transition: background-color 0.3s ease;
+    }
         .button.primary {
             background-color: #4a90e2;
             color: #fff;
