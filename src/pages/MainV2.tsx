@@ -579,12 +579,13 @@ const Styles = () => (
 }
    .footer-text {
       margin-top: 2rem;
-      font-size: 0.8rem;
+      font-size: 0.7rem;
       color: #333;
       text-align: center;
 	  position: absolute;
 	  bottom: 0;
-	  padding-left: 32px;
+	  padding-left: 50px;
+	  padding-bottom: 5px;
     }
   `}</style>
 )
