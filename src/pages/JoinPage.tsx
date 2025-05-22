@@ -282,9 +282,8 @@ const Styles = () => (
             width: 40%;
         }
         .button.primary:disabled {
-            opacity: 0.7;
 			background-color: #ccc;
-			color: #ccc;
+			color: #666;
             cursor: not-allowed;
         }
         .button.secondary {
