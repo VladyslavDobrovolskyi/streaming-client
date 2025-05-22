@@ -335,7 +335,7 @@ const MainV2 = () => {
 								Create Room
 							</button>
 							<div className='connection-tip'>
-								⚠️: Refresh the page if connection fails on first attempt
+								⚠️ If you don't see your friends in the room, just refresh the page.
 							</div>
 						</div>
 					</div>
