@@ -412,6 +412,8 @@ const Styles = () => (
       grid-template-columns: repeat(3, 1fr);
       gap: 1rem;
       margin-bottom: 1rem;
+	  animation: fadeIn 0.8s;
+	  
     }
     .poster {
       cursor: pointer;
@@ -419,6 +421,7 @@ const Styles = () => (
       overflow: hidden;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
       transition: transform 0.3s;
+
     }
     .poster:hover {
       transform: scale(1.05);
