@@ -125,6 +125,10 @@ export class ApiClient {
 		})
 	}
 
+	async getActiveSeance() {
+		return await this.request<{ activeRoom: string | null }>(`/seances/active`, 'GET')
+	}
+
 	async continueSeance() {
 		return await this.request('/seances/continue', 'PATCH')
 	}

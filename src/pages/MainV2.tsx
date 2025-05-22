@@ -27,6 +27,7 @@ const MainV2 = () => {
 	const [pendingRoomId, setPendingRoomId] = useState<string | null>(null)
 	const [imagesLoaded, setImagesLoaded] = useState(false)
 	const [loadedPosters, setLoadedPosters] = useState<Record<number, boolean>>({})
+	const [activeSeance, setActiveSeance] = useState<string | null>(null)
 
 	const fetchMovies = async () => {
 		try {
@@ -57,6 +58,15 @@ const MainV2 = () => {
 			}
 		} finally {
 			setIsLoading(false)
+		}
+	}
+
+	const getActiveSeance = async () => {
+		try {
+			const response = await apiClient.getActiveSeance()
+			setActiveSeance(response.activeRoom)
+		} catch (error) {
+			console.error('Error fetching active seance:', error)
 		}
 	}
 
@@ -112,6 +122,7 @@ const MainV2 = () => {
 			setStep('auth')
 		}
 		autchCheck()
+		getActiveSeance()
 		fetchMovies()
 	}, [])
 
@@ -244,11 +255,17 @@ const MainV2 = () => {
 						Create New Room
 					</button>
 					<div className='list'>
+						<div key={activeSeance} className='list-item'>
+							<span>{activeSeance}</span>
+							<button onClick={() => joinRoom(activeSeance!)} className='button small'>
+								Active Seance
+							</button>
+						</div>
 						{rooms.map(roomID => (
 							<div key={roomID} className='list-item'>
 								<span>{roomID}</span>
 								<button onClick={() => joinRoom(roomID)} className='button small'>
-									Join
+									Join to Room
 								</button>
 							</div>
 						))}
