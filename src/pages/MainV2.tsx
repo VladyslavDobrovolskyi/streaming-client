@@ -221,8 +221,12 @@ const MainV2 = () => {
 						className='input'
 					/>
 
-					<button onClick={handleGetTicket} className='button ticket-button' disabled={isLoading}>
-						<span>Get your ticket!</span>
+					<button
+						onClick={handleGetTicket}
+						className={`button ${username && password ? 'primary' : ''}`}
+						disabled={!username || !password || isLoading}
+					>
+						<span>{!username ? 'Username?' : !password ? 'Password?' : 'Take your Ticket!'}</span>
 					</button>
 				</div>
 			)}
@@ -531,6 +535,16 @@ const Styles = () => (
     .setpass {
       color: white;
     }
+	.button:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.button:not(.primary):not(:disabled) {
+  background-color: #eee;
+  color: #333;
+}
   `}</style>
 )
 
