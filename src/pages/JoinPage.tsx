@@ -52,7 +52,7 @@ const JoinPage = () => {
 					setStep('password')
 				}
 			} catch {
-				setStep('auth')
+				navigate(`/`)
 			} finally {
 				setIsLoading(false)
 			}
@@ -200,7 +200,6 @@ const JoinPage = () => {
 							className={`input ${inputError ? 'error-input' : ''}`}
 							disabled={isLoading}
 							autoComplete='off'
-							
 						/>
 						<button type='submit' className='button primary' disabled={isLoading || !roomPassword}>
 							{isLoading ? 'Joining...' : 'Join Room'}
