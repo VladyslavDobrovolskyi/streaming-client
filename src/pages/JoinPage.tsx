@@ -96,7 +96,6 @@ const JoinPage = () => {
 	const handleRoomJoin = async (e: React.FormEvent) => {
 		e.preventDefault()
 		setError('')
-		setIsLoading(true)
 
 		try {
 			const movieId = await apiClient.roomInfo(roomId!)
@@ -114,8 +113,6 @@ const JoinPage = () => {
 			setError(err instanceof Error ? err.message : 'Failed to join room')
 			setInputError(true)
 			setTimeout(() => setInputError(false), 3000) // Сбрасываем ошибку через 3 секунды
-		} finally {
-			setIsLoading(false)
 		}
 	}
 
