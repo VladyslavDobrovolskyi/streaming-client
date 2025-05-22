@@ -209,42 +209,44 @@ const MainV2 = () => {
 			)}
 
 			{step === 'auth' && (
-				<div className='auth-card'>
-					<div className='inline'>
-						<h2 className='title'>Watch</h2>
-						{ticketImg && <img src={ticketImg} alt='Ticket' className='ticket-img' />}
-						<h2 className='title'>Together</h2>
+				<>
+					<div className='auth-card'>
+						<div className='inline'>
+							<h2 className='title'>Watch</h2>
+							{ticketImg && <img src={ticketImg} alt='Ticket' className='ticket-img' />}
+							<h2 className='title'>Together</h2>
+						</div>
+						{authError && <div className='error'>{authError}</div>}
+
+						<input
+							autoComplete='off'
+							autoCorrect='off'
+							type='text'
+							placeholder='Username'
+							value={username}
+							onChange={e => setUsername(e.target.value)}
+							className='input'
+						/>
+						<input
+							type='password'
+							placeholder='Password'
+							autoComplete='off'
+							autoCorrect='off'
+							value={password}
+							onChange={e => setPassword(e.target.value)}
+							className='input'
+						/>
+
+						<button
+							onClick={handleGetTicket}
+							className={`button ${username && password ? 'primary' : ''}`}
+							disabled={!username || !password || isLoading}
+						>
+							<span>{!username ? 'Username?' : !password ? 'Password?' : 'Take your Ticket!'}</span>
+						</button>
 					</div>
-					{authError && <div className='error'>{authError}</div>}
-
-					<input
-						autoComplete='off'
-						autoCorrect='off'
-						type='text'
-						placeholder='Username'
-						value={username}
-						onChange={e => setUsername(e.target.value)}
-						className='input'
-					/>
-					<input
-						type='password'
-						placeholder='Password'
-						autoComplete='off'
-						autoCorrect='off'
-						value={password}
-						onChange={e => setPassword(e.target.value)}
-						className='input'
-					/>
-
-					<button
-						onClick={handleGetTicket}
-						className={`button ${username && password ? 'primary' : ''}`}
-						disabled={!username || !password || isLoading}
-					>
-						<span>{!username ? 'Username?' : !password ? 'Password?' : 'Take your Ticket!'}</span>
-					</button>
 					<div className='footer-text'>All rights reserved © {new Date().getFullYear()}</div>
-				</div>
+				</>
 			)}
 
 			{step === 'room' && (
