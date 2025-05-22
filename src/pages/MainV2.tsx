@@ -574,8 +574,10 @@ const Styles = () => (
    .footer-text {
       margin-top: 2rem;
       font-size: 0.8rem;
-      color: rgba(255, 255, 255, 0.6);
+      color: #333;
       text-align: center;
+	  position: absolute;
+	  bottom: 0;
     }
   `}</style>
 )
