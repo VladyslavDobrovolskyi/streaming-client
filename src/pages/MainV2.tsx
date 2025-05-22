@@ -207,6 +207,8 @@ const MainV2 = () => {
 					{authError && <div className='error'>{authError}</div>}
 
 					<input
+						autoComplete='off'
+						autoCorrect='off'
 						type='text'
 						placeholder='Username'
 						value={username}
@@ -217,6 +219,7 @@ const MainV2 = () => {
 						type='password'
 						placeholder='Password'
 						autoComplete='off'
+						autoCorrect='off'
 						value={password}
 						onChange={e => setPassword(e.target.value)}
 						className='input'
