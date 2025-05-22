@@ -325,7 +325,13 @@ const MainV2 = () => {
 				</div>
 			)}
 
-			<div className='footer-text'>All rights reserved © {new Date().getFullYear()}</div>
+			<div className='footer-text'>
+				PoC - Created by{' '}
+				<a href='https://github.com/VladyslavDobrovolskyi' target='_blank' rel='noopener noreferrer'>
+					Vladyslav Dobrovolskyi
+				</a>{' '}
+				All rights reserved © {new Date().getFullYear()}
+			</div>
 		</div>
 	)
 }
