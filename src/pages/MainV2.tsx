@@ -429,6 +429,7 @@ const Styles = () => (
       display: block;
       aspect-ratio: 2/3;
       object-fit: cover;
+	  animation: fadeIn 0.8s;
     }
     .poster-skeleton {
       width: 208px;
