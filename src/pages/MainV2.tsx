@@ -216,6 +216,7 @@ const MainV2 = () => {
 					<input
 						type='password'
 						placeholder='Password'
+						autoComplete='off'
 						value={password}
 						onChange={e => setPassword(e.target.value)}
 						className='input'
