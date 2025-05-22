@@ -434,7 +434,7 @@ const Styles = () => (
       width: 100%;
 	height: auto;
       aspect-ratio: 2/3;
-      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+	  background-color:rgb(181, 35, 35);
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
       border-radius: 0.5rem;

@@ -193,13 +193,14 @@ const JoinPage = () => {
 					</p>
 					<form onSubmit={handleRoomJoin}>
 						<input
-							type='text'
-							value={'*'.repeat(roomPassword.length)}
+							type='password'
+							value={roomPassword}
 							onChange={e => setRoomPassword(e.target.value)}
 							placeholder='Room password (if required)'
 							className={`input ${inputError ? 'error-input' : ''}`}
 							disabled={isLoading}
 							autoComplete='off'
+							
 						/>
 						<button type='submit' className='button primary' disabled={isLoading || !roomPassword}>
 							{isLoading ? 'Joining...' : 'Join Room'}
