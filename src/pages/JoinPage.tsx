@@ -201,7 +201,7 @@ const JoinPage = () => {
 							disabled={isLoading}
 							autoComplete='off'
 						/>
-						<button type='submit' className='button primary' disabled={isLoading}>
+						<button type='submit' className='button primary' disabled={isLoading || !roomPassword}>
 							{isLoading ? 'Joining...' : 'Join Room'}
 						</button>
 					</form>
@@ -278,7 +278,7 @@ const Styles = () => (
             width: 100%;
         }
         .button.primary {
-            background-color: #aaa;
+            background-color: #4a90e2;
             color: #fff;
             width: 40%;
         }
