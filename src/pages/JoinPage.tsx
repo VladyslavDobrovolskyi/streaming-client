@@ -112,7 +112,7 @@ const JoinPage = () => {
 			setStep('password')
 			setError(err instanceof Error ? err.message : 'Failed to join room')
 			setInputError(true)
-			setTimeout(() => setInputError(false), 1700) // Сбрасываем ошибку через 3 секунды
+			setTimeout(() => setInputError(false), 3000) // Сбрасываем ошибку через 3 секунды
 		}
 	}
 
@@ -200,11 +200,6 @@ const JoinPage = () => {
 							className={`input ${inputError ? 'error-input' : ''}`}
 							disabled={isLoading}
 							autoComplete='off'
-							onKeyDown={e => {
-								if (e.key === 'Enter') {
-									handleRoomJoin(e)
-								}
-							}}
 						/>
 						<button type='submit' className='button primary' disabled={isLoading || !roomPassword}>
 							{isLoading ? 'Joining...' : 'Join Room'}
@@ -264,7 +259,6 @@ const Styles = () => (
         }
 
         .error-input {
-            border-color: #ff4444;
             animation: shake 0.5s ease-in-out;
         }
 
