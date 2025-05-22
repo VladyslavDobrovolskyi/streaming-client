@@ -206,7 +206,7 @@ const JoinPage = () => {
 						</button>
 					</form>
 					<div className='connection-tip'>
-						⚠️ If you don't see your friends in the room, just refresh the page.
+						⭐ If you don't see your friends in the room, just refresh the page.
 					</div>
 				</div>
 			)}
