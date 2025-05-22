@@ -328,6 +328,11 @@ const MainV2 = () => {
 							<button
 								className='button primary'
 								onClick={confirmCreateRoom}
+								onKeyDown={e => {
+									if (e.key === 'Enter') {
+										confirmCreateRoom()
+									}
+								}}
 								disabled={isLoading || !roomPassword}
 							>
 								Create Room
