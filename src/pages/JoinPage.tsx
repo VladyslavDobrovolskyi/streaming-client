@@ -21,7 +21,7 @@ const JoinPage = () => {
 	const [roomPassword, setRoomPassword] = useState('')
 	const [error, setError] = useState('')
 	const [isLoading, setIsLoading] = useState(false) // New loading state
-
+	const [inputError, setInputError] = useState(false)
 	const getLockImg = async () => {
 		const response = await apiClient.getLockImg()
 		if (response) {
@@ -112,6 +112,8 @@ const JoinPage = () => {
 		} catch (err) {
 			setStep('password')
 			setError(err instanceof Error ? err.message : 'Failed to join room')
+			setInputError(true)
+			setTimeout(() => setInputError(false), 3000) // Сбрасываем ошибку через 3 секунды
 		} finally {
 			setIsLoading(false)
 		}
@@ -192,14 +194,13 @@ const JoinPage = () => {
 					<p className='room-info'>
 						You're joining room: <strong>{roomId}</strong>
 					</p>
-					{error && <div className='error'>{error}</div>}
 					<form onSubmit={handleRoomJoin}>
 						<input
 							type='password'
 							value={roomPassword}
 							onChange={e => setRoomPassword(e.target.value)}
 							placeholder='Room password (if required)'
-							className='input'
+							className={`input ${inputError ? 'error-input' : ''}`}
 							disabled={isLoading}
 							autoComplete='off'
 						/>
@@ -257,6 +258,18 @@ const Styles = () => (
             border: 1px solid #ccc;
             border-radius: 0.75rem;
             font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .error-input {
+            border-color: #ff4444;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
         }
         .button {
             padding: 0.6rem 1rem;
