@@ -193,8 +193,8 @@ const JoinPage = () => {
 					</p>
 					<form onSubmit={handleRoomJoin}>
 						<input
-							type='password'
-							value={roomPassword}
+							type='text'
+							value={'*'.repeat(roomPassword.length)}
 							onChange={e => setRoomPassword(e.target.value)}
 							placeholder='Room password (if required)'
 							className={`input ${inputError ? 'error-input' : ''}`}
