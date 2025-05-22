@@ -15,7 +15,6 @@ const MainV2 = () => {
 	const [movies, setMovies] = useState<Movie[]>([])
 	const [rooms, setRooms] = useState<string[]>([])
 	const [selectedMovieId, setSelectedMovieId] = useState<number | null>(null)
-	const [authError, setAuthError] = useState('')
 	const [isLoading, setIsLoading] = useState(false)
 	const [ticketImg, setTicketImg] = useState('')
 	const [searchImg, setSearchImg] = useState('')
@@ -138,7 +137,6 @@ const MainV2 = () => {
 	}, [])
 
 	const handleGetTicket = async () => {
-		setAuthError('')
 		setIsLoading(true)
 
 		try {
@@ -146,7 +144,7 @@ const MainV2 = () => {
 			await fetchMovies()
 			setStep('room')
 		} catch (error) {
-			setAuthError(error instanceof Error ? error.message : 'Failed to get ticket')
+			console.error(error)
 		} finally {
 			setIsLoading(false)
 		}
@@ -215,7 +213,6 @@ const MainV2 = () => {
 						{ticketImg && <img src={ticketImg} alt='Ticket' className='ticket-img' />}
 						<h2 className='title'>Together</h2>
 					</div>
-					{authError && <div className='error'>{authError}</div>}
 
 					<input
 						autoComplete='off'
