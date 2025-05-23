@@ -27,6 +27,7 @@ const MainV2 = () => {
 	const [imagesLoaded, setImagesLoaded] = useState(false)
 	const [loadedPosters, setLoadedPosters] = useState<Record<number, boolean>>({})
 	const [activeSeance, setActiveSeance] = useState<string | null>(null)
+	const [isMobileDomain, setIsMobileDomain] = useState(false)
 
 	const fetchMovies = async () => {
 		try {
@@ -148,6 +149,24 @@ const MainV2 = () => {
 		} finally {
 			setIsLoading(false)
 		}
+	}
+
+	useEffect(() => {
+		if (typeof window !== 'undefined') {
+			const currentHost = window.location.hostname
+			if (currentHost === 'mobile.watchtogether.fun') {
+				setIsMobileDomain(true)
+			}
+		}
+	}, [])
+
+	if (isMobileDomain) {
+		return (
+			<div style={{ padding: '2rem', textAlign: 'center' }}>
+				<h1>🚫 Мобильная версия пока недоступна</h1>
+				<p>Пожалуйста, зайдите с компьютера</p>
+			</div>
+		)
 	}
 
 	const handleSelectMovie = (movieId: number) => {
