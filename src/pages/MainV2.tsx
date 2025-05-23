@@ -168,8 +168,7 @@ const MainV2 = () => {
 					alt='Ticket'
 					className='mobile-img'
 				/>
-				<h3>Sorry, mobile devices aren't supported yet </h3>
-				<p>We're working on it, but for now, please use a desktop or laptop to watch with friends.</p>
+				<h3 style={{ fontSize: '1rem' }}>Sorry, mobile devices aren't supported yet </h3>
 				<Styles />
 			</div>
 		)
