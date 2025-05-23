@@ -7,6 +7,6 @@ export default defineConfig({
 	server: {
 		host: '0.0.0.0',
 		port: 20777, // Задайте нужный порт
-		allowedHosts: ['watchtogether.fun'],
+		allowedHosts: ['watchtogether.fun', 'mobile.watchtogether.fun'],
 	},
 })
