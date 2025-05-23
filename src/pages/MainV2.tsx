@@ -162,7 +162,7 @@ const MainV2 = () => {
 
 	if (isMobileDomain) {
 		return (
-			<div className='main-container'>
+			<div className='mob-container'>
 				<img
 					src='https://www.gstatic.com/android/keyboard/emojikitchen/20241021/u1f329-ufe0f/u1f329-ufe0f_u1f4f1.png'
 					alt='Ticket'
@@ -643,6 +643,19 @@ const Styles = () => (
 	.mobile-img {
       width: 128px;
       height: 128px;
+    }
+
+	.mob-container {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+	  flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
   `}</style>
 )
