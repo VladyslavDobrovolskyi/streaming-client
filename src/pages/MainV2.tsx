@@ -162,9 +162,9 @@ const MainV2 = () => {
 
 	if (isMobileDomain) {
 		return (
-			<div style={{ padding: '2rem', textAlign: 'center' }}>
-				<h1>🚫 Мобильная версия пока недоступна</h1>
-				<p>Пожалуйста, зайдите с компьютера</p>
+			<div className='main-container'>
+				{ticketImg && <img src={ticketImg} alt='Ticket' className='ticket-img' />}
+				<Styles />
 			</div>
 		)
 	}
