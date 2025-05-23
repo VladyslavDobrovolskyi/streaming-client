@@ -163,7 +163,11 @@ const MainV2 = () => {
 	if (isMobileDomain) {
 		return (
 			<div className='main-container'>
-				{ticketImg && <img src={ticketImg} alt='Ticket' className='ticket-img' />}
+				<img
+					src='https://www.gstatic.com/android/keyboard/emojikitchen/20241021/u1f329-ufe0f/u1f329-ufe0f_u1f4f1.png'
+					alt='Ticket'
+					className='ticket-img'
+				/>
 				<Styles />
 			</div>
 		)
