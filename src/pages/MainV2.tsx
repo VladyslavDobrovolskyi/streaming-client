@@ -168,7 +168,8 @@ const MainV2 = () => {
 					alt='Ticket'
 					className='mobile-img'
 				/>
-				<h3 style={{ fontSize: '1rem' }}>Sorry, mobile devices aren't supported yet </h3>
+				<h3 style={{ fontSize: '1rem', paddingTop: '20px' }}>Sorry, mobile devices aren't supported yet </h3>
+				
 				<Styles />
 			</div>
 		)
