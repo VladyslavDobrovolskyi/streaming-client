@@ -168,6 +168,8 @@ const MainV2 = () => {
 					alt='Ticket'
 					className='mobile-img'
 				/>
+				<h3>Sorry, mobile devices aren't supported yet </h3>
+				<p>We're working on it, but for now, please use a desktop or laptop to watch with friends.</p>
 				<Styles />
 			</div>
 		)
@@ -639,8 +641,8 @@ const Styles = () => (
     }
 
 	.mobile-img {
-      width: 456px;
-      height: 456px;
+      width: 128px;
+      height: 128px;
     }
   `}</style>
 )
