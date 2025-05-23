@@ -166,7 +166,7 @@ const MainV2 = () => {
 				<img
 					src='https://www.gstatic.com/android/keyboard/emojikitchen/20241021/u1f329-ufe0f/u1f329-ufe0f_u1f4f1.png'
 					alt='Ticket'
-					className='ticket-img'
+					className='mobile-img'
 				/>
 				<Styles />
 			</div>
@@ -636,6 +636,11 @@ const Styles = () => (
 	  bottom: 0;
 	  padding-left: 50px;
 	  padding-bottom: 5px;
+    }
+
+	.mobile-img {
+      width: 456px;
+      height: 456px;
     }
   `}</style>
 )
