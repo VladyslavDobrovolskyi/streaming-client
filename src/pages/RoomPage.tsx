@@ -389,13 +389,10 @@ export default function RoomPage() {
 
 	useEffect(() => {
 		console.log('Loaded:', loaded)
-		console.log(
-			`[ Initial Microphone and camera states: ${initialMicrophoneDisabledState}`,
-			initialCameraDisabledState
-		)
-		setMicMuted(initialMicrophoneDisabledState)
-		setCameraMuted(initialCameraDisabledState)
-	}, [loaded, initialCameraDisabledState, initialMicrophoneDisabledState])
+
+		// setMicMuted(initialMicrophoneDisabledState)
+		// setCameraMuted(initialCameraDisabledState)
+	}, [loaded])
 
 	useEffect(() => {
 		if (localPeerId) {
