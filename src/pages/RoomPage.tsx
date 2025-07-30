@@ -114,11 +114,6 @@ export default function RoomPage() {
 		updateUserCameraOpacity,
 	} = useLocalStorageSync(roomID!)
 
-	if (typeof window !== 'undefined' && window.performance && window.performance.navigation.type === 1) {
-		if (window.location.pathname === `/join/${roomID}`) {
-			window.location.reload()
-		}
-	}
 	// Add handlers for video loading states
 	const handleReady = () => {
 		setIsLoading(false)
