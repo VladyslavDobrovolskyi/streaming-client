@@ -30,6 +30,14 @@ const spinKeyframes = `
 `
 
 export default function RoomPage() {
+	useEffect(() => {
+		const reloadedOnce = localStorage.getItem('reloadedOnce')
+		if (!reloadedOnce) {
+			localStorage.setItem('reloadedOnce', 'true')
+			window.location.reload()
+		}
+	}, [])
+
 	const [toasts, setToasts] = useState<ToastNotification[]>([])
 	const { id: roomID } = useParams<{ id: string }>() // Брать отсюда, не дублировать получение
 	const [movieInfo, setMovieInfo] = useState<Movie>()
@@ -114,7 +122,10 @@ export default function RoomPage() {
 		updateUserCameraOpacity,
 	} = useLocalStorageSync(roomID!)
 
-	// Add handlers for video loading states
+	// Add handlers for video
+	//
+	// Check if the page has been reloaded once
+
 	const handleReady = () => {
 		setIsLoading(false)
 	}
