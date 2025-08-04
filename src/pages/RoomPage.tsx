@@ -407,21 +407,7 @@ export default function RoomPage() {
 
 		// setMicMuted(initialMicrophoneDisabledState)
 		// setCameraMuted(initialCameraDisabledState)
-		
-		// Дополнительная проверка состояния камеры при загрузке
-		if (localStream && !isLoading) {
-			const videoTrack = localStream.getVideoTracks()[0]
-			if (videoTrack) {
-				console.log('Initial video track state:', videoTrack.enabled)
-				console.log('Initial camera disabled state:', isCameraDisabled)
-				// Синхронизируем состояние с реальным состоянием трека
-				if (videoTrack.enabled !== !isCameraDisabled) {
-					console.log('Fixing camera state mismatch on load')
-					setCameraMuted(!videoTrack.enabled)
-				}
-			}
-		}
-	}, [loaded, localStream, isLoading, isCameraDisabled])
+	}, [loaded])
 
 	useEffect(() => {
 		if (localPeerId) {
@@ -647,33 +633,17 @@ export default function RoomPage() {
 	useEffect(() => {
 		if (localStream) {
 			const videoTrack = localStream.getVideoTracks()[0]
-			if (videoTrack) {
-				// Проверяем, нужно ли синхронизировать состояние
-				const shouldBeDisabled = isCameraDisabled
-				const isCurrentlyEnabled = videoTrack.enabled
-				
-				if (shouldBeDisabled && isCurrentlyEnabled) {
-					console.log('Syncing camera state after reinitialization - disabling')
-					videoTrack.enabled = false
-				} else if (!shouldBeDisabled && !isCurrentlyEnabled) {
-					console.log('Syncing camera state after reinitialization - enabling')
-					videoTrack.enabled = true
-				}
+			if (videoTrack && isCameraDisabled) {
+				// Если камера должна быть отключена, убеждаемся что трек тоже отключен
+				videoTrack.enabled = false
+				console.log('Camera track disabled after reinitialization')
 			}
 			
 			const audioTrack = localStream.getAudioTracks()[0]
-			if (audioTrack) {
-				// Проверяем, нужно ли синхронизировать состояние микрофона
-				const shouldBeDisabled = isMicrophoneDisabled
-				const isCurrentlyEnabled = audioTrack.enabled
-				
-				if (shouldBeDisabled && isCurrentlyEnabled) {
-					console.log('Syncing microphone state after reinitialization - disabling')
-					audioTrack.enabled = false
-				} else if (!shouldBeDisabled && !isCurrentlyEnabled) {
-					console.log('Syncing microphone state after reinitialization - enabling')
-					audioTrack.enabled = true
-				}
+			if (audioTrack && isMicrophoneDisabled) {
+				// Если микрофон должен быть отключен, убеждаемся что трек тоже отключен
+				audioTrack.enabled = false
+				console.log('Audio track disabled after reinitialization')
 			}
 		}
 	}, [localStream, isCameraDisabled, isMicrophoneDisabled])
@@ -764,36 +734,35 @@ export default function RoomPage() {
 		if (localStream) {
 			const audioTrack = localStream.getAudioTracks()[0]
 			console.log('Before Toggle Audio Track:', audioTrack)
+			
+			if (!audioTrack) {
+				console.warn('No audio track found')
+				return
+			}
+			
 			try {
-				// Проверяем текущее состояние трека
-				const isCurrentlyEnabled = audioTrack.enabled
-				console.log('Current audio track enabled state:', isCurrentlyEnabled)
+				// Получаем текущее состояние из UI, а не из трека
+				const currentUIState = isMicrophoneDisabled
+				const newUIState = !currentUIState
 				
-				if (isCurrentlyEnabled) {
-					audioTrack.enabled = false
-					setMicMuted(true)
-					emitInfoSync(localUsername, avatar, isCameraDisabled, true)
-					updateUserStatus(LOCAL_VIDEO, { isCameraDisabled, isMicrophoneDisabled: true })
-					console.log('Microphone disabled')
-				} else {
-					audioTrack.enabled = true
-					setMicMuted(false)
-					emitInfoSync(localUsername, avatar, isCameraDisabled, false)
-					updateUserStatus(LOCAL_VIDEO, { isCameraDisabled, isMicrophoneDisabled: false })
-					console.log('Microphone enabled')
-				}
+				console.log('Current UI state:', currentUIState)
+				console.log('New UI state:', newUIState)
 				
-				// Дополнительная проверка через небольшую задержку
-				setTimeout(() => {
-					console.log('Final microphone state check:', audioTrack.enabled)
-					if (audioTrack.enabled !== !isMicrophoneDisabled) {
-						console.log('Microphone state mismatch detected, fixing...')
-						audioTrack.enabled = !isMicrophoneDisabled
-					}
-				}, 100)
-			} finally {
-				console.log('After Toggle Audio Track:', audioTrack)
-				console.log('Final audio track enabled state:', audioTrack.enabled)
+				// Обновляем состояние UI немедленно
+				setMicMuted(newUIState)
+				
+				// Обновляем трек
+				audioTrack.enabled = !newUIState
+				
+				// Отправляем информацию о синхронизации
+				emitInfoSync(localUsername, avatar, isCameraDisabled, newUIState)
+				updateUserStatus(LOCAL_VIDEO, { isCameraDisabled, isMicrophoneDisabled: newUIState })
+				
+				console.log(`Microphone ${newUIState ? 'disabled' : 'enabled'}`)
+				console.log('Audio track enabled:', audioTrack.enabled)
+				
+			} catch (error) {
+				console.error('Error toggling microphone:', error)
 			}
 		} else {
 			console.warn('Local stream not available for microphone toggle')
@@ -804,36 +773,35 @@ export default function RoomPage() {
 		if (localStream) {
 			const videoTrack = localStream.getVideoTracks()[0]
 			console.log('Before Toggle Video Track:', videoTrack)
+			
+			if (!videoTrack) {
+				console.warn('No video track found')
+				return
+			}
+			
 			try {
-				// Проверяем текущее состояние трека
-				const isCurrentlyEnabled = videoTrack.enabled
-				console.log('Current video track enabled state:', isCurrentlyEnabled)
+				// Получаем текущее состояние из UI, а не из трека
+				const currentUIState = isCameraDisabled
+				const newUIState = !currentUIState
 				
-				if (isCurrentlyEnabled) {
-					videoTrack.enabled = false
-					setCameraMuted(true)
-					emitInfoSync(localUsername, avatar, true, isMicrophoneDisabled)
-					updateUserStatus(LOCAL_VIDEO, { isCameraDisabled: true, isMicrophoneDisabled })
-					console.log('Camera disabled')
-				} else {
-					videoTrack.enabled = true
-					setCameraMuted(false)
-					emitInfoSync(localUsername, avatar, false, isMicrophoneDisabled)
-					updateUserStatus(LOCAL_VIDEO, { isCameraDisabled: false, isMicrophoneDisabled })
-					console.log('Camera enabled')
-				}
+				console.log('Current UI state:', currentUIState)
+				console.log('New UI state:', newUIState)
 				
-				// Дополнительная проверка через небольшую задержку
-				setTimeout(() => {
-					console.log('Final camera state check:', videoTrack.enabled)
-					if (videoTrack.enabled !== !isCameraDisabled) {
-						console.log('State mismatch detected, fixing...')
-						videoTrack.enabled = !isCameraDisabled
-					}
-				}, 100)
-			} finally {
-				console.log('After Toggle Video Track:', videoTrack)
-				console.log('Final video track enabled state:', videoTrack.enabled)
+				// Обновляем состояние UI немедленно
+				setCameraMuted(newUIState)
+				
+				// Обновляем трек
+				videoTrack.enabled = !newUIState
+				
+				// Отправляем информацию о синхронизации
+				emitInfoSync(localUsername, avatar, newUIState, isMicrophoneDisabled)
+				updateUserStatus(LOCAL_VIDEO, { isCameraDisabled: newUIState, isMicrophoneDisabled })
+				
+				console.log(`Camera ${newUIState ? 'disabled' : 'enabled'}`)
+				console.log('Video track enabled:', videoTrack.enabled)
+				
+			} catch (error) {
+				console.error('Error toggling camera:', error)
 			}
 		} else {
 			console.warn('Local stream not available for camera toggle')
@@ -1134,34 +1102,6 @@ export default function RoomPage() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [isLoading, requestTimeAndState])
 
-	useEffect(() => {
-		if (localStream) {
-			const videoTrack = localStream.getVideoTracks()[0]
-			if (videoTrack) {
-				// Синхронизируем состояние с реальным состоянием трека
-				const isTrackEnabled = videoTrack.enabled
-				if (isTrackEnabled !== !isCameraDisabled) {
-					console.log('Syncing camera state with track state:', isTrackEnabled)
-					setCameraMuted(!isTrackEnabled)
-				}
-			}
-		}
-	}, [localStream, isCameraDisabled])
-
-	useEffect(() => {
-		if (localStream) {
-			const audioTrack = localStream.getAudioTracks()[0]
-			if (audioTrack) {
-				// Синхронизируем состояние с реальным состоянием трека
-				const isTrackEnabled = audioTrack.enabled
-				if (isTrackEnabled !== !isMicrophoneDisabled) {
-					console.log('Syncing microphone state with track state:', isTrackEnabled)
-					setMicMuted(!isTrackEnabled)
-				}
-			}
-		}
-	}, [localStream, isMicrophoneDisabled])
-
 	// Check if the user is authenticated before rendering the player
 	if (!isAuthenticated) {
 		return null
@@ -1313,16 +1253,6 @@ export default function RoomPage() {
 				hideMeToggle={() => {
 					toggleRemoteCamera(LOCAL_VIDEO)
 					setHideMe(prev => !prev)
-					
-					// Дополнительная синхронизация с реальным состоянием трека
-					if (localStream) {
-						const videoTrack = localStream.getVideoTracks()[0]
-						if (videoTrack) {
-							const newState = !hideMe
-							videoTrack.enabled = newState
-							console.log(`Hide me toggle: camera ${newState ? 'enabled' : 'disabled'}`)
-						}
-					}
 				}}
 				onHoveredItemChange={setHoveredItem}
 				onToggleChat={handleToggleChat}

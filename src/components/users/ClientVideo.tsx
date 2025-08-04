@@ -372,7 +372,7 @@ export default function ClientVideo({
 					zIndex: 12000,
 					pointerEvents: 'auto',
 				}}
-				hide={isCameraMuted || cameraStatus === false}
+				hide={false} // Убираем скрытие на уровне DraggableResizable
 				focused={highlightedUser === clientID || hoveredClient === clientID}
 			>
 				{({ isDragging }) => (
@@ -384,7 +384,7 @@ export default function ClientVideo({
 							pointerEvents: 'auto',
 							transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
 							cursor: 'default',
-							display: isCameraMuted ? 'none' : 'block',
+							display: isCameraMuted ? 'none' : 'block', // Оставляем только одно условие скрытия
 							border:
 								highlightedUser === clientID
 									? '3px solid var(--accent-color-main'

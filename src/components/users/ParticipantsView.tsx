@@ -81,7 +81,8 @@ export default function ParticipantsView({
 		>
 			{clients.map((clientID, index) => {
 				const participantData = participantInfo[clientID] || {}
-				const isCameraMuted = clientID === localVideoId ? isCameraDisabled : participantData.isCameraDisabled
+				// Для локального пользователя используем состояние из пропсов, для удаленных - из participantInfo
+				const isCameraMuted = clientID === localVideoId ? isCameraDisabled : (participantData.isCameraDisabled || false)
 
 				return (
 					<ClientVideo
