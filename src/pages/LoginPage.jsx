@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import DOMPurify from 'dompurify'
-// import { validatePasswordLength } from '../utils/validation'
 import { login } from '../features/auth/authSlice'
 import { Link } from 'react-router-dom'
 import styles from '../components/modules/AuthForm.module.css'
 import { useNavigate } from 'react-router-dom'
+
+const MIN_PASSWORD_LENGTH = 8
 
 const LoginPage = () => {
 	useEffect(() => {
@@ -35,24 +36,33 @@ const LoginPage = () => {
 		}
 	}
 
-	const handleSubmit = async e => {
-		e.preventDefault()
-		setErrors({ username: '', password: '' })
-
+	const validate = () => {
 		const { username, password } = formData
-		let formIsValid = true
+		let valid = true
+		const newErrors = { username: '', password: '' }
 
-		if (!username) {
-			setErrors(prevState => ({ ...prevState, username: 'Username is required.' }))
-			formIsValid = false
+		if (!username.trim()) {
+			newErrors.username = 'Username is required.'
+			valid = false
 		}
 
-		// if (!validatePasswordLength(password)) {
-		// 	setErrors(prevState => ({ ...prevState, password: 'Password must be at least 8 characters long.' }))
-		// 	formIsValid = false
-		// }
+		if (!password) {
+			newErrors.password = 'Password is required.'
+			valid = false
+		} else if (password.length < MIN_PASSWORD_LENGTH) {
+			newErrors.password = `Password must be at least ${MIN_PASSWORD_LENGTH} characters long.`
+			valid = false
+		}
 
-		if (!formIsValid) return
+		setErrors(newErrors)
+		return valid
+	}
+
+	const handleSubmit = async e => {
+		e.preventDefault()
+		if (!validate()) return
+
+		const { username, password } = formData
 
 		try {
 			const resultAction = await dispatch(login({ username, password })).unwrap()
